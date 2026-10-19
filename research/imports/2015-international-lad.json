@@ -1,0 +1,631 @@
+{
+  "format": "bai-research-import/1",
+  "batch_key": "pilot-2015-international-lad",
+  "channel": "INTERNATIONAL",
+  "description": "Pilot: a verified sample of Los Angeles Dodgers international signings made in calendar 2015 (eight 2015-16 amateurs plus one exempt Cuban professional in the 2014-15 period). Not a complete class. Research date 2026-10-19.",
+  "coverage_claims": [
+    {
+      "domain": "INTERNATIONAL",
+      "scope_key": "2015-16",
+      "organization": "LAD",
+      "coverage_state": "PARTIAL_RECONSTRUCTION",
+      "gap_notes": "Sample of the best-documented 2015-16 signings only; the full Dodgers 2015-16 class is larger and its size is not established. Pool, penalty and overage tax figures are not imported (sources disagree on the pool; no per-player tax is published)."
+    }
+  ],
+  "sources": [
+    {
+      "source_key": "pilot2015:mlb-statsapi-tx",
+      "source_type": "OFFICIAL_LEAGUE",
+      "authority_level": "OFFICIAL",
+      "title": "MLB Stats API transactions (playerId / teamId=119, 2015-01-01..2016-06-15)",
+      "publisher": "MLB Advanced Media",
+      "url": "https://statsapi.mlb.com/api/v1/transactions?teamId=119&startDate=2015-01-01&endDate=2016-06-15",
+      "archived_url": null,
+      "published_date": null,
+      "retrieved_date": "2026-10-19",
+      "notes": "MLB transaction wire data; typeCode SFA 'Signed as Free Agent'. Date = transaction date, not announcement or bonus-agreement date."
+    },
+    {
+      "source_key": "pilot2015:mlb-statsapi-people",
+      "source_type": "OFFICIAL_LEAGUE",
+      "authority_level": "OFFICIAL",
+      "title": "MLB Stats API people endpoint",
+      "publisher": "MLB Advanced Media",
+      "url": "https://statsapi.mlb.com/api/v1/people?personIds=665751,665752,665833,665798,665779,665931,666783,666784,664485,493343",
+      "archived_url": null,
+      "published_date": null,
+      "retrieved_date": "2026-10-19",
+      "notes": "Birth date/city/country, position, MLBAM id."
+    },
+    {
+      "source_key": "pilot2015:chadwick-register",
+      "source_type": "REFERENCE_DATABASE",
+      "authority_level": "AGGREGATOR",
+      "title": "Chadwick Baseball Bureau Register (people-*.csv)",
+      "publisher": "Chadwick Baseball Bureau (GitHub)",
+      "url": "https://github.com/chadwickbureau/register/tree/master/data",
+      "archived_url": null,
+      "published_date": null,
+      "retrieved_date": "2026-10-19",
+      "notes": "Used only for key_bbref / key_bbref_minors cross-walk from MLBAM id. Baseball-Reference itself blocked (Cloudflare challenge), so bbref ids NOT verified on bbref.com."
+    },
+    {
+      "source_key": "pilot2015:si-alvarez-20150702",
+      "source_type": "NEWS_REPORT",
+      "authority_level": "REPUTABLE_SECONDARY",
+      "title": "Dodgers sign 19-year-old Cuban pitching phenom Yadier Alvarez",
+      "publisher": "Sports Illustrated (SI Wire)",
+      "url": "https://www.si.com/mlb/2015/07/02/los-angeles-dodgers-yadier-alvarez-cuba-contract",
+      "archived_url": null,
+      "published_date": "2015-07-02",
+      "retrieved_date": "2026-10-19",
+      "notes": "Bonus attributed to CBSSports' Jon Heyman."
+    },
+    {
+      "source_key": "pilot2015:mlbtr-intl-notes-20150914",
+      "source_type": "NEWS_REPORT",
+      "authority_level": "REPUTABLE_SECONDARY",
+      "title": "International Notes: Eddy Julio Martinez, Yadier Alvarez",
+      "publisher": "MLB Trade Rumors",
+      "url": "https://www.mlbtraderumors.com/2015/09/international-notes-eddy-julio-martinez-yadier-alvarez.html",
+      "archived_url": null,
+      "published_date": "2015-09-14",
+      "retrieved_date": "2026-10-19",
+      "notes": ""
+    },
+    {
+      "source_key": "pilot2015:mlbtr-pools-20150416",
+      "source_type": "NEWS_REPORT",
+      "authority_level": "REPUTABLE_SECONDARY",
+      "title": "International Notes: Bonus Pools, Dodgers, Cubs",
+      "publisher": "MLB Trade Rumors",
+      "url": "https://www.mlbtraderumors.com/2015/04/international-notes-bonus-pools-dodgers-cubs.html",
+      "archived_url": null,
+      "published_date": "2015-04-16",
+      "retrieved_date": "2026-10-19",
+      "notes": "Pre-period: Dodgers $2.02MM pool; generic overage rules (100% tax; $300K cap in 2016-17 and 2017-18)."
+    },
+    {
+      "source_key": "pilot2015:mlbtr-diaz-20151122",
+      "source_type": "NEWS_REPORT",
+      "authority_level": "REPUTABLE_SECONDARY",
+      "title": "Dodgers, Cuban OF Yusniel Diaz Agree To $15.5MM Deal",
+      "publisher": "MLB Trade Rumors",
+      "url": "https://www.mlbtraderumors.com/2015/11/dodgers-sign-yusniel-diaz.html",
+      "archived_url": null,
+      "published_date": "2015-11-22",
+      "retrieved_date": "2026-10-19",
+      "notes": "Attributes Diaz figure to Jesse Sanchez (MLB.com); also Estevez $6MM; 'combined $43MM or so' incl. 100% tax (MLBTR estimate)."
+    },
+    {
+      "source_key": "pilot2015:mlbtr-estevez-20151122",
+      "source_type": "NEWS_REPORT",
+      "authority_level": "REPUTABLE_SECONDARY",
+      "title": "Dodgers Notes: Roberts, Estevez, Int'l Spending",
+      "publisher": "MLB Trade Rumors",
+      "url": "https://www.mlbtraderumors.com/2015/11/dodgers-notes-roberts-estevez-intl-spending.html",
+      "archived_url": null,
+      "published_date": "2015-11-22",
+      "retrieved_date": "2026-10-19",
+      "notes": "Estevez 'agreed to a $6MM bonus ... earlier today' (citing BA's Ben Badler)."
+    },
+    {
+      "source_key": "pilot2015:si-fernandez-20150323",
+      "source_type": "NEWS_REPORT",
+      "authority_level": "REPUTABLE_SECONDARY",
+      "title": "Dodgers sign Cuban pitcher Pablo Fernandez",
+      "publisher": "Sports Illustrated (SI Wire)",
+      "url": "https://www.si.com/mlb/2015/03/23/los-angeles-dodgers-sign-pablo-fernandez-cuba",
+      "archived_url": null,
+      "published_date": "2015-03-23",
+      "retrieved_date": "2026-10-19",
+      "notes": "$8M value; minor league contract; exempt from intl signing guidelines due to age/experience."
+    },
+    {
+      "source_key": "pilot2015:wiki-oneil-cruz",
+      "source_type": "REFERENCE_DATABASE",
+      "authority_level": "AGGREGATOR",
+      "title": "Oneil Cruz",
+      "publisher": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Oneil_Cruz",
+      "archived_url": null,
+      "published_date": null,
+      "retrieved_date": "2026-10-19",
+      "notes": "Cites True Blue LA 'Dodgers sign 9 international prospects on Day 1' (Eric Stephen, 2015-07-02) for $950,000."
+    },
+    {
+      "source_key": "pilot2015:ba-intl-review-lad-2015",
+      "source_type": "NEWS_REPORT",
+      "authority_level": "REPUTABLE_SECONDARY",
+      "title": "International Reviews: Los Angeles Dodgers (2015-16)",
+      "publisher": "Baseball America",
+      "url": "https://baseballamerica.com/?p=35877",
+      "archived_url": null,
+      "published_date": null,
+      "retrieved_date": "2026-10-19",
+      "notes": "Direct fetch HTTP 403. Content known ONLY via web-search index snippets (Heredia $2.6M July 2, trainer Franklin Ferreras; Brito $2M July 2). Needs manual verification."
+    },
+    {
+      "source_key": "pilot2015:ba-top40-bonuses-2015",
+      "source_type": "NEWS_REPORT",
+      "authority_level": "REPUTABLE_SECONDARY",
+      "title": "Top 40 International Bonuses Of 2015",
+      "publisher": "Baseball America",
+      "url": "https://www.baseballamerica.com/stories/top-40-international-bonuses-of-2015/",
+      "archived_url": null,
+      "published_date": null,
+      "retrieved_date": "2026-10-19",
+      "notes": "Direct fetch HTTP 403. Search snippet only: Brito $2,000,000 (T-10); Cruz $950,000. Needs manual verification."
+    },
+    {
+      "source_key": "pilot2015:mlb-dodgers-sign-top-ifa-20150702",
+      "source_type": "OFFICIAL_LEAGUE",
+      "authority_level": "OFFICIAL",
+      "title": "Dodgers sign top international free agents (c-134055834)",
+      "publisher": "MLB.com",
+      "url": "https://www.mlb.com/news/dodgers-sign-top-international-free-agents/c-134055834",
+      "archived_url": null,
+      "published_date": null,
+      "retrieved_date": "2026-10-19",
+      "notes": "Direct fetch HTTP 403. Search snippet only: Alvarez $16M, Heredia $2.6M, Brito $2M. Publication date presumed 2015-07-02 but NOT verified."
+    },
+    {
+      "source_key": "pilot2015:mlb-intl-scouts-c143777784",
+      "source_type": "OFFICIAL_LEAGUE",
+      "authority_level": "OFFICIAL",
+      "title": "Source: Dodgers part with several from int'l scouting corps",
+      "publisher": "MLB.com",
+      "url": "https://www.mlb.com/dodgers/news/dodgers-part-with-several-international-execs/c-143777784",
+      "archived_url": null,
+      "published_date": null,
+      "retrieved_date": "2026-10-19",
+      "notes": "Direct fetch HTTP 403. Search snippet only: 'Christopher Arias for $500,000 and shortstop Oneal Cruz for $950,000'; Rincon $350,000 (snippet from an earlier search summary, weaker). Date not verified."
+    },
+    {
+      "source_key": "pilot2015:mlb-cuban-pair-c157908784",
+      "source_type": "OFFICIAL_LEAGUE",
+      "authority_level": "OFFICIAL",
+      "title": "Sources: Dodgers ink pair of Cuban prospects",
+      "publisher": "MLB.com (Jesse Sanchez)",
+      "url": "https://www.mlb.com/news/dodgers-sign-pair-of-cuban-prospects/c-157908784",
+      "archived_url": null,
+      "published_date": null,
+      "retrieved_date": "2026-10-19",
+      "notes": "Direct fetch HTTP 403; cited by MLBTR as source of Diaz $15.5MM. Content not directly verified."
+    },
+    {
+      "source_key": "pilot2015:dodgersdigest-july2-2015",
+      "source_type": "NEWS_REPORT",
+      "authority_level": "OTHER",
+      "title": "Yadier Alvarez, Starling Heredia highlight Dodgers' July 2 signings",
+      "publisher": "Dodgers Digest",
+      "url": "https://dodgersdigest.com/?p=28594",
+      "archived_url": null,
+      "published_date": null,
+      "retrieved_date": "2026-10-19",
+      "notes": "Direct fetch 403 (Cloudflare). Search snippet only; used solely for pool/penalty conflict note ($2,002,900 pool; ~$22M spent)."
+    }
+  ],
+  "records": [
+    {
+      "type": "INTERNATIONAL_SIGNING",
+      "source_key": "pilot2015:mlb-statsapi-tx",
+      "organization": "LAD",
+      "signing_date": "2015-07-02",
+      "signing_date_precision": "DAY",
+      "pathway": "INTERNATIONAL_AMATEUR",
+      "market": {
+        "key": "CUB",
+        "name": "Cuba",
+        "region": "Caribbean"
+      },
+      "position": "RHP",
+      "player": {
+        "full_name": "Yadier Álvarez",
+        "display_name": "Yadier Álvarez",
+        "birth_date": "1996-03-07",
+        "birth_country": "Cuba",
+        "external_ids": {
+          "MLBAM": "665751",
+          "BBREF_MINORS": "alvare000yad"
+        },
+        "aliases": [
+          {
+            "alias": "Yadier Álvarez Ventosa",
+            "alias_type": "LEGAL_NAME"
+          }
+        ],
+        "source_key": "pilot2015:mlb-statsapi-people"
+      },
+      "costs": {
+        "signing_bonus_usd": 16000000
+      },
+      "cost_source_key": "pilot2015:si-alvarez-20150702",
+      "evidence": [
+        {
+          "subject": "signing",
+          "field": "signing_bonus_usd",
+          "value": 16000000,
+          "source_key": "pilot2015:mlbtr-intl-notes-20150914",
+          "locator": "corroborating report"
+        }
+      ],
+      "flags": [],
+      "notes": "MLB transaction date (Signed as Free Agent, minor league contract); SI report same day | Overage tax for Alvarez specifically not stated as a dollar figure in any fetched source; not computed."
+    },
+    {
+      "type": "INTERNATIONAL_SIGNING",
+      "source_key": "pilot2015:mlb-statsapi-tx",
+      "organization": "LAD",
+      "signing_date": "2015-07-02",
+      "signing_date_precision": "DAY",
+      "pathway": "INTERNATIONAL_AMATEUR",
+      "market": {
+        "key": "DOM",
+        "name": "Dominican Republic",
+        "region": "Caribbean"
+      },
+      "position": "OF",
+      "player": {
+        "full_name": "Starling Heredia",
+        "display_name": "Starling Heredia",
+        "birth_date": "1999-02-06",
+        "birth_country": "Dominican Republic",
+        "external_ids": {
+          "MLBAM": "665752",
+          "BBREF_MINORS": "heredi000sta"
+        },
+        "aliases": [
+          {
+            "alias": "Starling Heredia Guerra",
+            "alias_type": "LEGAL_NAME"
+          }
+        ],
+        "source_key": "pilot2015:mlb-statsapi-people"
+      },
+      "costs": {
+        "signing_bonus_usd": 2600000
+      },
+      "cost_source_key": "pilot2015:mlb-dodgers-sign-top-ifa-20150702",
+      "evidence": [
+        {
+          "subject": "signing",
+          "field": "signing_bonus_usd",
+          "value": 2600000,
+          "source_key": "pilot2015:ba-intl-review-lad-2015",
+          "locator": "corroborating report"
+        }
+      ],
+      "flags": [
+        {
+          "code": "EVIDENCE_EXCERPT_ONLY",
+          "severity": "WARNING",
+          "note": "Bonus seen only in search-result excerpts of the cited pages (direct fetch blocked); verify against the full page."
+        }
+      ],
+      "notes": "MLB transaction date; BA review (snippet) also says signed July 2 | Bonus/trainer rely on search-index snippets; verify against BA page manually."
+    },
+    {
+      "type": "INTERNATIONAL_SIGNING",
+      "source_key": "pilot2015:mlb-statsapi-tx",
+      "organization": "LAD",
+      "signing_date": "2015-07-02",
+      "signing_date_precision": "DAY",
+      "pathway": "INTERNATIONAL_AMATEUR",
+      "market": {
+        "key": "DOM",
+        "name": "Dominican Republic",
+        "region": "Caribbean"
+      },
+      "position": "SS",
+      "player": {
+        "full_name": "Ronny Rafael Brito",
+        "display_name": "Ronny Brito",
+        "birth_date": "1999-03-22",
+        "birth_country": "Dominican Republic",
+        "external_ids": {
+          "MLBAM": "665798",
+          "BBREF_MINORS": "brito-000ron"
+        },
+        "aliases": [
+          {
+            "alias": "Ronny Rafael Brito Fernandez",
+            "alias_type": "LEGAL_NAME"
+          }
+        ],
+        "source_key": "pilot2015:mlb-statsapi-people"
+      },
+      "costs": {
+        "signing_bonus_usd": 2000000
+      },
+      "cost_source_key": "pilot2015:mlb-dodgers-sign-top-ifa-20150702",
+      "evidence": [
+        {
+          "subject": "signing",
+          "field": "signing_bonus_usd",
+          "value": 2000000,
+          "source_key": "pilot2015:ba-top40-bonuses-2015",
+          "locator": "corroborating report"
+        },
+        {
+          "subject": "signing",
+          "field": "signing_bonus_usd",
+          "value": 2000000,
+          "source_key": "pilot2015:ba-intl-review-lad-2015",
+          "locator": "corroborating report"
+        }
+      ],
+      "flags": [
+        {
+          "code": "EVIDENCE_EXCERPT_ONLY",
+          "severity": "WARNING",
+          "note": "Bonus seen only in search-result excerpts of the cited pages (direct fetch blocked); verify against the full page."
+        }
+      ],
+      "notes": "MLB transaction date"
+    },
+    {
+      "type": "INTERNATIONAL_SIGNING",
+      "source_key": "pilot2015:mlb-statsapi-tx",
+      "organization": "LAD",
+      "signing_date": "2015-07-02",
+      "signing_date_precision": "DAY",
+      "pathway": "INTERNATIONAL_AMATEUR",
+      "market": {
+        "key": "DOM",
+        "name": "Dominican Republic",
+        "region": "Caribbean"
+      },
+      "position": "SS",
+      "player": {
+        "full_name": "Oneil Cruz",
+        "display_name": "Oneil Cruz",
+        "birth_date": "1998-10-04",
+        "birth_country": "Dominican Republic",
+        "external_ids": {
+          "MLBAM": "665833",
+          "BBREF": "cruzon01",
+          "BBREF_MINORS": "cruz--000one"
+        },
+        "aliases": [
+          {
+            "alias": "Oneil Cruz Urena",
+            "alias_type": "LEGAL_NAME"
+          }
+        ],
+        "source_key": "pilot2015:mlb-statsapi-people"
+      },
+      "costs": {
+        "signing_bonus_usd": 950000
+      },
+      "cost_source_key": "pilot2015:wiki-oneil-cruz",
+      "evidence": [
+        {
+          "subject": "signing",
+          "field": "signing_bonus_usd",
+          "value": 950000,
+          "source_key": "pilot2015:mlb-intl-scouts-c143777784",
+          "locator": "corroborating report"
+        }
+      ],
+      "flags": [],
+      "notes": "MLB transaction date; Wikipedia says only 'July 2015' | Name spelled 'Oneal'/'Onil' in some 2015 coverage. Traded to PIT in 2017."
+    },
+    {
+      "type": "INTERNATIONAL_SIGNING",
+      "source_key": "pilot2015:mlb-statsapi-tx",
+      "organization": "LAD",
+      "signing_date": "2015-07-02",
+      "signing_date_precision": "DAY",
+      "pathway": "INTERNATIONAL_AMATEUR",
+      "market": {
+        "key": "DOM",
+        "name": "Dominican Republic",
+        "region": "Caribbean"
+      },
+      "position": "OF",
+      "player": {
+        "full_name": "Carlos Jesus Rincon",
+        "display_name": "Carlos Rincon",
+        "birth_date": "1997-10-14",
+        "birth_country": "Dominican Republic",
+        "external_ids": {
+          "MLBAM": "665779",
+          "BBREF_MINORS": "rincon003car"
+        },
+        "aliases": [
+          {
+            "alias": "Carlos Jesus Rincon Martinez",
+            "alias_type": "LEGAL_NAME"
+          }
+        ],
+        "source_key": "pilot2015:mlb-statsapi-people"
+      },
+      "costs": {
+        "signing_bonus_usd": null
+      },
+      "evidence": [],
+      "flags": [],
+      "notes": "MLB transaction date | Treat $350K bonus as unverified. Pathway note: born Oct 1997, so he was eligible before 2015-16 (older July 2 signee) — inference from birth date, not sourced. | Bonus not recorded: the only figure seen ($350,000) came from a search-tool summary, not a citable excerpt."
+    },
+    {
+      "type": "INTERNATIONAL_SIGNING",
+      "source_key": "pilot2015:mlb-statsapi-tx",
+      "organization": "LAD",
+      "signing_date": "2015-07-02",
+      "signing_date_precision": "DAY",
+      "pathway": "INTERNATIONAL_AMATEUR",
+      "market": {
+        "key": "DOM",
+        "name": "Dominican Republic",
+        "region": "Caribbean"
+      },
+      "position": "OF",
+      "player": {
+        "full_name": "Christopher Arias",
+        "display_name": "Christopher Arias",
+        "birth_date": "1999-05-01",
+        "birth_country": "Dominican Republic",
+        "external_ids": {
+          "MLBAM": "665931",
+          "BBREF_MINORS": "arias-000chr"
+        },
+        "aliases": [
+          {
+            "alias": "Christopher Arias Cespedes",
+            "alias_type": "LEGAL_NAME"
+          }
+        ],
+        "source_key": "pilot2015:mlb-statsapi-people"
+      },
+      "costs": {
+        "signing_bonus_usd": 500000
+      },
+      "cost_source_key": "pilot2015:mlb-intl-scouts-c143777784",
+      "evidence": [],
+      "flags": [
+        {
+          "code": "EVIDENCE_EXCERPT_ONLY",
+          "severity": "WARNING",
+          "note": "Bonus seen only in search-result excerpts of the cited pages (direct fetch blocked); verify against the full page."
+        }
+      ],
+      "notes": "MLB transaction date | Released 2018-01-05 per MLB transactions."
+    },
+    {
+      "type": "INTERNATIONAL_SIGNING",
+      "source_key": "pilot2015:mlb-statsapi-tx",
+      "organization": "LAD",
+      "signing_date": "2015-11-21",
+      "signing_date_precision": "DAY",
+      "pathway": "INTERNATIONAL_AMATEUR",
+      "market": {
+        "key": "CUB",
+        "name": "Cuba",
+        "region": "Caribbean"
+      },
+      "position": "OF",
+      "player": {
+        "full_name": "Yusniel Efrain Díaz",
+        "display_name": "Yusniel Díaz",
+        "birth_date": "1996-10-07",
+        "birth_country": "Cuba",
+        "external_ids": {
+          "MLBAM": "666783",
+          "BBREF": "diazyu01",
+          "BBREF_MINORS": "efrain000yun"
+        },
+        "aliases": [],
+        "source_key": "pilot2015:mlb-statsapi-people"
+      },
+      "costs": {
+        "signing_bonus_usd": 15500000
+      },
+      "cost_source_key": "pilot2015:mlbtr-diaz-20151122",
+      "evidence": [
+        {
+          "subject": "signing",
+          "field": "agreement_reported_date",
+          "value": "2015-11-22",
+          "source_key": "pilot2015:mlbtr-diaz-20151122",
+          "locator": "report date of the agreement (the transaction is dated 2015-11-21)"
+        }
+      ],
+      "flags": [],
+      "notes": "MLB transaction date; agreement reported 2015-11-22 (MLBTR citing MLB.com's Jesse Sanchez) | Register's bbref_minors id looks irregular; verify on Baseball-Reference."
+    },
+    {
+      "type": "INTERNATIONAL_SIGNING",
+      "source_key": "pilot2015:mlb-statsapi-tx",
+      "organization": "LAD",
+      "signing_date": "2015-11-21",
+      "signing_date_precision": "DAY",
+      "pathway": "INTERNATIONAL_AMATEUR",
+      "market": {
+        "key": "CUB",
+        "name": "Cuba",
+        "region": "Caribbean"
+      },
+      "position": "2B",
+      "player": {
+        "full_name": "Omar Estévez",
+        "display_name": "Omar Estévez",
+        "birth_date": "1998-02-25",
+        "birth_country": "Cuba",
+        "external_ids": {
+          "MLBAM": "666784",
+          "BBREF_MINORS": "esteve000oma"
+        },
+        "aliases": [
+          {
+            "alias": "Omar Estévez Pérez",
+            "alias_type": "LEGAL_NAME"
+          }
+        ],
+        "source_key": "pilot2015:mlb-statsapi-people"
+      },
+      "costs": {
+        "signing_bonus_usd": 6000000
+      },
+      "cost_source_key": "pilot2015:mlbtr-estevez-20151122",
+      "evidence": [
+        {
+          "subject": "signing",
+          "field": "signing_bonus_usd",
+          "value": 6000000,
+          "source_key": "pilot2015:mlbtr-diaz-20151122",
+          "locator": "corroborating report"
+        },
+        {
+          "subject": "signing",
+          "field": "agreement_reported_date",
+          "value": "2015-11-22",
+          "source_key": "pilot2015:mlbtr-estevez-20151122",
+          "locator": "report date of the agreement (the transaction is dated 2015-11-21)"
+        }
+      ],
+      "flags": [],
+      "notes": "MLB transaction date; MLBTR (2015-11-22) says agreed 'earlier today'"
+    },
+    {
+      "type": "INTERNATIONAL_SIGNING",
+      "source_key": "pilot2015:mlb-statsapi-tx",
+      "organization": "LAD",
+      "signing_date": "2015-05-19",
+      "signing_date_precision": "DAY",
+      "pathway": "INTERNATIONAL_PROFESSIONAL",
+      "market": {
+        "key": "CUB",
+        "name": "Cuba",
+        "region": "Caribbean"
+      },
+      "position": "RHP",
+      "player": {
+        "full_name": "Pablo Millán Fernández",
+        "display_name": "Pablo Millán Fernández",
+        "birth_date": "1989-08-05",
+        "birth_country": "Cuba",
+        "external_ids": {
+          "MLBAM": "664485",
+          "BBREF_MINORS": "fernan001pab"
+        },
+        "aliases": [],
+        "source_key": "pilot2015:mlb-statsapi-people"
+      },
+      "costs": {
+        "signing_bonus_usd": null
+      },
+      "evidence": [
+        {
+          "subject": "signing",
+          "field": "agreement_reported_date",
+          "value": "2015-03-23",
+          "source_key": "pilot2015:si-fernandez-20150323",
+          "locator": "agreement reported; contract processed 2015-05-19"
+        }
+      ],
+      "flags": [],
+      "notes": "MLB transaction date; agreement reported 2015-03-22/23 (SI 2015-03-23 citing MLB.com) | Separate pathway from July 2 amateurs; did not count against pool (per SI's exemption statement). | SI reported an \"$8 million value\" minor-league deal; components not established, so no cost is recorded."
+    }
+  ]
+}
