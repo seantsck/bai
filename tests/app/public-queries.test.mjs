@@ -67,3 +67,14 @@ test('list queries return bounded results', async () => {
   const picks = await q.getDraftPicks()
   assert.ok(picks.some((p) => p.signing_status === 'DID_NOT_SIGN'))
 })
+
+test('coverage dashboard: one cell per calendar scope and organization, queue counts only', async () => {
+  const cells = await q.getResearchCoverage()
+  assert.equal(cells.length, (12 + 12) * 30, 'bounded by the calendar, not by research volume')
+  const lad = cells.filter((c) => c.franchise_key === 'LAD' && c.tracked_records > 0).map((c) => [c.domain, c.scope_key, c.coverage_state]).sort()
+  assert.deepEqual(lad, [['DRAFT', '2019-JUNE_AMATEUR', 'INDIVIDUALLY_VERIFIED'], ['INTERNATIONAL', '2019-20', 'RANKED_SAMPLE']])
+  assert.ok(cells.every((c) => c.supports_population_rate === false), 'no fixture cell supports rates')
+  const queues = await q.getResearchQueueSummary()
+  assert.equal(queues.length, 10)
+  assert.ok(queues.every((r) => Number.isInteger(r.open_items) && !('detail' in r)))
+})

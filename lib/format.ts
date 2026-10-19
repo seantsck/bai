@@ -61,3 +61,20 @@ export function label (map: Record<string, string>, key: string | null | undefin
   if (!key) return 'Unknown'
   return map[key] ?? key
 }
+
+// Compact coverage-state codes for the dashboard matrix. Absence of an assessment is shown as "not assessed", never as a state.
+export const COVERAGE_STATE_CODES: Record<string, string> = {
+  COMPLETE_CENSUS: 'CC',
+  SUBSTANTIALLY_COMPLETE: 'SC',
+  PARTIAL_RECONSTRUCTION: 'PR',
+  RANKED_SAMPLE: 'RS',
+  INDIVIDUALLY_VERIFIED: 'IV',
+  UNKNOWN: '?'
+}
+
+/** Share of a basis that is known; no basis means there is nothing to measure, which is not 0%. */
+export function formatShare (known: string | number | null | undefined, basis: string | number | null | undefined): string {
+  const b = Number(basis ?? 0)
+  if (!b) return '—'
+  return `${Math.round((Number(known ?? 0) / b) * 100)}% (${Number(known ?? 0)}/${b})`
+}
