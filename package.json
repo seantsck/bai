@@ -1,0 +1,42 @@
+{
+  "name": "bai",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "BAI — Baseball Acquisition Intelligence: league-wide MLB international and draft acquisition research",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "npm run test:app && npm run test:db",
+    "test:app": "node --test \"tests/app/*.test.mjs\"",
+    "test:db": "node --test --test-concurrency=4 \"tests/db/*.test.mjs\"",
+    "db:server": "node scripts/db/dev-server.mjs",
+    "db:migrate": "node --env-file-if-exists=.env.local scripts/db/migrate.mjs",
+    "db:fixtures": "node --env-file-if-exists=.env.local scripts/db/load-fixtures.mjs",
+    "refresh:read-models": "node --env-file-if-exists=.env.local scripts/db/refresh-read-models.mjs",
+    "scan:credentials": "node scripts/ci/credential-scan.mjs",
+    "check": "npm run lint && npm run typecheck && npm test && npm run build && git diff --check && npm run scan:credentials"
+  },
+  "dependencies": {
+    "next": "16.4.2",
+    "pg": "8.23.1",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "22.20.5",
+    "@types/pg": "8.23.1",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "embedded-postgres": "17.9.0-beta.17",
+    "eslint": "9.39.5",
+    "eslint-config-next": "16.4.2",
+    "typescript": "6.0.3"
+  }
+}
