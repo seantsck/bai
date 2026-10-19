@@ -1,0 +1,42 @@
+import { test } from 'node:test'
+import assert from 'node:assert/strict'
+import fs from 'node:fs'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { NAV_ITEMS, PLANNED_ROUTES, isActive } from '../../lib/nav.ts'
+
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
+
+test('navigation is Overview, International, Draft, Organizations, Players, Compare, Research', () => {
+  assert.deepEqual(NAV_ITEMS.map((n) => n.label), ['Overview', 'International', 'Draft', 'Organizations', 'Players', 'Compare', 'Research'])
+})
+
+test('every planned route has an App Router page', () => {
+  for (const route of PLANNED_ROUTES) {
+    const file = path.join(root, 'app', route, 'page.tsx')
+    assert.ok(fs.existsSync(file), `missing page for ${route}`)
+  }
+})
+
+test('every page renders dynamically (no build-time database access)', () => {
+  for (const route of PLANNED_ROUTES) {
+    const src = fs.readFileSync(path.join(root, 'app', route, 'page.tsx'), 'utf8')
+    assert.match(src, /export const dynamic = 'force-dynamic'/, route)
+  }
+})
+
+test('pages never query analytics.* or call the refresh directly', () => {
+  const files = [path.join(root, 'lib/queries.ts'), ...PLANNED_ROUTES.map((r) => path.join(root, 'app', r, 'page.tsx'))]
+  for (const f of files) {
+    const src = fs.readFileSync(f, 'utf8')
+    assert.doesNotMatch(src, /analytics\.\w/, f)
+    assert.doesNotMatch(src, /refresh_read_models/, f)
+  }
+})
+
+test('active nav matching', () => {
+  assert.ok(isActive('/', '/'))
+  assert.ok(!isActive('/draft', '/'))
+  assert.ok(isActive('/draft/picks', '/draft'))
+  assert.ok(!isActive('/drafts', '/draft'))
+})

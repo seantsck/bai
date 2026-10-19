@@ -1,0 +1,84 @@
+# Architecture
+
+## Overview
+
+```mermaid
+flowchart LR
+  subgraph Research["Research (owner role, offline)"]
+    S[Public sources] --> I[Ingestion / curation scripts]
+    I --> F[(Fact tables<br/>public schema)]
+  end
+  F --> A[analytics.* views<br/>heavy, cross-domain]
+  A -- "refresh_read_models()<br/>controlled, manual/scheduled" --> R[(rm_* read models<br/>bounded)]
+  F -- "simple indexed lookups" --> W[Next.js server components<br/>anon role, read-only txn]
+  R --> W
+  W --> U[Public pages]
+```
+
+## Database
+
+- PostgreSQL 17. Development and replay use an embedded PG17 on the VPS. Production will be a separate Supabase project.
+- Migrations live in `database/migrations/NNN_name.sql` and are applied by `scripts/db/lib/migrations.mjs`:
+  - one transaction per file;
+  - each file's checksum is recorded in `bai_meta.schema_migrations`;
+  - an applied migration is **frozen**, so a changed checksum aborts the run and a change means a new migration.
+- Schemas:
+  - `public`: fact tables, public views and read models.
+  - `analytics`: heavy views. Never granted to public roles.
+  - `bai_meta`: migration bookkeeping.
+
+| Migration | Content |
+|---|---|
+| 001_core_identity | extensions, platform roles, helpers, `sources`, players, aliases, external ids |
+| 002_organizations | 30 franchises, season-ranged name history, aliases (seeded, convergent) |
+| 003_sources_provenance | provenance registry (`provenance_fact_tables`), `source_observations`, conflict view |
+| 004_research_coverage | coverage states and assessments, research tasks, quality flags |
+| 005_expectations | shared ranking lists/entries, evaluations, tool grades |
+| 006_international | markets, date-bounded signing periods, signings, org period context, trainers, academies |
+| 007_draft | schools, drafts, rounds/phases, selections, slot values, pools, signings, shared acquisition layer, expectation links |
+| 008_outcomes | outcome audits, MLB debuts, WAR observations, outcome status view |
+| 009_development | affiliates by season, assignments, promotion/demotion events |
+| 010_transactions_value | transactions, trade packages/assets, organization value attributions |
+| 011_public_foundation | read models, `refresh_read_models()`, RLS and grants for the whole public schema |
+
+## Public boundary (RLS)
+
+- Every table in `public` has RLS enabled, and every view is `security_invoker`.
+- Public tables get `SELECT` for `anon`/`authenticated` plus a `public_read` select policy. No role other than the owner has write privileges or write policies.
+- Internal objects get no grants and no policy:
+  - registered in `public.internal_objects`;
+  - includes `research_tasks`, `quality_flags`, `read_model_refreshes`, `v_source_conflicts`.
+- Defense in depth: even if a Supabase-style blanket grant is applied, RLS still returns no internal rows and blocks writes. A test covers this.
+- Public roles cannot execute any function in `public` (including the refresh) and have no access to `analytics`.
+- The app's `publicQuery()` (`lib/db.ts`) runs every page query inside `BEGIN READ ONLY`, with `SET LOCAL ROLE anon` and a statement timeout. The production RLS boundary is therefore exercised in local development too.
+
+## Serving model (learned from DISI v1.0.0 / 045a)
+
+DISI's v1.0.0 overview recomputed a deep analytical graph per request, which stalled a small instance under four concurrent readers. BAI's rule from day one:
+
+1. **Simple indexed facts** (a player, a pick list, an organization's acquisitions) are queried directly, with explicit `LIMIT`s.
+2. **Heavy summaries** follow a fixed path:
+   - they are defined in `analytics.*`;
+   - they are materialized by `refresh_read_models()` into bounded `rm_*` tables: one overview row, one row per organization, one row per coverage assessment;
+   - the UI reads only the `rm_*` tables.
+3. The refresh:
+   - is run by the owner (`npm run refresh:read-models`), never by a request;
+   - is serialized by an EXCLUSIVE lock and replaces rows with DELETE + INSERT in a single transaction, so readers see the old or the new generation, never a mix;
+   - validates before commit (organization row count, outcome states partition acquired players);
+   - converges (an unchanged database yields identical rows; only `generation_id`/`refreshed_at` change).
+4. Large nested analytical graphs are never exposed publicly.
+
+## App
+
+- Next.js App Router with server components. Every page is `force-dynamic`, so the build never touches a database.
+- Pages degrade to a notice when the database is not configured.
+- Navigation: Overview, International, Draft, Organizations, Players, Compare, Research.
+- `dev` and `start` bind to `127.0.0.1` by default.
+
+## Testing
+
+- `tests/db/*`: each file boots a disposable PostgreSQL 17 (embedded binaries, random port, temp dir) and replays every migration from 001 into fresh databases.
+- `tests/app/*`:
+  - unit tests for formatting and navigation;
+  - an integration test that runs every page query through `publicQuery()` against migrated and fixture-loaded PG17.
+- TypeScript modules are loaded in tests through a small hook (`tests/support/ts-hooks.mjs`), because the distro Node build lacks built-in type stripping.
