@@ -13,8 +13,7 @@ values ('fixture:foundation', 'TEST_FIXTURE', 'BAI foundation test fixture', 'Fi
 
 insert into markets (market_key, name, region, slug) values ('DOM', 'Dominican Republic', 'Caribbean', 'dominican-republic');
 
-insert into international_signing_periods (period_key, label, start_date, end_date, source_id)
-values ('2019-20', '2019-20 signing period', date '2019-07-02', date '2020-06-15', (select id from sources where source_key = 'fixture:foundation'));
+-- Signing periods and drafts are the sourced reference calendars seeded by 015; fixtures only reference them.
 
 insert into players (slug, full_name, display_name, birth_date, birth_date_precision, birth_country, primary_position) values
   ('fixture-amateur-signee', 'Fixture Amateur Signee', 'Fixture Amateur Signee', date '2003-03-01', 'DAY', 'Dominican Republic', 'SS'),
@@ -46,12 +45,6 @@ insert into schools (slug, name, school_type, city, region, country) values
 insert into school_aliases (school_id, alias) select id, 'Fixture State' from schools where slug = 'fixture-state-university';
 
 -- Drafts and rounds (structure recorded per draft)
-insert into drafts (draft_key, draft_year, draft_kind, start_date, end_date, source_id)
-select k, y, 'JUNE_AMATEUR', s, e, (select id from sources where source_key = 'fixture:foundation')
-from (values ('2018-JUNE_AMATEUR', 2018, date '2018-06-04', date '2018-06-06'),
-             ('2019-JUNE_AMATEUR', 2019, date '2019-06-03', date '2019-06-05'),
-             ('2021-JUNE_AMATEUR', 2021, date '2021-07-11', date '2021-07-13')) v (k, y, s, e);
-
 insert into draft_rounds (draft_id, round_code, round_order, phase)
 select d.id, r.code, r.ord, 'REGULAR' from drafts d
 join (values ('2018-JUNE_AMATEUR', '3', 5), ('2019-JUNE_AMATEUR', '1', 1), ('2021-JUNE_AMATEUR', '2', 3)) r (draft_key, code, ord) using (draft_key);

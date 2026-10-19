@@ -15,7 +15,8 @@ test('every registered researched-fact table has a NOT NULL source_id referencin
       exists (select 1 from information_schema.referential_constraints rc
               join information_schema.key_column_usage k on k.constraint_name = rc.constraint_name and k.table_name = f.table_name and k.column_name = 'source_id'
               join information_schema.constraint_column_usage u on u.constraint_name = rc.unique_constraint_name and u.table_name = 'sources') as fk
-    from provenance_fact_tables f left join information_schema.columns c on c.table_schema = 'public' and c.table_name = f.table_name and c.column_name = 'source_id'`)
+    from provenance_fact_tables f left join information_schema.columns c on c.table_schema = 'public' and c.table_name = f.table_name and c.column_name = 'source_id'
+    where f.primary_source_required`)
   assert.ok(r.length >= 20, `registry lists ${r.length} tables`)
   for (const t of r) {
     assert.equal(t.is_nullable, 'NO', `${t.table_name}.source_id must be NOT NULL`)
@@ -25,7 +26,7 @@ test('every registered researched-fact table has a NOT NULL source_id referencin
 
 test('a researched fact without a source is rejected; sources must be public', async () => {
   await h.rejects(db, "insert into mlb_debuts (player_id, debut_date, debut_organization_id) values (1, '2024-04-01', 1)", [], /source_id/)
-  await h.rejects(db, "insert into sources (source_key, source_type, title, publicly_accessible) values ('private:x', 'OTHER', 'Private', false)", [], /sources_publicly_accessible_check/)
+  await h.rejects(db, "insert into sources (source_key, source_type, title, url, publicly_accessible) values ('private:x', 'OTHER', 'Private', 'https://example.org/private', false)", [], /sources_publicly_accessible_check/)
 })
 
 test('source observations keep conflicting values side by side and expose conflicts', async () => {

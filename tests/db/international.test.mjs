@@ -14,12 +14,12 @@ after(async () => { await h.stopServer() })
 const newPlayer = (slug) => h.id(db, 'insert into players (slug, full_name, display_name) values ($1, $1, $1) returning id', [slug])
 const period = async (key) => Number((await h.one(db, 'select id from international_signing_periods where period_key = $1', [key])).id)
 
-test('periods are explicit date ranges that cannot overlap, including non-July calendars', async () => {
-  await h.rejects(db, "insert into international_signing_periods (period_key, label, start_date, end_date, source_id) values ('2020-21', 'x', '2020-06-01', '2021-06-15', $1)", [src], /exclusion constraint/)
-  await db.query("insert into international_signing_periods (period_key, label, start_date, end_date, source_id) values ('2021', 'Fixture shifted period', '2021-01-15', '2021-12-15', $1)", [src])
-  assert.equal(Number((await h.one(db, "select international_period_for_date('2020-06-15') p")).p), await period('2019-20'), 'end date inclusive')
-  assert.equal((await h.one(db, "select international_period_for_date('2020-06-16') p")).p, null, 'gap between periods has no period')
-  assert.equal(Number((await h.one(db, "select international_period_for_date('2021-01-15') p")).p), await period('2021'))
+test('periods are explicit date ranges that cannot overlap, including the pandemic-shifted calendar', async () => {
+  await h.rejects(db, "insert into international_signing_periods (period_key, label, start_date, end_date, source_id) values ('2027', 'x', '2026-12-01', '2027-06-01', $1)", [src], /exclusion constraint/)
+  assert.equal(Number((await h.one(db, "select international_period_for_date('2020-06-16') p")).p), await period('2019-20'), '2019-20 was extended past June 15')
+  assert.equal(Number((await h.one(db, "select international_period_for_date('2020-10-15') p")).p), await period('2019-20'), 'end date inclusive')
+  assert.equal((await h.one(db, "select international_period_for_date('2020-10-16') p")).p, null, 'gap between periods has no period')
+  assert.equal(Number((await h.one(db, "select international_period_for_date('2021-01-15') p")).p), await period('2020-21'))
   await h.rejects(db, "insert into international_signing_periods (period_key, label, start_date, end_date, source_id) values ('2030', 'bad', '2030-02-01', '2030-01-01', $1)", [src], /check|lower bound must be less than or equal/)
 })
 
@@ -28,9 +28,9 @@ test('a signing dated outside its assigned period is rejected; boundary days are
   const pid = await period('2019-20')
   const ins = `insert into international_signings (player_id, organization_id, signing_period_id, signing_date, signing_date_precision, pathway, source_id)
                values ($1, $2, $3, $4, 'DAY', 'INTERNATIONAL_AMATEUR', $5)`
-  await h.rejects(db, ins, [p, lad, pid, '2020-06-16', src], /falls outside its signing period/)
+  await h.rejects(db, ins, [p, lad, pid, '2020-10-16', src], /falls outside its signing period/)
   await h.rejects(db, ins, [p, lad, pid, '2019-07-01', src], /falls outside its signing period/)
-  await db.query(ins, [p, lad, pid, '2020-06-15', src])
+  await db.query(ins, [p, lad, pid, '2020-10-15', src])
 })
 
 test('multiple pathways stay distinct and are not collapsed', async () => {
