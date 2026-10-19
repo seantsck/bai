@@ -21,6 +21,15 @@
     "db:fixtures": "node --env-file-if-exists=.env.local scripts/db/load-fixtures.mjs",
     "refresh:read-models": "node --env-file-if-exists=.env.local scripts/db/refresh-read-models.mjs",
     "scan:credentials": "node scripts/ci/credential-scan.mjs",
+    "research:import": "node --env-file-if-exists=.env.local scripts/research/cli.mjs import",
+    "research:validate": "node --env-file-if-exists=.env.local scripts/research/cli.mjs validate",
+    "research:apply": "node --env-file-if-exists=.env.local scripts/research/cli.mjs apply",
+    "research:conflicts": "node --env-file-if-exists=.env.local scripts/research/cli.mjs conflicts",
+    "research:resolve": "node --env-file-if-exists=.env.local scripts/research/cli.mjs resolve",
+    "research:identity": "node --env-file-if-exists=.env.local scripts/research/cli.mjs identity",
+    "research:queue": "node --env-file-if-exists=.env.local scripts/research/cli.mjs queue",
+    "research:coverage": "node --env-file-if-exists=.env.local scripts/research/cli.mjs coverage",
+    "research:batches": "node --env-file-if-exists=.env.local scripts/research/cli.mjs batches",
     "check": "npm run lint && npm run typecheck && npm test && npm run build && git diff --check && npm run scan:credentials"
   },
   "dependencies": {
