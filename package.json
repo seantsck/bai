@@ -8,13 +8,13 @@
     "node": ">=22"
   },
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -H 127.0.0.1",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -H 127.0.0.1",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "npm run test:app && npm run test:db",
-    "test:app": "node --test \"tests/app/*.test.mjs\"",
+    "test:app": "node --import ./tests/support/register-ts.mjs --test \"tests/app/*.test.mjs\"",
     "test:db": "node --test --test-concurrency=4 \"tests/db/*.test.mjs\"",
     "db:server": "node scripts/db/dev-server.mjs",
     "db:migrate": "node --env-file-if-exists=.env.local scripts/db/migrate.mjs",
