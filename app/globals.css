@@ -45,3 +45,18 @@ dl.facts dd { margin: 0; }
 section { margin-top: 28px; }
 h2 { font-size: 1.15rem; margin: 0 0 10px; }
 footer { color: var(--muted); font-size: .8rem; padding: 16px; text-align: center; border-top: 1px solid var(--border); }
+
+/* Coverage dashboard matrix */
+.matrix { font-size: .78rem; width: auto; }
+.matrix caption { text-align: left; padding: 8px 10px; color: var(--muted); }
+.matrix th, .matrix td { padding: 3px 6px; white-space: nowrap; }
+.matrix tbody th { text-align: left; font-weight: 600; }
+.matrix .cell { text-align: center; font-variant-numeric: tabular-nums; }
+.matrix .cell-empty { background: transparent; }
+.cell-code { font-weight: 700; }
+.cell-CC, .cell-SC { background: #dcefe0; }
+.cell-PR { background: #fff1cc; }
+.cell-RS, .cell-IV { background: #e8e4f4; }
+.cell-NA, .cell-\? { background: #f0eeea; }
+.legend { display: flex; flex-wrap: wrap; gap: 8px; font-size: .85rem; }
+.legend-item { padding: 2px 8px; border-radius: 6px; border: 1px solid var(--border); }

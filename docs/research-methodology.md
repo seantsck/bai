@@ -11,6 +11,10 @@ BAI is a research database first and an app second. These rules are enforced in 
 - Each researched-fact table has a NOT NULL `source_id`. The tables are registered in `provenance_fact_tables`, and a test enforces the rule.
 - Field-level claims go to `source_observations`. When sources disagree, both observations stay and the conflict is surfaced for review. Nothing is silently overwritten.
 - Superseded or retracted observations keep their history.
+- **Source authority** (OFFICIAL, PRIMARY_PUBLIC, REPUTABLE_SECONDARY, AGGREGATOR, ARCHIVE, OTHER) is metadata for reconciliation. It is never a truth value. See [source-policy.md](source-policy.md).
+- **No last-write-wins.** A later batch never replaces an existing canonical value; it adds an observation and opens a conflict.
+- **Traceable resolution.** A resolved conflict records the chosen observation, every observation considered, the rule or operator, and the rationale (`fact_resolutions`).
+- **Staged ingestion.** All research data enters through staged batches with a dry run first. See [research-ingestion.md](research-ingestion.md) and [identity-resolution.md](identity-resolution.md).
 
 ## 3. Missing is not zero
 - Unknown money is `NULL`.
@@ -68,6 +72,27 @@ BAI is a research database first and an app second. These rules are enforced in 
 ## 10. Serving discipline
 Heavy analytics are refreshed deliberately into bounded read models. A public request never triggers the analytical graph (see [architecture](architecture.md)).
 
+## 11. Calendars are sourced data
+- **Drafts:** the 2015–2026 Rule 4 drafts carry their dates, round counts and rules era, each backed by `source_observations`. Highlights:
+  - 40 rounds through 2019;
+  - 5 rounds in June 2020, held remotely;
+  - 20 rounds and a July date from 2021;
+  - a two-day format from 2025.
+- **International periods:** 2014-15 through 2026 are stored as date ranges, never calendar years:
+  - July 2 – June 15 until the pandemic;
+  - 2019-20 extended to Oct 15, 2020;
+  - 2020-21 moved to Jan 15 – Dec 15, 2021;
+  - Jan 15 – Dec 15 since.
+
+  There is no period between Oct 16, 2020 and Jan 14, 2021.
+- **Open future dates:** the 2026 period's Dec 15 close is the scheduled date. It had not been reached on the research date, and the CBA expires Dec 1, 2026.
+- **Disagreements:** where sources disagreed, the alternative claim is kept and the choice is recorded with a rationale (see [source-policy.md](source-policy.md)).
+
+## 12. Coverage claims are conservative
+- **Default:** an import's coverage claim applies only to its declared scope. Every other cell it touches becomes INDIVIDUALLY_VERIFIED.
+- **Pilot cohorts:** stay PARTIAL_RECONSTRUCTION unless documentary evidence establishes a complete population. Even then, a cell is promoted only after a review that writes down the gaps.
+- **The 2015 Dodgers draft class is the worked example:** 42 of 42 picks are tracked, yet the class is held at PARTIAL_RECONSTRUCTION because half the bonuses are missing and no outcomes are audited.
+
 ## Fixtures
 - `database/fixtures/foundation.sql` is fictional. It is cited to a `TEST_FIXTURE` source and exists only to prove the schema handles each required shape.
-- It must never be loaded into a research or production database.
+- It must never be loaded into a research or production database. Both tools enforce this: `research:import` refuses a database that holds the fixtures, and `db:fixtures` refuses a database that holds research batches.

@@ -1,0 +1,183 @@
+{
+  "retrieved_date": "2026-10-19",
+  "sources": [
+    {"key": "wiki-2015-draft", "title": "2015 Major League Baseball draft", "publisher": "Wikipedia", "url": "https://en.wikipedia.org/wiki/2015_Major_League_Baseball_draft", "published_date": null, "authority": "AGGREGATOR", "notes": "Fetched directly. Gives June 8-10, 2015, Secaucus NJ, 1,215 selections."},
+    {"key": "mlb-2015-completes", "title": "Major League Baseball completes 2015 Draft", "publisher": "MLB.com", "url": "https://www.mlb.com/news/major-league-baseball-completes-2015-draft/c-129860836", "published_date": null, "authority": "OFFICIAL", "notes": "MLB.com returned 403 to direct fetch; content seen through web-search result snippets only. Says 1,215 players over 40 rounds, two Competitive Balance rounds and one supplemental round."},
+    {"key": "mlb-2015-draft-order", "title": "2015 MLB draft order announced", "publisher": "MLB.com", "url": "https://www.mlb.com/news/2015-mlb-draft-order-announced/c-123709334", "published_date": null, "authority": "OFFICIAL", "notes": "Seen via search snippet. June 8 Day 1 (Round 1 through CB Round B), June 9 Rounds 3-10, June 10 Rounds 11-40."},
+    {"key": "wiki-2016-draft", "title": "2016 Major League Baseball draft", "publisher": "Wikipedia", "url": "https://en.wikipedia.org/wiki/2016_Major_League_Baseball_draft", "published_date": null, "authority": "AGGREGATOR", "notes": "Fetched directly. Gives June 9-11, 2016, Secaucus NJ, 1,216 selections."},
+    {"key": "mlb-2016-completes", "title": "Major League Baseball Completes 2016 Draft", "publisher": "MLB.com (press release)", "url": "https://www.mlb.com/press-release/major-league-baseball-completes-2016-draft-183524526", "published_date": null, "authority": "OFFICIAL", "notes": "Seen via search snippet. 1,216 players over 40 rounds and two Competitive Balance Lottery rounds; draft resumed in Round 11 after Friday's completion of rounds 3-10."},
+    {"key": "wiki-2017-draft", "title": "2017 Major League Baseball draft", "publisher": "Wikipedia", "url": "https://en.wikipedia.org/wiki/2017_Major_League_Baseball_draft", "published_date": null, "authority": "AGGREGATOR", "notes": "Fetched directly. June 12-14, 2017, Secaucus NJ, 1,215 selections; CB Rounds A (31-36) and B (68-75)."},
+    {"key": "mlb-2017-coverage-begins", "title": "2017 MLB Draft coverage begins on Monday night", "publisher": "MLB.com", "url": "https://www.mlb.com/news/2017-mlb-draft-coverage-begins-on-monday-night-c235739716", "published_date": null, "authority": "OFFICIAL", "notes": "Seen via search snippet. Day 1 Monday June 12 7pm ET; Day 2 June 13 Rounds 3-10; Day 3 June 14 Rounds 11-40."},
+    {"key": "mlb-2017-completes", "title": "Major League Baseball completes 2017 Draft", "publisher": "MLB.com (press release)", "url": "https://www.mlb.com/press-release/major-league-baseball-completes-2017-draft-236495628", "published_date": null, "authority": "OFFICIAL", "notes": "Seen via search snippet. 1,215 players chosen in 40 rounds and two Competitive Balance rounds."},
+    {"key": "wiki-2018-draft", "title": "2018 Major League Baseball draft", "publisher": "Wikipedia", "url": "https://en.wikipedia.org/wiki/2018_Major_League_Baseball_draft", "published_date": null, "authority": "AGGREGATOR", "notes": "Fetched directly. June 4-6, 2018, Secaucus NJ, 40 rounds, 1,214 selected; first 43 picks on MLB Network June 4."},
+    {"key": "mlb-2018-completes", "title": "Major League Baseball completes 2018 Draft", "publisher": "MLB.com (press release)", "url": "https://www.mlb.com/press-release/major-league-baseball-completes-2018-draft-280142028", "published_date": null, "authority": "OFFICIAL", "notes": "Seen via search snippet. 1,214 players over 40 rounds plus compensation and CB rounds; resumed in Round 11 after Tuesday's rounds 3-10."},
+    {"key": "wiki-2019-draft", "title": "2019 Major League Baseball draft", "publisher": "Wikipedia", "url": "https://en.wikipedia.org/wiki/2019_Major_League_Baseball_draft", "published_date": null, "authority": "AGGREGATOR", "notes": "Fetched directly. June 3-5, 2019, Secaucus NJ, 1,217 selections; first 41 picks on MLB Network June 3."},
+    {"key": "mlb-2019-details", "title": "2019 MLB Draft details announced", "publisher": "MLB.com (press release)", "url": "https://www.mlb.com/press-release/2019-mlb-draft-details-announced", "published_date": null, "authority": "OFFICIAL", "notes": "Seen via search snippet. Day 1 Mon June 3 7pm ET; Day 2 Tue June 4 Rounds 3-10; Day 3 Wed June 5 Rounds 11-40; 40 rounds."},
+    {"key": "mlb-2019-completes", "title": "Major League Baseball completes 2019 Draft", "publisher": "MLB.com (press release)", "url": "https://www.mlb.com/press-release/major-league-baseball-completes-2019-draft", "published_date": null, "authority": "OFFICIAL", "notes": "Seen via search snippet. 1,217 players across 40 rounds, two Compensation rounds and two Competitive Balance rounds."},
+    {"key": "wiki-2020-draft", "title": "2020 Major League Baseball draft", "publisher": "Wikipedia", "url": "https://en.wikipedia.org/wiki/2020_Major_League_Baseball_draft", "published_date": null, "authority": "AGGREGATOR", "notes": "Fetched directly. June 10-11, 2020; held remotely from MLB Network studios in Secaucus (originally planned for Omaha); 5 rounds, 160 selections; March 26, 2020 MLB-MLBPA agreement allowed shortening."},
+    {"key": "mlb-2020-schedule", "title": "MLB announces 2020 Draft schedule", "publisher": "MLB.com", "url": "https://www.mlb.com/news/2020-mlb-draft-schedule", "published_date": null, "authority": "OFFICIAL", "notes": "Seen via search snippet. June 10 first 37 picks (Round 1 + CB Round A); June 11 from Round 2 (pick 38) through the fifth and final round; undrafted players capped at $20,000 each."},
+    {"key": "wiki-2021-draft", "title": "2021 Major League Baseball draft", "publisher": "Wikipedia", "url": "https://en.wikipedia.org/wiki/2021_Major_League_Baseball_draft", "published_date": null, "authority": "AGGREGATOR", "notes": "Fetched directly. July 11-13, 2021, Bellco Theatre Denver; 20 rounds, 612 selections; moved from Atlanta on April 2, 2021; 20 rounds chosen under March 26, 2020 agreement."},
+    {"key": "mlb-2021-draft-coverage", "title": "2021 MLB Draft Day 2 / Day 3 complete coverage", "publisher": "MLB.com", "url": "https://www.mlb.com/news/2021-mlb-draft-day-3-complete-coverage", "published_date": null, "authority": "OFFICIAL", "notes": "Seen via search snippets (Day 1/2/3 coverage pages and mlb.com/draft/2021). Day 1 Sun July 11 first 36 picks; Day 2 Mon July 12 Rounds 2-10; Day 3 Tue July 13 Rounds 11-20; pools in a Draft reduced to 20 rounds from the 40 called for in the CBA."},
+    {"key": "wiki-2022-draft", "title": "2022 Major League Baseball draft", "publisher": "Wikipedia", "url": "https://en.wikipedia.org/wiki/2022_Major_League_Baseball_draft", "published_date": null, "authority": "AGGREGATOR", "notes": "Fetched directly. July 17-19, 2022, L.A. Live Los Angeles; 616 selections in 20 rounds; summarizes March 10, 2022 CBA draft changes (lottery from 2023, permanent 20 rounds, combine, draft-and-follow)."},
+    {"key": "mlb-2022-draft-schedule", "title": "MLB Draft overview and schedule 2022 / 2022 MLB Draft Day 2 overview and schedule", "publisher": "MLB.com", "url": "https://www.mlb.com/news/mlb-draft-overview-and-schedule-2022", "published_date": null, "authority": "OFFICIAL", "notes": "Seen via search snippets. Day 1 Sun July 17 Rounds 1-2 + comp/CB picks (80 players); Day 2 Mon July 18 Rounds 3-10; Day 3 Tue July 19 Rounds 11-20."},
+    {"key": "mlb-cba-draft-changes-2022", "title": "Here's how the new CBA impacts the Draft", "publisher": "MLB.com", "url": "https://www.mlb.com/news/draft-rule-changes-with-new-cba", "published_date": null, "authority": "OFFICIAL", "notes": "403 on direct fetch; seen via search snippets. Lottery for first six picks from 2023; draft remains 20 rounds; ineligible clubs cannot pick above 10th; 75% slot guarantee for top-300 prospects who take pre-draft physical."},
+    {"key": "mlb-ppi-faq", "title": "Prospect Promotion Incentive (PPI) FAQ", "publisher": "MLB.com", "url": "https://www.mlb.com/news/prospect-promotion-incentive-faq", "published_date": null, "authority": "OFFICIAL", "notes": "Seen via search snippet. PPI created in 2022 CBA; picks awarded when an eligible rookie-status player wins ROY or finishes top-3 in MVP/Cy Young pre-arbitration; max one per club per year."},
+    {"key": "wiki-2023-draft", "title": "2023 Major League Baseball draft", "publisher": "Wikipedia", "url": "https://en.wikipedia.org/wiki/2023_Major_League_Baseball_draft", "published_date": null, "authority": "AGGREGATOR", "notes": "Fetched directly. July 9-11, 2023, Lumen Field Seattle; 20 rounds, 614 selections; inaugural lottery Dec 6, 2022 in San Diego (Pirates won); first PPI pick (Mariners, No. 29)."},
+    {"key": "mlb-2023-draft-schedule", "title": "MLB Draft overview and schedule 2023 / 2023 MLB Draft Day 2 overview and schedule", "publisher": "MLB.com", "url": "https://www.mlb.com/news/mlb-draft-overview-and-schedule-2023", "published_date": null, "authority": "OFFICIAL", "notes": "Seen via search snippets. Day 1 Sun July 9 Rounds 1-2; Day 2 Mon July 10 Rounds 3-10; Day 3 Tue July 11 Rounds 11-20. Snippets disagree on Day 1 start time (6 vs 7 p.m. ET) - immaterial to dates."},
+    {"key": "wiki-2024-draft", "title": "2024 Major League Baseball draft", "publisher": "Wikipedia", "url": "https://en.wikipedia.org/wiki/2024_Major_League_Baseball_draft", "published_date": null, "authority": "AGGREGATOR", "notes": "Fetched directly. July 14-16, 2024, Cowtown Coliseum Fort Worth; 20 rounds, 615 selections; PPI picks 31 (ARI) and 32 (BAL); lottery Dec 5, 2023 (Guardians)."},
+    {"key": "mlb-2024-draft-schedule", "title": "2024 MLB Draft Day 2 / Day 3 overview and schedule", "publisher": "MLB.com", "url": "https://www.mlb.com/news/2024-mlb-draft-day-2-overview-and-schedule", "published_date": null, "authority": "OFFICIAL", "notes": "Seen via search snippets. Day 1 Sun July 14 first 74 picks; Day 2 Mon July 15 Rounds 3-10 from pick 75; Day 3 Tue July 16 Rounds 11-20 from pick 316."},
+    {"key": "wiki-2025-draft", "title": "2025 Major League Baseball draft", "publisher": "Wikipedia", "url": "https://en.wikipedia.org/wiki/2025_Major_League_Baseball_draft", "published_date": null, "authority": "AGGREGATOR", "notes": "Fetched directly. July 13-14, 2025, Coca-Cola Roxy, Cumberland (Atlanta area) GA; 20 rounds, 615 selections; PPI pick 28 (KC); lottery Dec 10, 2024 (Nationals)."},
+    {"key": "mlb-2025-draft-details", "title": "2025 MLB Draft to take place over two days on July 13-14 / 2025 MLB Draft Day 2 overview and schedule", "publisher": "MLB.com", "url": "https://www.mlb.com/news/2025-mlb-draft-details", "published_date": null, "authority": "OFFICIAL", "notes": "Seen via search snippets. Two-day format; Day 1 Sun July 13 first 105 picks (through Round 3); Day 2 Mon July 14 Rounds 4-20 from 11:30 a.m. ET."},
+    {"key": "wiki-2026-draft", "title": "2026 Major League Baseball draft", "publisher": "Wikipedia", "url": "https://en.wikipedia.org/wiki/2026_Major_League_Baseball_draft", "published_date": null, "authority": "AGGREGATOR", "notes": "Fetched directly. July 11-12, 2026, Pennsylvania Convention Center, Philadelphia; references rounds 2-20; CB Round A picks 29-37, Round B 67-74; PPI picks to ATL (26) and HOU (28); lottery Dec 9, 2025 Orlando (White Sox); No. 1 Roch Cholowsky."},
+    {"key": "mlb-2026-draft-schedule", "title": "2026 Draft starts Saturday! Here's what you need to know / 2026 MLB Draft Day 2 coverage", "publisher": "MLB.com", "url": "https://www.mlb.com/news/2026-mlb-draft-overview-and-schedule", "published_date": null, "authority": "OFFICIAL", "notes": "403 on direct fetch; seen via search snippets of club-site mirrors and Day 2 coverage. Day 1 Sat July 11 Rounds 1-4 (picks 1-135); Day 2 Sun July 12 Rounds 5-20; 613 selections across 20 rounds."},
+    {"key": "espn-2026-cholowsky", "title": "UCLA's Roch Cholowsky taken No. 1 overall in draft by White Sox", "publisher": "ESPN", "url": "https://www.espn.com/mlb/story/_/id/49335387/ucla-roch-cholowsky-taken-no-1-overall-draft-white-sox", "published_date": null, "authority": "REPUTABLE_SECONDARY", "notes": "Seen via search results only (with Yahoo/CBS coverage); corroborates draft occurred July 11 in Philadelphia with first 135 picks Saturday and wrap-up Sunday. Not fetched directly (CBS returned 429)."},
+    {"key": "si-2016-cba-ratified", "title": "MLB owners, players ratify labor deal through 2021", "publisher": "Sports Illustrated (AP)", "url": "https://www.si.com/mlb/2016/12/14/ap-bbo-labor-1", "published_date": "2016-12-14", "authority": "REPUTABLE_SECONDARY", "notes": "Seen via search snippet. Tentative deal Dec 1, 2016 (MLB press release), ratified ~Dec 14, 2016; expires Dec 1, 2021."},
+    {"key": "mlb-2016-tentative-cba", "title": "MLB reaches tentative labor agreement", "publisher": "MLB.com (press release)", "url": "https://www.mlb.com/press-release/mlb-reaches-tentative-labor-agreement-209976758", "published_date": "2016-12-01", "authority": "OFFICIAL", "notes": "Seen via search snippet only; date per snippet context."},
+    {"key": "ringer-2026-cba-faq", "title": "MLB-MLBPA labor battle FAQ", "publisher": "The Ringer", "url": "https://www.theringer.com/2026/03/23/mlb/mlb-mlbpa-labor-battle-faq-lockout-work-stoppage-2027-season", "published_date": "2026-03-23", "authority": "REPUTABLE_SECONDARY", "notes": "Seen via search snippet. Current CBA took effect March 10, 2022, expires 11:59 p.m. ET Dec 1, 2026."},
+    {"key": "sbd-2011-cba", "title": "MLB labor deal (Sports Business Journal, Nov 28 2011 issue)", "publisher": "Sports Business Journal", "url": "https://www.sportsbusinessdaily.com/Journal/Issues/2011/11/28/Labor-and-Agents/MLB.aspx", "published_date": "2011-11-28", "authority": "REPUTABLE_SECONDARY", "notes": "Seen via search snippet. 2011 CBA created draft signing bonus pools for first 10 rounds with taxes / pick forfeiture for overages; drafted players limited to minor-league contracts. Announcement Nov 22, 2011 per a secondary blog (riveraveblues.com) - not independently verified."}
+  ],
+  "drafts": [
+    {
+      "year": 2015, "start_date": "2015-06-08", "end_date": "2015-06-10", "total_rounds": 40, "rules_era": "CBA_2012_2016",
+      "notes": "Secaucus, NJ (MLB Network Studio 42). Day 1 June 8: Round 1 through Competitive Balance Round B; Day 2 June 9: Rounds 3-10; Day 3 June 10: Rounds 11-40. 1,215 players chosen in 40 rounds plus two CB rounds and one supplemental (compensation) round.",
+      "evidence": [
+        {"source_key": "wiki-2015-draft", "field": "start_date", "value": "2015-06-08", "locator": "infobox / lead", "snippet": "Draft held June 8-10, 2015 in Secaucus, NJ."},
+        {"source_key": "wiki-2015-draft", "field": "end_date", "value": "2015-06-10", "locator": "infobox / lead", "snippet": "Draft held June 8-10, 2015; 1,215 total selections."},
+        {"source_key": "mlb-2015-draft-order", "field": "start_date", "value": "2015-06-08", "locator": "search snippet", "snippet": "The 2015 Draft will take place on June 8-10 ... MLB Network and MLB.com."},
+        {"source_key": "mlb-2015-completes", "field": "total_rounds", "value": "40", "locator": "search snippet", "snippet": "1,215 players chosen across the 40 rounds, two Competitive Balance rounds and one Supplemental round."}
+      ],
+      "conflicts": [], "confidence": "CONFIRMED"
+    },
+    {
+      "year": 2016, "start_date": "2016-06-09", "end_date": "2016-06-11", "total_rounds": 40, "rules_era": "CBA_2012_2016",
+      "notes": "Secaucus, NJ. Day 1 Thu June 9 (Round 1 through CB rounds / Round 2); rounds 3-10 completed Fri June 10; Rounds 11-40 by conference call Sat June 11 (Saturday date inferred from 'after Friday's completion' plus Wikipedia June 9-11 range). 1,216 players in 40 rounds and two Competitive Balance Lottery rounds. Last draft under the 2012-2016 CBA.",
+      "evidence": [
+        {"source_key": "wiki-2016-draft", "field": "start_date", "value": "2016-06-09", "locator": "lead", "snippet": "Draft began on June 9, 2016; held June 9-11."},
+        {"source_key": "wiki-2016-draft", "field": "end_date", "value": "2016-06-11", "locator": "infobox", "snippet": "Dates June 9-11, 2016; 1,216 selections."},
+        {"source_key": "mlb-2016-completes", "field": "total_rounds", "value": "40", "locator": "search snippet", "snippet": "1,216 players chosen in the 40 rounds and two Competitive Balance Lottery rounds."},
+        {"source_key": "mlb-2016-completes", "field": "end_date", "value": "day after Friday (June 10) rounds 3-10", "locator": "search snippet", "snippet": "Draft resumed in the 11th round via conference call after Friday's completion of rounds three through 10."}
+      ],
+      "conflicts": [], "confidence": "CONFIRMED"
+    },
+    {
+      "year": 2017, "start_date": "2017-06-12", "end_date": "2017-06-14", "total_rounds": 40, "rules_era": "CBA_2017_2021",
+      "notes": "Secaucus, NJ. Day 1 Mon June 12 (Round 1, CB A, Round 2, CB B - 75 picks streamed); Day 2 Tue June 13 Rounds 3-10; Day 3 Wed June 14 Rounds 11-40. 1,215 players. First draft under the 2017-2021 CBA. Cardinals forfeited picks 56 and 75 to Astros (hacking penalty).",
+      "evidence": [
+        {"source_key": "wiki-2017-draft", "field": "start_date", "value": "2017-06-12", "locator": "lead", "snippet": "June 12-14, 2017; first 36 picks on MLB Network June 12."},
+        {"source_key": "mlb-2017-coverage-begins", "field": "end_date", "value": "2017-06-14", "locator": "search snippet", "snippet": "Day three on Wednesday, June 14 begins 12 p.m. ET, picks in rounds 11-40."},
+        {"source_key": "mlb-2017-completes", "field": "total_rounds", "value": "40", "locator": "search snippet", "snippet": "1,215 players chosen in the 40 rounds and two Competitive Balance rounds."}
+      ],
+      "conflicts": [], "confidence": "CONFIRMED"
+    },
+    {
+      "year": 2018, "start_date": "2018-06-04", "end_date": "2018-06-06", "total_rounds": 40, "rules_era": "CBA_2017_2021",
+      "notes": "Secaucus, NJ. Day 1 Mon June 4 (first 43 picks on MLB Network, rest of Day 1 online); Day 2 Tue June 5 Rounds 3-10; Day 3 Wed June 6 Rounds 11-40. 1,214 players. Signing deadline July 6.",
+      "evidence": [
+        {"source_key": "wiki-2018-draft", "field": "start_date", "value": "2018-06-04", "locator": "lead", "snippet": "June 4-6, 2018; first 43 picks on MLB Network June 4."},
+        {"source_key": "wiki-2018-draft", "field": "total_rounds", "value": "40", "locator": "infobox", "snippet": "40 rounds; 1,214 players selected."},
+        {"source_key": "mlb-2018-completes", "field": "total_rounds", "value": "40", "locator": "search snippet", "snippet": "1,214 players chosen in 40 rounds plus compensation and Competitive Balance rounds."},
+        {"source_key": "mlb-2018-completes", "field": "end_date", "value": "2018-06-06", "locator": "search snippet", "snippet": "Resumed in 11th round by conference call after rounds 3-10 completed Tuesday."}
+      ],
+      "conflicts": [], "confidence": "CONFIRMED"
+    },
+    {
+      "year": 2019, "start_date": "2019-06-03", "end_date": "2019-06-05", "total_rounds": 40, "rules_era": "CBA_2017_2021",
+      "notes": "Secaucus, NJ. Day 1 Mon June 3 (first 41 picks through CB Round A on MLB Network; Round 2 / CB B streamed after); Day 2 Tue June 4 Rounds 3-10; Day 3 Wed June 5 Rounds 11-40. 1,217 players in 40 rounds, two compensation rounds, two CB rounds. Last 40-round draft.",
+      "evidence": [
+        {"source_key": "wiki-2019-draft", "field": "start_date", "value": "2019-06-03", "locator": "lead", "snippet": "June 3-5, 2019; first 41 picks on MLB Network June 3."},
+        {"source_key": "mlb-2019-details", "field": "end_date", "value": "2019-06-05", "locator": "search snippet", "snippet": "Day 3 Wednesday, June 5: rounds 11-40 at 12 p.m. ET, no delay between selections."},
+        {"source_key": "mlb-2019-completes", "field": "total_rounds", "value": "40", "locator": "search snippet", "snippet": "1,217 players across the 40 rounds, two Compensation rounds and two Competitive Balance rounds."}
+      ],
+      "conflicts": [
+        {"field": "end_date", "values": ["2019-06-05", "2019-06-06"], "source_keys": ["mlb-2019-details", "mlb-2019-completes"], "explanation": "Search summary noted one MLB item phrased the draft as running to June 6; the official schedule and Wikipedia put the final picks on Wed June 5, and June 6 appears to be only the completion press release date. Resolved to June 5."}
+      ],
+      "confidence": "CONFIRMED"
+    },
+    {
+      "year": 2020, "start_date": "2020-06-10", "end_date": "2020-06-11", "total_rounds": 5, "rules_era": "CBA_2017_2021",
+      "notes": "Pandemic-shortened. Held remotely from MLB Network studios in Secaucus (originally planned for Omaha with the College World Series). Day 1 June 10: first 37 picks (Round 1 + CB Round A); Day 2 June 11: Round 2 (pick 38) through Round 5. 160 selections. Shortening permitted by the March 26, 2020 MLB-MLBPA agreement (under the 2017-2021 CBA). Undrafted signings capped at $20,000 each (per MLB.com).",
+      "evidence": [
+        {"source_key": "wiki-2020-draft", "field": "start_date", "value": "2020-06-10", "locator": "lead", "snippet": "June 10-11, 2020, held remotely from MLB Network studios."},
+        {"source_key": "wiki-2020-draft", "field": "total_rounds", "value": "5", "locator": "infobox", "snippet": "Five rounds with 160 total selections."},
+        {"source_key": "mlb-2020-schedule", "field": "end_date", "value": "2020-06-11", "locator": "search snippet", "snippet": "Coverage continues Thursday, June 11 ... through the end of the fifth and final round."},
+        {"source_key": "mlb-2020-schedule", "field": "rules_era", "value": "March 26, 2020 agreement", "locator": "search snippet", "snippet": "Teams may sign unlimited undrafted players for a maximum of $20,000 each."}
+      ],
+      "conflicts": [
+        {"field": "notes", "values": ["$20,000 undrafted cap adopted", "cap not adopted"], "source_keys": ["mlb-2020-schedule", "wiki-2020-draft"], "explanation": "Fetch summary of Wikipedia suggested the $20,000 plan wasn't adopted; MLB.com says it applied. Likely a summarization error; official source preferred. Does not affect dates/rounds."}
+      ],
+      "confidence": "CONFIRMED"
+    },
+    {
+      "year": 2021, "start_date": "2021-07-11", "end_date": "2021-07-13", "total_rounds": 20, "rules_era": "CBA_2017_2021",
+      "notes": "First draft moved to July / All-Star week (All-Star Game July 13). Relocated from Atlanta to Denver (Bellco Theatre) after April 2, 2021 decision. Day 1 Sun July 11: first 36 picks; Day 2 Mon July 12: Rounds 2-10; Day 3 Tue July 13: Rounds 11-20. 612 selections. Reduced to 20 rounds under the March 26, 2020 agreement while the 2017-2021 CBA (which called for 40) was still in force; 20 rounds made permanent by the 2022 CBA.",
+      "evidence": [
+        {"source_key": "wiki-2021-draft", "field": "start_date", "value": "2021-07-11", "locator": "lead", "snippet": "July 11-13, 2021, Bellco Theatre, Denver; held with All-Star Game."},
+        {"source_key": "wiki-2021-draft", "field": "total_rounds", "value": "20", "locator": "infobox", "snippet": "612 total selections over 20 rounds."},
+        {"source_key": "mlb-2021-draft-coverage", "field": "end_date", "value": "2021-07-13", "locator": "search snippet", "snippet": "2021 Draft concluded with rounds 11-20 on Tuesday."},
+        {"source_key": "mlb-2021-draft-coverage", "field": "total_rounds", "value": "20", "locator": "search snippet", "snippet": "Draft reduced to 20 rounds from the 40 called for in the Collective Bargaining Agreement."}
+      ],
+      "conflicts": [], "confidence": "CONFIRMED"
+    },
+    {
+      "year": 2022, "start_date": "2022-07-17", "end_date": "2022-07-19", "total_rounds": 20, "rules_era": "CBA_2022_2026",
+      "notes": "Los Angeles (Xbox Plaza at L.A. Live), All-Star week. Day 1 Sun July 17: Rounds 1-2 plus comp/CB picks (80 players); Day 2 Mon July 18: Rounds 3-10; Day 3 Tue July 19: Rounds 11-20. 616 selections. First draft under the March 10, 2022 CBA: 20 rounds permanent, draft combine, 75% slot guarantee for top-300 prospects who take physicals, draft-and-follow for post-10th-round picks; lottery deferred to 2023. Signing deadline Aug 1.",
+      "evidence": [
+        {"source_key": "wiki-2022-draft", "field": "start_date", "value": "2022-07-17", "locator": "infobox", "snippet": "July 17-19, 2022, Xbox Plaza, Los Angeles."},
+        {"source_key": "wiki-2022-draft", "field": "total_rounds", "value": "20", "locator": "lead", "snippet": "616 total selections in 20 rounds."},
+        {"source_key": "mlb-2022-draft-schedule", "field": "end_date", "value": "2022-07-19", "locator": "search snippet", "snippet": "Day 3 (July 19): Rounds 11 through 20, starting 2 p.m. ET Tuesday."},
+        {"source_key": "mlb-cba-draft-changes-2022", "field": "rules_era", "value": "CBA_2022_2026", "locator": "search snippet", "snippet": "Draft remains at 20 rounds; first six picks set by lottery beginning in 2023."}
+      ],
+      "conflicts": [], "confidence": "CONFIRMED"
+    },
+    {
+      "year": 2023, "start_date": "2023-07-09", "end_date": "2023-07-11", "total_rounds": 20, "rules_era": "CBA_2022_2026",
+      "notes": "Seattle (Lumen Field), All-Star week. Day 1 Sun July 9: Rounds 1-2; Day 2 Mon July 10: Rounds 3-10; Day 3 Tue July 11: Rounds 11-20. 614 selections. First draft with a lottery (held Dec 6, 2022, San Diego; Pirates won No. 1; lottery set top six picks). First PPI pick (Mariners, No. 29, for Julio Rodriguez's 2022 AL ROY).",
+      "evidence": [
+        {"source_key": "wiki-2023-draft", "field": "start_date", "value": "2023-07-09", "locator": "infobox", "snippet": "July 9-11, 2023, Lumen Field, Seattle."},
+        {"source_key": "wiki-2023-draft", "field": "total_rounds", "value": "20", "locator": "lead", "snippet": "20 rounds with 614 total selections."},
+        {"source_key": "mlb-2023-draft-schedule", "field": "end_date", "value": "2023-07-11", "locator": "search snippet", "snippet": "Day 3 (Rounds 11-20): Tuesday, July 11 at 2 p.m. ET."}
+      ],
+      "conflicts": [], "confidence": "CONFIRMED"
+    },
+    {
+      "year": 2024, "start_date": "2024-07-14", "end_date": "2024-07-16", "total_rounds": 20, "rules_era": "CBA_2022_2026",
+      "notes": "Fort Worth, TX (Cowtown Coliseum), All-Star week (game in Arlington). Day 1 Sun July 14: first 74 picks (Rounds 1-2 + comp/CB); Day 2 Mon July 15: Rounds 3-10 (from pick 75); Day 3 Tue July 16: Rounds 11-20 (from pick 316). 615 selections. Lottery Dec 5, 2023 Nashville (Guardians). PPI picks 31 (ARI) and 32 (BAL).",
+      "evidence": [
+        {"source_key": "wiki-2024-draft", "field": "start_date", "value": "2024-07-14", "locator": "infobox", "snippet": "July 14-16, 2024, Cowtown Coliseum, Fort Worth."},
+        {"source_key": "wiki-2024-draft", "field": "total_rounds", "value": "20", "locator": "lead", "snippet": "20 rounds, 615 total selections."},
+        {"source_key": "mlb-2024-draft-schedule", "field": "end_date", "value": "2024-07-16", "locator": "search snippet", "snippet": "Day 3 (Tuesday, July 16): Rounds 11-20 starting 2 p.m. ET."}
+      ],
+      "conflicts": [], "confidence": "CONFIRMED"
+    },
+    {
+      "year": 2025, "start_date": "2025-07-13", "end_date": "2025-07-14", "total_rounds": 20, "rules_era": "CBA_2022_2026",
+      "notes": "First two-day format. Coca-Cola Roxy at The Battery Atlanta (Cumberland, GA), All-Star week. Day 1 Sun July 13: first 105 picks (through Round 3); Day 2 Mon July 14: Rounds 4-20. 615 selections. Lottery Dec 10, 2024 Dallas (Nationals). PPI pick 28 (KC).",
+      "evidence": [
+        {"source_key": "wiki-2025-draft", "field": "start_date", "value": "2025-07-13", "locator": "infobox", "snippet": "July 13-14, 2025, Coca-Cola Roxy, Cumberland, Georgia."},
+        {"source_key": "wiki-2025-draft", "field": "total_rounds", "value": "20", "locator": "lead", "snippet": "20 rounds, 615 total selections."},
+        {"source_key": "mlb-2025-draft-details", "field": "end_date", "value": "2025-07-14", "locator": "search snippet / headline", "snippet": "2025 MLB Draft to take place over two days on July 13-14."},
+        {"source_key": "mlb-2025-draft-details", "field": "total_rounds", "value": "20", "locator": "search snippet", "snippet": "Day 2 picks in rounds 4 through 20 began 11:30 a.m. ET Monday, July 14."}
+      ],
+      "conflicts": [], "confidence": "CONFIRMED"
+    },
+    {
+      "year": 2026, "start_date": "2026-07-11", "end_date": "2026-07-12", "total_rounds": 20, "rules_era": "CBA_2022_2026",
+      "notes": "Philadelphia (Pennsylvania Convention Center), All-Star week. Two days: Day 1 Sat July 11: Rounds 1-4 (picks 1-135; picks 1-10 on NBC/Peacock); Day 2 Sun July 12: Rounds 5-20. 613 selections. Lottery Dec 9, 2025 Orlando (White Sox; COL, WSH, LAA ineligible). PPI picks to ATL (26) and HOU (28). Last draft under the 2022-2026 CBA (expires Dec 1, 2026). Round count is from MLB.com search snippets plus Wikipedia's 'rounds two through 20'; MLB.com pages could not be fetched directly.",
+      "evidence": [
+        {"source_key": "wiki-2026-draft", "field": "start_date", "value": "2026-07-11", "locator": "infobox", "snippet": "July 11-12, 2026, Pennsylvania Convention Center, Philadelphia."},
+        {"source_key": "wiki-2026-draft", "field": "total_rounds", "value": "20 (implied)", "locator": "draft order section", "snippet": "Order for rounds two through 20."},
+        {"source_key": "mlb-2026-draft-schedule", "field": "start_date", "value": "2026-07-11", "locator": "search snippet", "snippet": "Day 1: Saturday, July 11 (Rounds 1-4)."},
+        {"source_key": "mlb-2026-draft-schedule", "field": "end_date", "value": "2026-07-12", "locator": "search snippet", "snippet": "Day 2: Sunday, July 12 (Rounds 5-20)."},
+        {"source_key": "mlb-2026-draft-schedule", "field": "total_rounds", "value": "20", "locator": "search snippet (Day 2 coverage)", "snippet": "30 clubs combined for 613 selections across 20 rounds."},
+        {"source_key": "espn-2026-cholowsky", "field": "start_date", "value": "2026-07-11", "locator": "search result", "snippet": "White Sox take Cholowsky No. 1; draft in Philadelphia during All-Star weekend."}
+      ],
+      "conflicts": [], "confidence": "CONFIRMED"
+    }
+  ],
+  "rules_eras": [
+    {"key": "CBA_2012_2016", "label": "2012-2016 Basic Agreement", "effective_from": null, "effective_to": "2016-12-01", "summary": "Agreement reached in late November 2011 (announced Nov 22, 2011 per secondary source) introduced draft signing bonus pools for the first 10 rounds with tax/pick-forfeiture penalties, minor-league-only draft contracts, and Competitive Balance lottery rounds; 40-round draft. Governed the 2015 and 2016 drafts.", "source_keys": ["sbd-2011-cba", "mlb-2016-completes"]},
+    {"key": "CBA_2017_2021", "label": "2017-2021 Basic Agreement", "effective_from": "2016-12-01", "effective_to": "2021-12-01", "summary": "Tentative deal Dec 1, 2016, ratified mid-December 2016, expiring Dec 1, 2021. Kept the 40-round draft (2017-2019) and revised qualifying-offer compensation; the 2020 (5 rounds) and 2021 (20 rounds, moved to July/All-Star week) drafts were shortened under the March 26, 2020 pandemic agreement.", "source_keys": ["mlb-2016-tentative-cba", "si-2016-cba-ratified", "wiki-2020-draft", "wiki-2021-draft", "mlb-2021-draft-coverage"]},
+    {"key": "PANDEMIC_2020_AGREEMENT", "label": "March 26, 2020 MLB-MLBPA pandemic agreement (draft provisions)", "effective_from": "2020-03-26", "effective_to": null, "summary": "Let MLB cut the 2020 draft to as few as five rounds (it chose five, held remotely June 10-11) and the 2021 draft to 20 rounds; undrafted 2020 signings capped at $20,000.", "source_keys": ["wiki-2020-draft", "mlb-2020-schedule", "wiki-2021-draft"]},
+    {"key": "CBA_2022_2026", "label": "2022-2026 Basic Agreement", "effective_from": "2022-03-10", "effective_to": "2026-12-01", "summary": "Signed March 10, 2022 after the 99-day lockout. Made 20 rounds permanent, added a pre-draft combine, 75% slot guarantee for top-300 prospects who take physicals, draft-and-follow, a six-pick draft lottery from 2023 (with eligibility limits), and Prospect Promotion Incentive picks. Governed the 2022-2026 drafts.", "source_keys": ["wiki-2022-draft", "mlb-cba-draft-changes-2022", "mlb-ppi-faq", "ringer-2026-cba-faq"]}
+  ]
+}

@@ -1,0 +1,1957 @@
+{
+  "format": "bai-research-import/1",
+  "batch_key": "pilot-2015-draft-lad",
+  "channel": "DRAFT",
+  "description": "Pilot: every Los Angeles Dodgers selection in the 2015 Rule 4 draft (42 picks), plus the later selections of four unsigned 2015 picks who were drafted again. Research date 2026-10-19.",
+  "coverage_claims": [
+    {
+      "domain": "DRAFT",
+      "scope_key": "2015-JUNE_AMATEUR",
+      "organization": "LAD",
+      "coverage_state": "PARTIAL_RECONSTRUCTION",
+      "expected_count": 42,
+      "source_key": "pilot2015:mlb-statsapi-draft-2015-lad",
+      "gap_notes": "All 42 selections are tracked (MLB Stats API and Baseball-Reference agree on names and overall picks), and every pick has a signing status (36 signed, 6 did not sign). Held at PARTIAL_RECONSTRUCTION pending review: bonuses are published for only 18 of 36 signed picks, slots only for rounds 1-10, no outcomes audited, Baseball-Reference reached via an archived copy."
+    }
+  ],
+  "sources": [
+    {
+      "source_key": "pilot2015:bref-lad-2015",
+      "source_type": "REFERENCE_DATABASE",
+      "authority_level": "AGGREGATOR",
+      "title": "Baseball-Reference: 2015 June amateur draft, Los Angeles Dodgers",
+      "publisher": "Baseball-Reference (Sports Reference)",
+      "url": "https://www.baseball-reference.com/draft/?team_ID=LAD&year_ID=2015&draft_type=junreg&query_type=franch_year",
+      "archived_url": "http://web.archive.org/web/20241224144219/https://www.baseball-reference.com/draft/index.fcgi?team_ID=LAD&year_ID=2015&draft_type=junreg&query_type=franch_year",
+      "published_date": null,
+      "retrieved_date": "2026-10-19",
+      "notes": "Live URL https://www.baseball-reference.com/draft/?team_ID=LAD&year_ID=2015&draft_type=junreg&query_type=franch_year returned HTTP 403; used Wayback capture 2024-12-24 of index.fcgi equivalent (ARCHIVE of AGGREGATOR). Columns: Rnd, OvPck, RdPck, Signed, Bonus, Name, Pos, Type, Drafted From."
+    },
+    {
+      "source_key": "pilot2015:mlb-statsapi-draft-2015-lad",
+      "source_type": "OFFICIAL_LEAGUE",
+      "authority_level": "OFFICIAL",
+      "title": "MLB Stats API draft endpoint, 2015, teamId=119",
+      "publisher": "MLB Advanced Media",
+      "url": "https://statsapi.mlb.com/api/v1/draft/2015?teamId=119",
+      "archived_url": null,
+      "published_date": null,
+      "retrieved_date": "2026-10-19",
+      "notes": "JSON; 42 picks; pickRound, pickNumber, roundPickNumber, person.id (MLBAM), birthDate, school name. signingBonus/pickValue not populated for 2015 picks."
+    },
+    {
+      "source_key": "pilot2015:mlb-statsapi-people-drafts",
+      "source_type": "OFFICIAL_LEAGUE",
+      "authority_level": "OFFICIAL",
+      "title": "MLB Stats API people endpoint with draft hydration (6 unsigned players)",
+      "publisher": "MLB Advanced Media",
+      "url": "https://statsapi.mlb.com/api/v1/people?personIds=608335,663685,621508,664987,664986,663467&hydrate=draft",
+      "archived_url": null,
+      "published_date": null,
+      "retrieved_date": "2026-10-19",
+      "notes": "Full draft history per player; used for redrafts."
+    },
+    {
+      "source_key": "pilot2015:dodgersdigest-2015-07-17",
+      "source_type": "NEWS_REPORT",
+      "authority_level": "OTHER",
+      "title": "MLB Draft deadline day: Buehler, Funkhouser, Rios still unsigned",
+      "publisher": "Dodgers Digest (Dustin Nosler)",
+      "url": "https://dodgersdigest.com/2015/07/17/dodgers-mlb-draft-deadline-day-walker-buehler-kyle-funkhouser-edwin-rios-still-unsigned",
+      "archived_url": "http://web.archive.org/web/20160327015910/http://dodgersdigest.com/2015/07/17/dodgers-mlb-draft-deadline-day-walker-buehler-kyle-funkhouser-edwin-rios-still-unsigned",
+      "published_date": "2015-07-17",
+      "retrieved_date": "2026-10-19",
+      "notes": "Fan/analysis site; live page Cloudflare-blocked, used Wayback capture. Table of rounds 1-11 slot values and bonuses as of morning of signing deadline; pool total $7,781,700."
+    },
+    {
+      "source_key": "pilot2015:mlb-callis-pools-2015",
+      "source_type": "OFFICIAL_LEAGUE",
+      "authority_level": "OFFICIAL",
+      "title": "Breakdown of 2015 Draft signing bonus pools",
+      "publisher": "MLB.com (Jim Callis)",
+      "url": "https://m.mlb.com/news/article/126797888/breakdown-of-2015-draft-signing-bonus-pools",
+      "archived_url": "http://web.archive.org/web/20150530021525/http://m.mlb.com/news/article/126797888/breakdown-of-2015-draft-signing-bonus-pools",
+      "published_date": "2015-05-29",
+      "retrieved_date": "2026-10-19",
+      "notes": "Live mlb.com URL returned 403; Wayback capture 2015-05-30. Dodgers pool $7,781,700 (matches Dodgers Digest slot total). States draft starts June 8 (6 PM ET) with Day 2 on June 9. Published date approximate (capture 2015-05-30)."
+    },
+    {
+      "source_key": "pilot2015:bref-register-funkhouser",
+      "source_type": "REFERENCE_DATABASE",
+      "authority_level": "AGGREGATOR",
+      "title": "Kyle Funkhouser register page",
+      "publisher": "Baseball-Reference",
+      "url": "https://www.baseball-reference.com/register/player.fcgi?id=funkho001kyl",
+      "archived_url": "http://web.archive.org/web/20250506012248/https://www.baseball-reference.com/register/player.fcgi?id=funkho001kyl",
+      "published_date": null,
+      "retrieved_date": "2026-10-19",
+      "notes": "Wayback capture; 'Drafted by' line and pro stat rows (2016 Connecticut, DET)."
+    },
+    {
+      "source_key": "pilot2015:bref-register-goldstein",
+      "source_type": "REFERENCE_DATABASE",
+      "authority_level": "AGGREGATOR",
+      "title": "Jason Goldstein register page",
+      "publisher": "Baseball-Reference",
+      "url": "https://www.baseball-reference.com/register/player.fcgi?id=goldst000jas",
+      "archived_url": "http://web.archive.org/web/20240809055656/https://www.baseball-reference.com/register/player.fcgi?id=goldst000jas",
+      "published_date": null,
+      "retrieved_date": "2026-10-19",
+      "notes": "Wayback capture; draft line; pro rows with SEA (and OAK) affiliates."
+    },
+    {
+      "source_key": "pilot2015:bref-register-genord",
+      "source_type": "REFERENCE_DATABASE",
+      "authority_level": "AGGREGATOR",
+      "title": "Joe Genord register page",
+      "publisher": "Baseball-Reference",
+      "url": "https://www.baseball-reference.com/register/player.fcgi?id=genord000joe",
+      "archived_url": "http://web.archive.org/web/20240628042308/https://www.baseball-reference.com/register/player.fcgi?id=genord000joe",
+      "published_date": null,
+      "retrieved_date": "2026-10-19",
+      "notes": "Wayback capture; draft line; pro rows with NYM affiliate."
+    },
+    {
+      "source_key": "pilot2015:bref-register-bilous",
+      "source_type": "REFERENCE_DATABASE",
+      "authority_level": "AGGREGATOR",
+      "title": "Jason Bilous register page",
+      "publisher": "Baseball-Reference",
+      "url": "https://www.baseball-reference.com/register/player.fcgi?id=bilous000jas",
+      "archived_url": "http://web.archive.org/web/20251114191230/https://www.baseball-reference.com/register/player.fcgi?id=bilous000jas",
+      "published_date": null,
+      "retrieved_date": "2026-10-19",
+      "notes": "Wayback capture; draft line; 2018 Great Falls (CHW), 2019 Kannapolis (CHW)."
+    }
+  ],
+  "records": [
+    {
+      "type": "DRAFT_SELECTION",
+      "source_key": "pilot2015:mlb-statsapi-draft-2015-lad",
+      "draft_key": "2015-JUNE_AMATEUR",
+      "round_code": "1",
+      "overall_pick": 24,
+      "round_pick": 24,
+      "organization": "LAD",
+      "selection_type": "STANDARD",
+      "position": "RHP",
+      "field_sources": {
+        "position": "pilot2015:bref-lad-2015",
+        "school": "pilot2015:bref-lad-2015"
+      },
+      "player": {
+        "full_name": "Walker Buehler",
+        "birth_date": "1994-07-28",
+        "external_ids": {
+          "MLBAM": "621111",
+          "BBREF": "buehlwa01",
+          "BBREF_MINORS": "buehle000wal"
+        },
+        "source_key": "pilot2015:mlb-statsapi-draft-2015-lad"
+      },
+      "school": {
+        "name": "Vanderbilt University",
+        "school_type": "COLLEGE",
+        "city": "Nashville",
+        "region": "TN",
+        "country": "USA",
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "signing": {
+        "status": "SIGNED",
+        "bonus_usd": 1777500,
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "slot_value": {
+        "usd": 2094400,
+        "source_key": "pilot2015:dodgersdigest-2015-07-17",
+        "locator": "rounds 1-11 table"
+      },
+      "notes": "Dodgers Digest 2015-07-17 (pre-deadline) listed him unsigned; B-Ref shows Signed=Y with $1,777,500 (below $2,094,400 slot). MLB Stats API current primaryPosition=P (not necessarily draft-listed position); MLB school label='Vanderbilt'. A 2015-07-17 pre-deadline table listed him as unsigned; the final record shows him signed (timing, not a conflict)."
+    },
+    {
+      "type": "DRAFT_SELECTION",
+      "source_key": "pilot2015:mlb-statsapi-draft-2015-lad",
+      "draft_key": "2015-JUNE_AMATEUR",
+      "round_code": "1",
+      "overall_pick": 35,
+      "round_pick": 35,
+      "organization": "LAD",
+      "selection_type": "STANDARD",
+      "position": "RHP",
+      "field_sources": {
+        "position": "pilot2015:bref-lad-2015",
+        "school": "pilot2015:bref-lad-2015"
+      },
+      "player": {
+        "full_name": "Kyle Funkhouser",
+        "birth_date": "1994-03-16",
+        "external_ids": {
+          "MLBAM": "608335",
+          "BBREF": "funkhky01",
+          "BBREF_MINORS": "funkho001kyl"
+        },
+        "source_key": "pilot2015:mlb-statsapi-draft-2015-lad"
+      },
+      "school": {
+        "name": "University of Louisville",
+        "school_type": "COLLEGE",
+        "city": "Louisville",
+        "region": "KY",
+        "country": "USA",
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "signing": {
+        "status": "DID_NOT_SIGN",
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "slot_value": {
+        "usd": 1756100,
+        "source_key": "pilot2015:dodgersdigest-2015-07-17",
+        "locator": "rounds 1-11 table"
+      },
+      "notes": "Did not sign; returned to Louisville; re-drafted by Detroit in 2016 (see redrafts). Pick #35 shown as '1' by B-Ref and MLB API, '1s' by Dodgers Digest. MLB Stats API current primaryPosition=P (not necessarily draft-listed position); MLB school label='Louisville'."
+    },
+    {
+      "type": "DRAFT_SELECTION",
+      "source_key": "pilot2015:mlb-statsapi-draft-2015-lad",
+      "draft_key": "2015-JUNE_AMATEUR",
+      "round_code": "2",
+      "overall_pick": 67,
+      "round_pick": 25,
+      "organization": "LAD",
+      "selection_type": "STANDARD",
+      "position": "OF",
+      "field_sources": {
+        "position": "pilot2015:bref-lad-2015",
+        "school": "pilot2015:bref-lad-2015"
+      },
+      "player": {
+        "full_name": "Mitchell Hansen",
+        "birth_date": "1996-05-01",
+        "external_ids": {
+          "MLBAM": "663961",
+          "BBREF_MINORS": "hansen000mit"
+        },
+        "source_key": "pilot2015:mlb-statsapi-draft-2015-lad"
+      },
+      "school": {
+        "name": "Plano HS",
+        "school_type": "HIGH_SCHOOL",
+        "city": "Plano",
+        "region": "TX",
+        "country": "USA",
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "signing": {
+        "status": "SIGNED",
+        "bonus_usd": 997500,
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "slot_value": {
+        "usd": 921100,
+        "source_key": "pilot2015:dodgersdigest-2015-07-17",
+        "locator": "rounds 1-11 table"
+      },
+      "notes": "MLB Stats API current primaryPosition=LF (not necessarily draft-listed position); MLB school label='Plano Senior (TX) HS'."
+    },
+    {
+      "type": "DRAFT_SELECTION",
+      "source_key": "pilot2015:mlb-statsapi-draft-2015-lad",
+      "draft_key": "2015-JUNE_AMATEUR",
+      "round_code": "CB-B",
+      "overall_pick": 74,
+      "round_pick": 4,
+      "organization": "LAD",
+      "selection_type": "COMPETITIVE_BALANCE",
+      "position": "RHP",
+      "field_sources": {
+        "position": "pilot2015:bref-lad-2015",
+        "school": "pilot2015:bref-lad-2015"
+      },
+      "player": {
+        "full_name": "Josh Sborz",
+        "birth_date": "1993-12-17",
+        "external_ids": {
+          "MLBAM": "622250",
+          "BBREF": "sborzjo01",
+          "BBREF_MINORS": "sborz-000jos"
+        },
+        "source_key": "pilot2015:mlb-statsapi-draft-2015-lad"
+      },
+      "school": {
+        "name": "University of Virginia",
+        "school_type": "COLLEGE",
+        "city": "Charlottesville",
+        "region": "VA",
+        "country": "USA",
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "signing": {
+        "status": "SIGNED",
+        "bonus_usd": 722500,
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "slot_value": {
+        "usd": 827000,
+        "source_key": "pilot2015:dodgersdigest-2015-07-17",
+        "locator": "rounds 1-11 table"
+      },
+      "notes": "Round label differs: MLB Stats API 'CB-B' (round pick 4); B-Ref '2' (RdPck 32); Dodgers Digest '2c'. MLB Stats API current primaryPosition=P (not necessarily draft-listed position); MLB school label='Virginia'.",
+      "evidence": [
+        {
+          "subject": "selection",
+          "field": "round_code",
+          "value": "2",
+          "source_key": "pilot2015:bref-lad-2015",
+          "locator": "draft table round column"
+        },
+        {
+          "subject": "selection",
+          "field": "round_pick",
+          "value": 32,
+          "source_key": "pilot2015:bref-lad-2015",
+          "locator": "draft table pick-in-round column"
+        }
+      ]
+    },
+    {
+      "type": "DRAFT_SELECTION",
+      "source_key": "pilot2015:mlb-statsapi-draft-2015-lad",
+      "draft_key": "2015-JUNE_AMATEUR",
+      "round_code": "3",
+      "overall_pick": 101,
+      "round_pick": 26,
+      "organization": "LAD",
+      "selection_type": "STANDARD",
+      "position": "LHP",
+      "field_sources": {
+        "position": "pilot2015:bref-lad-2015",
+        "school": "pilot2015:bref-lad-2015"
+      },
+      "player": {
+        "full_name": "Phil Pfeifer",
+        "birth_date": "1992-07-15",
+        "external_ids": {
+          "MLBAM": "547177",
+          "BBREF_MINORS": "pfeife000phi"
+        },
+        "source_key": "pilot2015:mlb-statsapi-draft-2015-lad"
+      },
+      "school": {
+        "name": "Vanderbilt University",
+        "school_type": "COLLEGE",
+        "city": "Nashville",
+        "region": "TN",
+        "country": "USA",
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "signing": {
+        "status": "SIGNED",
+        "bonus_usd": 222500,
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "slot_value": {
+        "usd": 564700,
+        "source_key": "pilot2015:dodgersdigest-2015-07-17",
+        "locator": "rounds 1-11 table"
+      },
+      "notes": "MLB Stats API current primaryPosition=P (not necessarily draft-listed position); MLB school label='Vanderbilt'."
+    },
+    {
+      "type": "DRAFT_SELECTION",
+      "source_key": "pilot2015:mlb-statsapi-draft-2015-lad",
+      "draft_key": "2015-JUNE_AMATEUR",
+      "round_code": "4",
+      "overall_pick": 132,
+      "round_pick": 27,
+      "organization": "LAD",
+      "selection_type": "STANDARD",
+      "position": "2B",
+      "field_sources": {
+        "position": "pilot2015:bref-lad-2015",
+        "school": "pilot2015:bref-lad-2015"
+      },
+      "player": {
+        "full_name": "Willie Calhoun",
+        "birth_date": "1994-11-04",
+        "external_ids": {
+          "MLBAM": "641432",
+          "BBREF": "calhowi01",
+          "BBREF_MINORS": "calhou003wil"
+        },
+        "source_key": "pilot2015:mlb-statsapi-draft-2015-lad"
+      },
+      "school": {
+        "name": "Yavapai College",
+        "school_type": "JUNIOR_COLLEGE",
+        "city": "Prescott",
+        "region": "AZ",
+        "country": "USA",
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "signing": {
+        "status": "SIGNED",
+        "bonus_usd": 347500,
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "slot_value": {
+        "usd": 418800,
+        "source_key": "pilot2015:dodgersdigest-2015-07-17",
+        "locator": "rounds 1-11 table"
+      },
+      "notes": "MLB Stats API current primaryPosition=1B (not necessarily draft-listed position); MLB school label='Yavapai College'."
+    },
+    {
+      "type": "DRAFT_SELECTION",
+      "source_key": "pilot2015:mlb-statsapi-draft-2015-lad",
+      "draft_key": "2015-JUNE_AMATEUR",
+      "round_code": "5",
+      "overall_pick": 162,
+      "round_pick": 27,
+      "organization": "LAD",
+      "selection_type": "STANDARD",
+      "position": "SS",
+      "field_sources": {
+        "position": "pilot2015:bref-lad-2015",
+        "school": "pilot2015:bref-lad-2015"
+      },
+      "player": {
+        "full_name": "Brendon Davis",
+        "birth_date": "1997-07-28",
+        "external_ids": {
+          "MLBAM": "663478",
+          "BBREF": "davisbr04",
+          "BBREF_MINORS": "davis-012bre"
+        },
+        "source_key": "pilot2015:mlb-statsapi-draft-2015-lad"
+      },
+      "school": {
+        "name": "Lakewood HS",
+        "school_type": "HIGH_SCHOOL",
+        "city": "Lakewood",
+        "region": "CA",
+        "country": "USA",
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "signing": {
+        "status": "SIGNED",
+        "bonus_usd": 918600,
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "slot_value": {
+        "usd": 313600,
+        "source_key": "pilot2015:dodgersdigest-2015-07-17",
+        "locator": "rounds 1-11 table"
+      },
+      "notes": "MLB Stats API current primaryPosition=SS (not necessarily draft-listed position); MLB school label='Lakewood (CA) HS'."
+    },
+    {
+      "type": "DRAFT_SELECTION",
+      "source_key": "pilot2015:mlb-statsapi-draft-2015-lad",
+      "draft_key": "2015-JUNE_AMATEUR",
+      "round_code": "6",
+      "overall_pick": 192,
+      "round_pick": 27,
+      "organization": "LAD",
+      "selection_type": "STANDARD",
+      "position": "1B",
+      "field_sources": {
+        "position": "pilot2015:bref-lad-2015",
+        "school": "pilot2015:bref-lad-2015"
+      },
+      "player": {
+        "full_name": "Edwin Ríos",
+        "birth_date": "1994-04-21",
+        "external_ids": {
+          "MLBAM": "621458",
+          "BBREF": "riosed01",
+          "BBREF_MINORS": "rios--001edw"
+        },
+        "source_key": "pilot2015:mlb-statsapi-draft-2015-lad"
+      },
+      "school": {
+        "name": "Florida International University",
+        "school_type": "COLLEGE",
+        "city": "Miami",
+        "region": "FL",
+        "country": "USA",
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "signing": {
+        "status": "SIGNED",
+        "bonus_usd": 222500,
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "slot_value": {
+        "usd": 234800,
+        "source_key": "pilot2015:dodgersdigest-2015-07-17",
+        "locator": "rounds 1-11 table"
+      },
+      "notes": "Dodgers Digest 2015-07-17 (pre-deadline) listed him unsigned; B-Ref shows Signed=Y with $222,500. MLB Stats API current primaryPosition=1B (not necessarily draft-listed position); MLB school label='Florida International'. A 2015-07-17 pre-deadline table listed him as unsigned; the final record shows him signed (timing, not a conflict)."
+    },
+    {
+      "type": "DRAFT_SELECTION",
+      "source_key": "pilot2015:mlb-statsapi-draft-2015-lad",
+      "draft_key": "2015-JUNE_AMATEUR",
+      "round_code": "7",
+      "overall_pick": 222,
+      "round_pick": 27,
+      "organization": "LAD",
+      "selection_type": "STANDARD",
+      "position": "RHP",
+      "field_sources": {
+        "position": "pilot2015:bref-lad-2015",
+        "school": "pilot2015:bref-lad-2015"
+      },
+      "player": {
+        "full_name": "Andrew Sopko",
+        "birth_date": "1994-08-07",
+        "external_ids": {
+          "MLBAM": "621127",
+          "BBREF_MINORS": "sopko-000and"
+        },
+        "source_key": "pilot2015:mlb-statsapi-draft-2015-lad"
+      },
+      "school": {
+        "name": "Gonzaga University",
+        "school_type": "COLLEGE",
+        "city": "Spokane",
+        "region": "WA",
+        "country": "USA",
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "signing": {
+        "status": "SIGNED",
+        "bonus_usd": 147500,
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "slot_value": {
+        "usd": 178600,
+        "source_key": "pilot2015:dodgersdigest-2015-07-17",
+        "locator": "rounds 1-11 table"
+      },
+      "notes": "MLB Stats API current primaryPosition=P (not necessarily draft-listed position); MLB school label='Gonzaga'."
+    },
+    {
+      "type": "DRAFT_SELECTION",
+      "source_key": "pilot2015:mlb-statsapi-draft-2015-lad",
+      "draft_key": "2015-JUNE_AMATEUR",
+      "round_code": "8",
+      "overall_pick": 252,
+      "round_pick": 27,
+      "organization": "LAD",
+      "selection_type": "STANDARD",
+      "position": "RHP",
+      "field_sources": {
+        "position": "pilot2015:bref-lad-2015",
+        "school": "pilot2015:bref-lad-2015"
+      },
+      "player": {
+        "full_name": "Tommy Bergjans",
+        "birth_date": "1992-12-01",
+        "external_ids": {
+          "MLBAM": "664225",
+          "BBREF_MINORS": "bergja000tom"
+        },
+        "source_key": "pilot2015:mlb-statsapi-draft-2015-lad"
+      },
+      "school": {
+        "name": "Haverford College",
+        "school_type": "COLLEGE",
+        "city": "Haverford",
+        "region": "PA",
+        "country": "USA",
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "signing": {
+        "status": "SIGNED",
+        "bonus_usd": 17500,
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "slot_value": {
+        "usd": 167000,
+        "source_key": "pilot2015:dodgersdigest-2015-07-17",
+        "locator": "printed \"$167,00\"; 167,000 per the table total"
+      },
+      "notes": "Slot printed as '$167,00' (typo) in Dodgers Digest; $167,000 is implied by the table's $7,781,700 total minus the other 11 listed slots and by its listed savings ($167,000-$17,500=$149,500). MLB Stats API current primaryPosition=P (not necessarily draft-listed position); MLB school label='Haverford College'."
+    },
+    {
+      "type": "DRAFT_SELECTION",
+      "source_key": "pilot2015:mlb-statsapi-draft-2015-lad",
+      "draft_key": "2015-JUNE_AMATEUR",
+      "round_code": "9",
+      "overall_pick": 282,
+      "round_pick": 27,
+      "organization": "LAD",
+      "selection_type": "STANDARD",
+      "position": "RHP",
+      "field_sources": {
+        "position": "pilot2015:bref-lad-2015",
+        "school": "pilot2015:bref-lad-2015"
+      },
+      "player": {
+        "full_name": "Kevin Brown",
+        "birth_date": "1992-06-09",
+        "external_ids": {
+          "MLBAM": "664838",
+          "BBREF_MINORS": "brown-012kev"
+        },
+        "source_key": "pilot2015:mlb-statsapi-draft-2015-lad"
+      },
+      "school": {
+        "name": "California State University, Dominguez Hills",
+        "school_type": "COLLEGE",
+        "city": "Carson",
+        "region": "CA",
+        "country": "USA",
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "signing": {
+        "status": "SIGNED",
+        "bonus_usd": 2500,
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "slot_value": {
+        "usd": 155900,
+        "source_key": "pilot2015:dodgersdigest-2015-07-17",
+        "locator": "rounds 1-11 table"
+      },
+      "notes": "MLB Stats API current primaryPosition=P (not necessarily draft-listed position); MLB school label='Cal State Dominguez Hills'."
+    },
+    {
+      "type": "DRAFT_SELECTION",
+      "source_key": "pilot2015:mlb-statsapi-draft-2015-lad",
+      "draft_key": "2015-JUNE_AMATEUR",
+      "round_code": "10",
+      "overall_pick": 312,
+      "round_pick": 27,
+      "organization": "LAD",
+      "selection_type": "STANDARD",
+      "position": "CF",
+      "field_sources": {
+        "position": "pilot2015:bref-lad-2015",
+        "school": "pilot2015:bref-lad-2015"
+      },
+      "player": {
+        "full_name": "Logan Landon",
+        "birth_date": "1993-02-17",
+        "external_ids": {
+          "MLBAM": "664860",
+          "BBREF_MINORS": "landon000log"
+        },
+        "source_key": "pilot2015:mlb-statsapi-draft-2015-lad"
+      },
+      "school": {
+        "name": "University of Texas Pan American",
+        "school_type": "COLLEGE",
+        "city": "Edinburg",
+        "region": "TX",
+        "country": "USA",
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "signing": {
+        "status": "SIGNED",
+        "bonus_usd": 2500,
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "slot_value": {
+        "usd": 149700,
+        "source_key": "pilot2015:dodgersdigest-2015-07-17",
+        "locator": "rounds 1-11 table"
+      },
+      "notes": "MLB Stats API current primaryPosition=CF (not necessarily draft-listed position); MLB school label='Texas - Pan American'."
+    },
+    {
+      "type": "DRAFT_SELECTION",
+      "source_key": "pilot2015:mlb-statsapi-draft-2015-lad",
+      "draft_key": "2015-JUNE_AMATEUR",
+      "round_code": "11",
+      "overall_pick": 342,
+      "round_pick": 27,
+      "organization": "LAD",
+      "selection_type": "STANDARD",
+      "position": "RHP",
+      "field_sources": {
+        "position": "pilot2015:bref-lad-2015",
+        "school": "pilot2015:bref-lad-2015"
+      },
+      "player": {
+        "full_name": "Imani Abdullah",
+        "birth_date": "1997-04-20",
+        "external_ids": {
+          "MLBAM": "663563",
+          "BBREF_MINORS": "abdull000ima"
+        },
+        "source_key": "pilot2015:mlb-statsapi-draft-2015-lad"
+      },
+      "school": {
+        "name": "Madison HS",
+        "school_type": "HIGH_SCHOOL",
+        "city": "San Diego",
+        "region": "CA",
+        "country": "USA",
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "signing": {
+        "status": "SIGNED",
+        "bonus_usd": 647500,
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "notes": "Round 11: no slot value exists; Dodgers Digest shows $100,000 (the post-round-10 threshold). Bonus over $100k counted against pool. MLB Stats API current primaryPosition=P (not necessarily draft-listed position); MLB school label='Madison (CA) HS'."
+    },
+    {
+      "type": "DRAFT_SELECTION",
+      "source_key": "pilot2015:mlb-statsapi-draft-2015-lad",
+      "draft_key": "2015-JUNE_AMATEUR",
+      "round_code": "12",
+      "overall_pick": 372,
+      "round_pick": 27,
+      "organization": "LAD",
+      "selection_type": "STANDARD",
+      "position": "C",
+      "field_sources": {
+        "position": "pilot2015:bref-lad-2015",
+        "school": "pilot2015:bref-lad-2015"
+      },
+      "player": {
+        "full_name": "Matt Beaty",
+        "birth_date": "1993-04-28",
+        "external_ids": {
+          "MLBAM": "607461",
+          "BBREF": "beatyma01",
+          "BBREF_MINORS": "beaty-000mat"
+        },
+        "source_key": "pilot2015:mlb-statsapi-draft-2015-lad"
+      },
+      "school": {
+        "name": "Belmont University",
+        "school_type": "COLLEGE",
+        "city": "Nashville",
+        "region": "TN",
+        "country": "USA",
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "signing": {
+        "status": "SIGNED",
+        "bonus_usd": null,
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "notes": "B-Ref Signed=Y but bonus blank (not published). MLB Stats API current primaryPosition=1B (not necessarily draft-listed position); MLB school label='Belmont University'."
+    },
+    {
+      "type": "DRAFT_SELECTION",
+      "source_key": "pilot2015:mlb-statsapi-draft-2015-lad",
+      "draft_key": "2015-JUNE_AMATEUR",
+      "round_code": "13",
+      "overall_pick": 402,
+      "round_pick": 27,
+      "organization": "LAD",
+      "selection_type": "STANDARD",
+      "position": "LHP",
+      "field_sources": {
+        "position": "pilot2015:bref-lad-2015",
+        "school": "pilot2015:bref-lad-2015"
+      },
+      "player": {
+        "full_name": "Michael Boyle",
+        "birth_date": "1994-04-12",
+        "external_ids": {
+          "MLBAM": "664082",
+          "BBREF_MINORS": "boyle-001mic"
+        },
+        "source_key": "pilot2015:mlb-statsapi-draft-2015-lad"
+      },
+      "school": {
+        "name": "Radford University",
+        "school_type": "COLLEGE",
+        "city": "Radford",
+        "region": "VA",
+        "country": "USA",
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "signing": {
+        "status": "SIGNED",
+        "bonus_usd": 100000,
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "notes": "MLB Stats API current primaryPosition=P (not necessarily draft-listed position); MLB school label='Radford'."
+    },
+    {
+      "type": "DRAFT_SELECTION",
+      "source_key": "pilot2015:mlb-statsapi-draft-2015-lad",
+      "draft_key": "2015-JUNE_AMATEUR",
+      "round_code": "14",
+      "overall_pick": 432,
+      "round_pick": 27,
+      "organization": "LAD",
+      "selection_type": "STANDARD",
+      "position": "C",
+      "field_sources": {
+        "position": "pilot2015:bref-lad-2015",
+        "school": "pilot2015:bref-lad-2015"
+      },
+      "player": {
+        "full_name": "Garrett Kennedy",
+        "birth_date": "1992-12-13",
+        "external_ids": {
+          "MLBAM": "613588",
+          "BBREF_MINORS": "kenned001gar"
+        },
+        "source_key": "pilot2015:mlb-statsapi-draft-2015-lad"
+      },
+      "school": {
+        "name": "University of Miami",
+        "school_type": "COLLEGE",
+        "city": "Coral Gables",
+        "region": "FL",
+        "country": "USA",
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "signing": {
+        "status": "SIGNED",
+        "bonus_usd": 100000,
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "notes": "MLB Stats API current primaryPosition=C (not necessarily draft-listed position); MLB school label='Miami'."
+    },
+    {
+      "type": "DRAFT_SELECTION",
+      "source_key": "pilot2015:mlb-statsapi-draft-2015-lad",
+      "draft_key": "2015-JUNE_AMATEUR",
+      "round_code": "15",
+      "overall_pick": 462,
+      "round_pick": 27,
+      "organization": "LAD",
+      "selection_type": "STANDARD",
+      "position": "CF",
+      "field_sources": {
+        "position": "pilot2015:bref-lad-2015",
+        "school": "pilot2015:bref-lad-2015"
+      },
+      "player": {
+        "full_name": "Garrett Zech",
+        "birth_date": "1996-12-26",
+        "external_ids": {
+          "MLBAM": "663685",
+          "BBREF_MINORS": "zach--000gar"
+        },
+        "source_key": "pilot2015:mlb-statsapi-draft-2015-lad"
+      },
+      "school": {
+        "name": "Naples HS",
+        "school_type": "HIGH_SCHOOL",
+        "city": "Naples",
+        "region": "FL",
+        "country": "USA",
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "signing": {
+        "status": "DID_NOT_SIGN",
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "notes": "B-Ref minors register id is 'zach--000gar' (spelling differs from displayed name 'Zech'). No later draft found in MLB Stats API person draft history. MLB Stats API current primaryPosition=CF (not necessarily draft-listed position); MLB school label='Naples (FL) HS'."
+    },
+    {
+      "type": "DRAFT_SELECTION",
+      "source_key": "pilot2015:mlb-statsapi-draft-2015-lad",
+      "draft_key": "2015-JUNE_AMATEUR",
+      "round_code": "16",
+      "overall_pick": 492,
+      "round_pick": 27,
+      "organization": "LAD",
+      "selection_type": "STANDARD",
+      "position": "RHP",
+      "field_sources": {
+        "position": "pilot2015:bref-lad-2015",
+        "school": "pilot2015:bref-lad-2015"
+      },
+      "player": {
+        "full_name": "Nolan Long",
+        "birth_date": "1994-01-19",
+        "external_ids": {
+          "MLBAM": "621048",
+          "BBREF_MINORS": "long--000nol"
+        },
+        "source_key": "pilot2015:mlb-statsapi-draft-2015-lad"
+      },
+      "school": {
+        "name": "Wagner College",
+        "school_type": "COLLEGE",
+        "city": "Staten Island",
+        "region": "NY",
+        "country": "USA",
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "signing": {
+        "status": "SIGNED",
+        "bonus_usd": 100000,
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "notes": "MLB Stats API current primaryPosition=P (not necessarily draft-listed position); MLB school label='Wagner'."
+    },
+    {
+      "type": "DRAFT_SELECTION",
+      "source_key": "pilot2015:mlb-statsapi-draft-2015-lad",
+      "draft_key": "2015-JUNE_AMATEUR",
+      "round_code": "17",
+      "overall_pick": 522,
+      "round_pick": 27,
+      "organization": "LAD",
+      "selection_type": "STANDARD",
+      "position": "C",
+      "field_sources": {
+        "position": "pilot2015:bref-lad-2015",
+        "school": "pilot2015:bref-lad-2015"
+      },
+      "player": {
+        "full_name": "Jason Goldstein",
+        "birth_date": "1994-03-09",
+        "external_ids": {
+          "MLBAM": "621508",
+          "BBREF_MINORS": "goldst000jas"
+        },
+        "source_key": "pilot2015:mlb-statsapi-draft-2015-lad"
+      },
+      "school": {
+        "name": "University of Illinois at Urbana-Champaign",
+        "school_type": "COLLEGE",
+        "city": "Champaign",
+        "region": "IL",
+        "country": "USA",
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "signing": {
+        "status": "DID_NOT_SIGN",
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "notes": "MLB Stats API current primaryPosition=C (not necessarily draft-listed position); MLB school label='Illinois'."
+    },
+    {
+      "type": "DRAFT_SELECTION",
+      "source_key": "pilot2015:mlb-statsapi-draft-2015-lad",
+      "draft_key": "2015-JUNE_AMATEUR",
+      "round_code": "18",
+      "overall_pick": 552,
+      "round_pick": 27,
+      "organization": "LAD",
+      "selection_type": "STANDARD",
+      "position": "2B",
+      "field_sources": {
+        "position": "pilot2015:bref-lad-2015",
+        "school": "pilot2015:bref-lad-2015"
+      },
+      "player": {
+        "full_name": "Chris Godinez",
+        "birth_date": "1993-04-20",
+        "external_ids": {
+          "MLBAM": "656470",
+          "BBREF_MINORS": "godine000chr"
+        },
+        "source_key": "pilot2015:mlb-statsapi-draft-2015-lad"
+      },
+      "school": {
+        "name": "Bradley University",
+        "school_type": "COLLEGE",
+        "city": "Peoria",
+        "region": "IL",
+        "country": "USA",
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "signing": {
+        "status": "SIGNED",
+        "bonus_usd": null,
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "notes": "B-Ref Signed=Y but bonus blank (not published). MLB Stats API current primaryPosition=2B (not necessarily draft-listed position); MLB school label='Bradley'."
+    },
+    {
+      "type": "DRAFT_SELECTION",
+      "source_key": "pilot2015:mlb-statsapi-draft-2015-lad",
+      "draft_key": "2015-JUNE_AMATEUR",
+      "round_code": "19",
+      "overall_pick": 582,
+      "round_pick": 27,
+      "organization": "LAD",
+      "selection_type": "STANDARD",
+      "position": "C",
+      "field_sources": {
+        "position": "pilot2015:bref-lad-2015",
+        "school": "pilot2015:bref-lad-2015"
+      },
+      "player": {
+        "full_name": "Joe Genord",
+        "birth_date": "1996-08-17",
+        "external_ids": {
+          "MLBAM": "664987",
+          "BBREF_MINORS": "genord000joe"
+        },
+        "source_key": "pilot2015:mlb-statsapi-draft-2015-lad"
+      },
+      "school": {
+        "name": "Park Vista Community HS",
+        "school_type": "HIGH_SCHOOL",
+        "city": "Lake Worth",
+        "region": "FL",
+        "country": "USA",
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "signing": {
+        "status": "DID_NOT_SIGN",
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "notes": "MLB Stats API current primaryPosition=1B (not necessarily draft-listed position); MLB school label='Park Vista Community (FL) HS'."
+    },
+    {
+      "type": "DRAFT_SELECTION",
+      "source_key": "pilot2015:mlb-statsapi-draft-2015-lad",
+      "draft_key": "2015-JUNE_AMATEUR",
+      "round_code": "20",
+      "overall_pick": 612,
+      "round_pick": 27,
+      "organization": "LAD",
+      "selection_type": "STANDARD",
+      "position": "RHP",
+      "field_sources": {
+        "position": "pilot2015:bref-lad-2015",
+        "school": "pilot2015:bref-lad-2015"
+      },
+      "player": {
+        "full_name": "John Boushelle",
+        "birth_date": "1997-04-29",
+        "external_ids": {
+          "MLBAM": "664986",
+          "BBREF_MINORS": "boushe000joh"
+        },
+        "source_key": "pilot2015:mlb-statsapi-draft-2015-lad"
+      },
+      "school": {
+        "name": "Fayetteville HS",
+        "school_type": "HIGH_SCHOOL",
+        "city": "Fayetteville",
+        "region": "AR",
+        "country": "USA",
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "signing": {
+        "status": "DID_NOT_SIGN",
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "notes": "No later draft found in MLB Stats API person draft history. MLB Stats API current primaryPosition=P (not necessarily draft-listed position); MLB school label='Fayetteville Sr (AR) HS'."
+    },
+    {
+      "type": "DRAFT_SELECTION",
+      "source_key": "pilot2015:mlb-statsapi-draft-2015-lad",
+      "draft_key": "2015-JUNE_AMATEUR",
+      "round_code": "21",
+      "overall_pick": 642,
+      "round_pick": 27,
+      "organization": "LAD",
+      "selection_type": "STANDARD",
+      "position": "C",
+      "field_sources": {
+        "position": "pilot2015:bref-lad-2015",
+        "school": "pilot2015:bref-lad-2015"
+      },
+      "player": {
+        "full_name": "Jake Henson",
+        "birth_date": "1993-08-04",
+        "external_ids": {
+          "MLBAM": "664939",
+          "BBREF_MINORS": "henson000jak"
+        },
+        "source_key": "pilot2015:mlb-statsapi-draft-2015-lad"
+      },
+      "school": {
+        "name": "St. Louis University",
+        "school_type": "COLLEGE",
+        "city": "St. Louis",
+        "region": "MO",
+        "country": "USA",
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "signing": {
+        "status": "SIGNED",
+        "bonus_usd": null,
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "notes": "B-Ref Signed=Y but bonus blank (not published). MLB Stats API current primaryPosition=C (not necessarily draft-listed position); MLB school label='Saint Louis University'."
+    },
+    {
+      "type": "DRAFT_SELECTION",
+      "source_key": "pilot2015:mlb-statsapi-draft-2015-lad",
+      "draft_key": "2015-JUNE_AMATEUR",
+      "round_code": "22",
+      "overall_pick": 672,
+      "round_pick": 27,
+      "organization": "LAD",
+      "selection_type": "STANDARD",
+      "position": "2B",
+      "field_sources": {
+        "position": "pilot2015:bref-lad-2015",
+        "school": "pilot2015:bref-lad-2015"
+      },
+      "player": {
+        "full_name": "Jordan Tarsovich",
+        "birth_date": "1991-06-20",
+        "external_ids": {
+          "MLBAM": "664897",
+          "BBREF_MINORS": "tarsov000jor"
+        },
+        "source_key": "pilot2015:mlb-statsapi-draft-2015-lad"
+      },
+      "school": {
+        "name": "Virginia Military Institute",
+        "school_type": "COLLEGE",
+        "city": "Lexington",
+        "region": "VA",
+        "country": "USA",
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "signing": {
+        "status": "SIGNED",
+        "bonus_usd": null,
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "notes": "B-Ref Signed=Y but bonus blank (not published). MLB Stats API current primaryPosition=3B (not necessarily draft-listed position); MLB school label='Virginia Military Institute'."
+    },
+    {
+      "type": "DRAFT_SELECTION",
+      "source_key": "pilot2015:mlb-statsapi-draft-2015-lad",
+      "draft_key": "2015-JUNE_AMATEUR",
+      "round_code": "23",
+      "overall_pick": 702,
+      "round_pick": 27,
+      "organization": "LAD",
+      "selection_type": "STANDARD",
+      "position": "RHP",
+      "field_sources": {
+        "position": "pilot2015:bref-lad-2015",
+        "school": "pilot2015:bref-lad-2015"
+      },
+      "player": {
+        "full_name": "Andrew Istler",
+        "birth_date": "1992-09-18",
+        "external_ids": {
+          "MLBAM": "595995",
+          "BBREF_MINORS": "istler000and"
+        },
+        "source_key": "pilot2015:mlb-statsapi-draft-2015-lad"
+      },
+      "school": {
+        "name": "Duke University",
+        "school_type": "COLLEGE",
+        "city": "Durham",
+        "region": "NC",
+        "country": "USA",
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "signing": {
+        "status": "SIGNED",
+        "bonus_usd": null,
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "notes": "B-Ref Signed=Y but bonus blank (not published). MLB Stats API current primaryPosition=P (not necessarily draft-listed position); MLB school label='Duke'."
+    },
+    {
+      "type": "DRAFT_SELECTION",
+      "source_key": "pilot2015:mlb-statsapi-draft-2015-lad",
+      "draft_key": "2015-JUNE_AMATEUR",
+      "round_code": "24",
+      "overall_pick": 732,
+      "round_pick": 27,
+      "organization": "LAD",
+      "selection_type": "STANDARD",
+      "position": "RHP",
+      "field_sources": {
+        "position": "pilot2015:bref-lad-2015",
+        "school": "pilot2015:bref-lad-2015"
+      },
+      "player": {
+        "full_name": "Cameron Palmer",
+        "birth_date": "1991-12-03",
+        "external_ids": {
+          "MLBAM": "664884",
+          "BBREF_MINORS": "palmer000cam"
+        },
+        "source_key": "pilot2015:mlb-statsapi-draft-2015-lad"
+      },
+      "school": {
+        "name": "University of Toledo",
+        "school_type": "COLLEGE",
+        "city": "Toledo",
+        "region": "OH",
+        "country": "USA",
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "signing": {
+        "status": "SIGNED",
+        "bonus_usd": null,
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "notes": "B-Ref Signed=Y but bonus blank (not published). MLB Stats API current primaryPosition=P (not necessarily draft-listed position); MLB school label='Toledo'."
+    },
+    {
+      "type": "DRAFT_SELECTION",
+      "source_key": "pilot2015:mlb-statsapi-draft-2015-lad",
+      "draft_key": "2015-JUNE_AMATEUR",
+      "round_code": "25",
+      "overall_pick": 762,
+      "round_pick": 27,
+      "organization": "LAD",
+      "selection_type": "STANDARD",
+      "position": "LHP",
+      "field_sources": {
+        "position": "pilot2015:bref-lad-2015",
+        "school": "pilot2015:bref-lad-2015"
+      },
+      "player": {
+        "full_name": "Rob McDonnell",
+        "birth_date": "1992-04-28",
+        "external_ids": {
+          "MLBAM": "664994",
+          "BBREF_MINORS": "mcdonn000rob"
+        },
+        "source_key": "pilot2015:mlb-statsapi-draft-2015-lad"
+      },
+      "school": {
+        "name": "University of Illinois at Urbana-Champaign",
+        "school_type": "COLLEGE",
+        "city": "Champaign",
+        "region": "IL",
+        "country": "USA",
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "signing": {
+        "status": "SIGNED",
+        "bonus_usd": null,
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "notes": "B-Ref Signed=Y but bonus blank (not published). MLB Stats API current primaryPosition=P (not necessarily draft-listed position); MLB school label='Illinois'."
+    },
+    {
+      "type": "DRAFT_SELECTION",
+      "source_key": "pilot2015:mlb-statsapi-draft-2015-lad",
+      "draft_key": "2015-JUNE_AMATEUR",
+      "round_code": "26",
+      "overall_pick": 792,
+      "round_pick": 27,
+      "organization": "LAD",
+      "selection_type": "STANDARD",
+      "position": "RHP",
+      "field_sources": {
+        "position": "pilot2015:bref-lad-2015",
+        "school": "pilot2015:bref-lad-2015"
+      },
+      "player": {
+        "full_name": "Marcus Crescentini",
+        "birth_date": "1992-12-26",
+        "external_ids": {
+          "MLBAM": "641489",
+          "BBREF_MINORS": "cresce000mar"
+        },
+        "source_key": "pilot2015:mlb-statsapi-draft-2015-lad"
+      },
+      "school": {
+        "name": "Missouri Baptist University",
+        "school_type": "COLLEGE",
+        "city": "St. Louis",
+        "region": "MO",
+        "country": "USA",
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "signing": {
+        "status": "SIGNED",
+        "bonus_usd": null,
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "notes": "B-Ref Signed=Y but bonus blank (not published). MLB Stats API current primaryPosition=P (not necessarily draft-listed position); MLB school label='Missouri Baptist'."
+    },
+    {
+      "type": "DRAFT_SELECTION",
+      "source_key": "pilot2015:mlb-statsapi-draft-2015-lad",
+      "draft_key": "2015-JUNE_AMATEUR",
+      "round_code": "27",
+      "overall_pick": 822,
+      "round_pick": 27,
+      "organization": "LAD",
+      "selection_type": "STANDARD",
+      "position": "RHP",
+      "field_sources": {
+        "position": "pilot2015:bref-lad-2015",
+        "school": "pilot2015:bref-lad-2015"
+      },
+      "player": {
+        "full_name": "Ivan Vieitez",
+        "birth_date": "1993-05-08",
+        "external_ids": {
+          "MLBAM": "657079",
+          "BBREF_MINORS": "vieite000iva"
+        },
+        "source_key": "pilot2015:mlb-statsapi-draft-2015-lad"
+      },
+      "school": {
+        "name": "Lenoir-Rhyne University",
+        "school_type": "COLLEGE",
+        "city": "Hickory",
+        "region": "NC",
+        "country": "USA",
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "signing": {
+        "status": "SIGNED",
+        "bonus_usd": null,
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "notes": "B-Ref Signed=Y but bonus blank (not published). MLB Stats API current primaryPosition=P (not necessarily draft-listed position); MLB school label='Lenoir-Rhyne'."
+    },
+    {
+      "type": "DRAFT_SELECTION",
+      "source_key": "pilot2015:mlb-statsapi-draft-2015-lad",
+      "draft_key": "2015-JUNE_AMATEUR",
+      "round_code": "28",
+      "overall_pick": 852,
+      "round_pick": 27,
+      "organization": "LAD",
+      "selection_type": "STANDARD",
+      "position": "CF",
+      "field_sources": {
+        "position": "pilot2015:bref-lad-2015",
+        "school": "pilot2015:bref-lad-2015"
+      },
+      "player": {
+        "full_name": "Kyle Garlick",
+        "birth_date": "1992-01-26",
+        "external_ids": {
+          "MLBAM": "664247",
+          "BBREF": "garliky01",
+          "BBREF_MINORS": "garlic000kyl"
+        },
+        "source_key": "pilot2015:mlb-statsapi-draft-2015-lad"
+      },
+      "school": {
+        "name": "California State Polytechnic University, Pomona",
+        "school_type": "COLLEGE",
+        "city": "Pomona",
+        "region": "CA",
+        "country": "USA",
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "signing": {
+        "status": "SIGNED",
+        "bonus_usd": null,
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "notes": "B-Ref Signed=Y but bonus blank (not published). MLB Stats API current primaryPosition=LF (not necessarily draft-listed position); MLB school label='Cal Poly Pomona'."
+    },
+    {
+      "type": "DRAFT_SELECTION",
+      "source_key": "pilot2015:mlb-statsapi-draft-2015-lad",
+      "draft_key": "2015-JUNE_AMATEUR",
+      "round_code": "29",
+      "overall_pick": 882,
+      "round_pick": 27,
+      "organization": "LAD",
+      "selection_type": "STANDARD",
+      "position": "RHP",
+      "field_sources": {
+        "position": "pilot2015:bref-lad-2015",
+        "school": "pilot2015:bref-lad-2015"
+      },
+      "player": {
+        "full_name": "Jason Bilous",
+        "birth_date": "1997-08-11",
+        "external_ids": {
+          "MLBAM": "663467",
+          "BBREF_MINORS": "bilous000jas"
+        },
+        "source_key": "pilot2015:mlb-statsapi-draft-2015-lad"
+      },
+      "school": {
+        "name": "Caravel Academy",
+        "school_type": "HIGH_SCHOOL",
+        "city": "Bear",
+        "region": "DE",
+        "country": "USA",
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "signing": {
+        "status": "DID_NOT_SIGN",
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "notes": "MLB Stats API current primaryPosition=P (not necessarily draft-listed position); MLB school label='Caravel Academy (DE) HS'."
+    },
+    {
+      "type": "DRAFT_SELECTION",
+      "source_key": "pilot2015:mlb-statsapi-draft-2015-lad",
+      "draft_key": "2015-JUNE_AMATEUR",
+      "round_code": "30",
+      "overall_pick": 912,
+      "round_pick": 27,
+      "organization": "LAD",
+      "selection_type": "STANDARD",
+      "position": "RHP",
+      "field_sources": {
+        "position": "pilot2015:bref-lad-2015",
+        "school": "pilot2015:bref-lad-2015"
+      },
+      "player": {
+        "full_name": "Logan Crouse",
+        "birth_date": "1996-12-02",
+        "external_ids": {
+          "MLBAM": "663721",
+          "BBREF_MINORS": "crouse000log"
+        },
+        "source_key": "pilot2015:mlb-statsapi-draft-2015-lad"
+      },
+      "school": {
+        "name": "Bloomingdale HS",
+        "school_type": "HIGH_SCHOOL",
+        "city": "Valrico",
+        "region": "FL",
+        "country": "USA",
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "signing": {
+        "status": "SIGNED",
+        "bonus_usd": 497500,
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "notes": "MLB Stats API current primaryPosition=P (not necessarily draft-listed position); MLB school label='Bloomingdale Sr (FL) HS'."
+    },
+    {
+      "type": "DRAFT_SELECTION",
+      "source_key": "pilot2015:mlb-statsapi-draft-2015-lad",
+      "draft_key": "2015-JUNE_AMATEUR",
+      "round_code": "31",
+      "overall_pick": 942,
+      "round_pick": 27,
+      "organization": "LAD",
+      "selection_type": "STANDARD",
+      "position": "RHP",
+      "field_sources": {
+        "position": "pilot2015:bref-lad-2015",
+        "school": "pilot2015:bref-lad-2015"
+      },
+      "player": {
+        "full_name": "Corey Copping",
+        "birth_date": "1994-01-11",
+        "external_ids": {
+          "MLBAM": "665045",
+          "BBREF_MINORS": "coppin000cor"
+        },
+        "source_key": "pilot2015:mlb-statsapi-draft-2015-lad"
+      },
+      "school": {
+        "name": "University of Oklahoma",
+        "school_type": "COLLEGE",
+        "city": "Norman",
+        "region": "OK",
+        "country": "USA",
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "signing": {
+        "status": "SIGNED",
+        "bonus_usd": null,
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "notes": "B-Ref Signed=Y but bonus blank (not published). MLB Stats API current primaryPosition=P (not necessarily draft-listed position); MLB school label='Oklahoma'."
+    },
+    {
+      "type": "DRAFT_SELECTION",
+      "source_key": "pilot2015:mlb-statsapi-draft-2015-lad",
+      "draft_key": "2015-JUNE_AMATEUR",
+      "round_code": "32",
+      "overall_pick": 972,
+      "round_pick": 27,
+      "organization": "LAD",
+      "selection_type": "STANDARD",
+      "position": "SS",
+      "field_sources": {
+        "position": "pilot2015:bref-lad-2015",
+        "school": "pilot2015:bref-lad-2015"
+      },
+      "player": {
+        "full_name": "Nick Dean",
+        "birth_date": "1992-05-11",
+        "external_ids": {
+          "MLBAM": "664749",
+          "BBREF_MINORS": "dean--000nic"
+        },
+        "source_key": "pilot2015:mlb-statsapi-draft-2015-lad"
+      },
+      "school": {
+        "name": "Maryville College",
+        "school_type": "COLLEGE",
+        "city": "Maryville",
+        "region": "TN",
+        "country": "USA",
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "signing": {
+        "status": "SIGNED",
+        "bonus_usd": null,
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "notes": "B-Ref Signed=Y but bonus blank (not published). MLB Stats API current primaryPosition=SS (not necessarily draft-listed position); MLB school label='Maryville'."
+    },
+    {
+      "type": "DRAFT_SELECTION",
+      "source_key": "pilot2015:mlb-statsapi-draft-2015-lad",
+      "draft_key": "2015-JUNE_AMATEUR",
+      "round_code": "33",
+      "overall_pick": 1002,
+      "round_pick": 27,
+      "organization": "LAD",
+      "selection_type": "STANDARD",
+      "position": "RHP",
+      "field_sources": {
+        "position": "pilot2015:bref-lad-2015",
+        "school": "pilot2015:bref-lad-2015"
+      },
+      "player": {
+        "full_name": "Adam Bray",
+        "birth_date": "1993-04-14",
+        "external_ids": {
+          "MLBAM": "665032",
+          "BBREF_MINORS": "bray--000ada"
+        },
+        "source_key": "pilot2015:mlb-statsapi-draft-2015-lad"
+      },
+      "school": {
+        "name": "South Dakota State University",
+        "school_type": "COLLEGE",
+        "city": "Brookings",
+        "region": "SD",
+        "country": "USA",
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "signing": {
+        "status": "SIGNED",
+        "bonus_usd": null,
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "notes": "B-Ref Signed=Y but bonus blank (not published). MLB Stats API current primaryPosition=P (not necessarily draft-listed position); MLB school label='South Dakota State'."
+    },
+    {
+      "type": "DRAFT_SELECTION",
+      "source_key": "pilot2015:mlb-statsapi-draft-2015-lad",
+      "draft_key": "2015-JUNE_AMATEUR",
+      "round_code": "34",
+      "overall_pick": 1032,
+      "round_pick": 27,
+      "organization": "LAD",
+      "selection_type": "STANDARD",
+      "position": "RHP",
+      "field_sources": {
+        "position": "pilot2015:bref-lad-2015",
+        "school": "pilot2015:bref-lad-2015"
+      },
+      "player": {
+        "full_name": "Luis Rodriguez",
+        "birth_date": "1996-10-10",
+        "external_ids": {
+          "MLBAM": "663328",
+          "BBREF_MINORS": "rodrig030lui"
+        },
+        "source_key": "pilot2015:mlb-statsapi-draft-2015-lad"
+      },
+      "school": {
+        "name": "Calusa Preparatory School",
+        "school_type": "HIGH_SCHOOL",
+        "city": "Miami",
+        "region": "FL",
+        "country": "USA",
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "signing": {
+        "status": "SIGNED",
+        "bonus_usd": 100000,
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "notes": "MLB Stats API current primaryPosition=P (not necessarily draft-listed position); MLB school label='Calusa Preparatory School (FL) HS'."
+    },
+    {
+      "type": "DRAFT_SELECTION",
+      "source_key": "pilot2015:mlb-statsapi-draft-2015-lad",
+      "draft_key": "2015-JUNE_AMATEUR",
+      "round_code": "35",
+      "overall_pick": 1062,
+      "round_pick": 27,
+      "organization": "LAD",
+      "selection_type": "STANDARD",
+      "position": "C",
+      "field_sources": {
+        "position": "pilot2015:bref-lad-2015",
+        "school": "pilot2015:bref-lad-2015"
+      },
+      "player": {
+        "full_name": "Gage Green",
+        "birth_date": "1992-08-27",
+        "external_ids": {
+          "MLBAM": "665005",
+          "BBREF_MINORS": "green-000gag"
+        },
+        "source_key": "pilot2015:mlb-statsapi-draft-2015-lad"
+      },
+      "school": {
+        "name": "Oklahoma State University",
+        "school_type": "COLLEGE",
+        "city": "Stillwater",
+        "region": "OK",
+        "country": "USA",
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "signing": {
+        "status": "SIGNED",
+        "bonus_usd": null,
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "notes": "B-Ref Signed=Y but bonus blank (not published). MLB Stats API current primaryPosition=RF (not necessarily draft-listed position); MLB school label='Oklahoma State'."
+    },
+    {
+      "type": "DRAFT_SELECTION",
+      "source_key": "pilot2015:mlb-statsapi-draft-2015-lad",
+      "draft_key": "2015-JUNE_AMATEUR",
+      "round_code": "36",
+      "overall_pick": 1092,
+      "round_pick": 27,
+      "organization": "LAD",
+      "selection_type": "STANDARD",
+      "position": "RHP",
+      "field_sources": {
+        "position": "pilot2015:bref-lad-2015",
+        "school": "pilot2015:bref-lad-2015"
+      },
+      "player": {
+        "full_name": "Drayton Riekenberg",
+        "birth_date": "1994-03-27",
+        "external_ids": {
+          "MLBAM": "664089",
+          "BBREF_MINORS": "rieken000dra"
+        },
+        "source_key": "pilot2015:mlb-statsapi-draft-2015-lad"
+      },
+      "school": {
+        "name": "Fresno City College",
+        "school_type": "JUNIOR_COLLEGE",
+        "city": "Fresno",
+        "region": "CA",
+        "country": "USA",
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "signing": {
+        "status": "SIGNED",
+        "bonus_usd": null,
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "notes": "B-Ref Signed=Y but bonus blank (not published). MLB Stats API current primaryPosition=P (not necessarily draft-listed position); MLB school label='Fresno City College'."
+    },
+    {
+      "type": "DRAFT_SELECTION",
+      "source_key": "pilot2015:mlb-statsapi-draft-2015-lad",
+      "draft_key": "2015-JUNE_AMATEUR",
+      "round_code": "37",
+      "overall_pick": 1122,
+      "round_pick": 27,
+      "organization": "LAD",
+      "selection_type": "STANDARD",
+      "position": "RHP",
+      "field_sources": {
+        "position": "pilot2015:bref-lad-2015",
+        "school": "pilot2015:bref-lad-2015"
+      },
+      "player": {
+        "full_name": "Casey Mulholland",
+        "birth_date": "1991-12-17",
+        "external_ids": {
+          "MLBAM": "592575",
+          "BBREF_MINORS": "mulhol000cas"
+        },
+        "source_key": "pilot2015:mlb-statsapi-draft-2015-lad"
+      },
+      "school": {
+        "name": "University of South Florida",
+        "school_type": "COLLEGE",
+        "city": "Tampa",
+        "region": "FL",
+        "country": "USA",
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "signing": {
+        "status": "SIGNED",
+        "bonus_usd": null,
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "notes": "B-Ref Signed=Y but bonus blank (not published). MLB Stats API current primaryPosition=P (not necessarily draft-listed position); MLB school label='South Florida'."
+    },
+    {
+      "type": "DRAFT_SELECTION",
+      "source_key": "pilot2015:mlb-statsapi-draft-2015-lad",
+      "draft_key": "2015-JUNE_AMATEUR",
+      "round_code": "38",
+      "overall_pick": 1152,
+      "round_pick": 27,
+      "organization": "LAD",
+      "selection_type": "STANDARD",
+      "position": "CF",
+      "field_sources": {
+        "position": "pilot2015:bref-lad-2015",
+        "school": "pilot2015:bref-lad-2015"
+      },
+      "player": {
+        "full_name": "Edwin Drexler",
+        "birth_date": "1992-07-01",
+        "external_ids": {
+          "MLBAM": "665124",
+          "BBREF_MINORS": "drexle000edw"
+        },
+        "source_key": "pilot2015:mlb-statsapi-draft-2015-lad"
+      },
+      "school": {
+        "name": "Grambling State University",
+        "school_type": "COLLEGE",
+        "city": "Grambling",
+        "region": "LA",
+        "country": "USA",
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "signing": {
+        "status": "SIGNED",
+        "bonus_usd": null,
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "notes": "B-Ref Signed=Y but bonus blank (not published). MLB Stats API current primaryPosition=OF (not necessarily draft-listed position); MLB school label='Grambling State'."
+    },
+    {
+      "type": "DRAFT_SELECTION",
+      "source_key": "pilot2015:mlb-statsapi-draft-2015-lad",
+      "draft_key": "2015-JUNE_AMATEUR",
+      "round_code": "39",
+      "overall_pick": 1182,
+      "round_pick": 27,
+      "organization": "LAD",
+      "selection_type": "STANDARD",
+      "position": "RHP",
+      "field_sources": {
+        "position": "pilot2015:bref-lad-2015",
+        "school": "pilot2015:bref-lad-2015"
+      },
+      "player": {
+        "full_name": "Chris Powell",
+        "birth_date": "1992-09-21",
+        "external_ids": {
+          "MLBAM": "665121",
+          "BBREF_MINORS": "powell003chr"
+        },
+        "source_key": "pilot2015:mlb-statsapi-draft-2015-lad"
+      },
+      "school": {
+        "name": "California State Polytechnic University, Pomona",
+        "school_type": "COLLEGE",
+        "city": "Pomona",
+        "region": "CA",
+        "country": "USA",
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "signing": {
+        "status": "SIGNED",
+        "bonus_usd": null,
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "notes": "B-Ref Signed=Y but bonus blank (not published). MLB Stats API current primaryPosition=P (not necessarily draft-listed position); MLB school label='Cal Poly Pomona'."
+    },
+    {
+      "type": "DRAFT_SELECTION",
+      "source_key": "pilot2015:mlb-statsapi-draft-2015-lad",
+      "draft_key": "2015-JUNE_AMATEUR",
+      "round_code": "40",
+      "overall_pick": 1212,
+      "round_pick": 27,
+      "organization": "LAD",
+      "selection_type": "STANDARD",
+      "position": "RHP",
+      "field_sources": {
+        "position": "pilot2015:bref-lad-2015",
+        "school": "pilot2015:bref-lad-2015"
+      },
+      "player": {
+        "full_name": "Isaac Anderson",
+        "birth_date": "1993-09-04",
+        "external_ids": {
+          "MLBAM": "643197",
+          "BBREF_MINORS": "anders000isa"
+        },
+        "source_key": "pilot2015:mlb-statsapi-draft-2015-lad"
+      },
+      "school": {
+        "name": "Wichita State University",
+        "school_type": "COLLEGE",
+        "city": "Wichita",
+        "region": "KS",
+        "country": "USA",
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "signing": {
+        "status": "SIGNED",
+        "bonus_usd": 100000,
+        "source_key": "pilot2015:bref-lad-2015"
+      },
+      "notes": "MLB Stats API current primaryPosition=P (not necessarily draft-listed position); MLB school label='Wichita State'."
+    },
+    {
+      "type": "DRAFT_SELECTION",
+      "source_key": "pilot2015:mlb-statsapi-people-drafts",
+      "draft_key": "2016-JUNE_AMATEUR",
+      "round_code": "4",
+      "overall_pick": 115,
+      "round_pick": 9,
+      "organization": "DET",
+      "player": {
+        "full_name": "Kyle Funkhouser",
+        "external_ids": {
+          "MLBAM": "608335",
+          "BBREF": "funkhky01",
+          "BBREF_MINORS": "funkho001kyl"
+        },
+        "source_key": "pilot2015:mlb-statsapi-people-drafts"
+      },
+      "school": {
+        "name": "University of Louisville",
+        "school_type": "COLLEGE",
+        "city": "Louisville",
+        "region": "KY",
+        "country": "USA",
+        "source_key": "pilot2015:mlb-statsapi-people-drafts"
+      },
+      "signing": {
+        "status": "SIGNED",
+        "bonus_usd": null,
+        "source_key": "pilot2015:bref-register-funkhouser",
+        "notes": "Signed: evidenced by affiliated professional appearances for the drafting club; no bonus published."
+      },
+      "flags": [
+        {
+          "code": "SIGNING_STATUS_FROM_PRO_APPEARANCES",
+          "severity": "INFO",
+          "note": "No signing announcement located; status rests on affiliated pro stat rows."
+        }
+      ],
+      "notes": "Re-draft of a 2015 Dodgers selection who did not sign (35 overall, 2015)."
+    },
+    {
+      "type": "DRAFT_SELECTION",
+      "source_key": "pilot2015:mlb-statsapi-people-drafts",
+      "draft_key": "2016-JUNE_AMATEUR",
+      "round_code": "9",
+      "overall_pick": 267,
+      "round_pick": 11,
+      "organization": "SEA",
+      "player": {
+        "full_name": "Jason Goldstein",
+        "external_ids": {
+          "MLBAM": "621508",
+          "BBREF_MINORS": "goldst000jas"
+        },
+        "source_key": "pilot2015:mlb-statsapi-people-drafts"
+      },
+      "school": {
+        "name": "University of Illinois at Urbana-Champaign",
+        "school_type": "COLLEGE",
+        "city": null,
+        "region": null,
+        "country": "USA",
+        "source_key": "pilot2015:mlb-statsapi-people-drafts"
+      },
+      "signing": {
+        "status": "SIGNED",
+        "bonus_usd": null,
+        "source_key": "pilot2015:bref-register-goldstein",
+        "notes": "Signed: evidenced by affiliated professional appearances for the drafting club; no bonus published."
+      },
+      "flags": [
+        {
+          "code": "SIGNING_STATUS_FROM_PRO_APPEARANCES",
+          "severity": "INFO",
+          "note": "No signing announcement located; status rests on affiliated pro stat rows."
+        }
+      ],
+      "notes": "Re-draft of a 2015 Dodgers selection who did not sign (522 overall, 2015)."
+    },
+    {
+      "type": "DRAFT_SELECTION",
+      "source_key": "pilot2015:mlb-statsapi-people-drafts",
+      "draft_key": "2019-JUNE_AMATEUR",
+      "round_code": "9",
+      "overall_pick": 268,
+      "round_pick": 11,
+      "organization": "NYM",
+      "player": {
+        "full_name": "Joe Genord",
+        "external_ids": {
+          "MLBAM": "664987",
+          "BBREF_MINORS": "genord000joe"
+        },
+        "source_key": "pilot2015:mlb-statsapi-people-drafts"
+      },
+      "school": {
+        "name": "University of South Florida",
+        "school_type": "COLLEGE",
+        "city": "Tampa",
+        "region": "FL",
+        "country": "USA",
+        "source_key": "pilot2015:mlb-statsapi-people-drafts"
+      },
+      "signing": {
+        "status": "SIGNED",
+        "bonus_usd": 10000,
+        "source_key": "pilot2015:mlb-statsapi-people-drafts"
+      },
+      "slot_value": {
+        "usd": 154600,
+        "source_key": "pilot2015:mlb-statsapi-people-drafts"
+      },
+      "flags": [],
+      "notes": "Re-draft of a 2015 Dodgers selection who did not sign (582 overall, 2015)."
+    },
+    {
+      "type": "DRAFT_SELECTION",
+      "source_key": "pilot2015:mlb-statsapi-people-drafts",
+      "draft_key": "2018-JUNE_AMATEUR",
+      "round_code": "13",
+      "overall_pick": 378,
+      "round_pick": 4,
+      "organization": "CWS",
+      "player": {
+        "full_name": "Jason Bilous",
+        "external_ids": {
+          "MLBAM": "663467",
+          "BBREF_MINORS": "bilous000jas"
+        },
+        "source_key": "pilot2015:mlb-statsapi-people-drafts"
+      },
+      "school": {
+        "name": "Coastal Carolina University",
+        "school_type": "COLLEGE",
+        "city": "Conway",
+        "region": "SC",
+        "country": "USA",
+        "source_key": "pilot2015:mlb-statsapi-people-drafts"
+      },
+      "signing": {
+        "status": "SIGNED",
+        "bonus_usd": null,
+        "source_key": "pilot2015:bref-register-bilous",
+        "notes": "Signed: evidenced by affiliated professional appearances for the drafting club; no bonus published."
+      },
+      "flags": [
+        {
+          "code": "SIGNING_STATUS_FROM_PRO_APPEARANCES",
+          "severity": "INFO",
+          "note": "No signing announcement located; status rests on affiliated pro stat rows."
+        }
+      ],
+      "notes": "Re-draft of a 2015 Dodgers selection who did not sign (882 overall, 2015)."
+    }
+  ]
+}

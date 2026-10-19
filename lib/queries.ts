@@ -101,3 +101,15 @@ export const getCoverageSummary = () =>
 
 export const getLastRefresh = async (): Promise<Row | null> =>
   (await publicQuery('select generation_id, refreshed_at from rm_overview limit 1'))[0] ?? null
+
+// Coverage dashboard: one bounded row per (draft or signing period) x organization, from the refreshed read model.
+export const getResearchCoverage = () =>
+  publicQuery(`select c.domain, c.scope_key, c.scope_label, c.scope_start, c.organization_id, o.franchise_key, o.current_name as organization_name,
+      c.tracked_records, c.audited_outcomes, c.cost_basis_records, c.cost_known_records, c.coverage_state, c.expected_count,
+      c.supports_population_rate, c.last_research_date
+    from rm_research_coverage c join organizations o on o.id = c.organization_id
+    order by c.domain, c.scope_start, o.current_name limit 1000`)
+
+// Queue sizes only; the work items themselves are internal.
+export const getResearchQueueSummary = () =>
+  publicQuery('select queue_key, priority, description, open_items from rm_research_queue_summary order by priority, queue_key limit 50')
