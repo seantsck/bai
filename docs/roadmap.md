@@ -8,20 +8,37 @@
 - **App:** Next.js scaffold with every planned route rendering.
 - **Tests:** DB and app suites.
 
+## Done: research ingestion (`feature/research-ingestion`)
+
+- **Calendars (015):**
+  - all twelve Rule 4 drafts, 2015–2026, with dates, rounds and rules eras;
+  - all twelve international periods, 2014-15 through 2026, with the pandemic shift.
+
+  Every row cites sources with authority levels and field observations, and the recorded disagreements are resolved with rationales.
+- **Provenance (012):**
+  - source authority and richer source metadata;
+  - per-field conflict rules;
+  - `fact_resolutions` with no last-write-wins.
+- **Ingestion (013):**
+  - staged batches with validation, identity resolution, dry run, idempotent apply and reconciliation;
+  - the research CLI (`research:*`).
+- **Queues and dashboard (014):** ten research queues with fixed priorities, and the coverage dashboard read models behind `/research`.
+- **Pilot:**
+  - Dodgers 2015 draft class: 42 picks, plus 4 re-drafts;
+  - Dodgers 2015 international sample: 9 signings.
+
+  Both were applied to the local database only and are documented in [research-ingestion.md](research-ingestion.md).
+
 ## Next
 
-### Phase 1: reference calendars and structures (sourced)
-- Signing periods 2015-16 → 2026, with exact start and end dates and sources. This includes the shifted post-2020 calendar.
-- Draft events 2015–2026 with rounds, phases and pick structure per year, plus slot values and organization pools where public.
-- Markets reference list.
+### Phase 2b: hardening before scale (small)
+- **Pool context import:** add pools and penalty context per organization and period (`organization_signing_period_context`, `organization_draft_pools`), with conflicting figures kept as observations.
+- **Verify the excerpt-only figures:** re-read the excerpt-flagged bonuses from the full pages (Heredia, Brito, Arias), and verify Díaz's Baseball-Reference minors id.
+- **More record types:** batch imports for outcome audits, debuts and WAR observations, so the pilot players can leave `OUTCOME_NOT_AUDITED`.
+- **Census review:** a promotion workflow (PARTIAL_RECONSTRUCTION → COMPLETE_CENSUS) with a recorded reviewer and gap list.
+- **Rate-limited fetching:** a fetch policy and per-source cache before any multi-team backfill.
 
-### Phase 2: ingestion tooling
-- MLBAM-first identity resolution with an identity-review workflow (generalizing DISI 020). Name-only matches go to `research_tasks`.
-- Source-observation ingestion with precedence rules (generalizing DISI `source_tiers`) and an `amount_basis` for money.
-- Population-membership tables and candidate classification (generalizing DISI 018).
-- An idempotent upsert path for each fact table, keyed on natural keys.
-
-### Phase 3: backfill 2015–2026 (both channels, in parallel)
+### Phase 3: backfill 2015–2026 (both channels, in parallel; not started)
 - Draft:
   - every selection, then signing status, bonus and school;
   - coverage per draft and organization.

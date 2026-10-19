@@ -199,3 +199,47 @@ Every fact table above, apart from identity and lookup tables, also references `
 - `rm_overview`, `rm_organization_summary` and `rm_coverage_summary`, plus `read_model_refreshes`.
 - `refresh_read_models()`.
 - RLS and grants are applied to the whole `public` schema.
+
+### Source authority, rules eras and reconciliation (012)
+
+- `sources` gains:
+  - `authority_level`: OFFICIAL, PRIMARY_PUBLIC, REPUTABLE_SECONDARY, AGGREGATOR, ARCHIVE or OTHER;
+  - `retrieved_date` (renamed from `accessed_date`);
+  - `reference`, `effective_from` / `effective_to` and `archived_url`.
+
+  Every non-fixture source must carry a URL or a reference.
+- `source_authority_rank()` orders authority for the explicit `PREFER_HIGHER_AUTHORITY` rule only.
+- `rules_eras` holds CBA eras, kept separate for draft and international because their effective dates differ. `drafts.rules_era_id` and `international_signing_periods.rules_era_id` point to them, and periods also gain a `timing_note`.
+- `provenance_fact_tables.primary_source_required`: `players` is registered as observable without a single primary citation, because identity is evidenced field by field.
+- `conflict_rules(subject_table, field_name)` declares one of REQUIRE_OPERATOR, PREFER_HIGHER_AUTHORITY, PREFER_MORE_PRECISE_DATE or KEEP_ALL. A field without a row requires an operator.
+- `fact_resolutions` records each decision: the chosen observation, every observation considered, the rule, who decided and why. There is one per field, and it is internal.
+- `v_open_fact_conflicts` lists disagreeing active observations that no resolution covers. It is internal.
+- `apply_public_boundary()` applies 011's RLS and grant policy to any table created later.
+
+### Ingestion staging (013, schema `ingest`, never public)
+
+- `import_batches`: unique `batch_key`, unique `file_sha256`, channel, status (STAGED → VALIDATED or VALIDATION_FAILED → APPLIED, or ABANDONED), coverage claims, last report.
+- `staged_sources` and `staged_records`: the raw payload, validation status and errors, identity state, candidates and matched player, conflict status and details, review state (UNREVIEWED, AUTO_ACCEPTED, NEEDS_REVIEW, APPROVED, REJECTED), proposed and applied action, and a canonical reference.
+- `resolve_identity(jsonb)` returns one of EXACT_EXTERNAL_ID, EXACT_COMPOSITE, PROBABLE_MATCH, AMBIGUOUS, NO_MATCH or CONFLICT, plus the candidates. See [identity-resolution.md](identity-resolution.md).
+
+### Research queues and coverage dashboard (014)
+
+- `research_queue_types` declares ten queues with fixed priorities.
+- `v_research_queue` (internal) is one row per open item:
+  - IDENTITY_AMBIGUOUS, SOURCE_CONFLICT, DRAFT_SIGNING_STATUS_UNKNOWN, MISSING_SIGNING_DATE, CLASS_INCOMPLETE;
+  - MISSING_COST, MISSING_SIGNING_MARKET, SCHOOL_UNRESOLVED;
+  - OUTCOME_NOT_AUDITED, MISSING_EXPECTATION.
+- `analytics.research_coverage_cells` is one cell per (Rule 4 draft or signing period) × active organization. Each cell holds:
+  - tracked records and expected count;
+  - audited outcomes;
+  - known-cost numerator and basis;
+  - coverage state and the rate gate;
+  - last research date.
+- `rm_research_coverage` and `rm_research_queue_summary` are the refreshed, public, bounded read models behind `/research`.
+
+### Reference calendars (015)
+
+- **Drafts:** the twelve Rule 4 drafts (2015–2026). `draft_kind` stays `JUNE_AMATEUR` even for the July drafts from 2021; it names the Rule 4 draft, not the month.
+- **Signing periods:** the twelve international periods 2014-15 → 2026, with keys `2014-15` … `2020-21`, then `2022` … `2026`.
+- **Evidence:** 78 calendar sources (prefixed `cal:`) and their observations.
+- **Recorded disagreements:** two calendar disagreements are resolved in `fact_resolutions`.
