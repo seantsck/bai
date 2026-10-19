@@ -29,6 +29,14 @@
 
   Both were applied to the local database only and are documented in [research-ingestion.md](research-ingestion.md).
 
+## Done: Supabase bootstrap (`feature/supabase-bootstrap`, Phase 3A)
+
+- **Hosted project:** BAI's own Supabase project (ref `dbnmktidheefoxaztivm`, PostgreSQL 17.11), linked through a wrapper that refuses any other ref.
+- **Migrations 001–018 pushed** with `supabase db push` from the committed files; Supabase and BAI histories agree and are verified statement by statement. 016–018 are additive: the `bai_web` web role, removal of Supabase's old default privileges, btree_gist out of public.
+- **Parity:** 1,567 BAI-owned catalog objects and all seeded data identical to a local reference replay; the two platform differences are documented in [supabase.md](supabase.md).
+- **Security:** RLS, grants, functions, views, private `ingest` and the live Data API verified; advisors leave INFO findings only.
+- **Pilot only:** the validated 2015 Dodgers draft and 2015-16 international batches, reconciled with the local baseline. No backfill.
+
 ## Next
 
 ### Phase 2b: hardening before scale (small)
@@ -62,7 +70,7 @@
 - Search, pagination and filters on the fact lists.
 
 ### Phase 7: production
-- A separate Supabase project, which will never be DISI's.
+- The hosted Supabase project exists (Phase 3A); still to come: a public app deployment and its hosting decision.
 - Release validators: bundle replay, convergence and rollback on PG17 (generalizing DISI's `database/release/pg17`).
 - A deployment checklist.
 

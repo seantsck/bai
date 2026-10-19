@@ -10,8 +10,12 @@
 //   npm run research:queue     [-- --queue IDENTITY_AMBIGUOUS --limit 25]
 //   npm run research:coverage  [-- --domain DRAFT|INTERNATIONAL]
 //   npm run research:batches
+//
+// Against the hosted BAI database (.env.hosted.local, `npm run hosted:research -- <command> ...`), every command that writes
+// anything, staging included, also needs --confirm-hosted <project ref>. Read-only commands (conflicts, queue, coverage,
+// batches, resolve without --write) do not.
 import pg from 'pg'
-import { ownerDatabaseUrl } from '../db/lib/connection.mjs'
+import { ownerDatabaseUrl, requireHostedWriteConfirmation } from '../db/lib/connection.mjs'
 import * as P from './lib/pipeline.mjs'
 
 const [command, ...rest] = process.argv.slice(2)
@@ -109,13 +113,17 @@ async function main (db) {
   }
 }
 
-const db = new pg.Client({ connectionString: ownerDatabaseUrl() })
+const WRITES = { import: true, validate: true, apply: true, identity: true, resolve: Boolean(args.write) }
+let db = null
 let code = 1
 try {
+  const url = ownerDatabaseUrl()
+  if (WRITES[command]) requireHostedWriteConfirmation(url)
+  db = new pg.Client({ connectionString: url })
   await db.connect()
   code = await main(db)
 } catch (err) {
   console.error(err instanceof P.PipelineError ? `error: ${err.message}` : `error: ${err.message.replace(/postgres(ql)?:\/\/\S+/g, '<redacted>')}`)
   code = 1
-} finally { await db.end().catch(() => {}) }
+} finally { await db?.end().catch(() => {}) }
 process.exit(code)

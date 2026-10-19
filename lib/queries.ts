@@ -29,7 +29,7 @@ export const getOrganizationCoverage = (organizationId: string | number) =>
 export const getOrganizationAcquisitions = (organizationId: string | number) =>
   publicQuery(`select a.channel, a.acquisition_id, a.acquisition_date, a.acquisition_kind, a.signing_status, p.slug, p.display_name
     from v_acquisitions a join players p on p.id = a.player_id
-    where a.organization_id = $1 order by a.acquisition_date desc nulls last limit ${LIST_LIMIT}`, [organizationId])
+    where a.organization_id = $1 order by a.acquisition_date desc nulls last, p.display_name collate "C", a.channel, a.acquisition_id limit ${LIST_LIMIT}`, [organizationId])
 
 export const getPlayers = () =>
   publicQuery(`select slug, display_name, birth_country, primary_position from players order by display_name limit ${LIST_LIMIT}`)
@@ -43,7 +43,7 @@ export const getPlayer = async (slug: string): Promise<Row | null> =>
 
 export const getPlayerAcquisitions = (playerId: string | number) =>
   publicQuery(`select a.channel, a.acquisition_id, a.acquisition_date, a.acquisition_kind, a.signing_status, o.slug as organization_slug, o.current_name as organization_name
-    from v_acquisitions a join organizations o on o.id = a.organization_id where a.player_id = $1 order by a.acquisition_date limit 50`, [playerId])
+    from v_acquisitions a join organizations o on o.id = a.organization_id where a.player_id = $1 order by a.acquisition_date, a.channel, a.acquisition_id limit 50`, [playerId])
 
 export const getPlayerDevelopment = (playerId: string | number) =>
   publicQuery(`select c.season, c.sort_date, c.entry_kind, c.level, c.from_level, c.games, o.current_name as organization_name

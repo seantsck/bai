@@ -243,3 +243,9 @@ Every fact table above, apart from identity and lookup tables, also references `
 - **Signing periods:** the twelve international periods 2014-15 → 2026, with keys `2014-15` … `2020-21`, then `2022` … `2026`.
 - **Evidence:** 78 calendar sources (prefixed `cal:`) and their observations.
 - **Recorded disagreements:** two calendar disagreements are resolved in `fact_resolutions`.
+
+### Hosted roles and privileges (016–018)
+
+- **`bai_web` (016):** a login role for the web server's read pool. It is NOINHERIT and its only membership is `anon`, so it can read only after `SET ROLE anon`, and then sees exactly the public read surface. No password lives in the repository; `npm run hosted:web-role` sets one.
+- **Platform default privileges (017):** no default grants to anon, authenticated or service_role on objects `postgres` creates in `public`; no sequence privileges for any platform role; no service_role grants on BAI objects. Every grant BAI relies on is explicit (`apply_public_boundary()`).
+- **Extensions schema (018):** btree_gist lives in `extensions`, not `public`. Exclusion constraints created earlier keep working; new references to its operator classes must be schema-qualified.

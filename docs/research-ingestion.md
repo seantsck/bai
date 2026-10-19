@@ -106,7 +106,9 @@ Rules are declared per field in `conflict_rules`. A field with no row requires a
 - A `coverage_claims` entry sets the state only for its own scope. Every other touched cell becomes `INDIVIDUALLY_VERIFIED`. In the pilot, the four re-drafted players' other teams got this.
 - A `COMPLETE_CENSUS` claim without an expected count and a source is rejected by the table's CHECK.
 
-## Pilot (applied 2026-10-19, local database only)
+## Pilot (applied 2026-10-19 locally, then to the hosted BAI Supabase project)
+
+The same two committed batches were later imported into the hosted database through the guarded `hosted:research` workflow (dry run, write, idempotent re-apply, the same Sborz operator resolution) and reconciled with `research/baselines/pilot-2015-lad.local.json` with zero differences. See [supabase.md](supabase.md#research-on-hosted).
 
 The pilot proves the workflow. It is **not** league-wide coverage, and neither cell supports rates.
 

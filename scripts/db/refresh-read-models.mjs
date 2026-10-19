@@ -1,8 +1,10 @@
 // Controlled refresh of the bounded read models (rm_*). Run manually or from a scheduled operator job — never from a request.
 import pg from 'pg'
-import { ownerDatabaseUrl } from './lib/connection.mjs'
+import { ownerDatabaseUrl, requireHostedWriteConfirmation } from './lib/connection.mjs'
 
-const client = new pg.Client({ connectionString: ownerDatabaseUrl() })
+const url = ownerDatabaseUrl()
+requireHostedWriteConfirmation(url)
+const client = new pg.Client({ connectionString: url })
 await client.connect()
 try {
   const { rows: [{ role }] } = await client.query('select current_user as role')

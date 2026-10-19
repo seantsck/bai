@@ -3,7 +3,7 @@ import pg from 'pg'
 import { loadFixtures } from './lib/migrations.mjs'
 import { ownerDatabaseUrl } from './lib/connection.mjs'
 
-const client = new pg.Client({ connectionString: ownerDatabaseUrl() })
+const client = new pg.Client({ connectionString: ownerDatabaseUrl({ localOnly: true }) })
 await client.connect()
 try {
   const research = await client.query("select 1 from information_schema.tables where table_schema = 'ingest' and table_name = 'import_batches'")

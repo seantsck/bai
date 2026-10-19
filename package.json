@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "BAI — Baseball Acquisition Intelligence: league-wide MLB international and draft acquisition research",
+  "description": "BAI \u2014 Baseball Acquisition Intelligence: league-wide MLB international and draft acquisition research",
   "engines": {
     "node": ">=22"
   },
@@ -20,6 +20,8 @@
     "db:migrate": "node --env-file-if-exists=.env.local scripts/db/migrate.mjs",
     "db:fixtures": "node --env-file-if-exists=.env.local scripts/db/load-fixtures.mjs",
     "refresh:read-models": "node --env-file-if-exists=.env.local scripts/db/refresh-read-models.mjs",
+    "db:parity": "node --env-file-if-exists=.env.local scripts/db/parity.mjs",
+    "db:security": "node --env-file-if-exists=.env.local scripts/db/security.mjs",
     "scan:credentials": "node scripts/ci/credential-scan.mjs",
     "research:import": "node --env-file-if-exists=.env.local scripts/research/cli.mjs import",
     "research:validate": "node --env-file-if-exists=.env.local scripts/research/cli.mjs validate",
@@ -30,6 +32,18 @@
     "research:queue": "node --env-file-if-exists=.env.local scripts/research/cli.mjs queue",
     "research:coverage": "node --env-file-if-exists=.env.local scripts/research/cli.mjs coverage",
     "research:batches": "node --env-file-if-exists=.env.local scripts/research/cli.mjs batches",
+    "research:verify-pilot": "node --env-file-if-exists=.env.local scripts/research/pilot-verify.mjs --compare research/baselines/pilot-2015-lad.local.json",
+    "hosted:supabase": "node --env-file=.env.hosted.local scripts/db/supabase-hosted.mjs",
+    "hosted:migrate": "node --env-file=.env.hosted.local scripts/db/migrate.mjs",
+    "hosted:rehearse": "node --env-file=.env.hosted.local scripts/db/rehearse-pending.mjs",
+    "hosted:parity": "node --env-file=.env.hosted.local scripts/db/parity.mjs",
+    "hosted:security": "node --env-file=.env.hosted.local scripts/db/security.mjs",
+    "hosted:verify": "BAI_VERIFY_TARGET=hosted node --env-file=.env.hosted.local --test tests/db/hosted-readonly.test.mjs",
+    "hosted:web-role": "node --env-file=.env.hosted.local scripts/db/set-web-password.mjs",
+    "hosted:refresh": "node --env-file=.env.hosted.local scripts/db/refresh-read-models.mjs",
+    "hosted:research": "node --env-file=.env.hosted.local scripts/research/cli.mjs",
+    "hosted:verify-pilot": "node --env-file=.env.hosted.local scripts/research/pilot-verify.mjs --compare research/baselines/pilot-2015-lad.local.json",
+    "hosted:start": "node --env-file=.env.hosted.local scripts/db/web-preflight.mjs && node --env-file=.env.hosted.local node_modules/next/dist/bin/next start -H 127.0.0.1",
     "check": "npm run lint && npm run typecheck && npm test && npm run build && git diff --check && npm run scan:credentials"
   },
   "dependencies": {
@@ -46,6 +60,7 @@
     "embedded-postgres": "17.9.0-beta.17",
     "eslint": "9.39.5",
     "eslint-config-next": "16.4.2",
+    "supabase": "2.121.0",
     "typescript": "6.0.3"
   }
 }
