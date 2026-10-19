@@ -16,7 +16,8 @@ const PATTERNS = [
 const files = execFileSync('git', ['ls-files', '-co', '--exclude-standard'], { encoding: 'utf8' }).split('\n').filter(Boolean)
 const findings = []
 for (const file of files) {
-  if (file === 'package-lock.json' || !fs.existsSync(file) || fs.statSync(file).size > 2_000_000) continue
+  // Regular files only: a symlink (e.g. supabase/migrations -> database/migrations) is scanned through its target.
+  if (file === 'package-lock.json' || !fs.existsSync(file) || !fs.lstatSync(file).isFile() || fs.statSync(file).size > 2_000_000) continue
   const text = fs.readFileSync(file, 'utf8')
   text.split('\n').forEach((line, i) => {
     for (const [name, re] of PATTERNS) if (re.test(line) && !line.includes('credential-scan:allow')) findings.push(`${file}:${i + 1}  ${name}`)
