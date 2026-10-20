@@ -37,6 +37,13 @@
 - **Security:** RLS, grants, functions, views, private `ingest` and the live Data API verified; advisors leave INFO findings only.
 - **Pilot only:** the validated 2015 Dodgers draft and 2015-16 international batches, reconciled with the local baseline. No backfill.
 
+## Done: league-wide backfill framework (`feature/research-backfill-framework`, Phase 3B)
+
+- **Classes for all 30 organizations** (organization x channel x draft/period), a nine-stage machine that cannot skip, durable jobs with history, a deterministic priority queue, resumable research batches, source leads, agent review, and deterministic certification without a force option (migration 019; [backfill-methodology.md](backfill-methodology.md)).
+- **Franchise history:** Florida/Miami Marlins, Tampa Bay Devil Rays/Rays and Montreal Expos/Washington Nationals added to the name history; one resolver for source wording.
+- **Outcome audit details and economics views,** with rates gated on census-level, certified, fully audited cohorts.
+- **First non-pilot class, LAD 2016 draft (local):** 42 of 42 picks, census coverage, conflicts resolved, 7 bonuses explicitly unknown; READY_FOR_REVIEW, awaiting human certification.
+
 ## Next
 
 ### Phase 2b: hardening before scale (small)
@@ -46,7 +53,7 @@
 - **Census review:** a promotion workflow (PARTIAL_RECONSTRUCTION → COMPLETE_CENSUS) with a recorded reviewer and gap list.
 - **Rate-limited fetching:** a fetch policy and per-source cache before any multi-team backfill.
 
-### Phase 3: backfill 2015–2026 (both channels, in parallel; not started)
+### Phase 3: backfill 2015–2026 (both channels, in parallel; Wave 1 started with LAD 2016)
 - Draft:
   - every selection, then signing status, bonus and school;
   - coverage per draft and organization.

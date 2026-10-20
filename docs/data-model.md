@@ -249,3 +249,19 @@ Every fact table above, apart from identity and lookup tables, also references `
 - **`bai_web` (016):** a login role for the web server's read pool. It is NOINHERIT and its only membership is `anon`, so it can read only after `SET ROLE anon`, and then sees exactly the public read surface. No password lives in the repository; `npm run hosted:web-role` sets one.
 - **Platform default privileges (017):** no default grants to anon, authenticated or service_role on objects `postgres` creates in `public`; no sequence privileges for any platform role; no service_role grants on BAI objects. Every grant BAI relies on is explicit (`apply_public_boundary()`).
 - **Extensions schema (018):** btree_gist lives in `extensions`, not `public`. Exclusion constraints created earlier keep working; new references to its operator classes must be schema-qualified.
+
+### Research backfill (019, schema `research`, private)
+
+- **`channels`:** `DRAFT` and `INTERNATIONAL` implemented; `RULE_5` and `UNDRAFTED_FREE_AGENT` reserved. Scope kind: draft, signing period or season.
+- **`classes`:** one per organization x channel x scope, with a stable `class_key` and the current `stage`. A trigger enforces matching scope, implemented channels, immutable identity and one-step stage moves, and allows CERTIFIED only with an active certification. Transitions are logged in `stage_events` with the open jobs per stage.
+- **`job_categories`:** stage and fixed priority rank (1 = class not reconstructed … 10 = coverage certification).
+- **`jobs`:** deterministic `job_key`, subject (table, id, natural label), player, state, assignee, source requirements, notes, blocking reason, dependency and completion rationale. Every state change is logged in `job_events`, and a dependency trigger applies.
+- **`batches`:** resumable sessions, one active per class, with `batch_jobs` and `batch_events`.
+- **`source_leads`:** what was found and where (access, retrieval date, archive, evidence note, supported fields); not provenance.
+- **`import_reviews`:** the human review an agent-staged import needs before `--write`.
+- **`certifications`:** who certified, when, coverage at that moment and the metrics report. One active certification per class, and never by `agent:*`.
+- **`program_waves`:** program order per organization (data; the default is wave 3).
+- **`class_imports`:** import batches linked to classes.
+- **Views:** `v_class_metrics` (per-class counts), `v_class_status` (derived workflow status) and `v_next_jobs` (the ordered queue).
+- **Public:** `rm_research_certification` (certified flag per class, refreshed by `refresh_research_certification()`), `outcome_audit_details` (outcome facts as of a date), `resolve_organization()`, `bonus_band()`.
+- **Analytics (private):** `player_outcome_profile`, `acquisition_economics`, `class_economics`.

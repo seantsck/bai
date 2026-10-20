@@ -6,7 +6,7 @@ A league-wide research platform on MLB amateur talent acquisition across two equ
 
 BAI is independent of DISI and Diamond IQ. It shares DISI's research discipline but not its database, data or deployment.
 
-**Status:** Supabase bootstrap (branch `feature/supabase-bootstrap`). The foundation and research ingestion are merged to `main`. This phase links the repository to BAI's own hosted Supabase project, pushes migrations 001–018 there, proves local/hosted parity and the security boundary, and imports only the validated 2015 Dodgers pilot. The app runs against the hosted database on 127.0.0.1 for validation; nothing is publicly deployed and no large-scale backfill has run. See [docs/supabase.md](docs/supabase.md).
+**Status:** league-wide backfill framework (branch `feature/research-backfill-framework`). Foundation, research ingestion and the Supabase bootstrap are merged to `main`; the hosted project holds migrations 001–018 and the validated 2015 Dodgers pilot. This phase adds research classes for all 30 organizations, a stage machine, durable jobs, a deterministic queue, resumable research batches and deterministic certification (migration 019), and researches the first non-pilot class, LAD 2016 draft, locally (ready for human review, not certified). Migration 019 is not yet pushed to hosted. No league-wide backfill has run. See [docs/backfill-methodology.md](docs/backfill-methodology.md).
 
 ## Principles
 
@@ -32,7 +32,7 @@ See [docs/research-methodology.md](docs/research-methodology.md).
 npm install
 npm run db:server            # PostgreSQL 17 on 127.0.0.1:54329, data in .pgdata/ (keep running)
 cp .env.example .env.local
-npm run db:migrate           # applies database/migrations/001..018 (includes the sourced calendars)
+npm run db:migrate           # applies database/migrations/001..019 (includes the sourced calendars)
 npm run refresh:read-models  # controlled refresh of the rm_* read models
 npm run dev                  # http://127.0.0.1:3000 (localhost only)
 ```
@@ -48,7 +48,7 @@ ssh -N -L 3000:127.0.0.1:3000 <user>@<vps-host>   # then open http://localhost:3
 ## Research workflow
 
 ```bash
-npm run research:import   -- --file research/imports/2015-draft-lad.json
+npm run research:import   -- --file research/imports/2016-draft-lad.json --org LAD   # --org (or --league) is required
 npm run research:validate -- --batch pilot-2015-draft-lad          # exit 2 on validation failure
 npm run research:apply    -- --batch pilot-2015-draft-lad          # dry run (default)
 npm run research:apply    -- --batch pilot-2015-draft-lad --write  # apply
@@ -59,6 +59,19 @@ npm run refresh:read-models                                         # update the
 ```
 
 See [docs/research-ingestion.md](docs/research-ingestion.md).
+
+### Backfill (classes, jobs, queue, certification)
+
+```bash
+npm run research:class    -- --org LAD --channel draft --year 2016 --create   # create + plan a class; show its state and blockers
+npm run research:next     -- --org LAD                                         # deterministic queue (or --league)
+npm run research:start    -- --org LAD --channel draft --year 2016 --batch lad-2016-draft-a
+npm run research:resume   -- --batch lad-2016-draft-a                           # exactly what remains
+npm run research:progress                                                      # all 30 organizations
+npm run research:certify  -- --org LAD --channel draft --year 2016             # fails with blockers; no force
+```
+
+Every class works the same for any club. Full CLI and rules: [docs/backfill-methodology.md](docs/backfill-methodology.md). Replayable runbooks: `research/runbooks/`.
 
 ## Hosted (Supabase)
 
@@ -95,15 +108,16 @@ npm run check             # all of the above
 app/                    Next.js routes (Overview, International, Draft, Organizations, Players, Compare, Research)
 components/             UI primitives
 lib/                    db access (anon, read-only), page queries, formatting, navigation
-database/migrations/    001_core_identity … 018_btree_gist_extensions_schema (frozen once applied)
+database/migrations/    001_core_identity … 019_research_backfill (frozen once applied)
 supabase/               Supabase CLI config, migrations symlink, Supabase root CA (no secrets)
 database/fixtures/      fictional TEST_FIXTURE data for tests and local dev only
 scripts/db/             migrate, fixtures, read-model refresh, local PG17 server, parity/security verifiers, hosted wrappers
 scripts/app/            route smoke test
-scripts/research/       research CLI, ingestion pipeline, calendar seed generator
+scripts/research/       research CLI, ingestion pipeline, backfill orchestration, calendar seed generator, source-to-import builders
 research/calendars/     sourced calendar research (input to migration 015)
 research/imports/       research import batches (the 2015 Dodgers pilot)
 research/baselines/     id-independent snapshot of the validated local pilot (hosted reconciliation)
+research/runbooks/      replayable research sessions (2015 pilot, LAD 2016 draft)
 scripts/ci/             credential scan
 tests/db/               schema/rule tests on PostgreSQL 17
 tests/app/              app tests
@@ -115,6 +129,7 @@ docs/                   architecture, data model (ERD), methodology, DISI intero
 - [Architecture](docs/architecture.md)
 - [Data model and ERD](docs/data-model.md)
 - [Research methodology](docs/research-methodology.md)
+- [League-wide backfill methodology](docs/backfill-methodology.md)
 - [Hosted Supabase](docs/supabase.md)
 - [DISI interoperability](docs/disi-interoperability.md)
 - [Research ingestion](docs/research-ingestion.md), [Source policy](docs/source-policy.md), [Identity resolution](docs/identity-resolution.md)

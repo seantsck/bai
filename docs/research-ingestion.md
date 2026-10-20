@@ -15,7 +15,7 @@ Staging lives in the `ingest` schema, which the public roles cannot read.
 
 ## Import file
 
-Format `bai-research-import/1`. Examples: `research/imports/2015-draft-lad.json`, `research/imports/2015-international-lad.json`.
+Format `bai-research-import/1`. Examples: `research/imports/2015-draft-lad.json`, `research/imports/2015-international-lad.json`, `research/imports/2016-draft-lad.json` (built by `scripts/research/sources/draft-class-import.mjs` from downloaded MLB and Baseball-Reference files).
 
 ```jsonc
 {
@@ -34,6 +34,8 @@ Format `bai-research-import/1`. Examples: `research/imports/2015-draft-lad.json`
 
 **DRAFT_SELECTION**
 - **Pick:** `draft_key`, `round_code` (`1..N`, `C-n`, `CB-A`, `CB-B`), `overall_pick`, `round_pick`, `organization`, `selection_type`, `position`.
+- **Club wording (optional):** `organization_as_named` keeps the source's own name for the club (e.g. "Florida Marlins"); it must resolve to `organization` for that season (`resolve_organization`), and is kept on the organization observation.
+- **Other club (optional):** `cross_organization: "<reason>"` allows a record for a club other than the import's `--org` (e.g. a re-draft).
 - **Player:** `{ full_name, birth_date, birth_country, external_ids: { MLBAM, BBREF, BBREF_MINORS, FANGRAPHS }, aliases, source_key }`.
 - **School:** `{ name, school_type, city, region, country }`.
 - **Signing:** `{ status: SIGNED | DID_NOT_SIGN | UNKNOWN, bonus_usd, date, date_precision, source_key }`.
@@ -53,10 +55,10 @@ All commands read `BAI_DATABASE_URL` from `.env.local` and refuse non-local host
 
 | Command | What it does | Writes |
 |---|---|---|
-| `npm run research:import -- --file research/imports/x.json` | Stages the file. Identical bytes are a no-op, and a reused `batch_key` is refused. | `ingest.*` only |
+| `npm run research:import -- --file research/imports/x.json --org LAD [--class LAD/DRAFT/2016-JUNE_AMATEUR]` | Stages the file. `--org` (or an explicit `--league`) is required: every record and coverage claim must belong to that club unless the record carries `cross_organization: "<reason>"`. `--class` links the batch to a research class. `--agent <name>` stages as `agent:<name>`. Identical bytes are a no-op, and a reused `batch_key` is refused. | `ingest.*` only |
 | `npm run research:validate -- --batch <id\|key>` | Validates each record and resolves identity. Exits with code 2 if any record is invalid. | `ingest.*` only |
 | `npm run research:apply -- --batch <id\|key>` | **Dry run (the default).** Runs the full apply in a transaction, reports inserts, updates, conflicts, held records and coverage, then rolls back. | `ingest.*` only (the proposed action is recorded) |
-| `npm run research:apply -- --batch <id\|key> --write` | Applies. Only VALID records are applied, and a batch that failed validation is refused unless `--allow-partial` is given. | canonical tables |
+| `npm run research:apply -- --batch <id\|key> --write` | Applies. Only VALID records are applied, and a batch that failed validation is refused unless `--allow-partial` is given. A batch staged by an agent is refused until `research:review` records a human review. | canonical tables |
 | `npm run research:conflicts` | Lists open conflicts with every observation's value, source, authority and locator, and what the declared rule would decide. | — |
 | `npm run research:resolve -- --table t --id n --field f --observation o --operator me --rationale "..."` | Records an operator decision. Without `--write` it is a dry run. | `fact_resolutions` (and the canonical column) |
 | `npm run research:resolve -- --table t --id n --field f --rule [--write]` | Applies the field's declared rule. The rule refuses if it cannot decide. | same |
@@ -66,6 +68,8 @@ All commands read `BAI_DATABASE_URL` from `.env.local` and refuse non-local host
 | `npm run research:batches` | Lists batches and their status. | — |
 
 After applying, run `npm run refresh:read-models` so the `/research` dashboard reflects the new data.
+
+Class-level work (classes, jobs, the queue, research batches, certification) sits on top of these commands: see [backfill-methodology.md](backfill-methodology.md#cli).
 
 ## Modes
 

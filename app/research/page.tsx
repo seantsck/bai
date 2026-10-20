@@ -25,6 +25,7 @@ const DETAIL_COLUMNS = [
   { key: 'audited_outcomes', header: 'Audited outcomes', numeric: true },
   { key: 'cost', header: 'Known cost', numeric: true, render: (r: Record<string, any>) => formatShare(r.cost_known_records, r.cost_basis_records) },
   { key: 'last_research_date', header: 'Last research', render: (r: Record<string, any>) => r.last_research_date ? formatDate(r.last_research_date) : '—' },
+  { key: 'certified', header: 'Class certified', render: (r: Record<string, any>) => r.certified ? (r.certified_on ? `Yes, ${formatDate(r.certified_on)}` : 'Yes') : 'No' },
   { key: 'supports_population_rate', header: 'Rates', render: (r: Record<string, any>) => r.supports_population_rate ? 'Allowed' : 'Blocked' }
 ]
 
@@ -33,7 +34,7 @@ export default async function ResearchPage () {
   const cells = coverage.ok ? coverage.data : []
   const draft = cells.filter((c) => c.domain === 'DRAFT')
   const intl = cells.filter((c) => c.domain === 'INTERNATIONAL')
-  const active = cells.filter((c) => c.tracked_records > 0 || c.coverage_state)
+  const active = cells.filter((c) => c.tracked_records > 0 || c.coverage_state || c.certified)
   return (
     <>
       <PageHeader title='Research' lede='Coverage, open research work, and the limits of what BAI data can support.' />
@@ -41,8 +42,10 @@ export default async function ResearchPage () {
       <section>
         <h2>Coverage dashboard</h2>
         <Notice>
-          Cells show the coverage state and the number of tracked records. A blank cell means nothing is tracked yet. No hit rates are shown:
-          only complete-census or substantially-complete cells could support them, and none do yet. Counts come from the last read-model refresh.
+          Cells show the coverage state and the number of tracked records; ✓ marks a research class that passed certification. Certification
+          says the research workflow is finished for that class, not that the class is complete: coverage stays as assessed. A blank cell means
+          nothing is tracked yet. No hit rates are shown: only complete-census or substantially-complete cells could support them, and none do yet.
+          Counts come from the last read-model refresh.
         </Notice>
         <p className='legend'>
           {Object.entries(COVERAGE_STATE_CODES).filter(([k]) => k !== 'UNKNOWN').map(([k, code]) => (

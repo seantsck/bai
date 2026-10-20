@@ -13,7 +13,7 @@ import { ownerDatabaseUrl } from './lib/connection.mjs'
 import { PLATFORM_FUNCTION_FILTER } from './lib/catalog.mjs'
 
 const PUBLIC_ROLES = ['anon', 'authenticated']
-const PRIVATE_SCHEMAS = ['ingest', 'analytics', 'bai_meta']
+const PRIVATE_SCHEMAS = ['ingest', 'analytics', 'research', 'bai_meta']
 const json = process.argv.includes('--json')
 const failures = []
 const notes = []
@@ -134,7 +134,17 @@ try {
     ['read migration history', 'select * from bai_meta.schema_migrations limit 1'],
     ['write a public table', "update public.organizations set slug = slug"],
     ['insert a source', "insert into public.sources (source_key, publisher, title, source_type) values ('x', 'x', 'x', 'OTHER')"],
-    ['create a table in public', 'create table public.bai_security_probe (id int)']
+    ['create a table in public', 'create table public.bai_security_probe (id int)'],
+    ['list research workflow (catalog)', "select count(*) n from information_schema.tables where table_schema = 'research'", (rows) => Number(rows[0].n) === 0],
+    ['read research classes', 'select * from research.classes limit 1'],
+    ['read research jobs and notes', 'select notes, blocking_reason from research.jobs limit 1'],
+    ['read source leads', 'select * from research.source_leads limit 1'],
+    ['insert a research job', "insert into research.jobs (job_key, class_id, category_key, title, origin) values ('x', 1, 'SOURCE_CONFLICT', 'x', 'AGENT')"],
+    ['certify a class', "insert into research.certifications (class_id, certified_by, coverage_state, report) values (1, 'x', 'UNKNOWN', '{}')"],
+    ['record an import review', "insert into research.import_reviews (import_batch_id, reviewed_by, review_note) values (1, 'x', 'x')"],
+    ['read class economics', 'select * from analytics.class_economics limit 1'],
+    ['invoke refresh_research_certification', 'select public.refresh_research_certification()'],
+    ['invoke resolve_organization', "select public.resolve_organization('LAD')"]
   ]
   const behaviour = []
   for (const role of PUBLIC_ROLES) {
@@ -182,6 +192,8 @@ try {
     await probe('call refresh_read_models', 'rpc/refresh_read_models', { method: 'POST', body: '{}', headers: { 'Content-Type': 'application/json' } })
     await probe('insert a source', 'sources', { method: 'POST', body: JSON.stringify({ source_key: 'x' }), headers: { 'Content-Type': 'application/json' } })
     await probe('delete organizations', 'organizations?id=gt.0', { method: 'DELETE' })
+    await probe('read research.jobs via profile', 'jobs?select=*', { headers: { 'Accept-Profile': 'research' } })
+    await probe('read research.source_leads via profile', 'source_leads?select=*', { headers: { 'Accept-Profile': 'research' } })
     await probe('read public organizations (positive control)', 'organizations?select=franchise_key&limit=1', {}, true)
   } else notes.push('Data API probe skipped (BAI_SUPABASE_URL / BAI_SUPABASE_PUBLISHABLE_KEY not set)')
 

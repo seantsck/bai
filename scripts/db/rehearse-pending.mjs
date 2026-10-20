@@ -33,7 +33,7 @@ try {
     await db.query('rollback')
   }
   const left = await objects()
-  console.log(`rolled back; BAI schemas now hold ${['public', 'analytics', 'ingest', 'bai_meta'].map((s) => `${s}=${left[s] ?? 0}`).join(' ')} relations`)
+  console.log(`rolled back; BAI schemas now hold ${['public', 'analytics', 'ingest', 'research', 'bai_meta'].map((s) => `${s}=${left[s] ?? 0}`).join(' ')} relations`)
 } finally { await db.end() }
 console.log(failed ? 'REHEARSAL FAILED' : 'REHEARSAL OK')
 process.exit(failed ? 1 : 0)

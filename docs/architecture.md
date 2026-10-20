@@ -48,6 +48,7 @@ flowchart LR
 | 016_web_reader_role | `bai_web`: NOINHERIT login role for the web read pool, member of `anon` only; password set out of band |
 | 017_platform_default_privileges | removes Supabase's pre-2026 default grants to anon/authenticated/service_role in public and the sequence/service_role grants they produced (no-op locally) |
 | 018_btree_gist_extensions_schema | moves btree_gist from public to the `extensions` schema |
+| 019_research_backfill | private `research` schema (channels, classes, stage machine, jobs, batches, leads, import reviews, certifications, program waves, class metrics/status, the queue), franchise history names and `resolve_organization()`, `outcome_audit_details`, `analytics.player_outcome_profile` / `acquisition_economics` / `class_economics`, public `rm_research_certification` |
 
 Hosted (Supabase) databases are migrated with `supabase db push` from the same files (`supabase/migrations` is a symlink to `database/migrations`); the BAI runner then verifies the pushed history statement by statement and records checksums in `bai_meta`. See [supabase.md](supabase.md).
 

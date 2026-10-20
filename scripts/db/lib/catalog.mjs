@@ -1,7 +1,7 @@
 // Catalog snapshot of the BAI-owned part of a database, for local-vs-hosted parity. Every object becomes one
 // `kind|name -> description` entry so two snapshots diff as plain maps. Objects that belong to extensions are left out
 // (extensions are listed with their versions instead), and so is everything outside BAI's schemas.
-export const BAI_SCHEMAS = ['public', 'analytics', 'ingest', 'bai_meta']
+export const BAI_SCHEMAS = ['public', 'analytics', 'ingest', 'research', 'bai_meta']
 /** Roles BAI's migrations grant to or rely on. ACL entries for any other role are platform-managed. */
 export const BAI_ROLES = ['postgres', 'anon', 'authenticated', 'service_role', 'bai_web', 'PUBLIC']
 /** Login roles BAI's migrations create (cluster-level, so compared by attributes and memberships). */

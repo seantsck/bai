@@ -1,0 +1,297 @@
+{
+ "format": "bai-research-import/1",
+ "batch_key": "2016-draft-lad-tracker",
+ "channel": "DRAFT",
+ "description": "Los Angeles Dodgers, 2016 Rule 4 draft: signing bonuses for the 12 picks in rounds 1-10 from MLB.com signing and bonus tracker (corroborates Baseball-Reference; fills Raley; Smeltzer differs).",
+ "sources": [
+  {
+   "source_key": "lad2016:mlb-signing-tracker-2016",
+   "source_type": "OFFICIAL_LEAGUE",
+   "authority_level": "OFFICIAL",
+   "title": "2016 Draft: Signing and Bonus Tracker",
+   "publisher": "MLB.com",
+   "url": "https://www.mlb.com/news/2016-draft-signing-and-bonus-tracker/c-183906680",
+   "archived_url": "http://web.archive.org/web/20190922035650/https://www.mlb.com/news/2016-draft-signing-and-bonus-tracker/c-183906680",
+   "retrieved_date": "2026-10-20",
+   "notes": "Read through the archive capture (2019-09-22). Lists rounds 1-10 by overall pick: club, player, school, bonus, pick value, starting assignment. Publication date of the final update not stated."
+  }
+ ],
+ "records": [
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2016:mlb-statsapi-draft-2016-lad",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "1",
+   "overall_pick": 20,
+   "round_pick": 20,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Gavin Lux",
+    "birth_date": "1997-11-23",
+    "external_ids": {
+     "MLBAM": "666158"
+    },
+    "source_key": "lad2016:mlb-statsapi-draft-2016-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 2314500,
+    "source_key": "lad2016:mlb-signing-tracker-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2016:mlb-statsapi-draft-2016-lad",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "1",
+   "overall_pick": 32,
+   "round_pick": 32,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Will Smith",
+    "birth_date": "1995-03-28",
+    "external_ids": {
+     "MLBAM": "669257"
+    },
+    "source_key": "lad2016:mlb-statsapi-draft-2016-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 1772500,
+    "source_key": "lad2016:mlb-signing-tracker-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2016:mlb-statsapi-draft-2016-lad",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "CB-A",
+   "overall_pick": 36,
+   "round_pick": 2,
+   "organization": "LAD",
+   "selection_type": "COMPETITIVE_BALANCE",
+   "player": {
+    "full_name": "Jordan Sheffield",
+    "birth_date": "1995-06-01",
+    "external_ids": {
+     "MLBAM": "642068"
+    },
+    "source_key": "lad2016:mlb-statsapi-draft-2016-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 1847500,
+    "source_key": "lad2016:mlb-signing-tracker-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2016:mlb-statsapi-draft-2016-lad",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "2",
+   "overall_pick": 65,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Mitch White",
+    "birth_date": "1994-12-28",
+    "external_ids": {
+     "MLBAM": "669952"
+    },
+    "source_key": "lad2016:mlb-statsapi-draft-2016-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 588300,
+    "source_key": "lad2016:mlb-signing-tracker-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2016:mlb-statsapi-draft-2016-lad",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "3",
+   "overall_pick": 101,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Dustin May",
+    "birth_date": "1997-09-06",
+    "external_ids": {
+     "MLBAM": "669160"
+    },
+    "source_key": "lad2016:mlb-statsapi-draft-2016-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 997500,
+    "source_key": "lad2016:mlb-signing-tracker-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2016:mlb-statsapi-draft-2016-lad",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "4",
+   "overall_pick": 131,
+   "round_pick": 25,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "DJ Peters",
+    "birth_date": "1995-12-12",
+    "external_ids": {
+     "MLBAM": "656847"
+    },
+    "source_key": "lad2016:mlb-statsapi-draft-2016-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 247500,
+    "source_key": "lad2016:mlb-signing-tracker-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2016:mlb-statsapi-draft-2016-lad",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "5",
+   "overall_pick": 161,
+   "round_pick": 25,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Devin Smeltzer",
+    "birth_date": "1995-09-07",
+    "external_ids": {
+     "MLBAM": "656970"
+    },
+    "source_key": "lad2016:mlb-statsapi-draft-2016-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 500000,
+    "source_key": "lad2016:mlb-signing-tracker-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2016:mlb-statsapi-draft-2016-lad",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "6",
+   "overall_pick": 191,
+   "round_pick": 25,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Errol Robinson",
+    "birth_date": "1994-10-01",
+    "external_ids": {
+     "MLBAM": "642021"
+    },
+    "source_key": "lad2016:mlb-statsapi-draft-2016-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 247500,
+    "source_key": "lad2016:mlb-signing-tracker-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2016:mlb-statsapi-draft-2016-lad",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "7",
+   "overall_pick": 221,
+   "round_pick": 25,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Luke Raley",
+    "birth_date": "1994-09-19",
+    "external_ids": {
+     "MLBAM": "670042"
+    },
+    "source_key": "lad2016:mlb-statsapi-draft-2016-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 147500,
+    "source_key": "lad2016:mlb-signing-tracker-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2016:mlb-statsapi-draft-2016-lad",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "8",
+   "overall_pick": 251,
+   "round_pick": 25,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Andre Scrubb",
+    "birth_date": "1995-01-13",
+    "external_ids": {
+     "MLBAM": "668687"
+    },
+    "source_key": "lad2016:mlb-statsapi-draft-2016-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 122500,
+    "source_key": "lad2016:mlb-signing-tracker-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2016:mlb-statsapi-draft-2016-lad",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "9",
+   "overall_pick": 281,
+   "round_pick": 25,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Tony Gonsolin",
+    "birth_date": "1994-05-14",
+    "external_ids": {
+     "MLBAM": "664062"
+    },
+    "source_key": "lad2016:mlb-statsapi-draft-2016-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 2500,
+    "source_key": "lad2016:mlb-signing-tracker-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2016:mlb-statsapi-draft-2016-lad",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "10",
+   "overall_pick": 311,
+   "round_pick": 25,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Kevin Lachance",
+    "birth_date": "1994-07-02",
+    "external_ids": {
+     "MLBAM": "669730"
+    },
+    "source_key": "lad2016:mlb-statsapi-draft-2016-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 2500,
+    "source_key": "lad2016:mlb-signing-tracker-2016"
+   }
+  }
+ ]
+}
