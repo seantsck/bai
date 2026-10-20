@@ -60,6 +60,10 @@ The canonical migrations stay in `database/migrations/NNN_name.sql`. `supabase/m
 
 Never create or alter tables through the Dashboard. A hosted database must always be reproducible from the committed migrations.
 
+### Pending on hosted
+
+Migration 019 (research backfill) is committed but **not pushed**: hosted holds 001–018. `npm run hosted:rehearse` ran 019 on the hosted database inside a rolled-back transaction (it creates the private `research` schema and applies cleanly). Push it after the backfill-framework PR is reviewed, using steps 3–6 above. Until then `hosted:parity` and `hosted:verify` report 019 as pending.
+
 ### Hosted-only migrations
 
 Three migrations exist because of what a hosted Supabase database adds; on plain PostgreSQL they are inert or harmless:
@@ -85,7 +89,7 @@ Explained differences:
 
 ## Security model on hosted
 
-- **Data API** exposes `public` and `graphql_public` only (`pg_graphql` is not installed). `ingest`, `analytics` and `bai_meta` are not exposed.
+- **Data API** exposes `public` and `graphql_public` only (`pg_graphql` is not installed). `ingest`, `analytics`, `research` (019) and `bai_meta` are not exposed.
 - **anon/authenticated** may `SELECT` only public tables and views that are not registered in `internal_objects`. They have no write privilege, no sequence privilege, no EXECUTE on any BAI function and no USAGE on the private schemas. Every public table has RLS on, with one `SELECT` policy (`public_read`) on non-internal tables; internal tables have RLS and no policy (deny all; the advisor reports these as INFO by design).
 - **Views** are all `security_invoker`, so the reader's privileges and RLS apply.
 - **Functions**: 15 BAI functions, all SECURITY INVOKER with a pinned `search_path`; none is executable by PUBLIC, anon, authenticated or service_role.
@@ -100,7 +104,7 @@ Normal research happens locally. A batch goes to hosted only after it has been v
 - the CLI refuses any database whose host does not belong to `BAI_SUPABASE_PROJECT_REF`.
 
 ```
-npm run hosted:research -- import   --file research/imports/<batch>.json --operator <you> --confirm-hosted <ref>
+npm run hosted:research -- import   --file research/imports/<batch>.json --org <club> --operator <you> --confirm-hosted <ref>
 npm run hosted:research -- validate --batch <key> --confirm-hosted <ref>
 npm run hosted:research -- apply    --batch <key> --confirm-hosted <ref>            # dry run: compare with the local report
 npm run hosted:research -- apply    --batch <key> --write --confirm-hosted <ref>
