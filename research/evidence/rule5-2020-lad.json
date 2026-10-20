@@ -1,0 +1,16 @@
+{
+ "description": "Dodgers players selected in the 2020 Rule 5 draft (2020-12-10). MLB's transaction wire codes each of these as a waiver claim; MLB.com's same-day report names them as Rule 5 selections. Used by outcome-audits-import.mjs --rule5. Covers LAD 2016 and 2017 draftees only; the 2016 entries are proposed for the human reviewer and are not applied to the 2016 class.",
+ "sources": [
+  { "source_key": "lad:mlbcom-rule5-2020-lad", "source_type": "OFFICIAL_LEAGUE", "authority_level": "OFFICIAL", "title": "Dodgers lose 8 players in Rule 5 Draft", "publisher": "MLB.com",
+    "url": "https://www.mlb.com/news/dodgers-2020-rule-5-draft-results", "archived_url": "http://web.archive.org/web/20260101164013/https://www.mlb.com/news/dodgers-2020-rule-5-draft-results",
+    "published_date": "2020-12-10", "retrieved_date": "2026-10-20",
+    "notes": "\"right-handed pitchers Brett de Geus and Jordan Sheffield in the Major League phase. de Geus was taken with the second pick by Texas and Sheffield with the seventh pick by Colorado ... Also in the Minor League portion, the Dodgers lost ... shortstop Errol Robinson to Cincinnati, center fielder Chris Roller to Cleveland ... and infielder Marcus Chiu to Miami.\"" }
+ ],
+ "selections": [
+  { "mlbam": "642068", "name": "Jordan Sheffield", "draft_class": "2016", "date": "2020-12-10", "phase": "Major League phase (pick 7)", "to": "COL", "source_key": "lad:mlbcom-rule5-2020-lad" },
+  { "mlbam": "642021", "name": "Errol Robinson", "draft_class": "2016", "date": "2020-12-10", "phase": "Minor League phase", "to": "CIN", "source_key": "lad:mlbcom-rule5-2020-lad" },
+  { "mlbam": "676969", "name": "Brett de Geus", "draft_class": "2017", "date": "2020-12-10", "phase": "Major League phase (pick 2)", "to": "TEX", "source_key": "lad:mlbcom-rule5-2020-lad" },
+  { "mlbam": "676896", "name": "Chris Roller", "draft_class": "2017", "date": "2020-12-10", "phase": "Minor League phase", "to": "CLE", "source_key": "lad:mlbcom-rule5-2020-lad" },
+  { "mlbam": "676722", "name": "Marcus Chiu", "draft_class": "2017", "date": "2020-12-10", "phase": "Minor League phase", "to": "MIA", "source_key": "lad:mlbcom-rule5-2020-lad" }
+ ]
+}

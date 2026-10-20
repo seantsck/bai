@@ -1,0 +1,74 @@
+{
+ "format": "bai-research-import/1",
+ "batch_key": "2017-draft-lad-wire-dates",
+ "channel": "DRAFT",
+ "description": "LAD 2017 Rule 4 draft: signing dates for picks 520, 610 from the MLB transaction wire (follow-up batch).",
+ "sources": [
+  {
+   "source_key": "lad2017:mlb-transactions-draft-2017",
+   "source_type": "OFFICIAL_LEAGUE",
+   "authority_level": "OFFICIAL",
+   "title": "MLB transaction wire, team 119, 2017-06-12 to 2017-08-31",
+   "publisher": "MLB Advanced Media",
+   "url": "https://statsapi.mlb.com/api/v1/transactions?teamId=119&startDate=2017-06-12&endDate=2017-08-31",
+   "retrieved_date": "2026-10-20",
+   "notes": "SGN entries for the club's official picks. A pick without an entry is not claimed either way."
+  }
+ ],
+ "records": [
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2017:mlb-statsapi-draft-2017-lad",
+   "draft_key": "2017-JUNE_AMATEUR",
+   "round_code": "17",
+   "overall_pick": 520,
+   "round_pick": 25,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Nathan Witt",
+    "birth_date": "1996-04-19",
+    "external_ids": {
+     "MLBAM": "676739"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2017-07-06",
+    "date_precision": "DAY",
+    "source_key": "lad2017:mlb-transactions-draft-2017",
+    "locator": "transaction 323111"
+   },
+   "notes": "MLB transaction 323111 (2017-07-06): Los Angeles Dodgers signed RHP Nathan Witt."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2017:mlb-statsapi-draft-2017-lad",
+   "draft_key": "2017-JUNE_AMATEUR",
+   "round_code": "20",
+   "overall_pick": 610,
+   "round_pick": 25,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Donovan Casey",
+    "birth_date": "1996-02-23",
+    "external_ids": {
+     "MLBAM": "661541"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2017-07-06",
+    "date_precision": "DAY",
+    "source_key": "lad2017:mlb-transactions-draft-2017",
+    "locator": "transaction 323112"
+   },
+   "notes": "MLB transaction 323112 (2017-07-06): Los Angeles Dodgers signed OF Donovan Casey."
+  }
+ ]
+}

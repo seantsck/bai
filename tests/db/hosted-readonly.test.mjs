@@ -16,6 +16,7 @@ import pg from 'pg'
 import * as h from './harness.mjs'
 import * as P from '../../scripts/research/lib/pipeline.mjs'
 import { validateSource } from '../../scripts/research/lib/import-format.mjs'
+import { integrityViolations } from '../../scripts/research/lib/integrity.mjs'
 import { listMigrations, supabaseHistory, pushedMatchesFile } from '../../scripts/db/lib/migrations.mjs'
 import { ownerDatabaseUrl } from '../../scripts/db/lib/connection.mjs'
 
@@ -251,9 +252,9 @@ test('research queues: fixed priorities; the summary equals the internal queue',
   })
 })
 
-test('coverage states: only census-level states can support population rates; nothing claims them yet', async () => {
+test('coverage states: only census-level states support rates; census claims are sourced and whole; no rate without certification; partial never shown as complete', async () => {
   const states = await rows("select s::text state, coverage_supports_population_rate(s) ok from unnest(enum_range(null::coverage_state)) s order by 1")
   assert.deepEqual(states.filter((s) => s.ok).map((s) => s.state).sort(), ['COMPLETE_CENSUS', 'SUBSTANTIALLY_COMPLETE'])
-  assert.equal((await one("select count(*)::int n from coverage_assessments where coverage_state in ('COMPLETE_CENSUS', 'SUBSTANTIALLY_COMPLETE')")).n, 0)
-  assert.equal((await one('select count(*)::int n from rm_research_coverage where supports_population_rate')).n, 0)
+  // Shared invariants (scripts/research/lib/integrity.mjs; tests/db/integrity.test.mjs proves each detects a violation).
+  assert.deepEqual(await integrityViolations(raw), [])
 })

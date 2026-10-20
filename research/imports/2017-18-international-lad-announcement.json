@@ -1,0 +1,456 @@
+{
+ "format": "bai-research-import/1",
+ "batch_key": "2017-18-international-lad-announcement",
+ "channel": "INTERNATIONAL",
+ "description": "LAD 2017-18: 25 candidate signing(s) corroborated by \"July 2 signing update: Dodgers announce signings of 26 prospects\" (Dodgers Digest (Dustin Nosler)), 3 with a reported bonus; 1 listed name(s) not imported.",
+ "sources": [
+  {
+   "source_key": "lad201718:dodgersdigest-ifa-2017-07-04",
+   "source_type": "NEWS_REPORT",
+   "authority_level": "REPUTABLE_SECONDARY",
+   "title": "July 2 signing update: Dodgers announce signings of 26 prospects",
+   "publisher": "Dodgers Digest (Dustin Nosler)",
+   "published_date": "2017-07-04",
+   "url": "https://dodgersdigest.com/2017/07/04/july-2-signing-update-dodgers-announce-signings-of-26-prospects/",
+   "archived_url": "http://web.archive.org/web/20260309213502/https://dodgersdigest.com/2017/07/04/july-2-signing-update-dodgers-announce-signings-of-26-prospects/",
+   "retrieved_date": "2026-10-20",
+   "notes": "\"The Dodgers announced on Monday they have signed 26 international free agents ... Baseball America has been able to confirm three bonuses thus far: Heredia, $300,000 A. Valdez, $300,000 Leonard, $200,000\". Also: pool $4.75 million, no single bonus over $300,000 (penalty from 2015-16). Not imported: a reported Jaime Perez (Cuba) signing the article itself doubts, and a second report of Enrique $300,000 / Perez $200,000 it calls unreliable (2017-07-03 article)."
+  }
+ ],
+ "records": [
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:dodgersdigest-ifa-2017-07-04",
+   "organization": "LAD",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "player": {
+    "full_name": "Mayron Cathalina",
+    "birth_date": "2001-02-12",
+    "external_ids": {
+     "MLBAM": "678886"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "notes": "Listed by Dodgers Digest (Dustin Nosler) (2017-07-04) as \"Mayron Cathalina\", OF, Aruba."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:dodgersdigest-ifa-2017-07-04",
+   "organization": "LAD",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "player": {
+    "full_name": "Julio Enrique",
+    "birth_date": "2000-02-21",
+    "external_ids": {
+     "MLBAM": "678294"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "notes": "Listed by Dodgers Digest (Dustin Nosler) (2017-07-04) as \"Julio Enrique\", OF, Cuba."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:dodgersdigest-ifa-2017-07-04",
+   "organization": "LAD",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "player": {
+    "full_name": "Rushenten Tomsjansen",
+    "birth_date": "2001-05-14",
+    "external_ids": {
+     "MLBAM": "678751"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "notes": "Listed by Dodgers Digest (Dustin Nosler) (2017-07-04) as \"Rushenten Tomjansen\", OF, Curacao."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:dodgersdigest-ifa-2017-07-04",
+   "organization": "LAD",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "player": {
+    "full_name": "Jeffry Abreu",
+    "birth_date": "2000-01-28",
+    "external_ids": {
+     "MLBAM": "674100"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "notes": "Listed by Dodgers Digest (Dustin Nosler) (2017-07-04) as \"Jeffry Abreu\", RHP, Dominican Republic."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:dodgersdigest-ifa-2017-07-04",
+   "organization": "LAD",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "player": {
+    "full_name": "Axel Acevedo",
+    "birth_date": "2000-09-23",
+    "external_ids": {
+     "MLBAM": "678677"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "notes": "Listed by Dodgers Digest (Dustin Nosler) (2017-07-04) as \"Axel Acevedo\", RHP, Dominican Republic."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:dodgersdigest-ifa-2017-07-04",
+   "organization": "LAD",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "player": {
+    "full_name": "Jeisson Cabrera",
+    "birth_date": "1998-09-05",
+    "external_ids": {
+     "MLBAM": "678922"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "notes": "Listed by Dodgers Digest (Dustin Nosler) (2017-07-04) as \"Jession Cabrera\", RHP, Dominican Republic."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:dodgersdigest-ifa-2017-07-04",
+   "organization": "LAD",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "player": {
+    "full_name": "Darlin Camilo",
+    "birth_date": "1999-11-17",
+    "external_ids": {
+     "MLBAM": "678480"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "notes": "Listed by Dodgers Digest (Dustin Nosler) (2017-07-04) as \"Darlin Camilo\", RHP, Dominican Republic."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:dodgersdigest-ifa-2017-07-04",
+   "organization": "LAD",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "player": {
+    "full_name": "Daniel Cruz",
+    "birth_date": "1997-10-05",
+    "external_ids": {
+     "MLBAM": "677645"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "notes": "Listed by Dodgers Digest (Dustin Nosler) (2017-07-04) as \"Daniel Cruz\", RHP, Dominican Republic."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:dodgersdigest-ifa-2017-07-04",
+   "organization": "LAD",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "player": {
+    "full_name": "Carlos De Los Santos",
+    "birth_date": "2000-11-18",
+    "external_ids": {
+     "MLBAM": "678914"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "notes": "Listed by Dodgers Digest (Dustin Nosler) (2017-07-04) as \"Carlos De Los Santos\", RHP, Dominican Republic."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:dodgersdigest-ifa-2017-07-04",
+   "organization": "LAD",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "player": {
+    "full_name": "Jimmie Feliz",
+    "birth_date": "2000-08-01",
+    "external_ids": {
+     "MLBAM": "678491"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "notes": "Listed by Dodgers Digest (Dustin Nosler) (2017-07-04) as \"Jimmie Feliz\", OF, Dominican Republic."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:dodgersdigest-ifa-2017-07-04",
+   "organization": "LAD",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "player": {
+    "full_name": "Gorge Heredia",
+    "birth_date": "2000-12-01",
+    "external_ids": {
+     "MLBAM": "678734"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {
+    "signing_bonus_usd": 300000
+   },
+   "cost_source_key": "lad201718:dodgersdigest-ifa-2017-07-04",
+   "notes": "Listed by Dodgers Digest (Dustin Nosler) (2017-07-04) as \"George Heredia\", OF, Dominican Republic; bonus confirmed by Baseball America per the article."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:dodgersdigest-ifa-2017-07-04",
+   "organization": "LAD",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "player": {
+    "full_name": "Eddys Leonard",
+    "birth_date": "2000-11-10",
+    "external_ids": {
+     "MLBAM": "678760"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {
+    "signing_bonus_usd": 200000
+   },
+   "cost_source_key": "lad201718:dodgersdigest-ifa-2017-07-04",
+   "notes": "Listed by Dodgers Digest (Dustin Nosler) (2017-07-04) as \"Eddys Leonard\", SS, Dominican Republic; bonus confirmed by Baseball America per the article."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:dodgersdigest-ifa-2017-07-04",
+   "organization": "LAD",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "player": {
+    "full_name": "Vladimir Perez",
+    "birth_date": "2001-01-03",
+    "external_ids": {
+     "MLBAM": "678892"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "notes": "Listed by Dodgers Digest (Dustin Nosler) (2017-07-04) as \"Vladimir Perez\", SS, Dominican Republic."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:dodgersdigest-ifa-2017-07-04",
+   "organization": "LAD",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "player": {
+    "full_name": "Benony Robles",
+    "birth_date": "2000-10-01",
+    "external_ids": {
+     "MLBAM": "678840"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "notes": "Listed by Dodgers Digest (Dustin Nosler) (2017-07-04) as \"Benony Robles\", LHP, Dominican Republic."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:dodgersdigest-ifa-2017-07-04",
+   "organization": "LAD",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "player": {
+    "full_name": "Brayan Rodriguez",
+    "birth_date": "2000-11-23",
+    "external_ids": {
+     "MLBAM": "678589"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "notes": "Listed by Dodgers Digest (Dustin Nosler) (2017-07-04) as \"Brayan Rodriguez\", OF, Dominican Republic."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:dodgersdigest-ifa-2017-07-04",
+   "organization": "LAD",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "player": {
+    "full_name": "Randy Rodriguez",
+    "birth_date": "1995-09-04",
+    "external_ids": {
+     "MLBAM": "678776"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "notes": "Listed by Dodgers Digest (Dustin Nosler) (2017-07-04) as \"Randy Rodriguez\", IF, Dominican Republic."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:dodgersdigest-ifa-2017-07-04",
+   "organization": "LAD",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "player": {
+    "full_name": "Martin Santana",
+    "birth_date": "2001-01-30",
+    "external_ids": {
+     "MLBAM": "679756"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "notes": "Listed by Dodgers Digest (Dustin Nosler) (2017-07-04) as \"Martin Santana\", RHP, Dominican Republic."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:dodgersdigest-ifa-2017-07-04",
+   "organization": "LAD",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "player": {
+    "full_name": "Amin Valdez",
+    "birth_date": "2000-11-18",
+    "external_ids": {
+     "MLBAM": "677576"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {
+    "signing_bonus_usd": 300000
+   },
+   "cost_source_key": "lad201718:dodgersdigest-ifa-2017-07-04",
+   "notes": "Listed by Dodgers Digest (Dustin Nosler) (2017-07-04) as \"Amin Valdez\", SS, Dominican Republic; bonus confirmed by Baseball America per the article."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:dodgersdigest-ifa-2017-07-04",
+   "organization": "LAD",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "player": {
+    "full_name": "Jesus Valdez",
+    "birth_date": "1997-12-29",
+    "external_ids": {
+     "MLBAM": "678232"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "notes": "Listed by Dodgers Digest (Dustin Nosler) (2017-07-04) as \"Jesus Valdez\", IF, Dominican Republic."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:dodgersdigest-ifa-2017-07-04",
+   "organization": "LAD",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "player": {
+    "full_name": "Imanol Vargas",
+    "birth_date": "1998-06-29",
+    "external_ids": {
+     "MLBAM": "677673"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "notes": "Listed by Dodgers Digest (Dustin Nosler) (2017-07-04) as \"Imanol Vargas\", OF, Dominican Republic."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:dodgersdigest-ifa-2017-07-04",
+   "organization": "LAD",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "player": {
+    "full_name": "Jonathan Vasquez",
+    "birth_date": "2000-01-25",
+    "external_ids": {
+     "MLBAM": "677675"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "notes": "Listed by Dodgers Digest (Dustin Nosler) (2017-07-04) as \"Jonathan Vasquez\", RHP, Dominican Republic."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:dodgersdigest-ifa-2017-07-04",
+   "organization": "LAD",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "player": {
+    "full_name": "Andrew Budier",
+    "birth_date": "1999-10-20",
+    "external_ids": {
+     "MLBAM": "678292"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "notes": "Listed by Dodgers Digest (Dustin Nosler) (2017-07-04) as \"Andrew Budier\", LHP, Nicaragua."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:dodgersdigest-ifa-2017-07-04",
+   "organization": "LAD",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "player": {
+    "full_name": "Jenderson Jardines",
+    "birth_date": "2001-01-31",
+    "external_ids": {
+     "MLBAM": "678668"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "notes": "Listed by Dodgers Digest (Dustin Nosler) (2017-07-04) as \"Jenderson Jardines\", C, Venezuela."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:dodgersdigest-ifa-2017-07-04",
+   "organization": "LAD",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "player": {
+    "full_name": "Yhostin Chirinos",
+    "birth_date": "2000-09-29",
+    "external_ids": {
+     "MLBAM": "678477"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "notes": "Listed by Dodgers Digest (Dustin Nosler) (2017-07-04) as \"Yhostin Chirinos\", SS, Venezuela."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:dodgersdigest-ifa-2017-07-04",
+   "organization": "LAD",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "player": {
+    "full_name": "Jorbit Vivas",
+    "birth_date": "2001-03-09",
+    "external_ids": {
+     "MLBAM": "678391"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "notes": "Listed by Dodgers Digest (Dustin Nosler) (2017-07-04) as \"Jorbit Vivas\", IF, Venezuela."
+  }
+ ]
+}

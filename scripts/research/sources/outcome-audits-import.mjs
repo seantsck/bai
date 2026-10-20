@@ -12,6 +12,12 @@
 //                    RETAINED when still with the club; UNKNOWN when the record shows no exit
 //   trades           every trade between two MLB organizations in the player's record (shared when one trade moved several)
 //   WAR              Baseball-Reference career WAR from the draft page (as of its capture), never FanGraphs unless observed
+//                    (--bref-through: the last season the capture includes, e.g. 2025 for a January 2026 capture)
+//   signed           the draft import's status, or an official SGN entry to the club in the draft year (a disagreement is noted;
+//                    the signing itself is corrected through a DRAFT batch, never here)
+//   Rule 5           MLB's wire codes some Rule 5 selections as waiver claims. --rule5 <json> takes researcher-verified Rule 5
+//                    selections ([{ "mlbam", "date", "phase", "to", "source_key" }] plus "sources": [...]); a waiver claim on that
+//                    date to that club becomes LOST_RULE_5, citing that source. Without the file, waiver claims stay LOST_WAIVERS.
 //
 //   node --env-file-if-exists=.env.local scripts/research/sources/outcome-audits-import.mjs --org LAD --draft-key 2016-JUNE_AMATEUR \
 //     --dir <download dir> --draft-import research/imports/2016-draft-lad.json --bref page.html --bref-source lad2016:bref-lad-2016 \
@@ -59,6 +65,10 @@ if (arg('bref', false)) {
   }
 }
 
+// Researcher-verified Rule 5 selections (optional).
+const rule5 = arg('rule5', false) ? JSON.parse(fs.readFileSync(arg('rule5'), 'utf8')) : { selections: [], sources: [] }
+const rule5By = new Map(rule5.selections.map((x) => [String(x.mlbam), x]))
+
 const SRC = `${org.toLowerCase()}${draft.records[0].draft_key.slice(0, 4)}:mlb-statsapi-outcomes-${asOf}`
 const records = []
 const summary = []
@@ -73,7 +83,10 @@ for (const d of draft.records) {
   const seasons = [...mlbSeasons, ...milbSeasons].map((x) => Number(x.season)).filter(Boolean)
   const reached = p.mlbDebutDate && p.mlbDebutDate <= asOf
   const tx = (j.transactions.transactions ?? []).slice().sort((a, b) => (a.date + a.id).localeCompare(b.date + b.id))
-  const signed = d.signing.status === 'SIGNED'
+  const draftYear = d.draft_key.slice(0, 4)
+  const wireSigned = tx.some((t) => t.typeCode === 'SGN' && t.date.startsWith(draftYear) && franchiseOf(t.toTeam?.id, Number(draftYear)) === org)
+  const signed = d.signing.status === 'SIGNED' || wireSigned
+  const signingNote = signed && d.signing.status !== 'SIGNED' ? `draft import says ${d.signing.status} but MLB's wire records an SGN entry to ${org} in ${draftYear}; audited as signed` : null
 
   // Debut organization: the MLB club of the debut season; if several, the club the player joined last before the debut.
   let debut = null
@@ -95,6 +108,7 @@ for (const d of draft.records) {
 
   let disposition = 'UNKNOWN'
   let dispositionRef = null
+  let rule5Source = null
   if (!signed) disposition = 'UNSIGNED'
   else {
     const signing = tx.find((t) => t.typeCode === 'SGN' && franchiseOf(t.toTeam?.id, Number(t.date.slice(0, 4))) === org)
@@ -105,6 +119,8 @@ for (const d of draft.records) {
       const teamOrg = franchiseOf(t.toTeam?.id ?? t.fromTeam?.id, yr)
       if (t.typeCode === 'TR' && fromOrg === org) { disposition = 'TRADED'; dispositionRef = `mlb-tx-${t.id}`; break }
       if (t.typeCode === 'REL' && teamOrg === org) { disposition = 'RELEASED'; break }
+      const r5 = rule5By.get(id)
+      if (t.typeCode === 'CLW' && toOrg && toOrg !== org && r5 && r5.date === t.date && r5.to === toOrg) { disposition = 'LOST_RULE_5'; rule5Source = r5.source_key; break }
       if (t.typeCode === 'CLW' && toOrg && toOrg !== org) { disposition = 'LOST_WAIVERS'; break }
       if (t.typeCode === 'R5' && toOrg && toOrg !== org) { disposition = 'LOST_RULE_5'; break }
       if (t.typeCode === 'DFA' && (teamOrg === org || teamOrg == null)) { disposition = 'LEFT_AS_FREE_AGENT'; break }
@@ -124,8 +140,10 @@ for (const d of draft.records) {
   const notes = []
   if (p.active && !curOrg) notes.push(`active outside affiliated baseball (current team per MLB: ${p.currentTeam?.name ?? 'none'})`)
   if (!seasons.length) notes.push('MLB Stats API lists no affiliated or MLB season; affiliated reach not established')
+  if (signingNote) notes.push(signingNote)
+  if (rule5Source) notes.push(`MLB's wire codes the exit as a waiver claim; it was a ${rule5By.get(id).phase} Rule 5 selection by ${rule5By.get(id).to} (${rule5Source})`)
   const war = brefWar.has(d.overall_pick) && reached
-    ? [{ system: 'BREF', scope: 'CAREER', through_season: through, value: brefWar.get(d.overall_pick), observed_on: arg('bref-captured'), source_key: arg('bref-source'), locator: 'draft table WAR column (career, as of the capture)' }]
+    ? [{ system: 'BREF', scope: 'CAREER', through_season: Number(arg('bref-through', false) ?? through), value: brefWar.get(d.overall_pick), observed_on: arg('bref-captured'), source_key: arg('bref-source'), locator: 'draft table WAR column (career, as of the capture)' }]
     : []
   records.push({
     type: 'OUTCOME_AUDIT', source_key: SRC, organization: org,
@@ -154,7 +172,8 @@ const doc = {
   description: `${org} ${draft.records[0].draft_key} class: outcome audits for ${records.length} selections as of ${asOf} (MLB Stats API; Baseball-Reference career WAR).`,
   sources: [{ source_key: SRC, source_type: 'OFFICIAL_LEAGUE', authority_level: 'OFFICIAL', title: `MLB Stats API player outcomes (people, MLB and milb_all seasons, transactions), ${records.length} players`,
     publisher: 'MLB Advanced Media', reference: 'statsapi.mlb.com/api/v1: people/{id}?hydrate=currentTeam,stats(...); people/{id}/stats?stats=yearByYear&leagueListId=milb_all; transactions?playerId={id}; teams?sportIds=11..16&season=Y',
-    retrieved_date: manifest.retrieved_date, notes: `${manifest.requests.length} requests, all HTTP 200 (manifest kept with the download). Current status and transactions as of the retrieval date.` }],
+    retrieved_date: manifest.retrieved_date, notes: `${manifest.requests.length} requests, all HTTP 200 (manifest kept with the download). Current status and transactions as of the retrieval date.` },
+  ...rule5.sources.filter((s) => rule5.selections.some((x) => x.source_key === s.source_key))],
   records
 }
 fs.writeFileSync(arg('out'), JSON.stringify(doc, null, 1) + '\n')

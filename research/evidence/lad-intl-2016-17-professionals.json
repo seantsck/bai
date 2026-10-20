@@ -1,0 +1,17 @@
+{
+ "description": "Foreign-born 2016-17 Dodgers signees outside the amateur rule that a researcher classified with a source. Used by scripts/research/sources/intl-list-corroboration.mjs with --tx and --people-dir.",
+ "period_key": "2016-17",
+ "organization": "LAD",
+ "source": {
+  "source_key": "lad201617:dodgersdigest-fernandez-2017-01-09", "source_type": "NEWS_REPORT", "authority_level": "REPUTABLE_SECONDARY",
+  "title": "Dodgers reported Fernandez deal will be ~$200k, shouldn't impact Dozier talks", "publisher": "Dodgers Digest (Chad Moriyama)", "published_date": "2017-01-09",
+  "url": "https://dodgersdigest.com/2017/01/09/dodgers-reported-fernandez-deal-will-be-200k-shouldnt-impact-dozier-talks/",
+  "archived_url": "http://web.archive.org/web/20260519043055/https://dodgersdigest.com/2017/01/09/dodgers-reported-fernandez-deal-will-be-200k-shouldnt-impact-dozier-talks/",
+  "retrieved_date": "2026-10-20",
+  "notes": "\"Cuban infielder Jose Miguel Fernandez is nearing a Minor League deal with the Dodgers, sources told MLB.com's Jesse Sanchez ... Per Sanchez, Fernandez's signing bonus is worth around $200,000.\" An approximate figure: not imported as a bonus."
+ },
+ "entries": [
+  { "name": "Jose Miguel Fernandez", "position": "3B", "country": "Cuba", "mlbam": "628336", "pathway": "INTERNATIONAL_PROFESSIONAL",
+    "classification_note": "Age 28 at signing; reported to have played seven Serie Nacional seasons for Matanzas; a minor-league deal reported as outside the international bonus pools (Baseball America, not read directly: the site refuses automated requests). Bonus reported as about $200,000 (MLB.com via Dodgers Digest) and left unknown as an exact figure." }
+ ]
+}

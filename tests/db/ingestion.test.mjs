@@ -195,6 +195,25 @@ test('unknown signing status writes no signing row; later evidence fills it; a c
   assert.ok((await P.openConflicts(db)).some((c) => c.subject_table === 'draft_signings' && c.field_name === 'signing_status' && c.declared_rule === 'REQUIRE_OPERATOR'))
 })
 
+test('a signing date fills an unknown date with its precision; a different date is a conflict, and resolving one keeps date and precision together', async () => {
+  const p = { full_name: 'Dated Signee', external_ids: { MLBAM: '9800090' } }
+  const at = (key, source, date) => ({ batch_key: key, channel: 'DRAFT', sources: [src(source, 'OFFICIAL')], records: [pick({ source_key: source, overall_pick: 340, round_pick: 13, round_code: '11', player: p,
+    signing: { status: 'SIGNED', bonus_usd: null, source_key: source, ...(date ? { date, date_precision: 'DAY' } : {}) } })] })
+  await run(at('test-dated-1', 'test:club', null))
+  const row = () => h.one(db, "select g.id, g.signing_date::text d, g.signing_date_precision::text p from draft_signings g join draft_selections s on s.id = g.draft_selection_id join players x on x.id = s.player_id where x.slug = 'dated-signee'")
+  assert.deepEqual(await row().then(({ d, p }) => ({ d, p })), { d: null, p: null })
+  const r2 = await run(at('test-dated-2', 'test:wire', '2017-06-20'))
+  assert.equal(r2.results[0].action, 'UPDATE_UNKNOWN')
+  assert.deepEqual(await row().then(({ d, p }) => ({ d, p })), { d: '2017-06-20', p: 'DAY' })
+  const r3 = await run(at('test-dated-3', 'test:other', '2017-06-22'))
+  assert.equal(r3.results[0].action, 'CONFLICT')
+  const { id } = await row()
+  const c = (await P.openConflicts(db)).find((x) => x.subject_table === 'draft_signings' && String(x.subject_id) === String(id) && x.field_name === 'signing_date')
+  const chosen = c.observations.find((o) => o.source_key === 'test:other')
+  await P.resolveConflict(db, { subjectTable: 'draft_signings', subjectId: id, field: 'signing_date', observationId: chosen.observation_id, operator: 'tester', rationale: 'fixture: the later contract date', write: true })
+  assert.deepEqual(await row().then(({ d, p }) => ({ d, p })), { d: '2017-06-22', p: 'DAY' })
+})
+
 test('equal claims compare equal across sources: values are stored with one JSON type per field', async () => {
   const sel = await h.one(db, "select s.id from draft_selections s join players p on p.id = s.player_id where p.slug = 'status-unknown'")
   const vals = await h.rows(db, "select field_name, jsonb_typeof(observed_value) t, count(distinct observed_value)::int n from source_observations where subject_table = 'draft_selections' and subject_id = $1 and field_name in ('round_code', 'round_pick') group by 1, 2 order by 1", [sel.id])

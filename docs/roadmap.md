@@ -44,12 +44,20 @@
 - **Outcome audit details and economics views,** with rates gated on census-level, certified, fully audited cohorts.
 - **First non-pilot class, LAD 2016 draft (local):** 42 of 42 picks, census coverage, conflicts resolved, 7 bonuses explicitly unknown; READY_FOR_REVIEW, awaiting human certification.
 
-## In progress: Wave 1 (`feature/lad-2016-outcomes-and-cohorts`)
+## Done: Wave 1 release (PR #5, merged `1672f39`)
 
-- **Framework release:** PR #4 merged; migration 019 deployed to hosted, with parity, security and verification passing.
-- **LAD 2016 draft:** outcome audits for 42 of 42 picks (migration 020 outcomes channel). Evidence package ready; awaiting human certification.
-- **LAD 2017 draft:** 40 of 40 picks, census coverage, 10 of 10 slots, 13 of 31 bonuses. 18 bonus jobs and 40 outcome audits open; batch paused.
-- **LAD international 2016-17 and 2017-18:** 45 and 50 candidate amateur signings, discovered on the MLB transaction wire by a documented rule. PARTIAL_RECONSTRUCTION; universe, bonuses and the classification still to verify.
+- **Migration 020 deployed to hosted;** PR #5's runbooks replayed there (LAD 2016 with outcomes; LAD 2017 and international begun). Parity, security and pilot checks pass.
+
+## In progress: Wave 1 (`feature/phase6-certification-and-cohorts`)
+
+- **LAD 2016 draft:** independently re-verified, with a human-review checklist and a recommendation per decision. Baseball America added: Jenco's bonus found (6 unknown remain), and the Smeltzer conflict reopened for the reviewer. Not certified.
+- **LAD 2017 draft:**
+  - Witt and Casey corrected to signed (MLB wire), so 33 signed and 7 not.
+  - 33 signing dates; 13 of 33 bonuses, 20 unknown after research.
+  - 40 of 40 outcomes audited, with Rule 5 losses recorded.
+  - `READY_FOR_REVIEW`; not certified.
+- **LAD international 2016-17 and 2017-18:** reconciled against the club's 2017 announcement and published reports. Signees are classified as amateur, exempt professional, previously affiliated or ambiguous. Still `PARTIAL_RECONSTRUCTION`.
+- **Proposals:** [organizational WAR attribution](proposals/organizational-war-attribution.md) and the [league-wide cohort roadmap](proposals/league-wide-cohort-roadmap.md).
 
 ## Next
 
