@@ -16,7 +16,7 @@ import * as B from '../../scripts/research/lib/backfill.mjs'
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 let db
 const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'bai-backfill-'))
-before(async () => { await h.startServer(); db = await h.freshDatabase() }, { timeout: 120000 })
+before(async () => { await h.startServer(); db = await h.freshDatabase(); await B.addReviewer(db, { reviewer: ME, actor: 'test-admin', note: 'fixture reviewer' }) }, { timeout: 120000 })
 after(async () => { await h.stopServer(); fs.rmSync(dir, { recursive: true, force: true }) })
 
 const ME = 'tester'
@@ -358,7 +358,7 @@ test('automation safety: an agent may stage, validate and dry-run, never write o
   const w = await P.applyBatch(db, batch.id, { write: true })
   assert.equal(w.report.step, 'apply')
   await assert.rejects(B.certify(db, { org: 'SEA', channel: 'draft', year: 2016 }, { actor: 'agent:scout-1' }), /agent cannot certify/)
-  await h.rejects(db, "insert into research.certifications (class_id, certified_by, coverage_state, report) select id, 'agent:x', 'UNKNOWN', '{}' from research.classes limit 1", [], /certifications_certified_by_check/)
+  await h.rejects(db, "insert into research.certifications (class_id, certified_by, coverage_state, report) select id, 'agent:x', 'UNKNOWN', '{}' from research.classes limit 1", [], /registered, active human reviewer|certifications_certified_by_check/)
 })
 
 test('progress: league-wide covers all 30 organizations; no rates for incomplete classes', async () => {

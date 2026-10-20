@@ -470,7 +470,8 @@ function public_rate_state (state) { return state === 'COMPLETE_CENSUS' || state
 /** Certifies only when the deterministic check passes. There is no force option. */
 export async function certify (db, clsRef, { actor }) {
   requireActor(actor, 'certifying')
-  if (/^agent:/.test(actor)) throw new PipelineError('an automated agent cannot certify a class')
+  if (/^(agent|rule|system):/.test(actor)) throw new PipelineError('an automated agent cannot certify a class')
+  if (!(await one(db, 'select research.is_active_reviewer($1) ok', [actor])).ok) throw new PipelineError(`${actor} is not a registered, active human reviewer (research:reviewer --add, by a human)`)
   const { cls, metrics, blockers } = await certificationBlockers(db, clsRef)
   if (blockers.length) return { certified: false, cls, blockers }
   return tx(db, actor, async () => {
@@ -483,6 +484,32 @@ export async function certify (db, clsRef, { actor }) {
     await db.query("insert into research.stage_events (class_id, from_stage, to_stage, actor, rationale) values ($1, 'COVERAGE_REVIEW', 'CERTIFIED', $2, 'research:certify passed')", [cls.id, actor])
     return { certified: true, cls, blockers: [], coverage_state: metrics.coverage_state }
   })
+}
+
+/** Sets an organization's research program wave (priority data, no schema). A human decision with a rationale. */
+export async function setWave (db, { org, wave, actor, rationale }) {
+  requireActor(actor, 'setting a program wave')
+  if (/^(agent|rule|system):/.test(actor)) throw new PipelineError('program waves are set by a human')
+  if (![1, 2, 3].includes(Number(wave))) throw new PipelineError('wave must be 1, 2 or 3')
+  if (!rationale) throw new PipelineError('setting a wave needs --rationale')
+  const o = await one(db, 'select id from public.organizations where franchise_key = $1 and active', [String(org).toUpperCase()])
+  if (!o) throw new PipelineError(`unknown organization ${org}`)
+  return tx(db, actor, async () => one(db, `insert into research.program_waves (organization_id, wave, rationale, set_by) values ($1, $2, $3, $4)
+    on conflict (organization_id) do update set wave = excluded.wave, rationale = excluded.rationale, set_by = excluded.set_by, set_at = now() returning *`, [o.id, Number(wave), rationale, actor]))
+}
+
+/** Registers a human reviewer (migration 021). Only a human may register one; agent:/rule:/system: names never qualify. */
+export async function addReviewer (db, { reviewer, actor, note = null }) {
+  requireActor(actor, 'registering a reviewer')
+  if (/^(agent|rule|system):/.test(actor)) throw new PipelineError('only a human registers reviewers')
+  if (!reviewer || /^(agent:|rule:|system:|bai-)/.test(reviewer)) throw new PipelineError('a reviewer is a named human (not agent:, rule:, system: or a bai- operator label)')
+  return tx(db, actor, async () => one(db, 'insert into research.reviewers (reviewer, added_by, note) values ($1, $2, $3) on conflict (reviewer) do nothing returning *', [reviewer, actor, note]))
+}
+
+export async function deactivateReviewer (db, { reviewer, actor }) {
+  requireActor(actor, 'deactivating a reviewer')
+  if (/^(agent|rule|system):/.test(actor)) throw new PipelineError('only a human deactivates reviewers')
+  return tx(db, actor, async () => one(db, 'update research.reviewers set active = false, deactivated_at = now() where reviewer = $1 and active returning *', [reviewer]))
 }
 
 /** Revokes the active certification (a human act with a reason) and returns the class to COVERAGE_REVIEW. */
