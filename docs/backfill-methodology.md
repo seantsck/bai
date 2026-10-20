@@ -81,7 +81,7 @@ Every state change is logged in `research.job_events` with its actor.
 | `COVERAGE_CERTIFICATION` | COVERAGE_REVIEW | 10 | always (one per class; closed only by certification) |
 
 Job states and how the planner treats them:
-- **States:** `OPEN`, `IN_PROGRESS`, `BLOCKED` (needs a reason), `DONE`, `UNRESOLVED`, `CANCELLED`, `SUPERSEDED`. Terminal states need a rationale and never move again by hand.
+- **States:** `OPEN`, `IN_PROGRESS`, `BLOCKED` (needs a reason), `DONE`, `UNRESOLVED`, `CANCELLED`, `SUPERSEDED`. Terminal states need a rationale and never move again by hand, with one exception: `UNRESOLVED` → `SUPERSEDED` (with a rationale) when a later source answers the question. The job is never reopened, and its `UNRESOLVED` closing stays in `research.job_events`.
 - **`UNRESOLVED`** is how research says "unknown after looking": it is the only way an unknown bonus, slot or school satisfies certification, and the value stays NULL, never zero.
 - **Planning is idempotent.** It creates missing jobs and closes `PLANNER` jobs whose condition the data no longer shows (`DONE`, "resolved in data"). It reopens a `DONE` planner job whose condition returns. It never touches `UNRESOLVED`, `CANCELLED` or `SUPERSEDED` jobs, or jobs a researcher or agent created.
 - **Dependencies:** a job cannot start or finish before the job it depends on is finished (trigger), and it does not appear in the queue until then. Outcome audits automatically wait for an open identity job of the same player.
@@ -162,12 +162,18 @@ Outcome facts enter like every other fact, through an `OUTCOMES` import batch th
 - **Audit state:** a debut on or before the audit date means `AUDITED_REACHED_MLB`; otherwise `AUDITED_NO_MLB` through the stated season.
 - **Reached affiliated:** true when MLB lists an affiliated or MLB season; otherwise null (not established), never false.
 - **Games, PA and IP:** MLB career totals. Pitchers use pitching games; IP is in baseball notation.
+- **Signed:** the draft import's status, or an official `SGN` entry to the club in the draft year (a disagreement is noted on the audit; the signing itself is corrected through a DRAFT batch).
 - **Disposition:** `UNSIGNED` for picks that did not sign. Otherwise it is the first transaction that took the player out of the acquiring organization: trade, release, waiver claim, Rule 5, declared free agency or retirement. It is `RETAINED` when the player is still with the club, and `UNKNOWN` when the record shows no exit.
 - **Current status:** players active outside affiliated baseball are `UNKNOWN`.
-- **WAR:** recorded per provider as observed. Unobserved providers are omitted, not estimated.
+- **Rule 5:** MLB's wire codes some Rule 5 selections as waiver claims. With `--rule5 <evidence file>` (researcher-verified selections with a source, e.g. `research/evidence/rule5-2020-lad.json`), a matching waiver claim becomes `LOST_RULE_5`.
+- **WAR:** recorded per provider as observed, with the capture's last season (`--bref-through`). Unobserved providers are omitted, not estimated.
 - **Trades:** every trade between MLB organizations in the player's record.
 
-Organization value attribution needs WAR by organization tenure, which no reachable public source provides yet; it stays empty.
+Organization value attribution needs WAR by organization tenure, which no reachable public source provides yet; it stays empty. The design is proposed in [proposals/organizational-war-attribution.md](proposals/organizational-war-attribution.md).
+
+### Bonus conventions
+
+From 2016 some clubs (LAD included) took a $2,500 accounting deduction on each signed pick. MLB.com's tracker, Baseball-Reference and Baseball America report the net figure, and some fan sites report gross. BAI records the net figure. A gross figure is a different quantity, not a rival claim, and is not imported as a bonus.
 
 ### International discovery
 
@@ -178,6 +184,8 @@ No official complete list of a club's international class exists. `scripts/resea
 - has no affiliated season before the signing year.
 
 Each record keeps MLB's day-precision transaction date, unknown costs, no market, and a `PATHWAY_BY_RULE` flag. The class stays `PARTIAL_RECONSTRUCTION` with an unknown universe. Foreign-born signees outside the rule (veterans, possible exempt professionals) are listed in a researcher job, not imported.
+
+Independent lists (a club announcement, a published class list) are transcribed into `research/evidence/` and matched to MLBAM ids by hand; `intl-list-corroboration.mjs` turns them into a batch. A match corroborates the pathway, a listed bonus is a claim, and an unmatched name becomes a researcher job, never a new player. An entry the researcher classifies explicitly (for example, `INTERNATIONAL_PROFESSIONAL` for a pool-exempt veteran) is imported with a `PATHWAY_CLASSIFIED_BY_RESEARCHER` flag. Draft signings can also be dated and confirmed from the wire (`draft-signings-from-wire.mjs`): a pick without a wire entry gets no claim either way.
 
 ## Acquisition economics
 
@@ -251,9 +259,9 @@ The class was researched on 2026-10-20 and can be replayed with `research/runboo
 
 **Conflicts**
 - **Jordan Sheffield #36** (MLB CB-A pick 2; B-Ref round 1 pick 36): resolved by researcher rationale.
-- **Smeltzer bonus:** resolved by the declared `PREFER_HIGHER_AUTHORITY` rule, choosing MLB. Both claims stay on record.
+- **Smeltzer bonus:** resolved by the declared `PREFER_HIGHER_AUTHORITY` rule, choosing MLB; both claims stay on record. In Phase 6, Baseball America (`lad-2016-ba-corroboration.mjs`) reopened it, and it is left open for the human reviewer ([evidence/lad-2016-review-checklist.md](evidence/lad-2016-review-checklist.md)).
 
-**Explicit unknowns:** 7 late-round signed picks have no published bonus anywhere searched. Their cost jobs are `UNRESOLVED` with that rationale, and the values are NULL.
+**Explicit unknowns:** 7 late-round signed picks had no published bonus anywhere searched; Baseball America later supplied one (Jenco, $75,000), leaving 6. Their cost jobs are `UNRESOLVED` with that rationale, and the values are NULL.
 
 **State:** stage `COVERAGE_REVIEW`, workflow `READY_FOR_REVIEW`, no certification blockers. The class is deliberately not certified: certification is a human reviewer's step.
 
@@ -261,12 +269,12 @@ The class was researched on 2026-10-20 and can be replayed with `research/runboo
 
 **Remaining:** human certification, using the evidence package [evidence/lad-2016-draft-certification.md](evidence/lad-2016-draft-certification.md), which lists the items that need judgment.
 
-## Next cohorts (begun 2026-10-20; none certified)
+## Next cohorts (2026-10-20; none certified)
 
 | Class | State | Open work |
 |---|---|---|
-| `LAD/DRAFT/2017-JUNE_AMATEUR` | 40 of 40 picks (MLB universe), `COMPLETE_CENSUS`, 31 signed / 9 not, 10 of 10 slots (sum = $5,794,200 pool), 13 of 31 bonuses (7 corroborated by the MLB.com tracker) | 18 bonuses (rounds 15–37), 40 outcome audits; batch `lad-2017-draft-b` paused |
-| `LAD/INTERNATIONAL/2016-17` | 45 candidate amateurs from the transaction wire, day-dated, `PARTIAL_RECONSTRUCTION` | class universe (a published list), 45 bonuses, classification review, 9 signees outside the rule, outcome audits |
-| `LAD/INTERNATIONAL/2017-18` | 50 candidate amateurs, same method | the same; one candidate excluded for prior DSL Braves play |
+| `LAD/DRAFT/2017-JUNE_AMATEUR` | 40 of 40 picks, `COMPLETE_CENSUS`, **33 signed / 7 not** (Witt and Casey corrected from the MLB wire), 33 signing dates, 10 of 10 slots, 13 of 33 bonuses (each with 2+ agreeing sources), 20 unknown after research, 40 of 40 outcomes audited; `COVERAGE_REVIEW`, `READY_FOR_REVIEW` | human review and certification ([evidence/lad-2017-draft-certification.md](evidence/lad-2017-draft-certification.md)) |
+| `LAD/INTERNATIONAL/2016-17` | 45 rule-classified amateurs + 1 exempt professional (Fernández), 1 reported bonus, `PARTIAL_RECONSTRUCTION` | a published class list, bonuses, the Yordan Alvarez period decision, signees outside the rule, outcome audits |
+| `LAD/INTERNATIONAL/2017-18` | 50 rule-classified amateurs, 25 corroborated by the club's 2017-07-03 announcement, 3 bonuses, `PARTIAL_RECONSTRUCTION` | the same; 2 announced names without an MLB identity, Núñez and Zuñiga classification, outcome audits |
 
-Replay with `research/runbooks/lad-2017-cohorts.mjs`.
+Reconciliation and classification: [evidence/lad-international-2016-18-reconciliation.md](evidence/lad-international-2016-18-reconciliation.md). Replay: `research/runbooks/lad-2017-cohorts.mjs`, `lad-2017-completion.mjs`, `lad-2016-ba-corroboration.mjs`, `lad-international-2016-18.mjs` (after `pilot-2015-lad.mjs` and `lad-2016-draft.mjs`). The league-wide sequence beyond LAD is proposed in [proposals/league-wide-cohort-roadmap.md](proposals/league-wide-cohort-roadmap.md).

@@ -15,7 +15,7 @@ Staging lives in the `ingest` schema, which the public roles cannot read.
 
 ## Import file
 
-Format `bai-research-import/1`. Examples: `research/imports/2015-draft-lad.json`, `research/imports/2015-international-lad.json`, `research/imports/2016-draft-lad.json` (built by `scripts/research/sources/draft-class-import.mjs` from downloaded MLB and Baseball-Reference files). Other builders in `scripts/research/sources/`: `mlbcom-draft-money-import.mjs` (slot values and tracker bonuses), `fetch-mlb-player-outcomes.mjs` + `outcome-audits-import.mjs` (outcome audits), and `intl-signings-from-wire.mjs` (international discovery). Builders never write to a database, and the only fetcher is capped and rate-limited.
+Format `bai-research-import/1`. Examples: `research/imports/2015-draft-lad.json`, `research/imports/2015-international-lad.json`, `research/imports/2016-draft-lad.json` (built by `scripts/research/sources/draft-class-import.mjs` from downloaded MLB and Baseball-Reference files). Other builders in `scripts/research/sources/`: `mlbcom-draft-money-import.mjs` (slot values and tracker bonuses), `fetch-mlb-player-outcomes.mjs` + `outcome-audits-import.mjs` (outcome audits), `intl-signings-from-wire.mjs` (international discovery), `ba-draft-bonuses-import.mjs` (Baseball America draft tables), `draft-signings-from-wire.mjs` (draft signings and dates from the MLB wire), and `intl-list-corroboration.mjs` (independent international lists transcribed into `research/evidence/`). Builders never write to a database, and the only fetcher is capped and rate-limited.
 
 ```jsonc
 {

@@ -63,8 +63,12 @@ Never create or alter tables through the Dashboard. A hosted database must alway
 ### Hosted state and pending migrations
 
 - **019 (research backfill) is deployed** (2026-10-20, after PR #4 merged). Hosted parity found 0 differences over 2,021 objects; security, the verification suite (11/11) and pilot reconciliation all pass. The live Data API refuses the `research` schema (406).
-- **020 (outcome import channel) is committed on a feature branch and not pushed.** Push it after that PR merges (steps 3–6 above). Until then `hosted:parity` and `hosted:verify` report it as pending.
-- **Research data:** hosted holds only the 2015 pilot. LAD 2016 and the 2017 cohorts live in the local research database. They move to hosted only by replaying their runbooks with `--confirm-hosted` after review.
+- **020 (outcome import channel) is deployed** (2026-10-20, after PR #5 merged at `1672f39`): rehearsed and rolled back, then dry run, push and `hosted:migrate` record. Parity found 0 BAI differences over 2,022 objects (history 20/20); security passed (24 functions, 62 behavioural attempts, 60 denied or invisible, plus the 2 public-read positive controls); pilot reconciliation passed.
+- **Research data on hosted (2026-10-20):** the 2015 pilot, plus PR #5's runbooks replayed with `--confirm-hosted`:
+  - `lad-2016-draft.mjs`: LAD 2016 with 42 outcome audits, `READY_FOR_REVIEW`, not certified;
+  - `lad-2017-cohorts.mjs`: LAD 2017 picks, slots and tracker, and both international candidate classes, batches paused.
+  The aggregates match the local replay exactly, and 260 import records checked field by field show no unexplained difference. Later research (Phase 6 runbooks: `lad-2017-completion.mjs`, `lad-2016-ba-corroboration.mjs`, `lad-international-2016-18.mjs`) is local until its PR merges. No class is certified and no rate is published on hosted.
+- **`hosted:verify` and census claims:** with research classes on hosted, the original assertion "no coverage cell claims a census" no longer holds; LAD 2016 and 2017 legitimately claim `COMPLETE_CENSUS`. The Phase 6 branch replaces it with the intended invariant: a census claim names its expected size and source, and no rate exists for an uncertified class. With the committed test, `hosted:verify` reports 10/11 until that branch merges.
 - `hosted:verify-pilot` compares only the pilot's own rows, so it keeps working as hosted gains other classes.
 
 ### Hosted-only migrations

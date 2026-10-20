@@ -1,20 +1,20 @@
 # Certification evidence: LAD / DRAFT / 2016-JUNE_AMATEUR
 
-Prepared 2026-10-20 by automated research (operator `bai-backfill-research`). **This class is not certified.** Certification is a human reviewer's decision. The framework refuses `agent:*` actors, and this package exists so a person can check the evidence independently and run the command themselves.
+Prepared 2026-10-20 by automated research (operator `bai-backfill-research`); updated in Phase 6 with a third bonus source (Baseball America) and an independent re-verification. The reviewer's checklist, with a recommendation per decision, is [lad-2016-review-checklist.md](lad-2016-review-checklist.md). **This class is not certified.** Certification is a human reviewer's decision. The framework refuses `agent:*` actors, and this package exists so a person can check the evidence independently and run the command themselves.
 
 ## State at preparation
 
 | Check | Value |
 |---|---|
-| Stage / workflow | `COVERAGE_REVIEW` / `READY_FOR_REVIEW` |
+| Stage / workflow | `COVERAGE_REVIEW`; locally blocked only by the reopened Smeltzer conflict (left for the reviewer); hosted (PR #5 state) `READY_FOR_REVIEW` |
 | Coverage | `COMPLETE_CENSUS`: 42 expected (MLB official draft data), 42 tracked |
 | Signing status | 33 signed, 9 did not sign, 0 unknown |
-| Bonuses | 26 of 33 signed known; 7 explicitly unknown (`UNRESOLVED` jobs with rationale; values NULL) |
+| Bonuses | 27 of 33 signed known (Jenco from Baseball America); 6 explicitly unknown (`UNRESOLVED` jobs with rationale; values NULL) |
 | Slot values | 12 of 12 picks in rounds 1–10 |
 | Schools | 42 of 42 |
 | Identity | 42 of 42 with an MLBAM id (plus Baseball-Reference ids where well formed) |
 | Provenance | 42 of 42 selections and signings cite a source |
-| Conflicts | 3 recorded, 3 resolved (below), 0 open |
+| Conflicts | 3 recorded: 2 resolved (Sheffield), 1 reopened by Baseball America and left open for the reviewer (Smeltzer) |
 | Outcome audits | 42 of 42 (18 reached MLB, 24 no MLB through 2026); not a certification requirement |
 | `research:certify` check | no blockers (deterministic check run read-only through `research:class`) |
 
@@ -26,6 +26,7 @@ Prepared 2026-10-20 by automated research (operator `bai-backfill-research`). **
 | `lad2016:bref-lad-2016` | AGGREGATOR | signing status, bonus, draft-listed position, school, B-Ref ids, career bWAR | https://www.baseball-reference.com/draft/?team_ID=LAD&year_ID=2016&draft_type=junreg&query_type=franch_year (archive capture 2026-08-03: http://web.archive.org/web/20260803214548/https://www.baseball-reference.com/draft/index.fcgi?query_type=franch_year&team_ID=LAD&year_ID=2016&draft_type=junreg) | 2026-10-19 |
 | `lad2016:mlb-callis-pick-values-2016` | OFFICIAL | slot values, rounds 1–10 | https://www.mlb.com/news/2016-draft-bonus-pools-pick-values-c170470526 (capture 2021-12-09), published 2016-04-05 | 2026-10-20 |
 | `lad2016:mlb-signing-tracker-2016` | OFFICIAL | bonuses, rounds 1–10 | https://www.mlb.com/news/2016-draft-signing-and-bonus-tracker/c-183906680 (capture 2019-09-22) | 2026-10-20 |
+| `lad2016:ba-draft-selections-2016` | REPUTABLE_SECONDARY | bonuses (25 corroborate, Jenco new, Smeltzer $497,500); "—" rows skipped | https://www.baseballamerica.com/stories/2016-draft-selections/ (capture 2026-04-29) | 2026-10-20 |
 | `lad2016:mlb-statsapi-outcomes-2026-10-20` | OFFICIAL | debuts, MLB/minor-league seasons, current team, transactions | statsapi.mlb.com people, stats (milb_all) and transactions endpoints; 137 requests, all HTTP 200 | 2026-10-20 |
 
 **Slot mapping evidence.** The 2016 pick-values article lists values in draft order without pick numbers. The Dodgers entries sit at overall positions 20, 32, 36, 65, 101, 131, 161, 191, 221, 251, 281 and 311, exactly the picks in MLB's official data. They sum to $9,336,500, the Dodgers pool the same article states. The signing tracker's "pick value" fields agree (for example #36 $1,791,000 and #161 $331,100).
@@ -59,7 +60,7 @@ Prepared 2026-10-20 by automated research (operator `bai-backfill-research`). **
 | 641 | 21 | James Carter (641445) | Yes | $100,000 | — | University of California, Santa Barbara | No MLB; affiliated from 2016 | RELEASED |  |
 | 671 | 22 | Jeff Paschke (667704) | Yes | $100,000 | — | University of Southern California | No MLB; affiliated from 2016 | RELEASED |  |
 | 701 | 23 | Bailey Ober (641927) | No | — | — | College of Charleston | MLB 2021-05-18 (MIN, age 25); 140 G, 2 PA, 748.2 IP | UNSIGNED | 10.2 |
-| 731 | 24 | Saige Jenco (663396) | Yes | **unknown** | — | Virginia Polytechnic Institute and State University | No MLB; affiliated from 2016 | RELEASED |  |
+| 731 | 24 | Saige Jenco (663396) | Yes | $75,000 (BA) | — | Virginia Polytechnic Institute and State University | No MLB; affiliated from 2016 | RELEASED |  |
 | 761 | 25 | Chandler Eden (641549) | Yes | **unknown** | — | Texas Tech University | No MLB; affiliated play not established | UNKNOWN |  |
 | 791 | 26 | Brandon Montgomery (670417) | Yes | $60,000 | — | San Jacinto College, North Campus | No MLB; affiliated from 2016 | RELEASED |  |
 | 821 | 27 | Austin French (670451) | Yes | **unknown** | — | Brown University | No MLB; affiliated from 2016 | RELEASED |  |
@@ -88,15 +89,15 @@ Prepared 2026-10-20 by automated research (operator `bai-backfill-research`). **
 |---|---|---|
 | Jordan Sheffield #36, `round_code` | MLB `CB-A`; Baseball-Reference `1` | Researcher rationale (`bai-backfill-review`). MLB's official structure is kept: the pick is a Competitive Balance Round A pick, pick 2 of that round, and both sources agree on overall pick 36. B-Ref's label stays on record. |
 | Jordan Sheffield #36, `round_pick` | MLB `2`; Baseball-Reference `36` | Same decision and rationale. |
-| Devin Smeltzer #161, signing bonus | MLB.com tracker $500,000 (OFFICIAL); Baseball-Reference $497,500 (AGGREGATOR) | Declared field rule `PREFER_HIGHER_AUTHORITY` chose $500,000. The $497,500 claim stays on record. |
+| Devin Smeltzer #161, signing bonus | MLB.com tracker $500,000 (OFFICIAL); Baseball-Reference $497,500 (AGGREGATOR); Baseball America $497,500 (REPUTABLE_SECONDARY) | Hosted (PR #5 state): the declared rule `PREFER_HIGHER_AUTHORITY` chose $500,000. Locally, Baseball America reopened the conflict and it is **open for the reviewer**; $497,500 is recommended (net-of-deduction convention, checklist item 1). |
 
-## The seven unknown bonuses
+## The seven bonuses that were unknown
 
-All seven signed with the Dodgers per MLB's official transaction wire, independently re-checked on 2026-10-20. No source consulted states a bonus.
+All seven signed with the Dodgers per MLB's official transaction wire, independently re-checked on 2026-10-20. In Phase 6, Baseball America supplied Jenco's ($75,000); the other six stay unknown (Baseball America prints "—"; Dodgers Digest lists all seven among picks not counted against the pool, which bounds each at $100,000 or less).
 
 | Pick | Player | Official signing transaction | Bonus sources checked |
 |---|---|---|---|
-| 731 | Saige Jenco | 2016-06-17 "Los Angeles Dodgers signed CF Saige Jenco." | B-Ref bonus blank; MLB tracker covers rounds 1–10; web search (no figure) |
+| 731 | Saige Jenco | 2016-06-17 "Los Angeles Dodgers signed CF Saige Jenco." | **$75,000, Baseball America** (B-Ref blank); job `SUPERSEDED` |
 | 761 | Chandler Eden | 2016-06-17 "Los Angeles Dodgers signed RHP Chandler Eden." | same |
 | 821 | Austin French | 2016-06-17 "Los Angeles Dodgers signed LHP Austin French." | same |
 | 851 | Jake Perkins | 2016-06-17 "Los Angeles Dodgers signed RHP Jake Perkins." | same |
@@ -112,10 +113,10 @@ All seven signed with the Dodgers per MLB's official transaction wire, independe
 
 ## Items that need human judgment
 
-1. **Smeltzer bonus.** The rule chose MLB's $500,000 over Baseball-Reference's $497,500. A reviewer may prefer B-Ref's exact-looking figure. If so, they can re-resolve with `research:resolve` and a rationale.
+1. **Smeltzer bonus.** Open for the reviewer locally (three sources). Recommended: $497,500. A recorded resolution cannot be re-decided with `research:resolve` (an earlier version of this package said it could; it cannot), which is why this one was left open.
 2. **Census claim.** Coverage is `COMPLETE_CENSUS` because MLB's official draft data lists 42 picks and Baseball-Reference lists the same 42. A reviewer should confirm the official list is the population definition they accept.
-3. **Seven unknown bonuses.** Accept them as unknown after research, or reopen them (a new researcher job) with additional sources, for example Baseball America's signing database.
-4. **Dispositions of Jordan Sheffield and Errol Robinson.** MLB codes both departures as waiver claims on 2020-12-10, which is also the date of that year's Rule 5 draft. The audits keep MLB's coding (`LOST_WAIVERS`). A reviewer may know them as Rule 5 selections and should decide with a source.
+3. **Six unknown bonuses** (seven before Baseball America). Accept them as unknown after research, or reopen them (a new researcher job) with additional sources, for example Baseball America's signing database.
+4. **Dispositions of Jordan Sheffield and Errol Robinson.** MLB codes both departures as waiver claims on 2020-12-10. MLB.com's same-day report (archived) names both as Rule 5 selections: Sheffield 7th in the Major League phase to Colorado, and Robinson to Cincinnati in the Minor League phase. Recommended: recode to `LOST_RULE_5` with a corrective outcomes batch (`research/evidence/rule5-2020-lad.json`).
 5. **Chandler Eden.** He signed, but no affiliated game appears in MLB's data, and no exit transaction is recorded. His disposition is `UNKNOWN` and affiliated play is "not established".
 6. **WAR.** Only Baseball-Reference career WAR (as of 2026-08-03) is recorded. FanGraphs WAR and WAR by organization tenure are not, so organization value attribution cannot be computed yet.
 
@@ -145,4 +146,5 @@ npm run hosted:refresh -- --confirm-hosted <ref>
 Notes:
 - `certify` re-runs every check and refuses on any blocker. There is no force option.
 - To undo a certification: `research:revoke -- --org LAD --channel draft --year 2016 --reason "..."`. It is human-only, the revocation stays on record, and the class returns to `COVERAGE_REVIEW`.
-- After certification, `analytics.class_economics` may compute `mlb_reach_rate` for this class: census coverage, certified, and 42 of 42 audited. `cost_per_mlb_player` stays null because 7 costs are unknown.
+- After certification, `analytics.class_economics` may compute `mlb_reach_rate` for this class: census coverage, certified, and 42 of 42 audited. `cost_per_mlb_player` stays null because 6 costs are unknown.
+- Migration 020 is deployed to hosted (2026-10-20), and the PR #5 runbook has been replayed there, so the hosted steps above that push 020 are already done.
