@@ -60,9 +60,12 @@ The canonical migrations stay in `database/migrations/NNN_name.sql`. `supabase/m
 
 Never create or alter tables through the Dashboard. A hosted database must always be reproducible from the committed migrations.
 
-### Pending on hosted
+### Hosted state and pending migrations
 
-Migration 019 (research backfill) is committed but **not pushed**: hosted holds 001–018. `npm run hosted:rehearse` ran 019 on the hosted database inside a rolled-back transaction (it creates the private `research` schema and applies cleanly). Push it after the backfill-framework PR is reviewed, using steps 3–6 above. Until then `hosted:parity` and `hosted:verify` report 019 as pending.
+- **019 (research backfill) is deployed** (2026-10-20, after PR #4 merged). Hosted parity found 0 differences over 2,021 objects; security, the verification suite (11/11) and pilot reconciliation all pass. The live Data API refuses the `research` schema (406).
+- **020 (outcome import channel) is committed on a feature branch and not pushed.** Push it after that PR merges (steps 3–6 above). Until then `hosted:parity` and `hosted:verify` report it as pending.
+- **Research data:** hosted holds only the 2015 pilot. LAD 2016 and the 2017 cohorts live in the local research database. They move to hosted only by replaying their runbooks with `--confirm-hosted` after review.
+- `hosted:verify-pilot` compares only the pilot's own rows, so it keeps working as hosted gains other classes.
 
 ### Hosted-only migrations
 

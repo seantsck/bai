@@ -156,6 +156,29 @@ The audit state lives in `outcome_audits` (008):
 
 Migration 019 adds `outcome_audit_details`, one row per audit and true as of a stated date: reached affiliated baseball, first affiliated season, MLB games, plate appearances and innings, current status, disposition (retained, traded with the transaction, released, Rule 5, waivers, free agency), and the source. `analytics.player_outcome_profile` adds debut age (from a day-precision birth date) and keeps WAR per provider side by side, never one "true" WAR.
 
+### Outcome audits through ingestion (020)
+
+Outcome facts enter like every other fact, through an `OUTCOMES` import batch that is validated, dry-run and applied (see [research-ingestion.md](research-ingestion.md)). The builder `scripts/research/sources/outcome-audits-import.mjs` derives each audit from downloaded MLB Stats API files using these rules, which never fill a gap by guessing:
+- **Audit state:** a debut on or before the audit date means `AUDITED_REACHED_MLB`; otherwise `AUDITED_NO_MLB` through the stated season.
+- **Reached affiliated:** true when MLB lists an affiliated or MLB season; otherwise null (not established), never false.
+- **Games, PA and IP:** MLB career totals. Pitchers use pitching games; IP is in baseball notation.
+- **Disposition:** `UNSIGNED` for picks that did not sign. Otherwise it is the first transaction that took the player out of the acquiring organization: trade, release, waiver claim, Rule 5, declared free agency or retirement. It is `RETAINED` when the player is still with the club, and `UNKNOWN` when the record shows no exit.
+- **Current status:** players active outside affiliated baseball are `UNKNOWN`.
+- **WAR:** recorded per provider as observed. Unobserved providers are omitted, not estimated.
+- **Trades:** every trade between MLB organizations in the player's record.
+
+Organization value attribution needs WAR by organization tenure, which no reachable public source provides yet; it stays empty.
+
+### International discovery
+
+No official complete list of a club's international class exists. `scripts/research/sources/intl-signings-from-wire.mjs` discovers candidates from the MLB transaction wire with a documented rule. A candidate:
+- was born outside the United States, Canada and Puerto Rico;
+- was never drafted;
+- was 22 or younger on the signing date;
+- has no affiliated season before the signing year.
+
+Each record keeps MLB's day-precision transaction date, unknown costs, no market, and a `PATHWAY_BY_RULE` flag. The class stays `PARTIAL_RECONSTRUCTION` with an unknown universe. Foreign-born signees outside the rule (veterans, possible exempt professionals) are listed in a researcher job, not imported.
+
 ## Acquisition economics
 
 `analytics.acquisition_economics` holds one row per acquisition, with these dimensions and measures:
@@ -164,7 +187,7 @@ Migration 019 adds `outcome_audit_details`, one row per audit and true as of a s
 - school type, birth country, position, rules era;
 - audit state, `reached_mlb` (only when audited), WAR per provider.
 
-`analytics.class_economics` sums known values only, per class. Its rates (`mlb_reach_rate`, `cost_per_mlb_player`) stay null unless the class has census-level coverage, is certified, and has every outcome audited (and, for cost rates, every cost known). Both views are private. Dimensions the evidence does not yet support (signing scout, front-office era) are deliberately absent.
+`analytics.class_economics` sums known values only, per class. Its rates (`mlb_reach_rate`, `cost_per_mlb_player`) stay null unless the class has census-level coverage, is certified, and has every outcome audited (and, for cost rates, every cost known). On `/research`, census-level cells read "Coverage supports rates: Yes, once certified": coverage alone never publishes a rate. Both views are private. Dimensions the evidence does not yet support (signing scout, front-office era) are deliberately absent.
 
 ## Sources, leads and automation
 
@@ -203,6 +226,7 @@ Migration 019 adds `outcome_audit_details`, one row per audit and true as of a s
 | `research:lead -- --job key --url … --source-type … --authority … --access … --retrieved … --fields a,b --note …` | record a source lead |
 | `research:stage -- --org X --channel … [--to STAGE --rationale …]` | one stage forward (or back with a rationale) |
 | `research:certify -- --org X --channel …` | deterministic certification; exits 3 with blockers |
+| `research:revoke -- --org X --channel … --reason …` | human-only revocation (kept on record); class back to `COVERAGE_REVIEW` |
 | `research:review -- --batch key --reviewer name --note …` | human review of an agent-staged import |
 
 ## Rollout
@@ -233,4 +257,16 @@ The class was researched on 2026-10-20 and can be replayed with `research/runboo
 
 **State:** stage `COVERAGE_REVIEW`, workflow `READY_FOR_REVIEW`, no certification blockers. The class is deliberately not certified: certification is a human reviewer's step.
 
-**Remaining:** 42 outcome audits (rank 8, non-blocking) and certification. LAD 2017 has not started.
+**Outcomes (2026-10-20):** all 42 audited: 18 reached MLB and 24 did not through 2026. Debuts, games, PA and IP come from the MLB Stats API; Baseball-Reference career WAR from the 2026-08-03 capture; 26 trades. Dispositions: 15 released, 11 traded, 9 unsigned, 3 lost on waivers, 1 retained, 1 left as a free agent, 1 retired, 1 unknown.
+
+**Remaining:** human certification, using the evidence package [evidence/lad-2016-draft-certification.md](evidence/lad-2016-draft-certification.md), which lists the items that need judgment.
+
+## Next cohorts (begun 2026-10-20; none certified)
+
+| Class | State | Open work |
+|---|---|---|
+| `LAD/DRAFT/2017-JUNE_AMATEUR` | 40 of 40 picks (MLB universe), `COMPLETE_CENSUS`, 31 signed / 9 not, 10 of 10 slots (sum = $5,794,200 pool), 13 of 31 bonuses (7 corroborated by the MLB.com tracker) | 18 bonuses (rounds 15–37), 40 outcome audits; batch `lad-2017-draft-b` paused |
+| `LAD/INTERNATIONAL/2016-17` | 45 candidate amateurs from the transaction wire, day-dated, `PARTIAL_RECONSTRUCTION` | class universe (a published list), 45 bonuses, classification review, 9 signees outside the rule, outcome audits |
+| `LAD/INTERNATIONAL/2017-18` | 50 candidate amateurs, same method | the same; one candidate excluded for prior DSL Braves play |
+
+Replay with `research/runbooks/lad-2017-cohorts.mjs`.
