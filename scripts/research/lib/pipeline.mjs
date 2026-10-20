@@ -147,6 +147,17 @@ export async function validateBatch (db, ref) {
           if (k && !orgs.has(k)) errors.push(`unknown organization ${k}`)
         }
       }
+      if (batch.channel === 'TRADES') {
+        for (const k of r.packages ?? []) {
+          for (const o of [k.from, k.to, ...(k.players ?? []).flatMap((p) => (p.war ?? []).map((w) => w.organization))]) if (o && !orgs.has(o)) errors.push(`unknown organization ${o}`)
+          // A traded player links by a strong id or is new; anything weaker waits for a researcher.
+          for (const p of k.players ?? []) {
+            if (!p.player?.full_name) continue
+            const id = (await db.query('select * from ingest.resolve_identity($1)', [identityInput(p.player)])).rows[0]
+            if (!['EXACT_EXTERNAL_ID', 'NO_MATCH'].includes(id.state)) errors.push(`traded player ${p.player.full_name}: identity ${id.state}; decide it before importing the trade`)
+          }
+        }
+      }
       let identity = { state: null, player_id: null, candidates: null }
       if (r.player?.full_name) identity = (await db.query('select * from ingest.resolve_identity($1)', [identityInput(r.player)])).rows[0]
       // Outcome audits describe players BAI already holds; they never create one.
@@ -514,24 +525,10 @@ class Applier {
     let action = 'NO_CHANGE'
     const txIds = {}
     for (const t of r.transactions ?? []) {
-      const from = await this.organizationId(t.from_organization)
-      const to = await this.organizationId(t.to_organization)
-      // One trade, one transaction: a trade that moved several audited players (same date, same clubs) is shared.
-      let tx = await this.one(`select t.id, p.id as package_id from public.transactions t join public.trade_packages p on p.transaction_id = t.id
-        where t.transaction_type = 'TRADE' and t.transaction_date = $1 and p.from_organization_id = $2 and p.to_organization_id = $3 order by t.id limit 1`, [t.date, from, to])
-      if (tx && !(await this.one('select 1 from public.trade_package_assets where trade_package_id = $1 and player_id = $2', [tx.package_id, playerId]))) {
-        await this.q("insert into public.trade_package_assets (trade_package_id, asset_type, player_id) values ($1, 'PLAYER', $2)", [tx.package_id, playerId])
-        action = strongest(action, 'UPDATE_UNKNOWN')
-      }
-      if (!tx) {
-        tx = await this.one("insert into public.transactions (transaction_type, transaction_date, date_precision, description, source_id) values ('TRADE', $1, $2, $3, $4) returning id",
-          [t.date, t.date_precision ?? 'DAY', t.description ?? null, await this.sourceId(t.source_key ?? r.source_key)])
-        const pkg = await this.one('insert into public.trade_packages (transaction_id, from_organization_id, to_organization_id) values ($1, $2, $3) returning id', [tx.id, from, to])
-        await this.q("insert into public.trade_package_assets (trade_package_id, asset_type, player_id) values ($1, 'PLAYER', $2)", [pkg.id, playerId])
-        await this.observe(t.source_key ?? r.source_key, 'transactions', tx.id, 'transaction_date', t.date, t.locator ?? null)
-        action = strongest(action, 'INSERT')
-      }
-      txIds[t.ref] = tx.id
+      const k = await this.tradePackage({ date: t.date, precision: t.date_precision, from: t.from_organization, to: t.to_organization, description: t.description, sourceKey: t.source_key ?? r.source_key, locator: t.locator })
+      action = strongest(action, k.action)
+      action = strongest(action, await this.tradeAsset(k.packageId, playerId))
+      txIds[t.ref] = k.transactionId
     }
     if (r.debut) {
       const d = await this.one('select * from public.mlb_debuts where player_id = $1', [playerId])
@@ -571,11 +568,18 @@ class Applier {
         if (JSON.stringify(cur) !== JSON.stringify(inc)) { conflicts.push({ table: 'outcome_audit_details', id: ex.id, field: 'details', incoming: d, canonical: cur }); action = 'CONFLICT' }
       }
     }
-    for (const w of r.war ?? []) {
+    action = strongest(action, await this.applyWar(playerId, r.war, r.source_key, conflicts))
+    return { action, canonical: ['outcome_audits', audit.id] }
+  }
+
+  /** WAR per provider as observed; a different value for the same observation key is a conflict, never an overwrite. */
+  async applyWar (playerId, list, fallbackSource, conflicts) {
+    let action = 'NO_CHANGE'
+    for (const w of list ?? []) {
       const org = w.organization ? await this.organizationId(w.organization) : null
       const ex = await this.one(`select * from public.war_observations where player_id = $1 and war_system = $2 and scope = $3 and season is not distinct from $4
         and organization_id is not distinct from $5 and through_season = $6`, [playerId, w.system, w.scope, w.season ?? null, org, w.through_season])
-      const wsrc = w.source_key ?? r.source_key
+      const wsrc = w.source_key ?? fallbackSource
       if (!ex) {
         const row = await this.one(`insert into public.war_observations (player_id, war_system, scope, season, organization_id, through_season, war_value, observed_on, source_id)
           values ($1, $2, $3, $4, $5, $6, $7, $8, $9) returning id`, [playerId, w.system, w.scope, w.season ?? null, org, w.through_season, w.value, w.observed_on, await this.sourceId(wsrc)])
@@ -585,7 +589,69 @@ class Applier {
         action = strongest(action, await this.reconcile({ table: 'war_observations', id: ex.id, field: 'war_value', column: 'war_value', canonical: Number(ex.war_value), incoming: w.value, sourceKey: wsrc, rowSourceId: ex.source_id, conflicts }))
       }
     }
-    return { action, canonical: ['outcome_audits', audit.id] }
+    return action
+  }
+
+  // --- trades -----------------------------------------------------------------------------------------------------
+
+  /**
+   * One trade is one transaction, whichever side is imported first: it is found by date and the two clubs (in either
+   * direction), and each direction is one package.
+   */
+  async tradePackage ({ date, precision, from, to, description, sourceKey, locator }) {
+    const fromId = await this.organizationId(from)
+    const toId = await this.organizationId(to)
+    let action = 'NO_CHANGE'
+    let tx = await this.one(`select t.id from public.transactions t where t.transaction_type = 'TRADE' and t.transaction_date = $1
+      and exists (select 1 from public.trade_packages p where p.transaction_id = t.id
+        and ((p.from_organization_id = $2 and p.to_organization_id = $3) or (p.from_organization_id = $3 and p.to_organization_id = $2))) order by t.id limit 1`, [date, fromId, toId])
+    if (!tx) {
+      tx = await this.one("insert into public.transactions (transaction_type, transaction_date, date_precision, description, source_id) values ('TRADE', $1, $2, $3, $4) returning id",
+        [date, precision ?? 'DAY', description ?? null, await this.sourceId(sourceKey)])
+      await this.observe(sourceKey, 'transactions', tx.id, 'transaction_date', date, locator ?? null)
+      action = 'INSERT'
+    }
+    let pkg = await this.one('select id from public.trade_packages where transaction_id = $1 and from_organization_id = $2 and to_organization_id = $3', [tx.id, fromId, toId])
+    if (!pkg) {
+      pkg = await this.one('insert into public.trade_packages (transaction_id, from_organization_id, to_organization_id) values ($1, $2, $3) returning id', [tx.id, fromId, toId])
+      action = strongest(action, action === 'INSERT' ? 'INSERT' : 'UPDATE_UNKNOWN')
+    }
+    return { transactionId: tx.id, packageId: pkg.id, action }
+  }
+
+  async tradeAsset (packageId, playerId) {
+    if (await this.one('select 1 from public.trade_package_assets where trade_package_id = $1 and player_id = $2', [packageId, playerId])) return 'NO_CHANGE'
+    await this.q("insert into public.trade_package_assets (trade_package_id, asset_type, player_id) values ($1, 'PLAYER', $2)", [packageId, playerId])
+    return 'UPDATE_UNKNOWN'
+  }
+
+  /** TRADE: every package and player of one trade, plus the players' observed WAR. New players only by a strong id. */
+  async applyTrade (rec, conflicts) {
+    const r = rec.payload
+    let action = 'NO_CHANGE'
+    let newPlayers = 0
+    let txId = null
+    for (const k of r.packages) {
+      const pk = await this.tradePackage({ date: r.date, precision: r.date_precision, from: k.from, to: k.to, description: r.description, sourceKey: r.source_key, locator: r.locator })
+      txId = pk.transactionId
+      action = strongest(action, pk.action)
+      for (const p of k.players ?? []) {
+        const src = p.player.source_key ?? r.source_key
+        const res = await this.one('select * from ingest.resolve_identity($1)', [identityInput(p.player)])
+        let playerId
+        if (res.state === 'EXACT_EXTERNAL_ID') playerId = res.player_id
+        else if (res.state === 'NO_MATCH') { playerId = await this.createPlayer(p.player, src); newPlayers++; action = strongest(action, 'INSERT') } else throw new PipelineError(`traded player ${p.player.full_name}: identity ${res.state}`)
+        await this.attachIdentifiers(playerId, p.player, src)
+        action = strongest(action, await this.tradeAsset(pk.packageId, playerId))
+        action = strongest(action, await this.applyWar(playerId, p.war, r.source_key, conflicts))
+      }
+      for (const a of k.other_assets ?? []) {
+        if (await this.one('select 1 from public.trade_package_assets where trade_package_id = $1 and asset_type = $2 and description is not distinct from $3', [pk.packageId, a.asset_type, a.description ?? null])) continue
+        await this.q('insert into public.trade_package_assets (trade_package_id, asset_type, amount_usd, description) values ($1, $2, $3, $4)', [pk.packageId, a.asset_type, a.amount_usd ?? null, a.description ?? null])
+        action = strongest(action, 'UPDATE_UNKNOWN')
+      }
+    }
+    return { action, canonical: ['transactions', txId], newPlayers }
   }
 
   touch (domain, scope, orgId) { this.touchedScopes.set(`${domain}|${scope}|${orgId}`, { domain, scope, orgId }) }
@@ -645,6 +711,12 @@ export async function applyBatch (db, ref, { write = false, allowPartial = false
     const sourcesAdded = await a.registerSources()
     for (const rec of records) {
       const recConflicts = []
+      if (rec.record_type === 'TRADE') {
+        const res = await a.applyTrade(rec, recConflicts)
+        results.push({ rec, action: strongest(res.action, recConflicts.length ? 'CONFLICT' : 'NO_CHANGE'), canonical: res.canonical, playerAction: res.newPlayers ? 'INSERT' : null })
+        conflicts.push(...recConflicts.map((c) => ({ record_index: rec.record_index, ...c })))
+        continue
+      }
       const who = await a.resolvePlayer(rec, recConflicts)
       if (who.held) { results.push({ rec, action: 'HELD', reason: who.held }); continue }
       const res = rec.record_type === 'DRAFT_SELECTION' ? await a.applyDraftSelection(rec, who.playerId, recConflicts)
@@ -656,6 +728,15 @@ export async function applyBatch (db, ref, { write = false, allowPartial = false
       conflicts.push(...recConflicts.map((c) => ({ record_index: rec.record_index, ...c })))
     }
     const coverage = await a.updateCoverage()
+    // Evidence that changes or contests a record of a certified class revokes that certification (migration 021).
+    // Contested fields first, so the history names the most specific record.
+    const touched = new Map()
+    for (const c of conflicts) touched.set(`${c.table}#${c.id}`, [c.table, c.id])
+    for (const r of results) if (r.canonical && ['INSERT', 'UPDATE_UNKNOWN', 'CONFLICT'].includes(r.action)) touched.set(r.canonical.join('#'), r.canonical)
+    const revokedClasses = touched.size
+      ? (await db.query('select research.record_evidence_change($1::text[], $2::bigint[], $3, $4) as r', [[...touched.values()].map((t) => t[0]), [...touched.values()].map((t) => t[1]), batch.id, batch.imported_by])).rows[0].r
+      : []
+    const revokedKeys = revokedClasses.length ? (await db.query('select class_key from research.classes where id = any ($1::bigint[]) order by 1', [revokedClasses])).rows.map((x) => x.class_key) : []
     if (!write) await db.query('rollback to savepoint canonical')
 
     for (const r of results) {
@@ -665,7 +746,7 @@ export async function applyBatch (db, ref, { write = false, allowPartial = false
         conflicts.some((c) => c.record_index === r.rec.record_index) ? 'CONFLICT' : 'NONE',
         JSON.stringify(conflicts.filter((c) => c.record_index === r.rec.record_index))])
     }
-    const counts = { records: records.length, skipped_invalid: skippedInvalid, sources_added: sourcesAdded, actions: {}, new_players: 0, held: 0, conflicts: conflicts.length }
+    const counts = { records: records.length, skipped_invalid: skippedInvalid, sources_added: sourcesAdded, actions: {}, new_players: 0, held: 0, conflicts: conflicts.length, certifications_revoked: revokedKeys }
     for (const r of results) {
       counts.actions[r.action] = (counts.actions[r.action] ?? 0) + 1
       if (r.playerAction === 'INSERT') counts.new_players++
@@ -745,7 +826,7 @@ const RESOLVABLE_COLUMNS = {
  * Record a resolution. Either an operator choice (observationId + operator + rationale) or the declared rule
  * (useRule). The canonical column is set to the chosen value; non-column fields must already match the chosen value.
  */
-export async function resolveConflict (db, { subjectTable, subjectId, field, observationId = null, useRule = false, operator = null, rationale = null, write = false }) {
+export async function resolveConflict (db, { subjectTable, subjectId, field, observationId = null, useRule = false, operator = null, rationale = null, proposalId = null, write = false }) {
   const conflict = (await openConflicts(db)).find((c) => c.subject_table === subjectTable && String(c.subject_id) === String(subjectId) && c.field_name === field)
   if (!conflict) throw new PipelineError(`no open conflict on ${subjectTable}#${subjectId}.${field}`)
   let chosen = observationId
@@ -759,9 +840,11 @@ export async function resolveConflict (db, { subjectTable, subjectId, field, obs
   const obs = conflict.observations.find((o) => String(o.observation_id) === String(chosen))
   if (!obs) throw new PipelineError(`observation ${chosen} is not part of this conflict`)
   const plan = { conflict: `${subjectTable}#${subjectId}.${field}`, chosen: obs, decided_by: decidedBy, rationale, canonical_update: null }
+  if (proposalId) await checkProposal(db, proposalId, { subjectTable, subjectId, field, observationId: chosen, reviewer: useRule ? null : decidedBy })
 
   await db.query('begin')
   try {
+    if (proposalId) await db.query("select set_config('bai.proposal_id', $1, true)", [String(proposalId)])
     if ((RESOLVABLE_COLUMNS[subjectTable] ?? []).includes(field)) {
       const cur = (await db.query(`select ${field} as v from public.${subjectTable} where id = $1`, [subjectId])).rows[0]
       // A date chosen for a row that had none gets DAY precision (observed dates are day-precise; the table needs both or neither).
@@ -781,9 +864,101 @@ export async function resolveConflict (db, { subjectTable, subjectId, field, obs
         considered_observation_ids = excluded.considered_observation_ids, rule = excluded.rule, decided_by = excluded.decided_by,
         rationale = excluded.rationale, decided_at = now()`,
     [subjectTable, subjectId, field, chosen, conflict.observation_ids, useRule ? conflict.declared_rule : 'REQUIRE_OPERATOR', decidedBy, rationale])
+    if (proposalId) await db.query("update research.decision_proposals set status = 'ACCEPTED', decided_by = $2, decided_at = now(), decision_reason = $3 where id = $1", [proposalId, decidedBy, rationale])
     await db.query(write ? 'commit' : 'rollback')
     return { ...plan, written: write }
   } catch (err) { await db.query('rollback'); throw err }
+}
+
+/**
+ * Reconsiders a recorded resolution with the same evidence (migration 021): only a registered, active human reviewer,
+ * with a reason, through this path (it sets bai.reconsideration for the transaction). The previous judgment stays in
+ * research.decision_history; a certified class touching the record loses its certification. Choosing the observation
+ * already chosen changes nothing (idempotent). Without write, a dry run.
+ */
+export async function reconsiderResolution (db, { subjectTable, subjectId, field, observationId, reviewer, reason, evidence = [], proposalId = null, write = false }) {
+  if (!reviewer || /^(agent|rule|system):/.test(reviewer)) throw new PipelineError('reconsideration is a human decision: --reviewer <registered human reviewer>')
+  if (!reason) throw new PipelineError('reconsideration needs --reason')
+  if (!observationId) throw new PipelineError('reconsideration needs --observation (the claim to choose)')
+  const res = (await db.query('select * from public.fact_resolutions where subject_table = $1 and subject_id = $2 and field_name = $3', [subjectTable, subjectId, field])).rows[0]
+  if (!res) throw new PipelineError(`no recorded resolution on ${subjectTable}#${subjectId}.${field} (an open conflict is decided with research:resolve)`)
+  if (!(await db.query('select research.is_active_reviewer($1) ok', [reviewer])).rows[0].ok) throw new PipelineError(`${reviewer} is not a registered, active reviewer (research:reviewer --add)`)
+  const obs = (await db.query(`select o.id, o.observed_value as value, s.source_key from public.source_observations o join public.sources s on s.id = o.source_id
+    where o.id = $1 and o.subject_table = $2 and o.subject_id = $3 and o.field_name = $4 and o.status = 'ACTIVE'`, [observationId, subjectTable, subjectId, field])).rows[0]
+  if (!obs) throw new PipelineError(`observation ${observationId} is not an active claim on ${subjectTable}#${subjectId}.${field}`)
+  if (!res.considered_observation_ids.map(String).includes(String(obs.id))) throw new PipelineError('that observation was not part of the recorded decision; new evidence reopens the conflict instead (research:resolve)')
+  const plan = { resolution: `${subjectTable}#${subjectId}.${field}`, from: String(res.chosen_observation_id), to: obs, reviewer, reason, canonical_update: null }
+  if (proposalId) await checkProposal(db, proposalId, { subjectTable, subjectId, field, observationId: obs.id, reviewer })
+  if (String(res.chosen_observation_id) === String(obs.id)) return { ...plan, unchanged: true, written: false }
+  if (!(RESOLVABLE_COLUMNS[subjectTable] ?? []).includes(field)) throw new PipelineError(`${field} is not a directly resolvable column`)
+  await db.query('begin')
+  try {
+    await db.query("select set_config('bai.reconsideration', 'authorized', true), set_config('bai.actor', $1, true), set_config('bai.decision_evidence', $2, true)",
+      [reviewer, JSON.stringify(evidence.map((e) => ({ reviewer_evidence: e })))])
+    if (proposalId) await db.query("select set_config('bai.proposal_id', $1, true)", [String(proposalId)])
+    const cur = (await db.query(`select ${field} as v from public.${subjectTable} where id = $1`, [subjectId])).rows[0]
+    if (!same(field, cur.v, obs.value)) { plan.canonical_update = { from: cur.v, to: obs.value }; await db.query(`update public.${subjectTable} set ${field} = $2 where id = $1`, [subjectId, obs.value]) }
+    await db.query(`update public.fact_resolutions set chosen_observation_id = $2, rule = 'REQUIRE_OPERATOR', decided_by = $3, rationale = $4, decided_at = now() where id = $1`,
+      [res.id, obs.id, reviewer, reason])
+    if (proposalId) await db.query("update research.decision_proposals set status = 'ACCEPTED', decided_by = $2, decided_at = now(), decision_reason = $3 where id = $1", [proposalId, reviewer, reason])
+    plan.history = (await db.query('select id, kind, certification_impact, revoked_class_ids from research.decision_history where fact_resolution_id = $1 order by id desc limit 1', [res.id])).rows[0]
+    await db.query(write ? 'commit' : 'rollback')
+    return { ...plan, written: write }
+  } catch (err) { await db.query('rollback'); throw err }
+}
+
+async function checkProposal (db, id, { subjectTable, subjectId, field, observationId, reviewer }) {
+  const pr = (await db.query('select * from research.decision_proposals where id = $1', [id])).rows[0]
+  if (!pr) throw new PipelineError(`proposal ${id} not found`)
+  if (pr.status !== 'PROPOSED') throw new PipelineError(`proposal ${id} is ${pr.status}`)
+  if (pr.subject_table !== subjectTable || String(pr.subject_id) !== String(subjectId) || pr.field_name !== field || String(pr.proposed_observation_id) !== String(observationId)) {
+    throw new PipelineError(`proposal ${id} proposes observation ${pr.proposed_observation_id} for ${pr.subject_table}#${pr.subject_id}.${pr.field_name}; the decision must match it`)
+  }
+  if (!reviewer || !(await db.query('select research.is_active_reviewer($1) ok', [reviewer])).rows[0].ok) throw new PipelineError('only a registered, active human reviewer accepts a proposal (an operator decision, not a rule)')
+}
+
+/**
+ * Files a decision proposal: the claim the proposer recommends for a contested or decided field, with reasoning and
+ * evidence. Anyone may propose (agents included); a proposal changes nothing until a registered reviewer accepts it
+ * through research:resolve / research:reconsider --proposal, or rejects it. Filing the same open proposal twice returns it.
+ */
+export async function proposeDecision (db, { subjectTable, subjectId, field, observationId, proposedBy, rationale, evidence = [] }) {
+  if (!proposedBy) throw new PipelineError('a proposal names its proposer (--operator or --agent)')
+  if (!rationale) throw new PipelineError('a proposal needs --rationale')
+  const obs = (await db.query(`select o.id, o.observed_value as value from public.source_observations o where o.id = $1 and o.subject_table = $2 and o.subject_id = $3 and o.field_name = $4 and o.status = 'ACTIVE'`,
+    [observationId, subjectTable, subjectId, field])).rows[0]
+  if (!obs) throw new PipelineError(`observation ${observationId} is not an active claim on ${subjectTable}#${subjectId}.${field}`)
+  const open = (await openConflicts(db)).some((c) => c.subject_table === subjectTable && String(c.subject_id) === String(subjectId) && c.field_name === field)
+  const decided = (await db.query('select 1 from public.fact_resolutions where subject_table = $1 and subject_id = $2 and field_name = $3', [subjectTable, subjectId, field])).rows.length > 0
+  if (!open && !decided) throw new PipelineError('nothing to decide: the field has no conflict and no recorded resolution')
+  const ex = (await db.query("select * from research.decision_proposals where subject_table = $1 and subject_id = $2 and field_name = $3 and proposed_observation_id = $4 and status = 'PROPOSED'",
+    [subjectTable, subjectId, field, observationId])).rows[0]
+  if (ex) return { proposal: ex, created: false, path: open ? 'resolve' : 'reconsider' }
+  const proposal = (await db.query(`insert into research.decision_proposals (subject_table, subject_id, field_name, proposed_observation_id, proposed_value, proposed_by, rationale, evidence)
+    values ($1, $2, $3, $4, $5, $6, $7, $8) returning *`, [subjectTable, subjectId, field, observationId, JSON.stringify(obs.value), proposedBy, rationale, JSON.stringify(evidence)])).rows[0]
+  return { proposal, created: true, path: open ? 'resolve' : 'reconsider' }
+}
+
+/** Rejects (registered reviewer, with a reason) or withdraws (the proposer) an open proposal. */
+export async function closeProposal (db, id, { status, by, reason }) {
+  if (!['REJECTED', 'WITHDRAWN'].includes(status)) throw new PipelineError('a proposal is closed as REJECTED or WITHDRAWN (accept it by deciding with --proposal)')
+  if (!reason) throw new PipelineError('closing a proposal needs --reason')
+  const r = (await db.query('update research.decision_proposals set status = $2, decided_by = $3, decided_at = now(), decision_reason = $4 where id = $1 returning *', [id, status, by, reason])).rows[0]
+  if (!r) throw new PipelineError(`proposal ${id} not found`)
+  return r
+}
+
+export async function listProposals (db, { status = 'PROPOSED' } = {}) {
+  return (await db.query(`select p.id, p.created_at, p.subject_table, p.subject_id, p.field_name, p.proposed_observation_id, p.proposed_value, s.source_key, p.proposed_by, p.status, p.decided_by, p.rationale
+    from research.decision_proposals p join public.source_observations o on o.id = p.proposed_observation_id join public.sources s on s.id = o.source_id
+    where $1::text is null or p.status::text = $1 order by p.id`, [status])).rows
+}
+
+/** The decision history of one record, or of one class (newest first). */
+export async function decisionHistory (db, { subjectTable = null, subjectId = null, classId = null, limit = 50 } = {}) {
+  return (await db.query(`select id, recorded_at, kind, subject_table, subject_id, field_name, previous_value, new_value, previous_source_key, new_source_key, decided_by, reason,
+      certification_impact, revoked_class_ids from research.decision_history
+    where ($1::text is null or (subject_table = $1 and subject_id = $2)) and ($3::bigint is null or $3 = any (class_ids)) order by id desc limit $4`, [subjectTable, subjectId, classId, limit])).rows
 }
 
 export async function queueSummary (db) {
