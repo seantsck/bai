@@ -1,15 +1,15 @@
 # Deployments upload only what the web app needs. Never upload credentials, local database data or research material.
+# Directory patterns are anchored with a leading slash: an unanchored `research` also matched app/research (the page).
 .env*
 !.env.example
-.pgdata
-.pgdata*
-.vercel
-research
-tests
-docs
-database
-scripts
-supabase/*
-!supabase/prod-ca-2021.crt
+/.pgdata*
+/.vercel
+/research
+/tests
+/docs
+/database
+/scripts
+/supabase/*
+!/supabase/prod-ca-2021.crt
 *.log
-tsconfig.tsbuildinfo
+/tsconfig.tsbuildinfo
