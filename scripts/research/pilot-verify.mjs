@@ -61,7 +61,55 @@ const RUN_DATE_COLUMNS = new Set(['raised_on', 'assessed_on', 'observed_on'])
 // Reference sources seeded by migrations (calendars, franchise identity). Parity checks them; the pilot does not own them.
 const SEEDED_SOURCE = /^"_key":"src:(cal:|bai-reference:)/
 
-async function snapshot (db) {
+/**
+ * The pilot's own rows, so the verifier keeps working as a database grows past the pilot (later classes, other clubs):
+ * the rows its two batches wrote, their players, signings, slots, schools, rounds and markets, the observations, flags
+ * and resolutions on those subjects, and the coverage cells they touch. Seeded reference data (organizations,
+ * calendars, rules eras) is compared whole.
+ */
+async function pilotScope (db) {
+  const ids = async (sql, p) => new Set((await q(db, sql, p)).map((r) => String(r.id)))
+  const batches = (await q(db, "select id from ingest.import_batches where batch_key like 'pilot-2015-%'")).map((r) => r.id)
+  const sel = await ids("select canonical_id id from ingest.staged_records where batch_id = any($1) and canonical_table = 'draft_selections'", [batches])
+  const intl = await ids("select canonical_id id from ingest.staged_records where batch_id = any($1) and canonical_table = 'international_signings'", [batches])
+  const selA = [...sel]
+  const intlA = [...intl]
+  const scope = {
+    batches, sel, intl,
+    players: await ids('select player_id id from public.draft_selections where id = any($1::bigint[]) union select player_id from public.international_signings where id = any($2::bigint[])', [selA, intlA]),
+    signings: await ids('select id from public.draft_signings where draft_selection_id = any($1::bigint[])', [selA]),
+    slots: await ids('select v.id from public.slot_values v join public.draft_selections s on s.draft_id = v.draft_id and s.overall_pick = v.overall_pick where s.id = any($1::bigint[])', [selA]),
+    schools: await ids('select school_id id from public.draft_selections where id = any($1::bigint[]) and school_id is not null', [selA]),
+    rounds: await ids('select round_id id from public.draft_selections where id = any($1::bigint[])', [selA]),
+    markets: await ids('select market_id id from public.international_signings where id = any($1::bigint[]) and market_id is not null', [intlA]),
+    cells: new Set((await q(db, `select 'DRAFT|' || d.draft_key || '|' || s.organization_id k from public.draft_selections s join public.drafts d on d.id = s.draft_id where s.id = any($1::bigint[])
+      union select 'INTERNATIONAL|' || p.period_key || '|' || i.organization_id from public.international_signings i join public.international_signing_periods p on p.id = i.signing_period_id where i.id = any($2::bigint[])`, [selA, intlA])).map((r) => r.k)),
+    otherBatches: (await q(db, "select count(*)::int n from ingest.import_batches where batch_key not like 'pilot-2015-%'"))[0].n
+  }
+  const subject = { players: scope.players, draft_selections: scope.sel, draft_signings: scope.signings, international_signings: scope.intl, slot_values: scope.slots }
+  scope.subjectIn = (t, id) => ['drafts', 'international_signing_periods'].includes(t) || (subject[t]?.has(String(id)) ?? false)
+  return scope
+}
+
+const SCOPED = {
+  players: (r, s) => s.players.has(String(r.id)),
+  player_external_ids: (r, s) => s.players.has(String(r.player_id)),
+  player_aliases: (r, s) => s.players.has(String(r.player_id)),
+  draft_selections: (r, s) => s.sel.has(String(r.id)),
+  draft_signings: (r, s) => s.signings.has(String(r.id)),
+  slot_values: (r, s) => s.slots.has(String(r.id)),
+  international_signings: (r, s) => s.intl.has(String(r.id)),
+  schools: (r, s) => s.schools.has(String(r.id)),
+  draft_rounds: (r, s) => s.rounds.has(String(r.id)),
+  markets: (r, s) => s.markets.has(String(r.id)),
+  source_observations: (r, s) => s.subjectIn(r.subject_table, r.subject_id),
+  fact_resolutions: (r, s) => s.subjectIn(r.subject_table, r.subject_id),
+  quality_flags: (r, s) => s.subjectIn(r.subject_table, r.subject_id),
+  coverage_assessments: (r, s) => s.cells.has(`${r.domain}|${r.scope_key}|${r.organization_id}`),
+  sources: (r) => /^(pilot2015:|cal:|bai-reference:)/.test(r.source_key)
+}
+
+async function snapshot (db, scope) {
   const nk = await naturalKeys(db)
   const out = { tables: {}, run_dates: {} }
   for (const t of RESEARCH_TABLES) {
@@ -69,6 +117,7 @@ async function snapshot (db) {
       .filter((c) => !c.d.startsWith('timestamp') && c.c !== 'id' && c.c !== 'player_key')
     const rows = []
     for (const r of await q(db, `select id, ${cols.map((c) => `"${c.c}"`).join(', ')}${cols.some((c) => c.d === 'date') ? '' : ''} from public.${t}`)) {
+      if (SCOPED[t] && !SCOPED[t](r, scope)) continue
       const o = {}
       for (const { c, d } of cols) {
         let v = r[c]
@@ -86,16 +135,18 @@ async function snapshot (db) {
     out.tables[t] = rows.map((r) => JSON.stringify(r)).sort()
   }
   out.ingest = {
-    batches: (await q(db, 'select batch_key, channel, status, file_sha256, coverage_claim from ingest.import_batches order by batch_key')),
+    batches: (await q(db, "select batch_key, channel, status, file_sha256, coverage_claim from ingest.import_batches where batch_key like 'pilot-2015-%' order by batch_key")),
     // proposed/applied_action describe the most recent apply run (INSERT the first time, NO_CHANGE on a re-run), so they
     // are workflow history, not results, and are not compared.
     records: (await q(db, `select b.batch_key, r.record_index, r.record_type, r.validation_status, r.identity_state, r.review_state,
-        r.applied_at is not null applied from ingest.staged_records r join ingest.import_batches b on b.id = r.batch_id order by 1, 2`)).map((r) => JSON.stringify(r))
+        r.applied_at is not null applied from ingest.staged_records r join ingest.import_batches b on b.id = r.batch_id where b.batch_key like 'pilot-2015-%' order by 1, 2`)).map((r) => JSON.stringify(r))
   }
   const rm = async (t, drop) => (await q(db, `select * from public.${t}`)).map((r) => { for (const k of drop) delete r[k]; return JSON.stringify(r) }).sort()
   out.read_models = {
-    rm_research_coverage: (await rm('rm_research_coverage', ['generation_id', 'refreshed_at', 'organization_id', 'last_research_date'])).filter((s) => !/"tracked_records":0,/.test(s) || /"coverage_state":"/.test(s)),
-    rm_research_queue_summary: await rm('rm_research_queue_summary', ['generation_id', 'refreshed_at'])
+    rm_research_coverage: (await q(db, 'select * from public.rm_research_coverage')).filter((r) => scope.cells.has(`${r.domain}|${r.scope_key}|${r.organization_id}`))
+      .map((r) => { for (const k of ['generation_id', 'refreshed_at', 'organization_id', 'last_research_date']) delete r[k]; return JSON.stringify(r) }).sort(),
+    // Queue counts are database-wide; they belong to the pilot only while the database holds nothing else.
+    ...(scope.otherBatches ? {} : { rm_research_queue_summary: await rm('rm_research_queue_summary', ['generation_id', 'refreshed_at']) })
   }
   for (const k of Object.keys(out.run_dates)) out.run_dates[k] = [...out.run_dates[k]].filter(Boolean).sort()
   return out
@@ -123,14 +174,17 @@ function compare (base, cur) {
   for (const t of new Set([...Object.keys(base.tables), ...Object.keys(cur.tables)])) cmpList(t, base.tables[t], cur.tables[t])
   cmpList('ingest.import_batches', base.ingest.batches.map((x) => JSON.stringify(x)), cur.ingest.batches.map((x) => JSON.stringify(x)))
   cmpList('ingest.staged_records', base.ingest.records, cur.ingest.records)
-  for (const t of Object.keys(base.read_models)) cmpList(t, base.read_models[t], cur.read_models[t])
+  for (const t of Object.keys(base.read_models)) if (t in cur.read_models) cmpList(t, base.read_models[t], cur.read_models[t])
+  // Baseline coverage rows from a pilot-only database: keep the pilot's cells only (tracked cells it touched).
   return diffs
 }
 
 // ---------------------------------------------------------------------------------------------------------------
 // Expectations (the validated pilot)
 // ---------------------------------------------------------------------------------------------------------------
-async function expectations (db) {
+async function expectations (db, scope) {
+  const pilotPlayers = [...scope.players]
+  const inPilot = (rows) => rows.filter((r) => scope.subjectIn(r.subject_table, r.subject_id))
   const one = async (sql, p) => (await q(db, sql, p))[0]
   const facts = {}
   const lad = `(select id from organizations where franchise_key = 'LAD')`
@@ -153,7 +207,7 @@ async function expectations (db) {
   check(d.signed_bonus_known === 18 && d.signed_bonus_unknown === 18, `signed bonuses known/unknown ${d.signed_bonus_known}/${d.signed_bonus_unknown}, expected 18/18`)
   check(d.zero_bonus === 0, 'a bonus is stored as zero')
   // 40 schools across all 46 pilot selections (the 42 LAD picks span 39; re-drafts add one); none unmatched.
-  const allSchools = await one('select count(distinct school_id)::int n, count(*) filter (where school_id is null)::int unmatched, count(*)::int selections from draft_selections')
+  const allSchools = await one('select count(distinct school_id)::int n, count(*) filter (where school_id is null)::int unmatched, count(*)::int selections from draft_selections where id = any($1::bigint[])', [[...scope.sel]])
   facts.schools = allSchools
   check(d.no_school === 0 && allSchools.n === 40 && allSchools.unmatched === 0 && allSchools.selections === 46, `schools ${JSON.stringify(allSchools)} (LAD ${d.schools}), expected 40 schools over 46 selections, none unmatched`)
   const slots = await one(`select count(*)::int n, sum(v.slot_value_usd)::bigint total, bool_and(r.round_order <= 100) top10
@@ -171,7 +225,8 @@ async function expectations (db) {
     from players p join player_external_ids x on x.player_id = p.id and x.id_system = 'MLBAM'
     join draft_selections s on s.player_id = p.id join drafts dr on dr.id = s.draft_id join organizations o on o.id = s.organization_id
     left join draft_signings g on g.draft_selection_id = s.id
-    group by p.id, p.display_name, x.external_id having count(s.id) > 1 order by p.display_name`)
+    where p.id = any($1::bigint[])
+    group by p.id, p.display_name, x.external_id having count(s.id) > 1 order by p.display_name`, [pilotPlayers])
   facts.redrafts = redrafts
   check(redrafts.length === 4, `${redrafts.length} players with two selections, expected 4`)
   for (const n of ['Funkhouser', 'Goldstein', 'Genord', 'Bilous']) check(redrafts.some((r) => r.display_name.includes(n) && r.selections === 2), `${n} is not one player with two selections`)
@@ -192,7 +247,7 @@ async function expectations (db) {
   const intl = await q(db, `select p.display_name, i.signing_bonus_usd bonus, i.signing_date, i.signing_date_precision prec, i.pathway, sp.period_key period, i.notes
     from international_signings i join players p on p.id = i.player_id join international_signing_periods sp on sp.id = i.signing_period_id
     where i.organization_id = ${lad} order by sp.label, p.display_name`)
-  facts.international = intl.map(({ notes, ...r }) => ({ ...r, signing_date: r.signing_date && `${r.signing_date.getFullYear()}-${String(r.signing_date.getMonth() + 1).padStart(2, '0')}-${String(r.signing_date.getDate()).padStart(2, '0')}`, bonus: r.bonus === null ? null : Number(r.bonus) }))
+  facts.international = intl.filter((r) => ['2014-15', '2015-16'].includes(r.period)).map(({ notes, ...r }) => ({ ...r, signing_date: r.signing_date && `${r.signing_date.getFullYear()}-${String(r.signing_date.getMonth() + 1).padStart(2, '0')}-${String(r.signing_date.getDate()).padStart(2, '0')}`, bonus: r.bonus === null ? null : Number(r.bonus) }))
   const amateur = facts.international.filter((r) => r.period === '2015-16')
   // Names exactly as the validated import records them (MLB transaction wire).
   const expected = { 'Yadier Álvarez': 16000000, 'Yusniel Díaz': 15500000, 'Omar Estévez': 6000000, 'Starling Heredia': 2600000, 'Ronny Brito': 2000000, 'Oneil Cruz': 950000, 'Christopher Arias': 500000, 'Carlos Rincon': null }
@@ -221,43 +276,51 @@ async function expectations (db) {
   const cov = (scope, org) => facts.coverage.find((c) => c.scope_key === scope && c.franchise_key === org)
   check(cov('2015-JUNE_AMATEUR', 'LAD')?.coverage_state === 'PARTIAL_RECONSTRUCTION' && cov('2015-JUNE_AMATEUR', 'LAD')?.expected_count === 42, '2015 draft × LAD must be PARTIAL_RECONSTRUCTION, expected 42')
   check(cov('2015-16', 'LAD')?.coverage_state === 'PARTIAL_RECONSTRUCTION' && cov('2015-16', 'LAD')?.expected_count === null, '2015-16 × LAD must be PARTIAL_RECONSTRUCTION with unknown class size')
-  check(!facts.coverage.some((c) => ['COMPLETE_CENSUS', 'SUBSTANTIALLY_COMPLETE'].includes(c.coverage_state)), 'no cell may claim census coverage')
-  const audits = await one('select count(*)::int n from outcome_audits')
+  const pilotCells = await q(db, `select c.coverage_state from coverage_assessments c where c.domain::text || '|' || c.scope_key || '|' || c.organization_id = any($1)`, [[...scope.cells]])
+  check(!pilotCells.some((c) => ['COMPLETE_CENSUS', 'SUBSTANTIALLY_COMPLETE'].includes(c.coverage_state)), 'no pilot cell may claim census coverage')
+  const audits = await one('select count(*)::int n from outcome_audits where player_id = any($1::bigint[])', [pilotPlayers])
   check(audits.n === 0, 'no outcome audits are part of the pilot')
-  const rates = await one('select count(*) filter (where supports_population_rate)::int n from rm_research_coverage')
-  check(rates.n === 0, 'no coverage cell may support population rates')
+  const pilotRates = (await q(db, 'select domain, scope_key, organization_id, supports_population_rate from rm_research_coverage')).filter((r) => scope.cells.has(`${r.domain}|${r.scope_key}|${r.organization_id}`) && r.supports_population_rate)
+  check(pilotRates.length === 0, 'no pilot cell supports population rates')
+  const computed = await one('select count(*) filter (where mlb_reach_rate is not null or cost_per_mlb_player is not null)::int n from analytics.class_economics')
+  check(computed.n === 0, 'no rate is computed anywhere until a class is census-level, certified and fully audited')
 
   facts.sources_by_authority = await q(db, `select authority_level, count(*)::int n from sources where source_key not like 'cal:%' and source_type <> 'TEST_FIXTURE'
     and source_key in (select s.source_key from sources s join source_observations o on o.source_id = s.id where o.subject_table <> all(array['drafts','international_signing_periods']))
     group by 1 order by 1`)
   const missingRetrieved = await one("select count(*)::int n from sources where source_type not in ('TEST_FIXTURE', 'BAI_REFERENCE') and retrieved_date is null")
   check(missingRetrieved.n === 0, `${missingRetrieved.n} sources lack a retrieved date`)
-  facts.quality_flags = await q(db, 'select flag_code, count(*)::int n from quality_flags group by 1 order by 1')
+  facts.quality_flags = Object.entries(inPilot(await q(db, 'select flag_code, subject_table, subject_id from quality_flags'))
+    .reduce((m, f) => ({ ...m, [f.flag_code]: (m[f.flag_code] ?? 0) + 1 }), {})).map(([flag_code, n]) => ({ flag_code, n })).sort((a, b) => a.flag_code.localeCompare(b.flag_code))
   const flag = (c) => facts.quality_flags.find((f) => f.flag_code === c)?.n ?? 0
   check(flag('EVIDENCE_EXCERPT_ONLY') === 3 && flag('SIGNING_STATUS_FROM_PRO_APPEARANCES') === 3, `quality flags ${JSON.stringify(facts.quality_flags)}`)
-  facts.resolutions = (await one('select count(*)::int n from fact_resolutions')).n
+  facts.resolutions = inPilot(await q(db, 'select subject_table, subject_id from fact_resolutions')).length
   check(facts.resolutions === 4, `${facts.resolutions} fact resolutions, expected 4 (2 calendar, 2 Sborz)`)
-  facts.open_conflicts = (await one('select count(*)::int n from v_open_fact_conflicts')).n
+  facts.open_conflicts = inPilot(await q(db, 'select subject_table, subject_id from v_open_fact_conflicts')).length
   check(facts.open_conflicts === 0, `${facts.open_conflicts} open conflicts`)
-  facts.external_ids = (await one('select count(*)::int n from player_external_ids')).n
+  facts.external_ids = (await one('select count(*)::int n from player_external_ids where player_id = any($1::bigint[])', [pilotPlayers])).n
   check(facts.external_ids === 112, `${facts.external_ids} external ids, expected 112`)
-  facts.players = (await one('select count(*)::int n from players')).n
+  facts.players = pilotPlayers.length
   facts.queues = await q(db, 'select queue_key, priority, open_items from rm_research_queue_summary order by priority, queue_key')
   const qn = (k) => facts.queues.find((x) => x.queue_key === k)?.open_items
   check(facts.queues.length === 10, `${facts.queues.length} queues, expected 10`)
+  // Queue counts are database-wide: assert the pilot's own counts only while the database holds nothing else.
+  if (!scope.otherBatches)
   check(qn('CLASS_INCOMPLETE') === 7 && qn('MISSING_COST') === 23 && qn('OUTCOME_NOT_AUDITED') === 51 && qn('MISSING_EXPECTATION') === 55 && qn('IDENTITY_AMBIGUOUS') === 0 && qn('SOURCE_CONFLICT') === 0,
     `queue counts ${JSON.stringify(facts.queues)}`)
-  const batches = await q(db, 'select batch_key, status from ingest.import_batches order by 1')
+  const batches = await q(db, "select batch_key, status from ingest.import_batches where batch_key like 'pilot-2015-%' order by 1")
   facts.batches = batches
-  check(batches.length === 2 && batches.every((b) => b.status === 'APPLIED' && b.batch_key.startsWith('pilot-2015-')), `import batches ${JSON.stringify(batches)} (only the two pilot batches may exist)`)
+  check(batches.length === 2 && batches.every((b) => b.status === 'APPLIED'), `pilot import batches ${JSON.stringify(batches)}`)
+  facts.other_batches = scope.otherBatches
   return facts
 }
 
 const db = new pg.Client({ connectionString: ownerDatabaseUrl() })
 await db.connect()
 try {
-  const facts = await expectations(db)
-  const snap = await snapshot(db)
+  const scope = await pilotScope(db)
+  const facts = await expectations(db, scope)
+  const snap = await snapshot(db, scope)
   const toFile = (s) => JSON.stringify(s, null, 1) + '\n'
   if (arg('snapshot')) fs.writeFileSync(arg('snapshot'), toFile(snap))
   let diffs = null
@@ -274,6 +337,7 @@ try {
     console.table(facts.coverage)
     console.log(`players ${facts.players}, external ids ${facts.external_ids}, resolutions ${facts.resolutions}, open conflicts ${facts.open_conflicts}`)
     console.log(`flags ${facts.quality_flags.map((f) => `${f.flag_code}=${f.n}`).join(' ')}; pilot sources by authority ${facts.sources_by_authority.map((s) => `${s.authority_level}=${s.n}`).join(' ')}`)
+    if (scope.otherBatches) console.log(`database also holds ${scope.otherBatches} non-pilot batch(es): pilot rows compared in scope; database-wide queue counts not asserted`)
     console.log(`queues ${facts.queues.map((x) => `${x.queue_key}(p${x.priority})=${x.open_items}`).join(' ')}`)
     console.log(`run dates (not compared): ${JSON.stringify(snap.run_dates)}`)
     if (diffs) console.log(`reconciliation against ${arg('compare')}: ${diffs.length} difference(s)`)

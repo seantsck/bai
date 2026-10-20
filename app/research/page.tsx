@@ -26,7 +26,7 @@ const DETAIL_COLUMNS = [
   { key: 'cost', header: 'Known cost', numeric: true, render: (r: Record<string, any>) => formatShare(r.cost_known_records, r.cost_basis_records) },
   { key: 'last_research_date', header: 'Last research', render: (r: Record<string, any>) => r.last_research_date ? formatDate(r.last_research_date) : '—' },
   { key: 'certified', header: 'Class certified', render: (r: Record<string, any>) => r.certified ? (r.certified_on ? `Yes, ${formatDate(r.certified_on)}` : 'Yes') : 'No' },
-  { key: 'supports_population_rate', header: 'Rates', render: (r: Record<string, any>) => r.supports_population_rate ? 'Allowed' : 'Blocked' }
+  { key: 'supports_population_rate', header: 'Coverage supports rates', render: (r: Record<string, any>) => r.supports_population_rate ? (r.certified ? 'Yes' : 'Yes, once certified') : 'No' }
 ]
 
 export default async function ResearchPage () {
@@ -44,7 +44,8 @@ export default async function ResearchPage () {
         <Notice>
           Cells show the coverage state and the number of tracked records; ✓ marks a research class that passed certification. Certification
           says the research workflow is finished for that class, not that the class is complete: coverage stays as assessed. A blank cell means
-          nothing is tracked yet. No hit rates are shown: only complete-census or substantially-complete cells could support them, and none do yet.
+          nothing is tracked yet. No hit rates are shown: a rate needs a complete-census or substantially-complete cell whose class is certified
+          and fully audited, and none is yet.
           Counts come from the last read-model refresh.
         </Notice>
         <p className='legend'>

@@ -482,6 +482,23 @@ export async function certify (db, clsRef, { actor }) {
   })
 }
 
+/** Revokes the active certification (a human act with a reason) and returns the class to COVERAGE_REVIEW. */
+export async function revokeCertification (db, clsRef, { actor, reason }) {
+  requireActor(actor, 'revoking a certification')
+  if (/^agent:/.test(actor)) throw new PipelineError('an automated agent cannot revoke a certification')
+  if (!reason || reason === true) throw new PipelineError('revoking needs --reason')
+  const cls = await findClass(db, clsRef)
+  return tx(db, actor, async () => {
+    const c = await one(db, 'update research.certifications set revoked_at = now(), revoked_by = $2, revoke_reason = $3 where class_id = $1 and revoked_at is null returning id', [cls.id, actor, reason])
+    if (!c) throw new PipelineError(`${cls.class_key} has no active certification`)
+    await db.query("update research.classes set stage = 'COVERAGE_REVIEW' where id = $1", [cls.id])
+    await db.query("insert into research.stage_events (class_id, from_stage, to_stage, actor, rationale) values ($1, 'CERTIFIED', 'COVERAGE_REVIEW', $2, $3)", [cls.id, actor, `certification revoked: ${reason}`])
+    await db.query(`update research.jobs set state = 'OPEN', completed_at = null, completion_rationale = null
+      where class_id = $1 and category_key = 'COVERAGE_CERTIFICATION' and state = 'DONE'`, [cls.id])
+    return { cls, revoked: true }
+  })
+}
+
 // ---------------------------------------------------------------------------------------------------------------
 // Reports
 // ---------------------------------------------------------------------------------------------------------------
