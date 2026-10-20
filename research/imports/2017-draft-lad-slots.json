@@ -1,0 +1,302 @@
+{
+ "format": "bai-research-import/1",
+ "batch_key": "2017-draft-lad-slots",
+ "channel": "DRAFT",
+ "description": "LAD 2017 Rule 4 draft: slot values for 10 picks in rounds 1-10 (sum $5,794,200) (MLB.com).",
+ "sources": [
+  {
+   "source_key": "lad2017:mlb-pick-values-2017",
+   "source_type": "OFFICIAL_LEAGUE",
+   "authority_level": "OFFICIAL",
+   "title": "2017 Draft bonus pools, pick values",
+   "publisher": "MLB.com",
+   "url": "https://www.mlb.com/news/2017-mlb-draft-bonus-pools-pick-values/c-223686792",
+   "archived_url": "http://web.archive.org/web/20181030014428/https://www.mlb.com/news/2017-mlb-draft-bonus-pools-pick-values/c-223686792",
+   "published_date": null,
+   "retrieved_date": "2026-10-20",
+   "notes": "Values tied to overall picks by the numbers printed in the list."
+  }
+ ],
+ "records": [
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2017:mlb-statsapi-draft-2017-lad",
+   "draft_key": "2017-JUNE_AMATEUR",
+   "round_code": "1",
+   "overall_pick": 23,
+   "round_pick": 23,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Jeren Kendall",
+    "birth_date": "1996-02-04",
+    "external_ids": {
+     "MLBAM": "656607"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 2897500,
+    "source_key": "lad2017:bref-lad-2017"
+   },
+   "slot_value": {
+    "usd": 2702700,
+    "source_key": "lad2017:mlb-pick-values-2017",
+    "locator": "pick 23 in the list"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2017:mlb-statsapi-draft-2017-lad",
+   "draft_key": "2017-JUNE_AMATEUR",
+   "round_code": "2",
+   "overall_pick": 62,
+   "round_pick": 26,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Morgan Cooper",
+    "birth_date": "1994-09-12",
+    "external_ids": {
+     "MLBAM": "668729"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 867500,
+    "source_key": "lad2017:bref-lad-2017"
+   },
+   "slot_value": {
+    "usd": 1018200,
+    "source_key": "lad2017:mlb-pick-values-2017",
+    "locator": "pick 62 in the list"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2017:mlb-statsapi-draft-2017-lad",
+   "draft_key": "2017-JUNE_AMATEUR",
+   "round_code": "3",
+   "overall_pick": 100,
+   "round_pick": 25,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Connor Wong",
+    "birth_date": "1996-05-19",
+    "external_ids": {
+     "MLBAM": "657136"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 547500,
+    "source_key": "lad2017:bref-lad-2017"
+   },
+   "slot_value": {
+    "usd": 537100,
+    "source_key": "lad2017:mlb-pick-values-2017",
+    "locator": "pick 100 in the list"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2017:mlb-statsapi-draft-2017-lad",
+   "draft_key": "2017-JUNE_AMATEUR",
+   "round_code": "4",
+   "overall_pick": 130,
+   "round_pick": 25,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "James Marinan",
+    "birth_date": "1998-10-10",
+    "external_ids": {
+     "MLBAM": "675653"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 822500,
+    "source_key": "lad2017:bref-lad-2017"
+   },
+   "slot_value": {
+    "usd": 401000,
+    "source_key": "lad2017:mlb-pick-values-2017",
+    "locator": "pick 130 in the list"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2017:mlb-statsapi-draft-2017-lad",
+   "draft_key": "2017-JUNE_AMATEUR",
+   "round_code": "5",
+   "overall_pick": 160,
+   "round_pick": 25,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Riley Ottesen",
+    "birth_date": "1994-10-30",
+    "external_ids": {
+     "MLBAM": "675962"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 197500,
+    "source_key": "lad2017:bref-lad-2017"
+   },
+   "slot_value": {
+    "usd": 299300,
+    "source_key": "lad2017:mlb-pick-values-2017",
+    "locator": "pick 160 in the list"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2017:mlb-statsapi-draft-2017-lad",
+   "draft_key": "2017-JUNE_AMATEUR",
+   "round_code": "6",
+   "overall_pick": 190,
+   "round_pick": 25,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Wills Montgomerie",
+    "birth_date": "1995-06-02",
+    "external_ids": {
+     "MLBAM": "676377"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 197500,
+    "source_key": "lad2017:bref-lad-2017"
+   },
+   "slot_value": {
+    "usd": 231900,
+    "source_key": "lad2017:mlb-pick-values-2017",
+    "locator": "pick 190 in the list"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2017:mlb-statsapi-draft-2017-lad",
+   "draft_key": "2017-JUNE_AMATEUR",
+   "round_code": "7",
+   "overall_pick": 220,
+   "round_pick": 25,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Zach Pop",
+    "birth_date": "1996-09-20",
+    "external_ids": {
+     "MLBAM": "647315"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 147500,
+    "source_key": "lad2017:bref-lad-2017"
+   },
+   "slot_value": {
+    "usd": 182200,
+    "source_key": "lad2017:mlb-pick-values-2017",
+    "locator": "pick 220 in the list"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2017:mlb-statsapi-draft-2017-lad",
+   "draft_key": "2017-JUNE_AMATEUR",
+   "round_code": "8",
+   "overall_pick": 250,
+   "round_pick": 25,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Rylan Bannon",
+    "birth_date": "1996-04-22",
+    "external_ids": {
+     "MLBAM": "676625"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 122500,
+    "source_key": "lad2017:bref-lad-2017"
+   },
+   "slot_value": {
+    "usd": 151400,
+    "source_key": "lad2017:mlb-pick-values-2017",
+    "locator": "pick 250 in the list"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2017:mlb-statsapi-draft-2017-lad",
+   "draft_key": "2017-JUNE_AMATEUR",
+   "round_code": "9",
+   "overall_pick": 280,
+   "round_pick": 25,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Connor Strain",
+    "birth_date": "1994-08-04",
+    "external_ids": {
+     "MLBAM": "676150"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 1500,
+    "source_key": "lad2017:bref-lad-2017"
+   },
+   "slot_value": {
+    "usd": 138800,
+    "source_key": "lad2017:mlb-pick-values-2017",
+    "locator": "pick 280 in the list"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2017:mlb-statsapi-draft-2017-lad",
+   "draft_key": "2017-JUNE_AMATEUR",
+   "round_code": "10",
+   "overall_pick": 310,
+   "round_pick": 25,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Zach Reks",
+    "birth_date": "1993-11-12",
+    "external_ids": {
+     "MLBAM": "676646"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 1500,
+    "source_key": "lad2017:bref-lad-2017"
+   },
+   "slot_value": {
+    "usd": 131600,
+    "source_key": "lad2017:mlb-pick-values-2017",
+    "locator": "pick 310 in the list"
+   }
+  }
+ ]
+}

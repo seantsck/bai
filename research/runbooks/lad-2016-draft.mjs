@@ -10,6 +10,7 @@
 //   2016-draft-lad-slots.json    MLB.com pick values (Callis, 2016-04-05, Wayback 2021-12-09): the Dodgers entries sit at
 //                                overall positions 20, 32, 36, 65, 101 … 311 and sum to the stated $9,336,500 pool
 //   2016-draft-lad-tracker.json  MLB.com signing and bonus tracker (Wayback 2019-09-22), rounds 1-10
+//   2016-draft-lad-outcomes.json outcome audits as of 2026-10-20 (MLB Stats API; B-Ref career WAR from the 2026-08-03 capture)
 import { cli, pickObservation, refresh } from './run.mjs'
 
 const C = ['--org', 'LAD', '--channel', 'draft', '--year', '2016']
@@ -60,5 +61,13 @@ const unknown = 'Signed (Baseball-Reference Signed=Y) but no bonus published: Ba
 for (const pick of [731, 761, 821, 851, 941, 971, 1031]) run('job', ['--job', `${J}/ACQUISITION_COST_MISSING/pick-${pick}`, '--state', 'UNRESOLVED', '--rationale', unknown])
 run('complete', ['--batch', 'lad-2016-draft-b'])
 for (let i = 0; i < 7; i++) run('stage', [...C, '--rationale', 'class review'])
+
+// Outcome audits for all 42 selections (2026-10-20; MLB Stats API + Baseball-Reference career WAR). Needs migration 020.
+// Built with scripts/research/sources/fetch-mlb-player-outcomes.mjs and outcome-audits-import.mjs (see the evidence package).
+run('import', ['--file', 'research/imports/2016-draft-lad-outcomes.json', '--org', 'LAD', '--class', J])
+run('validate', ['--batch', '2016-draft-lad-outcomes'])
+run('apply', ['--batch', '2016-draft-lad-outcomes'])
+run('apply', ['--batch', '2016-draft-lad-outcomes', '--write'])
+run('plan', C)
 refresh()
 run('class', C)

@@ -1,0 +1,1439 @@
+{
+ "format": "bai-research-import/1",
+ "batch_key": "2017-18-international-lad",
+ "channel": "INTERNATIONAL",
+ "description": "LAD 2017-18 signing period: 50 candidate international amateur signings discovered on the MLB transaction wire (bonuses unknown).",
+ "coverage_claims": [
+  {
+   "domain": "INTERNATIONAL",
+   "scope_key": "2017-18",
+   "organization": "LAD",
+   "coverage_state": "PARTIAL_RECONSTRUCTION",
+   "gap_notes": "Discovered from the MLB transaction wire by a documented rule; no complete published class list consulted yet; bonuses unknown; 9 foreign-born signees outside the rule not imported."
+  }
+ ],
+ "sources": [
+  {
+   "source_key": "lad201718:mlb-transactions-2017-18",
+   "source_type": "OFFICIAL_LEAGUE",
+   "authority_level": "OFFICIAL",
+   "title": "MLB transaction wire, team 119, 2017-18 signing period",
+   "publisher": "MLB Advanced Media",
+   "reference": "statsapi.mlb.com/api/v1/transactions?teamId=119&startDate=…&endDate=… (period window)",
+   "retrieved_date": "2026-10-20",
+   "notes": "547 transactions in the window; signing entries give the day but no bonus."
+  },
+  {
+   "source_key": "lad201718:mlb-people-2017-18",
+   "source_type": "OFFICIAL_LEAGUE",
+   "authority_level": "OFFICIAL",
+   "title": "MLB Stats API people and milb_all seasons for 2017-18 signees",
+   "publisher": "MLB Advanced Media",
+   "reference": "statsapi.mlb.com/api/v1/people?personIds=…; people/{id}/stats?stats=yearByYear&leagueListId=milb_all",
+   "retrieved_date": "2026-10-20",
+   "notes": "Birth date, birth country, draft year; affiliated seasons used only to exclude players with earlier professional history."
+  }
+ ],
+ "records": [
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:mlb-transactions-2017-18",
+   "organization": "LAD",
+   "signing_date": "2017-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "SS",
+   "player": {
+    "full_name": "Amin Valdez",
+    "birth_date": "2000-11-18",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "677576"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 321877: Los Angeles Dodgers signed free agent SS Amin Valdez to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:mlb-transactions-2017-18",
+   "organization": "LAD",
+   "signing_date": "2017-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Daniel Cruz",
+    "birth_date": "1997-10-05",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "677645"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 19 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 322255: Los Angeles Dodgers signed free agent RHP Daniel Cruz to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:mlb-transactions-2017-18",
+   "organization": "LAD",
+   "signing_date": "2017-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "OF",
+   "player": {
+    "full_name": "Imanol Vargas",
+    "birth_date": "1998-06-29",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "677673"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 19 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 322322: Los Angeles Dodgers signed free agent OF Imanol Vargas to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:mlb-transactions-2017-18",
+   "organization": "LAD",
+   "signing_date": "2017-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Jonathan Vasquez",
+    "birth_date": "2000-01-25",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "677675"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 17 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 322324: Los Angeles Dodgers signed free agent RHP Jonathan Vasquez to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:mlb-transactions-2017-18",
+   "organization": "LAD",
+   "signing_date": "2017-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "OF",
+   "player": {
+    "full_name": "Rushenten Tomsjansen",
+    "birth_date": "2001-05-14",
+    "birth_country": "Netherlands",
+    "external_ids": {
+     "MLBAM": "678751"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Netherlands, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 338162: Los Angeles Dodgers signed free agent OF Rushenten Tomsjansen to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:mlb-transactions-2017-18",
+   "organization": "LAD",
+   "signing_date": "2017-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "2B",
+   "player": {
+    "full_name": "Randy Rodriguez",
+    "birth_date": "1995-09-04",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "678776"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 21 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 338343: Los Angeles Dodgers signed free agent 2B Randy Rodriguez to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:mlb-transactions-2017-18",
+   "organization": "LAD",
+   "signing_date": "2017-07-03",
+   "signing_date_precision": "DAY",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "2B",
+   "player": {
+    "full_name": "Jesus Valdez",
+    "birth_date": "1997-12-29",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "678232"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 19 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 333097: Los Angeles Dodgers signed free agent 2B Jesus Valdez to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:mlb-transactions-2017-18",
+   "organization": "LAD",
+   "signing_date": "2017-07-03",
+   "signing_date_precision": "DAY",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "LHP",
+   "player": {
+    "full_name": "Andrew Budier",
+    "birth_date": "1999-10-20",
+    "birth_country": "Nicaragua",
+    "external_ids": {
+     "MLBAM": "678292"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Nicaragua, age 17 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 333210: Los Angeles Dodgers signed free agent LHP Andrew Budier to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:mlb-transactions-2017-18",
+   "organization": "LAD",
+   "signing_date": "2017-07-03",
+   "signing_date_precision": "DAY",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "OF",
+   "player": {
+    "full_name": "Julio Enrique",
+    "birth_date": "2000-02-21",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "678294"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 17 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 333212: Los Angeles Dodgers signed free agent OF Julio Enrique to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:mlb-transactions-2017-18",
+   "organization": "LAD",
+   "signing_date": "2017-07-03",
+   "signing_date_precision": "DAY",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Jeffry Abreu",
+    "birth_date": "2000-01-28",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "674100"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 17 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 335422: Los Angeles Dodgers signed free agent RHP Jeffry Abreu to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:mlb-transactions-2017-18",
+   "organization": "LAD",
+   "signing_date": "2017-07-03",
+   "signing_date_precision": "DAY",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Darlin Camilo",
+    "birth_date": "1999-11-17",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "678480"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 17 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 337084: Los Angeles Dodgers signed free agent RHP Darlin Camilo to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:mlb-transactions-2017-18",
+   "organization": "LAD",
+   "signing_date": "2017-07-03",
+   "signing_date_precision": "DAY",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "OF",
+   "player": {
+    "full_name": "Jimmie Feliz",
+    "birth_date": "2000-08-01",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "678491"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 337095: Los Angeles Dodgers signed free agent OF Jimmie Feliz to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:mlb-transactions-2017-18",
+   "organization": "LAD",
+   "signing_date": "2017-07-03",
+   "signing_date_precision": "DAY",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "OF",
+   "player": {
+    "full_name": "Brayan Rodriguez",
+    "birth_date": "2000-11-23",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "678589"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 337821: Los Angeles Dodgers signed free agent OF Brayan Rodriguez to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:mlb-transactions-2017-18",
+   "organization": "LAD",
+   "signing_date": "2017-07-03",
+   "signing_date_precision": "DAY",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "SS",
+   "player": {
+    "full_name": "Eynar Machin",
+    "birth_date": "2000-10-03",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "678659"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 337976: Los Angeles Dodgers signed free agent SS Eynar Machin to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:mlb-transactions-2017-18",
+   "organization": "LAD",
+   "signing_date": "2017-07-03",
+   "signing_date_precision": "DAY",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Axel Acevedo",
+    "birth_date": "2000-09-23",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "678677"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 337994: Los Angeles Dodgers signed free agent RHP Axel Acevedo to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:mlb-transactions-2017-18",
+   "organization": "LAD",
+   "signing_date": "2017-07-03",
+   "signing_date_precision": "DAY",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "OF",
+   "player": {
+    "full_name": "Gorge Heredia",
+    "birth_date": "2000-12-01",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "678734"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 338068: Los Angeles Dodgers signed free agent OF Gorge Heredia to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:mlb-transactions-2017-18",
+   "organization": "LAD",
+   "signing_date": "2017-07-03",
+   "signing_date_precision": "DAY",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "SS",
+   "player": {
+    "full_name": "Eddys Leonard",
+    "birth_date": "2000-11-10",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "678760"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 338171: Los Angeles Dodgers signed free agent SS Eddys Leonard to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:mlb-transactions-2017-18",
+   "organization": "LAD",
+   "signing_date": "2017-07-03",
+   "signing_date_precision": "DAY",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "LHP",
+   "player": {
+    "full_name": "Benony Robles",
+    "birth_date": "2000-10-01",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "678840"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 338536: Los Angeles Dodgers signed free agent LHP Benony Robles to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:mlb-transactions-2017-18",
+   "organization": "LAD",
+   "signing_date": "2017-07-03",
+   "signing_date_precision": "DAY",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "OF",
+   "player": {
+    "full_name": "Mayron Cathalina",
+    "birth_date": "2001-02-12",
+    "birth_country": "Aruba",
+    "external_ids": {
+     "MLBAM": "678886"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Aruba, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 338605: Los Angeles Dodgers signed free agent OF Mayron Cathalina to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:mlb-transactions-2017-18",
+   "organization": "LAD",
+   "signing_date": "2017-07-03",
+   "signing_date_precision": "DAY",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "SS",
+   "player": {
+    "full_name": "Vladimir Perez",
+    "birth_date": "2001-01-03",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "678892"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 338657: Los Angeles Dodgers signed free agent SS Vladimir Perez to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:mlb-transactions-2017-18",
+   "organization": "LAD",
+   "signing_date": "2017-07-03",
+   "signing_date_precision": "DAY",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Carlos De Los Santos",
+    "birth_date": "2000-11-18",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "678914"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 338678: Los Angeles Dodgers signed free agent RHP Carlos De Los Santos to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:mlb-transactions-2017-18",
+   "organization": "LAD",
+   "signing_date": "2017-07-03",
+   "signing_date_precision": "DAY",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Jeisson Cabrera",
+    "birth_date": "1998-09-05",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "678922"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 18 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 338684: Los Angeles Dodgers signed free agent RHP Jeisson Cabrera to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:mlb-transactions-2017-18",
+   "organization": "LAD",
+   "signing_date": "2017-07-04",
+   "signing_date_precision": "DAY",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "3B",
+   "player": {
+    "full_name": "Jose Nava",
+    "birth_date": "1999-01-15",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "678264"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 18 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 333181: Los Angeles Dodgers signed free agent 3B Jose Nava to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:mlb-transactions-2017-18",
+   "organization": "LAD",
+   "signing_date": "2017-07-04",
+   "signing_date_precision": "DAY",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Hugo Beltran",
+    "birth_date": "2000-06-13",
+    "birth_country": "Colombia",
+    "external_ids": {
+     "MLBAM": "678286"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Colombia, age 17 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 333204: Los Angeles Dodgers signed free agent RHP Hugo Beltran to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:mlb-transactions-2017-18",
+   "organization": "LAD",
+   "signing_date": "2017-07-04",
+   "signing_date_precision": "DAY",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "2B",
+   "player": {
+    "full_name": "Jorbit Vivas",
+    "birth_date": "2001-03-09",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "678391"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 335523: Los Angeles Dodgers signed free agent 2B Jorbit Vivas to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:mlb-transactions-2017-18",
+   "organization": "LAD",
+   "signing_date": "2017-07-04",
+   "signing_date_precision": "DAY",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "SS",
+   "player": {
+    "full_name": "Yhostin Chirinos",
+    "birth_date": "2000-09-29",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "678477"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 337081: Los Angeles Dodgers signed free agent SS Yhostin Chirinos to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:mlb-transactions-2017-18",
+   "organization": "LAD",
+   "signing_date": "2017-07-04",
+   "signing_date_precision": "DAY",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "LHP",
+   "player": {
+    "full_name": "Luisenyer Perez",
+    "birth_date": "2000-11-09",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "678500"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 337115: Los Angeles Dodgers signed free agent LHP Luisenyer Perez to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:mlb-transactions-2017-18",
+   "organization": "LAD",
+   "signing_date": "2017-07-04",
+   "signing_date_precision": "DAY",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "C",
+   "player": {
+    "full_name": "Andres Noriega",
+    "birth_date": "2001-01-03",
+    "birth_country": "Colombia",
+    "external_ids": {
+     "MLBAM": "678618"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Colombia, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 337873: Los Angeles Dodgers signed free agent C Andres Noriega to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:mlb-transactions-2017-18",
+   "organization": "LAD",
+   "signing_date": "2017-07-04",
+   "signing_date_precision": "DAY",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "C",
+   "player": {
+    "full_name": "Jenderson Jardines",
+    "birth_date": "2001-01-31",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "678668"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 337985: Los Angeles Dodgers signed free agent C Jenderson Jardines to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:mlb-transactions-2017-18",
+   "organization": "LAD",
+   "signing_date": "2017-07-04",
+   "signing_date_precision": "DAY",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Harold Galindo",
+    "birth_date": "2001-01-22",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "678693"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 338010: Los Angeles Dodgers signed free agent RHP Harold Galindo to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:mlb-transactions-2017-18",
+   "organization": "LAD",
+   "signing_date": "2017-07-04",
+   "signing_date_precision": "DAY",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "C",
+   "player": {
+    "full_name": "Alejandro Fernandez",
+    "birth_date": "2001-03-07",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "678740"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 338082: Los Angeles Dodgers signed free agent C Alejandro Fernandez to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:mlb-transactions-2017-18",
+   "organization": "LAD",
+   "signing_date": "2017-07-04",
+   "signing_date_precision": "DAY",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "SS",
+   "player": {
+    "full_name": "Jorge Hernandez",
+    "birth_date": "2001-01-12",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "678814"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 338438: Los Angeles Dodgers signed free agent SS Jorge Hernandez to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:mlb-transactions-2017-18",
+   "organization": "LAD",
+   "signing_date": "2017-07-24",
+   "signing_date_precision": "DAY",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "SS",
+   "player": {
+    "full_name": "Carlos Santiago",
+    "birth_date": "2001-07-24",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "678807"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 338422: Los Angeles Dodgers signed free agent SS Carlos Santiago to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:mlb-transactions-2017-18",
+   "organization": "LAD",
+   "signing_date": "2017-07-29",
+   "signing_date_precision": "DAY",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "OF",
+   "player": {
+    "full_name": "Yunior Garcia",
+    "birth_date": "2001-07-29",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "678832"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 338528: Los Angeles Dodgers signed free agent OF Yunior Garcia to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:mlb-transactions-2017-18",
+   "organization": "LAD",
+   "signing_date": "2017-08-30",
+   "signing_date_precision": "DAY",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "3B",
+   "player": {
+    "full_name": "Jeans Garcia",
+    "birth_date": "2001-06-21",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "678769"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 338179: Los Angeles Dodgers signed free agent 3B Jeans Garcia to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:mlb-transactions-2017-18",
+   "organization": "LAD",
+   "signing_date": "2017-09-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Wilkin Baez",
+    "birth_date": "1999-11-12",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "678387"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 17 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 335516: Los Angeles Dodgers signed free agent RHP Wilkin Baez to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:mlb-transactions-2017-18",
+   "organization": "LAD",
+   "signing_date": "2017-09-07",
+   "signing_date_precision": "DAY",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "3B",
+   "player": {
+    "full_name": "Miguel Vargas",
+    "birth_date": "1999-11-17",
+    "birth_country": "Cuba",
+    "external_ids": {
+     "MLBAM": "678246"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Cuba, age 17 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 333161: Los Angeles Dodgers signed free agent 3B Miguel Vargas to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:mlb-transactions-2017-18",
+   "organization": "LAD",
+   "signing_date": "2017-10-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "SS",
+   "player": {
+    "full_name": "Yohandry Sequera",
+    "birth_date": "2000-01-25",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "682547"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 17 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 363241: Los Angeles Dodgers signed free agent SS Yohandry Sequera to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:mlb-transactions-2017-18",
+   "organization": "LAD",
+   "signing_date": "2017-10-04",
+   "signing_date_precision": "DAY",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Jesus Turizo",
+    "birth_date": "2001-05-09",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "682555"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 363287: Los Angeles Dodgers signed free agent RHP Jesus Turizo to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:mlb-transactions-2017-18",
+   "organization": "LAD",
+   "signing_date": "2017-10-20",
+   "signing_date_precision": "DAY",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Martin Santana",
+    "birth_date": "2001-01-30",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "679756"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 343045: Los Angeles Dodgers signed free agent RHP Martin Santana to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:mlb-transactions-2017-18",
+   "organization": "LAD",
+   "signing_date": "2018-02-09",
+   "signing_date_precision": "DAY",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Duany Gomez",
+    "birth_date": "2000-09-30",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "679400"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 17 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 341538: Los Angeles Dodgers signed free agent RHP Duany Gomez to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:mlb-transactions-2017-18",
+   "organization": "LAD",
+   "signing_date": "2018-02-09",
+   "signing_date_precision": "DAY",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Abel Moya",
+    "birth_date": "2001-06-06",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "679402"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 341540: Los Angeles Dodgers signed free agent RHP Abel Moya to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:mlb-transactions-2017-18",
+   "organization": "LAD",
+   "signing_date": "2018-03-01",
+   "signing_date_precision": "DAY",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "C",
+   "player": {
+    "full_name": "Jesus Dominguez",
+    "birth_date": "2001-04-06",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "681599"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 356117: Los Angeles Dodgers signed free agent C Jesus Dominguez to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:mlb-transactions-2017-18",
+   "organization": "LAD",
+   "signing_date": "2018-03-01",
+   "signing_date_precision": "DAY",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "OF",
+   "player": {
+    "full_name": "Andy Pages",
+    "birth_date": "2000-12-08",
+    "birth_country": "Cuba",
+    "external_ids": {
+     "MLBAM": "681624"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Cuba, age 17 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 356371: Los Angeles Dodgers signed free agent OF Andy Pages to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:mlb-transactions-2017-18",
+   "organization": "LAD",
+   "signing_date": "2018-03-08",
+   "signing_date_precision": "DAY",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Carlos Duran",
+    "birth_date": "2001-07-30",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "679922"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 343976: Los Angeles Dodgers signed free agent RHP Carlos Duran to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:mlb-transactions-2017-18",
+   "organization": "LAD",
+   "signing_date": "2018-04-01",
+   "signing_date_precision": "DAY",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Israiky Berroa",
+    "birth_date": "2000-11-17",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "681616"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 17 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 356321: Los Angeles Dodgers signed free agent RHP Israiky Berroa to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:mlb-transactions-2017-18",
+   "organization": "LAD",
+   "signing_date": "2018-04-01",
+   "signing_date_precision": "DAY",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "LHP",
+   "player": {
+    "full_name": "Stiven Gutierrez",
+    "birth_date": "2001-06-21",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "681618"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 356328: Los Angeles Dodgers signed free agent LHP Stiven Gutierrez to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:mlb-transactions-2017-18",
+   "organization": "LAD",
+   "signing_date": "2018-06-04",
+   "signing_date_precision": "DAY",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "P",
+   "player": {
+    "full_name": "Carlos De Avila",
+    "birth_date": "2000-02-11",
+    "birth_country": "Colombia",
+    "external_ids": {
+     "MLBAM": "681770"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Colombia, age 18 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 358713: Los Angeles Dodgers signed free agent P Carlos De Avila to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:mlb-transactions-2017-18",
+   "organization": "LAD",
+   "signing_date": "2018-06-14",
+   "signing_date_precision": "DAY",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "OF",
+   "player": {
+    "full_name": "Harold Restituyo",
+    "birth_date": "2000-09-01",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "683060"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 17 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 372519: Los Angeles Dodgers signed free agent OF Harold Restituyo to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "lad201718:mlb-transactions-2017-18",
+   "organization": "LAD",
+   "signing_date": "2018-06-15",
+   "signing_date_precision": "DAY",
+   "period_key": "2017-18",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Engerbes Escalona",
+    "birth_date": "1999-01-18",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "682559"
+    },
+    "source_key": "lad201718:mlb-people-2017-18"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 19 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 363294: Los Angeles Dodgers signed free agent RHP Engerbes Escalona to a minor league contract."
+  }
+ ]
+}
