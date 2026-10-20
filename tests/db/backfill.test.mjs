@@ -145,6 +145,10 @@ test('certification (draft): fails with explicit blockers, then passes once ever
   await assert.rejects(B.setJobState(db, k('ACQUISITION_COST_MISSING', 'pick-500'), 'UNRESOLVED', { actor: ME }), /--rationale/)
   await B.setJobState(db, k('ACQUISITION_COST_MISSING', 'pick-500'), 'UNRESOLVED', { actor: ME, rationale: 'no published bonus in tracker, club release or reference database (searched 2026-10-20)' })
   await B.setJobState(db, k('SCHOOL_MISSING', 'pick-500'), 'UNRESOLVED', { actor: ME, rationale: 'drafted out of an independent program; no school listed anywhere' })
+  // Unknown after research can only be superseded (a later source answered it), never reopened or marked done.
+  await assert.rejects(B.setJobState(db, k('SCHOOL_MISSING', 'pick-500'), 'OPEN', { actor: ME }), /cannot move to OPEN/)
+  await assert.rejects(B.setJobState(db, k('SCHOOL_MISSING', 'pick-500'), 'DONE', { actor: ME, rationale: 'x' }), /cannot move to DONE/)
+  await assert.rejects(B.setJobState(db, k('SCHOOL_MISSING', 'pick-500'), 'SUPERSEDED', { actor: ME }), /--rationale/)
   await toReview(NYY_DRAFT)
   const ready = await h.one(db, "select s.workflow_status from research.v_class_status s join research.classes c on c.id = s.class_id where c.class_key = 'NYY/DRAFT/2016-JUNE_AMATEUR'")
   assert.equal(ready.workflow_status, 'READY_FOR_REVIEW', 'open outcome audits do not hold a class back from review')

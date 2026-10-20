@@ -241,10 +241,13 @@ export async function findJob (db, key) {
 const ALLOWED = {
   OPEN: ['IN_PROGRESS', 'BLOCKED', 'DONE', 'UNRESOLVED', 'CANCELLED', 'SUPERSEDED'],
   IN_PROGRESS: ['OPEN', 'BLOCKED', 'DONE', 'UNRESOLVED', 'CANCELLED', 'SUPERSEDED'],
-  BLOCKED: ['OPEN', 'IN_PROGRESS', 'UNRESOLVED', 'CANCELLED', 'SUPERSEDED']
+  BLOCKED: ['OPEN', 'IN_PROGRESS', 'UNRESOLVED', 'CANCELLED', 'SUPERSEDED'],
+  // "Unknown after research" can be overtaken by a later source; the job is superseded (with a rationale), never reopened,
+  // and its UNRESOLVED closing stays in job_events.
+  UNRESOLVED: ['SUPERSEDED']
 }
 
-/** Moves a job. Terminal states need a rationale; BLOCKED needs a reason; terminal jobs never move again. */
+/** Moves a job. Terminal states need a rationale; BLOCKED needs a reason; terminal jobs never move again, except UNRESOLVED -> SUPERSEDED. */
 export async function setJobState (db, key, state, { actor, rationale = null, reason = null, assign } = {}) {
   requireActor(actor, 'changing a job')
   const j = await findJob(db, key)

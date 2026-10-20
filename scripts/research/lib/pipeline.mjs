@@ -416,6 +416,11 @@ class Applier {
         const statusAgrees = ex.signing_status === s.status
         if (statusAgrees && s.status === 'SIGNED') {
           action = strongest(action, await this.reconcile({ table: 'draft_signings', id: ex.id, field: 'signing_bonus_usd', canonical: ex.signing_bonus_usd, incoming: s.bonus_usd, sourceKey: s.bonus_source_key ?? s.source_key, rowSourceId: ex.source_id, conflicts }))
+          // A signing date fills an unknown date (with its precision); a different date is a conflict.
+          // (date and precision are written together: the table requires both or neither)
+          const dated = await this.reconcile({ table: 'draft_signings', id: ex.id, field: 'signing_date', column: null, canonical: ex.signing_date ? isoDate(ex.signing_date) : null, incoming: s.date ?? null, sourceKey: s.source_key, rowSourceId: ex.source_id, conflicts })
+          if (dated === 'UPDATE_UNKNOWN') await this.q('update public.draft_signings set signing_date = $2, signing_date_precision = $3 where id = $1', [ex.id, s.date, s.date_precision ?? 'DAY'])
+          action = strongest(action, dated)
         }
       }
     }
@@ -727,7 +732,7 @@ export function ruleOutcome (conflict) {
 const RESOLVABLE_COLUMNS = {
   players: ['birth_date', 'birth_country', 'primary_position'],
   draft_selections: ['position', 'round_pick'],
-  draft_signings: ['signing_status', 'signing_bonus_usd'],
+  draft_signings: ['signing_status', 'signing_bonus_usd', 'signing_date'],
   international_signings: ['signing_date', 'signing_bonus_usd', 'posting_fee_usd', 'transfer_fee_usd', 'other_cost_usd', 'pathway'],
   slot_values: ['slot_value_usd'],
   mlb_debuts: ['debut_date'],
@@ -759,7 +764,9 @@ export async function resolveConflict (db, { subjectTable, subjectId, field, obs
   try {
     if ((RESOLVABLE_COLUMNS[subjectTable] ?? []).includes(field)) {
       const cur = (await db.query(`select ${field} as v from public.${subjectTable} where id = $1`, [subjectId])).rows[0]
-      if (!same(field, cur.v, obs.value)) { plan.canonical_update = { from: cur.v, to: obs.value }; await db.query(`update public.${subjectTable} set ${field} = $2 where id = $1`, [subjectId, obs.value]) }
+      // A date chosen for a row that had none gets DAY precision (observed dates are day-precise; the table needs both or neither).
+      const extra = field.endsWith('_date') && ['draft_signings', 'international_signings'].includes(subjectTable) ? `, ${field}_precision = coalesce(${field}_precision, 'DAY')` : ''
+      if (!same(field, cur.v, obs.value)) { plan.canonical_update = { from: cur.v, to: obs.value }; await db.query(`update public.${subjectTable} set ${field} = $2${extra} where id = $1`, [subjectId, obs.value]) }
     } else {
       // Evidence-only field: the canonical value is what the row's own citation says; a resolution may only confirm it.
       const rowSource = (await db.query(`select s.source_key from public.${subjectTable} t join public.sources s on s.id = t.source_id where t.id = $1`, [subjectId])).rows[0]?.source_key

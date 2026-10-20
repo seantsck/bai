@@ -251,9 +251,13 @@ test('research queues: fixed priorities; the summary equals the internal queue',
   })
 })
 
-test('coverage states: only census-level states can support population rates; nothing claims them yet', async () => {
+test('coverage states: only census-level states can support population rates; a census claim names its size and source; no rate without certification', async () => {
   const states = await rows("select s::text state, coverage_supports_population_rate(s) ok from unnest(enum_range(null::coverage_state)) s order by 1")
   assert.deepEqual(states.filter((s) => s.ok).map((s) => s.state).sort(), ['COMPLETE_CENSUS', 'SUBSTANTIALLY_COMPLETE'])
-  assert.equal((await one("select count(*)::int n from coverage_assessments where coverage_state in ('COMPLETE_CENSUS', 'SUBSTANTIALLY_COMPLETE')")).n, 0)
-  assert.equal((await one('select count(*)::int n from rm_research_coverage where supports_population_rate')).n, 0)
+  // Research classes may claim census coverage (e.g. a draft class against MLB's official pick list) once they are imported;
+  // such a claim must state the expected size and cite a source.
+  assert.equal((await one(`select count(*)::int n from coverage_assessments where coverage_state in ('COMPLETE_CENSUS', 'SUBSTANTIALLY_COMPLETE')
+    and (expected_count is null or source_id is null)`)).n, 0)
+  // Coverage alone never publishes a rate: a rate needs a certified class.
+  assert.equal((await one('select count(*)::int n from analytics.class_economics where (rates_allowed or mlb_reach_rate is not null or cost_per_mlb_player is not null) and not certified')).n, 0)
 })
