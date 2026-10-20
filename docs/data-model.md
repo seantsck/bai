@@ -271,3 +271,23 @@ Every fact table above, apart from identity and lookup tables, also references `
 - `ingest.batch_channel` gains `OUTCOMES`, and staged records may be `OUTCOME_AUDIT`.
 - An outcome record attaches to an existing player by a strong identity and never creates one. It writes `outcome_audits`, `mlb_debuts`, `outcome_audit_details`, `war_observations` (per provider) and trade `transactions`; a trade that moved several audited players is shared.
 - Rival debut dates or WAR values become conflicts (`mlb_debuts.debut_date` and `war_observations.war_value` are resolvable fields). `NOT_AUDITED` is never imported: it is the absence of an audit.
+
+### Decision history (021, schema `research`, private)
+
+- `research.decision_history`: append-only (trigger), one row per resolution, re-decision, reconsideration, certification, revocation and certified-class evidence change; it records values, sources, decider, reason, evidence and certification impact.
+- `research.reviewers`: registered human reviewers. Certification and reconsideration require an active one; automation names are refused.
+- `research.decision_proposals`: proposed decisions (anyone may file one) that only a registered reviewer accepts or rejects.
+- Guards on `public.fact_resolutions` (no delete; same-evidence changes only through `research:reconsider`) and `research.certifications` (immutable, one final revocation, never deleted).
+- `research.classes_of_subject(table, id)` maps a canonical record to its research classes. `research.revoke_for_evidence_change` and `research.record_evidence_change` revoke certifications whose evidence changed.
+- Full rules: [decision-history.md](decision-history.md).
+
+### Organizational value (022)
+
+- `ingest.batch_channel` gains `TRADES`, and staged records may be `TRADE` (every package of one trade, players by MLBAM id, their observed WAR, non-player assets). A trade may add a traded-in player by strong id. Both sides of a trade share one transaction.
+- Views (private `analytics`):
+  - `player_season_war` and `player_career_war`: the latest observation per key;
+  - `player_war_coverage`: `COMPLETE` / `PARTIAL` / `CAREER_ONLY` / `NO_MLB` / `NOT_OBSERVED`, per provider;
+  - `trade_returns`: per package sent, the WAR the received players produced for the club from the trade season on;
+  - `acquisition_value`: career, original-organization and other-organization WAR, the trade return, cost, debut timeline and coverage, per provider;
+  - `class_value`: known sums with coverage counts; a total only when every member is covered; each package counted once per class, with shared packages flagged.
+- Baseball-Reference and FanGraphs are never mixed or used to fill each other. A provider not observed is NULL, never zero.

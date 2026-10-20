@@ -39,7 +39,7 @@ Each item has a recommendation; the decision is yours.
 
 | # | Item | Recommendation | How |
 |---|---|---|---|
-| 1 | **Smeltzer #161 bonus**: $500,000 (MLB.com tracker, OFFICIAL) vs $497,500 (Baseball-Reference and Baseball America) | **Choose $497,500.** Every other recorded LAD 2016 bonus is the net figure, and the tracker's $500,000 matches the gross amount Dodgers Digest lists. Two independent sources agree on the net figure. Confidence: moderate (the tracker is the official publication). | `npm run research:conflicts` shows the open conflict with its observation ids. Then `npm run research:resolve -- --table draft_signings --id <signing id> --field signing_bonus_usd --observation <Baseball America obs id> --operator "<your name>" --rationale "<reason>" --write`. Choosing the rule's figure instead: `--rule --write`. |
+| 1 | **Smeltzer #161 bonus**: $500,000 (MLB.com tracker, OFFICIAL) vs $497,500 (Baseball-Reference and Baseball America) | **Choose $497,500** (proposal 1, below). Every other recorded LAD 2016 bonus is the net figure, and the tracker's $500,000 matches the gross amount Dodgers Digest lists. Two independent sources agree on the net figure. Confidence: moderate (the tracker is the official publication). | `npm run research:conflicts` shows the open conflict with its observation ids. Then `npm run research:resolve -- --table draft_signings --id <signing id> --field signing_bonus_usd --observation <Baseball America obs id> --operator "<your name>" --rationale "<reason>" --write`. Choosing the rule's figure instead: `--rule --write`. |
 | 2 | **Census claim** (42 = MLB official list) | **Accept.** MLB's list, Baseball-Reference and Baseball America each list the same 42 picks. | No command; certification records the claim as reviewed. |
 | 3 | **Six unknown bonuses** (761 Eden, 821 French, 851 Perkins, 941 Berman, 971 Costello, 1031 Toribio) | **Accept as unknown** (bounded at ≤ $100,000, not stored). No source with a figure was found; Baseball America prints "—". | Already `UNRESOLVED` with a rationale. To reopen, add a researcher job. |
 | 4 | **Sheffield #36 and Robinson #191 dispositions** (`LOST_WAIVERS` from MLB's wire) | **Recode both to `LOST_RULE_5`.** MLB.com's 2020-12-10 report: Sheffield was taken 7th in the Major League phase by Colorado, and Robinson by Cincinnati in the Minor League phase. The evidence is in `research/evidence/rule5-2020-lad.json`. | Not applied, because the 2016 audits are under review. Applying it needs a corrective OUTCOMES batch: rebuild with `outcome-audits-import.mjs --rule5 research/evidence/rule5-2020-lad.json` (a new `as_of` date) and apply. The old and new details then show as a conflict to resolve. |
@@ -47,9 +47,19 @@ Each item has a recommendation; the decision is yours.
 | 6 | **WAR**: only Baseball-Reference career WAR (capture 2026-08-03) | **Accept for certification.** WAR is not a certification requirement; FanGraphs and tenure WAR belong to the attribution work ([organizational-war-attribution.md](../proposals/organizational-war-attribution.md)). | none |
 | 7 | **Operator decisions made by the research agent**: Sheffield's round code and pick (`bai-backfill-review`) | **Confirm.** MLB's official structure (CB-A, pick 2) is kept, and B-Ref's label stays on record. | A recorded resolution cannot currently be re-decided (see the limitation below), so confirm or raise it before certifying. |
 
-## Limitation to know before deciding
+## Recording decisions (Phase 7, migration 021)
 
-A resolution is one row per field. Once recorded, `research:resolve` cannot re-decide it unless a new conflicting source reopens the conflict, and a re-decision overwrites the previous row (`fact_resolutions` keeps no history). This is why item 1 was left open for you rather than settled by the rule. A resolution-history table and a human-only `--reconsider` path are proposed as follow-up work.
+Every decision is now kept in `research.decision_history`, and no recorded judgment is silently overwritten ([../decision-history.md](../decision-history.md)).
+- **Register first:** register yourself as a reviewer (`research:reviewer --add "<you>" --operator "<you>"`). Certification and reconsideration refuse unregistered names and automation.
+- **Item 1 (Smeltzer) is filed as proposal 1** (`research:proposals`). Automated research proposed it (`agent:bai-research`) with the evidence in `research/evidence/smeltzer-2016-bonus.json`, and it decides nothing. Accept it: `research:resolve -- --table draft_signings --id <signing> --field signing_bonus_usd --observation <Baseball America obs> --operator "<you>" --rationale "<reason>" --proposal 1 --write`. Or reject it: `research:proposals -- --reject 1 --reviewer "<you>" --reason "..."`, then decide the conflict yourself.
+- **Item 7 (Sheffield):** if you disagree with the recorded operator decision, `research:reconsider ... --reviewer "<you>" --reason "..." --authorize --write` now re-decides it, and the earlier judgment stays in the history.
+
+**Smeltzer evidence (Phase 7):**
+- For 11 of the 12 Dodgers picks in rounds 1–10, MLB.com's tracker shows exactly the gross bonus minus $2,500 (the net figure).
+- Pick 161 is the only one where the tracker shows the gross figure ($500,000).
+- Baseball-Reference and Baseball America both give $497,500.
+- So the tracker's $500,000 is gross, and $497,500 is the net figure on the convention every other recorded LAD bonus follows.
+- No source states pick 161's deduction explicitly: confidence is moderate to high.
 
 ## Certify (after items 1–7)
 

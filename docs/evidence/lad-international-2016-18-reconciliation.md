@@ -54,3 +54,18 @@ Costs known: 2016-17 has 1 of 46 signings; 2017-18 has 3 of 50. Each period's $3
 1. Baseball America's period lists of Dodgers international signings: the most complete published lists, which may settle the universe and bonuses.
 2. MLB.com's international signing trackers (Jesse Sanchez) for 2016-17 and 2017-18.
 3. Dodgers press releases for later signing batches.
+
+## Phase 7 follow-up (2026-10-20)
+
+MLB's season rosters for every Dodgers rookie-level club (DSL 611/612, AZL 2690/5427; `teams/{id}/roster?season=…&rosterType=fullSeason`, 2017–2019) were checked against each open question.
+
+| Question | Evidence | Status | Recommendation |
+|---|---|---|---|
+| **Jonathan Alvarez** (announced 2017-07-03) | No LAD signing entry on the wire, no MLBAM identity. Absent from all eight Dodgers rookie-level rosters in 2017–2019. The only "Jonathan Alvarez" found in reference data is a 2019 DSL Cubs pitcher (The Baseball Cube), not linked to LAD. | **Unresolved** | Keep him out of the class: an announcement alone is not a signing BAI can tie to a player. Record the job as unknown after research unless a club or MLB source identifies him. |
+| **The July 2017 "second" Jaime Perez** | MLB data holds one Cuban OF Jaime Perez in the system (676015, signed 2017-05-29), on the DSL and AZL rosters 2017–2019. No second player appears. Dodgers Digest itself called the report doubtful. | **Unresolved; likely no second player** | Close as unknown after research. No player is created. |
+| **Martin Santana** | The wire dates the contract 2017-10-20; the club announced him on 2017-07-03. He played for the DSL Dodgers in 2018 and 2019 (679756). Both dates fall in 2017-18. | **Resolved for classification** (2017-18 amateur) | Keep the wire's contract date as the signing date and the announcement as a note. The period is unaffected. |
+| **Yordan Alvarez** | Agreed 2016-06-15 for $2,000,000 (MLB.com, Baseball America, Dodgers Digest), the last day of 2015-16; contract on the wire 2016-07-15; traded to HOU 2016-08-01. | **Documented, not corrected** | Belongs to 2015-16 by pool accounting. BAI has no mechanism yet to move a recorded signing to another period: the period comes from the date. A reviewer-approved corrective batch plus a "superseded signing" mechanism is needed, so his record stays in 2016-17 with the open job. |
+| **Darien Núñez** | Age 25 at signing (2018-04-16). Serie Nacional 2011–2015 (Wikipedia; Baseball-Reference Bullpen: debut 2011-12 with Las Tunas), about four seasons. Under the 2017–2021 agreement, an exempt professional is 25 or older **and** has six professional seasons. | **Recommended: pool-subject, not exempt** (contrary to Dodgers Digest's age-only inference) | Classify as an international amateur (pool-subject) outside BAI's age-22 discovery rule, once a reviewer accepts that the season count is established. Not imported. |
+| **Guillo Zuñiga** | Signed by Atlanta 2016-07-02; GCL Braves 2017; freed by MLB's 2017-11-21 ruling on Atlanta's violations; signed by LAD 2017-12-06; AZL Dodgers 2018. | **Documented: a distinct category** | Neither a fresh amateur nor an ordinary minor-league free agent. Add a pathway note ("freed by MLB ruling") rather than force him into either class. Not imported. |
+
+Coverage stays `PARTIAL_RECONSTRUCTION` for both periods. No bonus was added in Phase 7; every figure above is either already on record or not a figure BAI can verify.

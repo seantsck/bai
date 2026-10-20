@@ -69,6 +69,13 @@ Never create or alter tables through the Dashboard. A hosted database must alway
   - `lad-2017-cohorts.mjs`: LAD 2017 picks, slots and tracker, and both international candidate classes, batches paused.
   The aggregates match the local replay exactly, and 260 import records checked field by field show no unexplained difference. Later research (Phase 6 runbooks: `lad-2017-completion.mjs`, `lad-2016-ba-corroboration.mjs`, `lad-international-2016-18.mjs`) is local until its PR merges. No class is certified and no rate is published on hosted.
 - **`hosted:verify` and census claims:** with research classes on hosted, the original assertion "no coverage cell claims a census" no longer holds (LAD 2016 and 2017 legitimately claim `COMPLETE_CENSUS`). It is replaced by five shared invariants in `scripts/research/lib/integrity.mjs`: census claims are sourced and track their whole universe; no rate for an uncertified or non-census class; the public read model never shows a partial cell as complete or rate-capable. `tests/db/integrity.test.mjs` injects each violation in a rolled-back transaction and proves it is detected.
+- **Phase 6 research on hosted (2026-10-20, after PR #6 merged at `ae73225`):** `lad-2017-completion.mjs`, `lad-2016-ba-corroboration.mjs` and `lad-international-2016-18.mjs` were replayed with `--confirm-hosted`.
+  - Hosted class totals equal the local replay.
+  - 375 import records checked field by field: 0 unexplained differences.
+  - Parity 0 differences; security passed; pilot reconciliation passed.
+  - The Smeltzer conflict is open on hosted for the reviewer, as intended.
+  - `hosted:verify` on `main`'s code reported 10/11: its pipeline test counted every open bonus conflict in the database, including that real one. Phase 7 scopes the assertion to the test's own fixture (11/11 against hosted with only that change).
+- **021 (decision history) and 022 (organizational value) are committed on a feature branch and not pushed.** Push them after that PR merges (steps 3–6 above). Until then `hosted:parity` and `hosted:verify` report them as pending.
 - `hosted:verify-pilot` compares only the pilot's own rows, so it keeps working as hosted gains other classes.
 
 ### Hosted-only migrations

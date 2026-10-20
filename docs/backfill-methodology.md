@@ -117,6 +117,8 @@ Every transition is logged in `research.batch_events`.
 
 ## Certification
 
+Certification and every research judgment are recorded in an append-only history. A certification needs a registered human reviewer, and it is revoked automatically when the evidence under the class changes ([decision-history.md](decision-history.md)).
+
 `research:certify` runs a deterministic check and certifies only when it finds no blocker. There is no force option, and an agent (`agent:*`) cannot certify.
 
 **Draft class**
@@ -236,6 +238,11 @@ Independent lists (a club announcement, a published class list) are transcribed 
 | `research:certify -- --org X --channel …` | deterministic certification; exits 3 with blockers |
 | `research:revoke -- --org X --channel … --reason …` | human-only revocation (kept on record); class back to `COVERAGE_REVIEW` |
 | `research:review -- --batch key --reviewer name --note …` | human review of an agent-staged import |
+| `research:reviewer -- --add <name>` | register a human reviewer (needed to certify and reconsider; 021) |
+| `research:propose` / `research:proposals` | file a decision proposal (anyone, agents included) / list, reject or withdraw one; it decides nothing |
+| `research:reconsider -- … --reviewer <name> --reason … --authorize --write` | a human re-decides a recorded resolution; both judgments stay in the history |
+| `research:history -- --org X --channel …` | the append-only decision history of a class or record |
+| `research:wave -- --org X --wave 2 --rationale …` | set a program wave (a human decision) |
 
 ## Rollout
 

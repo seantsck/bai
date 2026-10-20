@@ -1,6 +1,6 @@
 # Proposal: organizational WAR attribution
 
-Status: **proposal** (Phase 6, 2026-10-20). Not implemented and not part of the 020 release. It builds on tables that already exist (`war_observations`, `transactions`, `trade_packages`, `trade_package_assets`, `organization_value_attributions` from 008/010) and adds what they lack.
+Status: **phase 1 implemented** in migration 022 (Phase 7, 2026-10-20); see data-model.md. The tenure table (phase 2) is still a proposal: phase 1 credits WAR to the organization it was produced for, in any tenure (a player who returned to the club counts in both stints), and credits a trade return only through the first trade that sent the player away. Originally a proposal (Phase 6), not part of the 020 release. It builds on tables that already exist (`war_observations`, `transactions`, `trade_packages`, `trade_package_assets`, `organization_value_attributions` from 008/010) and adds what they lack.
 
 ## Problem
 

@@ -48,7 +48,7 @@
 
 - **Migration 020 deployed to hosted;** PR #5's runbooks replayed there (LAD 2016 with outcomes; LAD 2017 and international begun). Parity, security and pilot checks pass.
 
-## In progress: Wave 1 (`feature/phase6-certification-and-cohorts`)
+## Done: Phase 6 (PR #6, merged `ae73225`; research replayed on hosted)
 
 - **LAD 2016 draft:** independently re-verified, with a human-review checklist and a recommendation per decision. Baseball America added: Jenco's bonus found (6 unknown remain), and the Smeltzer conflict reopened for the reviewer. Not certified.
 - **LAD 2017 draft:**
@@ -58,6 +58,27 @@
   - `READY_FOR_REVIEW`; not certified.
 - **LAD international 2016-17 and 2017-18:** reconciled against the club's 2017 announcement and published reports. Signees are classified as amateur, exempt professional, previously affiliated or ambiguous. Still `PARTIAL_RECONSTRUCTION`.
 - **Proposals:** [organizational WAR attribution](proposals/organizational-war-attribution.md) and the [league-wide cohort roadmap](proposals/league-wide-cohort-roadmap.md).
+
+## In progress: Phase 7 (`feature/phase7-decision-history-and-attribution`)
+
+- **Certification integrity (021):**
+  - append-only decision history; registered human reviewers;
+  - authorized reconsideration (`research:reconsider`);
+  - decision proposals that decide nothing until a reviewer accepts them;
+  - certifications revoked automatically when their evidence changes.
+- **Organizational value (022):**
+  - `TRADES` channel;
+  - season-by-team WAR;
+  - value for the signing club kept apart from other clubs' value, and trade returns per package;
+  - LAD 2016 and 2017 classes populated (26 players' season WAR; 19 trades, both sides).
+- **LAD 2018 and 2019 drafts:**
+  - 40 and 41 picks, census coverage, full slots;
+  - every signed bonus known (2018: 32 of 32; 2019: 31 of 31);
+  - all outcomes audited;
+  - `COVERAGE_REVIEW`, not certified.
+- **Smeltzer:** the correction is filed as proposal 1 with its evidence; a human decides.
+- **International:** identification questions closed as unknown after research; Yordan Alvarez, Núñez and Zuñiga documented with recommendations.
+- **Wave 2 (ATL, BAL, SD, TB, HOU, NYY):** 2016 classes prepared with verified leads; waves await a human decision.
 
 ## Next
 

@@ -6,7 +6,11 @@ A league-wide research platform on MLB amateur talent acquisition across two equ
 
 BAI is independent of DISI and Diamond IQ. It shares DISI's research discipline but not its database, data or deployment.
 
-**Status:** Wave 1 research (branch `feature/phase6-certification-and-cohorts`). Migrations 001–020 are deployed to the hosted BAI project, which holds the 2015 pilot, LAD 2016 (42 picks, 42 outcome audits, awaiting human certification) and the LAD 2017 and international classes as begun in PR #5. This phase re-verifies LAD 2016 for a human reviewer ([docs/evidence/lad-2016-review-checklist.md](docs/evidence/lad-2016-review-checklist.md)), completes LAD 2017 to review-ready ([docs/evidence/lad-2017-draft-certification.md](docs/evidence/lad-2017-draft-certification.md)), reconciles the 2016-17 / 2017-18 international classes against independent lists, and proposes [WAR attribution](docs/proposals/organizational-war-attribution.md) and a [league-wide roadmap](docs/proposals/league-wide-cohort-roadmap.md). That research is local until this branch merges. Nothing is certified. See [docs/backfill-methodology.md](docs/backfill-methodology.md).
+**Status:** Wave 1 research (branch `feature/phase7-decision-history-and-attribution`).
+- **On hosted:** migrations 001–020, the 2015 pilot, and PR #6's research: LAD 2016 and 2017 drafts and the 2016-17 / 2017-18 international classes.
+- **This phase:** an append-only decision history with registered human reviewers and proposals (migration 021, [docs/decision-history.md](docs/decision-history.md)); organizational WAR attribution with season-by-team value and trade returns (migration 022); the LAD 2018 and 2019 drafts; the Smeltzer correction as a proposal; Wave 2 preparation.
+- Migrations 021–022 and this phase's research are local until the branch merges.
+- Nothing is certified. See [docs/backfill-methodology.md](docs/backfill-methodology.md).
 
 ## Principles
 
