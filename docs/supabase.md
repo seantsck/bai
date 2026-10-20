@@ -75,7 +75,20 @@ Never create or alter tables through the Dashboard. A hosted database must alway
   - Parity 0 differences; security passed; pilot reconciliation passed.
   - The Smeltzer conflict is open on hosted for the reviewer, as intended.
   - `hosted:verify` on `main`'s code reported 10/11: its pipeline test counted every open bonus conflict in the database, including that real one. Phase 7 scopes the assertion to the test's own fixture (11/11 against hosted with only that change).
-- **021 (decision history) and 022 (organizational value) are committed on a feature branch and not pushed.** Push them after that PR merges (steps 3–6 above). Until then `hosted:parity` and `hosted:verify` report them as pending.
+- **021 (decision history and certification boundary), 022 (acquisition dispositions) and 023 (organizational value) are deployed** (2026-10-20, after PR #7 merged at `034b71e`).
+  - **Rehearsals:** the first one caught a migration bug in 022 (pending trigger events blocked an `ALTER TABLE` after the backfill). It was fixed in 022 before the merge; the second rehearsal passed.
+  - **Push and record:** dry run, push, then `hosted:migrate` recorded all three.
+  - **022 backfill:** moved 77 legacy dispositions onto their acquisitions (21 trades dated). The deferred consistency guard checked them inside the migration.
+  - **Roles:** 021 created the NOLOGIN groups `bai_reviewer` and `bai_automation`. On Supabase, `postgres` (CREATEROLE) automatically holds ADMIN membership in both (PostgreSQL 16+; no INHERIT, no SET). It still can't act as a reviewer, because CREATEROLE is refused, but it can administer the group. This is why the certification gate stays closed ([decision-history.md](decision-history.md#what-remains-before-certification)).
+- **Phase 7/8 research on hosted (2026-10-20):** replayed with `--confirm-hosted`, all exit 0:
+  - `lad-international-phase7.mjs`, `lad-2016-smeltzer-proposal.mjs`, `lad-value-2016-2017.mjs`;
+  - `lad-2018-2019-drafts.mjs`, `lad-dispositions-phase8.mjs`, `wave2-2016-slice.mjs`.
+- **After the replay:**
+  - Parity: 0 BAI differences over 2,428 objects; migration history 23/23.
+  - Security passed: 52 functions. The 18 SECURITY DEFINER ones are the 7 reviewer functions (executable only by `bai_reviewer`) and 11 trigger guards. 0 are executable by public roles; 60 of 62 behavioural attempts were denied or invisible, plus the 2 public-read controls.
+  - `hosted:verify` 11/11; pilot reconciliation OK.
+  - A LAD-scoped record-by-record comparison with a fresh local rebuild found 0 differences: 205 picks, 105 international signings, 310 acquisition tenures, 166 audits, 354 WAR observations, 83 trade packages, class value, 11 resolutions, 4 proposals.
+  - The certification gate is closed. No reviewer is enrolled, no class is certified, and no rate is published.
 - `hosted:verify-pilot` compares only the pilot's own rows, so it keeps working as hosted gains other classes.
 
 ### Hosted-only migrations
