@@ -142,8 +142,15 @@ export async function validateBatch (db, ref) {
       }
       if (errors.length === 0 && batchProblems.length) errors.push(...batchProblems)
 
+      if (batch.channel === 'OUTCOMES') {
+        for (const k of [r.debut?.organization, ...(r.transactions ?? []).flatMap((t) => [t.from_organization, t.to_organization]), ...(r.war ?? []).map((w) => w.organization)]) {
+          if (k && !orgs.has(k)) errors.push(`unknown organization ${k}`)
+        }
+      }
       let identity = { state: null, player_id: null, candidates: null }
       if (r.player?.full_name) identity = (await db.query('select * from ingest.resolve_identity($1)', [identityInput(r.player)])).rows[0]
+      // Outcome audits describe players BAI already holds; they never create one.
+      if (batch.channel === 'OUTCOMES' && identity.state === 'NO_MATCH') errors.push('outcome audit for a player BAI does not hold (import the acquisition first)')
       const status = errors.length ? 'INVALID' : 'VALID'
       const review = rec.review_state === 'APPROVED' || rec.review_state === 'REJECTED' ? rec.review_state
         : (identity.state && SAFE_STATES.has(identity.state) ? 'AUTO_ACCEPTED' : 'NEEDS_REVIEW')
@@ -168,7 +175,7 @@ export async function validateBatch (db, ref) {
 
 // Observed values are stored with one JSON type per field so equal claims compare equal: money and pick numbers as
 // numbers (node-pg returns NUMERIC as text), everything else (dates, codes, names) as strings.
-const NUMERIC_FIELDS = new Set(['signing_bonus_usd', 'posting_fee_usd', 'transfer_fee_usd', 'other_cost_usd', 'slot_value_usd', 'round_pick', 'overall_pick', 'total_rounds', 'bonus_pool_usd'])
+const NUMERIC_FIELDS = new Set(['war_value', 'signing_bonus_usd', 'posting_fee_usd', 'transfer_fee_usd', 'other_cost_usd', 'slot_value_usd', 'round_pick', 'overall_pick', 'total_rounds', 'bonus_pool_usd'])
 export const observedJson = (field, v) => v === null || v === undefined ? 'null'
   : NUMERIC_FIELDS.has(field) ? JSON.stringify(Number(v))
     : JSON.stringify(v instanceof Date ? isoDate(v) : String(v))
@@ -313,6 +320,7 @@ class Applier {
       await this.attachIdentifiers(res.player_id, p, rec.payload.source_key)
       return { playerId: res.player_id, action, state: res.state }
     }
+    if (res.state === 'NO_MATCH' && this.batch.channel === 'OUTCOMES') return { held: 'outcome audits never create players', state: res.state }
     if (res.state === 'NO_MATCH') {
       const id = await this.createPlayer(p, rec.payload.source_key)
       await this.attachIdentifiers(id, p, rec.payload.source_key)
@@ -493,6 +501,88 @@ class Applier {
     }
   }
 
+  // --- outcomes ---------------------------------------------------------------------------------------------------
+
+  /** One outcome audit: trades, the audit row, the debut, details as of a date, WAR per provider. Never overwrites. */
+  async applyOutcomeAudit (rec, playerId, conflicts) {
+    const r = rec.payload
+    let action = 'NO_CHANGE'
+    const txIds = {}
+    for (const t of r.transactions ?? []) {
+      const from = await this.organizationId(t.from_organization)
+      const to = await this.organizationId(t.to_organization)
+      // One trade, one transaction: a trade that moved several audited players (same date, same clubs) is shared.
+      let tx = await this.one(`select t.id, p.id as package_id from public.transactions t join public.trade_packages p on p.transaction_id = t.id
+        where t.transaction_type = 'TRADE' and t.transaction_date = $1 and p.from_organization_id = $2 and p.to_organization_id = $3 order by t.id limit 1`, [t.date, from, to])
+      if (tx && !(await this.one('select 1 from public.trade_package_assets where trade_package_id = $1 and player_id = $2', [tx.package_id, playerId]))) {
+        await this.q("insert into public.trade_package_assets (trade_package_id, asset_type, player_id) values ($1, 'PLAYER', $2)", [tx.package_id, playerId])
+        action = strongest(action, 'UPDATE_UNKNOWN')
+      }
+      if (!tx) {
+        tx = await this.one("insert into public.transactions (transaction_type, transaction_date, date_precision, description, source_id) values ('TRADE', $1, $2, $3, $4) returning id",
+          [t.date, t.date_precision ?? 'DAY', t.description ?? null, await this.sourceId(t.source_key ?? r.source_key)])
+        const pkg = await this.one('insert into public.trade_packages (transaction_id, from_organization_id, to_organization_id) values ($1, $2, $3) returning id', [tx.id, from, to])
+        await this.q("insert into public.trade_package_assets (trade_package_id, asset_type, player_id) values ($1, 'PLAYER', $2)", [pkg.id, playerId])
+        await this.observe(t.source_key ?? r.source_key, 'transactions', tx.id, 'transaction_date', t.date, t.locator ?? null)
+        action = strongest(action, 'INSERT')
+      }
+      txIds[t.ref] = tx.id
+    }
+    if (r.debut) {
+      const d = await this.one('select * from public.mlb_debuts where player_id = $1', [playerId])
+      const dsrc = r.debut.source_key ?? r.source_key
+      if (!d) {
+        const row = await this.one('insert into public.mlb_debuts (player_id, debut_date, debut_organization_id, source_id) values ($1, $2, $3, $4) returning id',
+          [playerId, r.debut.date, await this.organizationId(r.debut.organization), await this.sourceId(dsrc)])
+        await this.observe(dsrc, 'mlb_debuts', row.id, 'debut_date', r.debut.date, r.debut.locator ?? null)
+        action = strongest(action, 'INSERT')
+      } else {
+        action = strongest(action, await this.reconcile({ table: 'mlb_debuts', id: d.id, field: 'debut_date', column: 'debut_date', canonical: isoDate(d.debut_date), incoming: r.debut.date, sourceKey: dsrc, rowSourceId: d.source_id, conflicts }))
+      }
+    }
+    let audit = await this.one('select * from public.outcome_audits where player_id = $1 and observation_through_season is not distinct from $2', [playerId, r.observation_through_season ?? null])
+    if (!audit) {
+      audit = await this.one(`insert into public.outcome_audits (player_id, audit_state, observation_through_season, audited_on, source_id, notes)
+        values ($1, $2, $3, $4, $5, $6) returning *`, [playerId, r.audit_state, r.observation_through_season ?? null, r.audited_on, await this.sourceId(r.source_key), r.notes ?? null])
+      action = strongest(action, 'INSERT')
+    } else if (audit.audit_state !== r.audit_state) {
+      conflicts.push({ table: 'outcome_audits', id: audit.id, field: 'audit_state', incoming: r.audit_state, canonical: audit.audit_state })
+      action = 'CONFLICT'
+    }
+    if (r.details) {
+      const d = r.details
+      const ex = await this.one('select * from public.outcome_audit_details where outcome_audit_id = $1', [audit.id])
+      const vals = [d.as_of_date, d.reached_affiliated ?? null, d.first_affiliated_season ?? null, d.mlb_games ?? null, d.mlb_plate_appearances ?? null,
+        d.mlb_innings_pitched ?? null, d.current_status ?? 'UNKNOWN', d.disposition ?? 'UNKNOWN', d.disposition_transaction_ref ? txIds[d.disposition_transaction_ref] : null]
+      if (!ex) {
+        await this.q(`insert into public.outcome_audit_details (outcome_audit_id, as_of_date, reached_affiliated, first_affiliated_season, mlb_games, mlb_plate_appearances,
+            mlb_innings_pitched, current_status, disposition, disposition_transaction_id, source_id, notes) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
+        [audit.id, ...vals, await this.sourceId(d.source_key ?? r.source_key), d.notes ?? null])
+        action = strongest(action, 'INSERT')
+      } else {
+        const cur = [isoDate(ex.as_of_date), ex.reached_affiliated, ex.first_affiliated_season, ex.mlb_games, ex.mlb_plate_appearances,
+          ex.mlb_innings_pitched == null ? null : Number(ex.mlb_innings_pitched), ex.current_status, ex.disposition, ex.disposition_transaction_id == null ? null : Number(ex.disposition_transaction_id)]
+        const inc = vals.map((v, i) => i === 8 && v != null ? Number(v) : v)
+        if (JSON.stringify(cur) !== JSON.stringify(inc)) { conflicts.push({ table: 'outcome_audit_details', id: ex.id, field: 'details', incoming: d, canonical: cur }); action = 'CONFLICT' }
+      }
+    }
+    for (const w of r.war ?? []) {
+      const org = w.organization ? await this.organizationId(w.organization) : null
+      const ex = await this.one(`select * from public.war_observations where player_id = $1 and war_system = $2 and scope = $3 and season is not distinct from $4
+        and organization_id is not distinct from $5 and through_season = $6`, [playerId, w.system, w.scope, w.season ?? null, org, w.through_season])
+      const wsrc = w.source_key ?? r.source_key
+      if (!ex) {
+        const row = await this.one(`insert into public.war_observations (player_id, war_system, scope, season, organization_id, through_season, war_value, observed_on, source_id)
+          values ($1, $2, $3, $4, $5, $6, $7, $8, $9) returning id`, [playerId, w.system, w.scope, w.season ?? null, org, w.through_season, w.value, w.observed_on, await this.sourceId(wsrc)])
+        await this.observe(wsrc, 'war_observations', row.id, 'war_value', w.value, w.locator ?? null)
+        action = strongest(action, 'INSERT')
+      } else {
+        action = strongest(action, await this.reconcile({ table: 'war_observations', id: ex.id, field: 'war_value', column: 'war_value', canonical: Number(ex.war_value), incoming: w.value, sourceKey: wsrc, rowSourceId: ex.source_id, conflicts }))
+      }
+    }
+    return { action, canonical: ['outcome_audits', audit.id] }
+  }
+
   touch (domain, scope, orgId) { this.touchedScopes.set(`${domain}|${scope}|${orgId}`, { domain, scope, orgId }) }
 
   /** Coverage follows the data: tracked counts are recounted; a claimed state applies only to its declared scope. */
@@ -552,7 +642,9 @@ export async function applyBatch (db, ref, { write = false, allowPartial = false
       const recConflicts = []
       const who = await a.resolvePlayer(rec, recConflicts)
       if (who.held) { results.push({ rec, action: 'HELD', reason: who.held }); continue }
-      const res = rec.record_type === 'DRAFT_SELECTION' ? await a.applyDraftSelection(rec, who.playerId, recConflicts) : await a.applyInternationalSigning(rec, who.playerId, recConflicts)
+      const res = rec.record_type === 'DRAFT_SELECTION' ? await a.applyDraftSelection(rec, who.playerId, recConflicts)
+        : rec.record_type === 'OUTCOME_AUDIT' ? await a.applyOutcomeAudit(rec, who.playerId, recConflicts)
+          : await a.applyInternationalSigning(rec, who.playerId, recConflicts)
       await a.applyFlags(rec.payload, { player: who.playerId, row: res.canonical })
       const action = strongest(strongest(res.action, who.action), recConflicts.length ? 'CONFLICT' : 'NO_CHANGE')
       results.push({ rec, action, canonical: res.canonical, identity: who.state, playerAction: who.action })
@@ -638,6 +730,8 @@ const RESOLVABLE_COLUMNS = {
   draft_signings: ['signing_status', 'signing_bonus_usd'],
   international_signings: ['signing_date', 'signing_bonus_usd', 'posting_fee_usd', 'transfer_fee_usd', 'other_cost_usd', 'pathway'],
   slot_values: ['slot_value_usd'],
+  mlb_debuts: ['debut_date'],
+  war_observations: ['war_value'],
   drafts: ['start_date', 'end_date', 'total_rounds'],
   international_signing_periods: []
 }

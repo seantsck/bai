@@ -265,3 +265,9 @@ Every fact table above, apart from identity and lookup tables, also references `
 - **Views:** `v_class_metrics` (per-class counts), `v_class_status` (derived workflow status) and `v_next_jobs` (the ordered queue).
 - **Public:** `rm_research_certification` (certified flag per class, refreshed by `refresh_research_certification()`), `outcome_audit_details` (outcome facts as of a date), `resolve_organization()`, `bonus_band()`.
 - **Analytics (private):** `player_outcome_profile`, `acquisition_economics`, `class_economics`.
+
+### Outcome import channel (020)
+
+- `ingest.batch_channel` gains `OUTCOMES`, and staged records may be `OUTCOME_AUDIT`.
+- An outcome record attaches to an existing player by a strong identity and never creates one. It writes `outcome_audits`, `mlb_debuts`, `outcome_audit_details`, `war_observations` (per provider) and trade `transactions`; a trade that moved several audited players is shared.
+- Rival debut dates or WAR values become conflicts (`mlb_debuts.debut_date` and `war_observations.war_value` are resolvable fields). `NOT_AUDITED` is never imported: it is the absence of an audit.

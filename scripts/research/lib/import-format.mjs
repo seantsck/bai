@@ -11,6 +11,12 @@ export const SCHOOL_TYPES = ['HIGH_SCHOOL', 'COLLEGE', 'JUNIOR_COLLEGE', 'OTHER'
 export const SIGNING_STATUSES = ['SIGNED', 'DID_NOT_SIGN', 'UNKNOWN']
 export const SELECTION_TYPES = ['STANDARD', 'COMPENSATION', 'COMPETITIVE_BALANCE', 'PRIZE', 'SUPPLEMENTAL', 'OTHER']
 export const IMPORTABLE_COVERAGE_STATES = ['COMPLETE_CENSUS', 'SUBSTANTIALLY_COMPLETE', 'PARTIAL_RECONSTRUCTION', 'RANKED_SAMPLE', 'INDIVIDUALLY_VERIFIED']
+export const AUDIT_STATES = ['AUDITED_REACHED_MLB', 'AUDITED_NO_MLB', 'ACTIVE_TOO_RECENT', 'OUT_OF_SCOPE', 'UNKNOWN']
+export const CURRENT_STATUSES = ['WITH_ACQUIRING_ORGANIZATION', 'WITH_OTHER_ORGANIZATION', 'FREE_AGENT', 'RELEASED', 'RETIRED', 'INACTIVE', 'UNKNOWN']
+export const DISPOSITIONS = ['RETAINED', 'TRADED', 'RELEASED', 'LOST_RULE_5', 'LOST_WAIVERS', 'LEFT_AS_FREE_AGENT', 'RETIRED', 'UNSIGNED', 'OTHER', 'UNKNOWN']
+export const WAR_SYSTEMS = ['BREF', 'FANGRAPHS', 'OTHER']
+export const WAR_SCOPES = ['CAREER', 'SEASON', 'ORGANIZATION_TENURE']
+export const CHANNEL_RECORD_TYPES = { DRAFT: 'DRAFT_SELECTION', INTERNATIONAL: 'INTERNATIONAL_SIGNING', OUTCOMES: 'OUTCOME_AUDIT' }
 export const EVIDENCE_SUBJECTS = { player: 'players', selection: 'draft_selections', draft_signing: 'draft_signings', signing: 'international_signings', slot: 'slot_values' }
 
 const KEY = /^[a-z0-9][a-z0-9_.:-]*$/
@@ -39,14 +45,14 @@ export function validateEnvelope (doc) {
   if (!doc || typeof doc !== 'object') return ['file is not a JSON object']
   if (doc.format !== FORMAT) errors.push(`format must be "${FORMAT}"`)
   if (typeof doc.batch_key !== 'string' || !KEY.test(doc.batch_key)) errors.push('batch_key must match ' + KEY)
-  if (!['DRAFT', 'INTERNATIONAL'].includes(doc.channel)) errors.push('channel must be DRAFT or INTERNATIONAL')
+  if (!CHANNEL_RECORD_TYPES[doc.channel]) errors.push('channel must be DRAFT, INTERNATIONAL or OUTCOMES')
   if (!Array.isArray(doc.sources)) errors.push('sources must be an array')
   if (!Array.isArray(doc.records) || doc.records.length === 0) errors.push('records must be a non-empty array')
   for (const c of doc.coverage_claims ?? []) {
     if (!IMPORTABLE_COVERAGE_STATES.includes(c.coverage_state)) errors.push(`coverage claim ${c.scope_key}: unsupported state ${c.coverage_state}`)
     if (!c.scope_key || !c.organization) errors.push('coverage claim needs scope_key and organization')
   }
-  const recordType = doc.channel === 'DRAFT' ? 'DRAFT_SELECTION' : 'INTERNATIONAL_SIGNING'
+  const recordType = CHANNEL_RECORD_TYPES[doc.channel] ?? 'DRAFT_SELECTION'
   for (const [i, r] of (Array.isArray(doc.records) ? doc.records : []).entries()) if (r?.type !== recordType) errors.push(`records[${i}]: type must be ${recordType} in a ${doc.channel} batch`)
   const keys = new Set()
   for (const [i, s] of (doc.sources ?? []).entries()) errors.push(...validateSource(s).map((e) => `sources[${i}]: ${e}`))
@@ -126,6 +132,8 @@ export function validateRecordShape (r, channel, declared) {
       if (!isMoney(r.slot_value.usd) || r.slot_value.usd == null) errors.push('slot_value.usd must be a non-negative number')
       needSource(r.slot_value.source_key, 'slot_value')
     }
+  } else if (channel === 'OUTCOMES') {
+    validateOutcome(r, errors, warnings, needSource)
   } else {
     if (r.type !== 'INTERNATIONAL_SIGNING') errors.push('INTERNATIONAL batches hold INTERNATIONAL_SIGNING records')
     if (!PATHWAYS.includes(r.pathway)) errors.push('pathway must be one of ' + PATHWAYS.join('|'))
@@ -139,6 +147,58 @@ export function validateRecordShape (r, channel, declared) {
     if (!r.market) warnings.push('no market given')
   }
   return { errors, warnings }
+}
+
+const isInt = (v) => Number.isInteger(v) && v >= 0
+const isSeason = (v) => Number.isInteger(v) && v >= 1871 && v <= 2100
+
+/**
+ * OUTCOME_AUDIT: an audit of one acquired player's outcome, true as of a date. `organization` is the acquiring club whose
+ * acquisition is being audited (the import's --org). Values a source does not give stay null; NOT_AUDITED is never imported.
+ */
+function validateOutcome (r, errors, warnings, needSource) {
+  if (r.type !== 'OUTCOME_AUDIT') errors.push('OUTCOMES batches hold OUTCOME_AUDIT records')
+  if (!r.player?.external_ids || !Object.keys(r.player.external_ids).length) errors.push('an outcome audit identifies its player by an external id')
+  if (!AUDIT_STATES.includes(r.audit_state)) errors.push('audit_state must be one of ' + AUDIT_STATES.join('|') + ' (NOT_AUDITED is the absence of an audit)')
+  if (['AUDITED_REACHED_MLB', 'AUDITED_NO_MLB', 'ACTIVE_TOO_RECENT'].includes(r.audit_state) && !isSeason(r.observation_through_season)) errors.push('observation_through_season required for an audited state')
+  if (!isDate(r.audited_on)) errors.push('audited_on must be YYYY-MM-DD')
+  if (r.audit_state === 'AUDITED_REACHED_MLB' && !r.debut) errors.push('AUDITED_REACHED_MLB needs the MLB debut')
+  if (r.audit_state === 'AUDITED_NO_MLB' && r.debut) errors.push('AUDITED_NO_MLB cannot carry an MLB debut')
+  if (r.debut) {
+    if (!isDate(r.debut.date)) errors.push('debut.date must be YYYY-MM-DD')
+    if (!r.debut.organization) errors.push('debut.organization (franchise key) required')
+    needSource(r.debut.source_key ?? r.source_key, 'debut')
+  }
+  const refs = new Set()
+  for (const [i, t] of (r.transactions ?? []).entries()) {
+    if (t.type !== 'TRADE') errors.push(`transactions[${i}]: only TRADE transactions can be linked to a player`)
+    if (!/^[a-z0-9][a-z0-9_.-]*$/.test(t.ref ?? '')) errors.push(`transactions[${i}]: ref required (lowercase key)`)
+    if (!isDate(t.date)) errors.push(`transactions[${i}]: date must be YYYY-MM-DD`)
+    if (!t.from_organization || !t.to_organization || t.from_organization === t.to_organization) errors.push(`transactions[${i}]: from_organization and to_organization required and different`)
+    needSource(t.source_key ?? r.source_key, `transactions[${i}]`)
+    refs.add(t.ref)
+  }
+  const d = r.details
+  if (d) {
+    if (!isDate(d.as_of_date)) errors.push('details.as_of_date must be YYYY-MM-DD (an outcome is true as of a date)')
+    if (d.reached_affiliated != null && typeof d.reached_affiliated !== 'boolean') errors.push('details.reached_affiliated must be true, false or null')
+    if (d.first_affiliated_season != null && !isSeason(d.first_affiliated_season)) errors.push('details.first_affiliated_season must be a season')
+    for (const k of ['mlb_games', 'mlb_plate_appearances']) if (d[k] != null && !isInt(d[k])) errors.push(`details.${k} must be a non-negative integer or null`)
+    if (d.mlb_innings_pitched != null && !(typeof d.mlb_innings_pitched === 'number' && d.mlb_innings_pitched >= 0)) errors.push('details.mlb_innings_pitched must be a non-negative number or null')
+    if (d.current_status && !CURRENT_STATUSES.includes(d.current_status)) errors.push('details.current_status invalid')
+    if (d.disposition && !DISPOSITIONS.includes(d.disposition)) errors.push('details.disposition invalid')
+    if (d.disposition === 'TRADED' && !refs.has(d.disposition_transaction_ref)) errors.push('details.disposition TRADED needs disposition_transaction_ref naming one of transactions[]')
+    needSource(d.source_key ?? r.source_key, 'details')
+  } else warnings.push('no outcome details given')
+  for (const [i, w] of (r.war ?? []).entries()) {
+    if (!WAR_SYSTEMS.includes(w.system)) errors.push(`war[${i}]: system must be ${WAR_SYSTEMS.join('|')} (attribute WAR to its provider)`)
+    if (!WAR_SCOPES.includes(w.scope)) errors.push(`war[${i}]: scope invalid`)
+    if (!isSeason(w.through_season)) errors.push(`war[${i}]: through_season required`)
+    if (typeof w.value !== 'number' || !Number.isFinite(w.value)) errors.push(`war[${i}]: value must be a number (omit the entry when not observed)`)
+    if (!isDate(w.observed_on)) errors.push(`war[${i}]: observed_on must be YYYY-MM-DD`)
+    if (w.scope === 'ORGANIZATION_TENURE' && !w.organization) errors.push(`war[${i}]: ORGANIZATION_TENURE needs organization`)
+    needSource(w.source_key ?? r.source_key, `war[${i}]`)
+  }
 }
 
 /**

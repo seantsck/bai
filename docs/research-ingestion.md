@@ -15,7 +15,7 @@ Staging lives in the `ingest` schema, which the public roles cannot read.
 
 ## Import file
 
-Format `bai-research-import/1`. Examples: `research/imports/2015-draft-lad.json`, `research/imports/2015-international-lad.json`, `research/imports/2016-draft-lad.json` (built by `scripts/research/sources/draft-class-import.mjs` from downloaded MLB and Baseball-Reference files).
+Format `bai-research-import/1`. Examples: `research/imports/2015-draft-lad.json`, `research/imports/2015-international-lad.json`, `research/imports/2016-draft-lad.json` (built by `scripts/research/sources/draft-class-import.mjs` from downloaded MLB and Baseball-Reference files). Other builders in `scripts/research/sources/`: `mlbcom-draft-money-import.mjs` (slot values and tracker bonuses), `fetch-mlb-player-outcomes.mjs` + `outcome-audits-import.mjs` (outcome audits), and `intl-signings-from-wire.mjs` (international discovery). Builders never write to a database, and the only fetcher is capped and rate-limited.
 
 ```jsonc
 {
@@ -43,6 +43,14 @@ Format `bai-research-import/1`. Examples: `research/imports/2015-draft-lad.json`
 - **Attribution:** `field_sources` cites specific fields to a different source than the record's.
 - **Evidence:** `evidence[]` holds extra claims from other sources: `{ subject, field, value, source_key, locator }`.
 - **Flags:** `flags[]` holds quality flags.
+
+**OUTCOME_AUDIT** (channel `OUTCOMES`, migration 020)
+- **Player:** an existing player, identified by an external id; outcome records never create players.
+- **Audit:** `audit_state` (`AUDITED_REACHED_MLB`, `AUDITED_NO_MLB`, `ACTIVE_TOO_RECENT`, `OUT_OF_SCOPE`, `UNKNOWN`; never `NOT_AUDITED`), `observation_through_season` and `audited_on`.
+- **Debut:** `debut { date, organization }`, required for `AUDITED_REACHED_MLB` and forbidden for `AUDITED_NO_MLB`.
+- **Details:** `details { as_of_date, reached_affiliated, first_affiliated_season, mlb_games, mlb_plate_appearances, mlb_innings_pitched, current_status, disposition, disposition_transaction_ref }`. Unknown values are null.
+- **WAR and trades:** `war[] { system: BREF | FANGRAPHS | OTHER, scope, through_season, value, observed_on }` and `transactions[] { ref, type: TRADE, date, from_organization, to_organization }`.
+- **Organization:** `organization` is the acquiring club whose acquisition is audited (the import's `--org`).
 
 **INTERNATIONAL_SIGNING**
 - **Signing:** `organization`, `signing_date` and `signing_date_precision`, an optional `period_key`, `pathway`, `market { key, name }` and `position`.

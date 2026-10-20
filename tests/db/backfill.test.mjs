@@ -156,6 +156,12 @@ test('certification (draft): fails with explicit blockers, then passes once ever
   const bonus = await h.one(db, "select g.signing_bonus_usd from draft_signings g join draft_selections s on s.id = g.draft_selection_id join drafts d on d.id = s.draft_id where d.draft_year = 2016 and s.overall_pick = 500")
   assert.equal(bonus.signing_bonus_usd, null, 'explicitly unknown stays unknown, never zero')
   await h.rejects(db, "update research.classes set stage = 'COVERAGE_REVIEW' where class_key = 'NYY/DRAFT/2016-JUNE_AMATEUR'", [], /revoke the certification/)
+  await assert.rejects(B.revokeCertification(db, NYY_DRAFT, { actor: 'agent:x', reason: 'r' }), /agent cannot revoke/)
+  await assert.rejects(B.revokeCertification(db, NYY_DRAFT, { actor: ME }), /--reason/)
+  await B.revokeCertification(db, NYY_DRAFT, { actor: ME, reason: 'review found a transcription error' })
+  assert.equal((await h.one(db, "select stage from research.classes where class_key = 'NYY/DRAFT/2016-JUNE_AMATEUR'")).stage, 'COVERAGE_REVIEW')
+  assert.equal((await B.certify(db, NYY_DRAFT, { actor: ME })).certified, true, 'a revoked class can be certified again once checks pass')
+  assert.equal((await h.one(db, "select count(*)::int n from research.certifications c join research.classes k on k.id = c.class_id where k.class_key = 'NYY/DRAFT/2016-JUNE_AMATEUR' and c.revoked_at is not null")).n, 1, 'revocations stay on record')
   assert.equal(Number((await h.one(db, 'select refresh_research_certification() n')).n), 1)
   await h.asRole(db, 'anon', async () => {
     const r = await h.rows(db, 'select domain, scope_key, certified, coverage_state_at_certification from rm_research_certification')

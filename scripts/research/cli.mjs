@@ -25,6 +25,7 @@
 //   npm run research:lead     -- --job <key> --url ... --source-type ... --authority ... --access ACCESSIBLE --retrieved 2026-10-20 --fields a,b --note "..."
 //   npm run research:stage    -- --org LAD --channel draft --year 2016 [--to STAGE --rationale "..."]
 //   npm run research:certify  -- --org LAD --channel draft --year 2016       deterministic; fails with blockers; no force option
+//   npm run research:revoke   -- --org LAD --channel draft --year 2016 --reason "..."   human only; back to COVERAGE_REVIEW
 //   npm run research:review   -- --batch <import batch> --reviewer <human> --note "..."   (required before applying an agent-staged batch)
 //
 // Against the hosted BAI database (.env.hosted.local, `npm run hosted:research -- <command> ...`), every command that writes
@@ -124,7 +125,7 @@ async function main (db) {
       const rows = await P.coverageCells(db, { domain: args.domain ?? null })
       print(`${rows.length} cell(s) with records or an assessment (no hit rates are computed here)`, rows.map((r) => ({
         domain: r.domain, scope: r.scope_key, org: r.organization, state: r.coverage_state ?? 'NOT_ASSESSED', tracked: r.tracked_records, expected: r.expected_count ?? 'unknown',
-        audited: r.audited_outcomes, cost_known: `${r.cost_known_records}/${r.cost_basis_records}`, last: r.last_research_date ? P.isoDate(r.last_research_date) : null, rates: r.supports_population_rate ? 'allowed' : 'blocked'
+        audited: r.audited_outcomes, cost_known: `${r.cost_known_records}/${r.cost_basis_records}`, last: r.last_research_date ? P.isoDate(r.last_research_date) : null, coverage_supports_rates: r.supports_population_rate ? 'yes (rates still need certification)' : 'no'
       })))
       return 0
     }
@@ -246,19 +247,24 @@ async function main (db) {
       console.log(`CERTIFIED: ${r.cls.class_key} (coverage stays ${r.coverage_state})`)
       return 0
     }
+    case 'revoke': {
+      const r = await B.revokeCertification(db, scopeArgs(), { actor: operator(), reason: args.reason })
+      console.log(`certification of ${r.cls.class_key} revoked; class back at COVERAGE_REVIEW`)
+      return 0
+    }
     case 'review': {
       const b = await B.reviewImport(db, need('batch'), { reviewer: args.reviewer, note: args.note })
       console.log(`review recorded for ${b.batch_key} (staged by ${b.imported_by})`)
       return 0
     }
     default:
-      console.error('usage: research <import|validate|apply|conflicts|resolve|identity|queue|coverage|batches|orgs|class|plan|next|progress|start|pause|resume|complete|fail|supersede|job|block|unblock|lead|stage|certify|review> [--options]')
+      console.error('usage: research <import|validate|apply|conflicts|resolve|identity|queue|coverage|batches|orgs|class|plan|next|progress|start|pause|resume|complete|fail|supersede|job|block|unblock|lead|stage|certify|revoke|review> [--options]')
       return 1
   }
 }
 
 const WRITES = { import: true, validate: true, apply: true, identity: true, resolve: Boolean(args.write), class: Boolean(args.create), plan: true, start: true,
-  pause: true, resume: true, complete: true, fail: true, supersede: true, job: true, block: true, unblock: true, lead: true, stage: true, certify: true, review: true }
+  pause: true, resume: true, complete: true, fail: true, supersede: true, job: true, block: true, unblock: true, lead: true, stage: true, certify: true, revoke: true, review: true }
 let db = null
 let code = 1
 try {

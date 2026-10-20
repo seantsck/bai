@@ -6,7 +6,7 @@ A league-wide research platform on MLB amateur talent acquisition across two equ
 
 BAI is independent of DISI and Diamond IQ. It shares DISI's research discipline but not its database, data or deployment.
 
-**Status:** league-wide backfill framework (branch `feature/research-backfill-framework`). Foundation, research ingestion and the Supabase bootstrap are merged to `main`; the hosted project holds migrations 001–018 and the validated 2015 Dodgers pilot. This phase adds research classes for all 30 organizations, a stage machine, durable jobs, a deterministic queue, resumable research batches and deterministic certification (migration 019), and researches the first non-pilot class, LAD 2016 draft, locally (ready for human review, not certified). Migration 019 is not yet pushed to hosted. No league-wide backfill has run. See [docs/backfill-methodology.md](docs/backfill-methodology.md).
+**Status:** Wave 1 research (branch `feature/lad-2016-outcomes-and-cohorts`). The backfill framework (migration 019) is merged and deployed to the hosted BAI project, which holds 001–019 and the validated 2015 pilot. This phase adds outcome audits through ingestion (migration 020, local only), audits all 42 LAD 2016 picks, prepares the LAD 2016 certification evidence package for a human reviewer ([docs/evidence/lad-2016-draft-certification.md](docs/evidence/lad-2016-draft-certification.md)), and begins LAD 2017 draft and the 2016-17 / 2017-18 international classes. Nothing is certified. See [docs/backfill-methodology.md](docs/backfill-methodology.md).
 
 ## Principles
 
@@ -32,7 +32,7 @@ See [docs/research-methodology.md](docs/research-methodology.md).
 npm install
 npm run db:server            # PostgreSQL 17 on 127.0.0.1:54329, data in .pgdata/ (keep running)
 cp .env.example .env.local
-npm run db:migrate           # applies database/migrations/001..019 (includes the sourced calendars)
+npm run db:migrate           # applies database/migrations/001..020 (includes the sourced calendars)
 npm run refresh:read-models  # controlled refresh of the rm_* read models
 npm run dev                  # http://127.0.0.1:3000 (localhost only)
 ```
@@ -108,7 +108,7 @@ npm run check             # all of the above
 app/                    Next.js routes (Overview, International, Draft, Organizations, Players, Compare, Research)
 components/             UI primitives
 lib/                    db access (anon, read-only), page queries, formatting, navigation
-database/migrations/    001_core_identity … 019_research_backfill (frozen once applied)
+database/migrations/    001_core_identity … 020_outcome_import_channel (frozen once applied)
 supabase/               Supabase CLI config, migrations symlink, Supabase root CA (no secrets)
 database/fixtures/      fictional TEST_FIXTURE data for tests and local dev only
 scripts/db/             migrate, fixtures, read-model refresh, local PG17 server, parity/security verifiers, hosted wrappers
@@ -117,7 +117,8 @@ scripts/research/       research CLI, ingestion pipeline, backfill orchestration
 research/calendars/     sourced calendar research (input to migration 015)
 research/imports/       research import batches (the 2015 Dodgers pilot)
 research/baselines/     id-independent snapshot of the validated local pilot (hosted reconciliation)
-research/runbooks/      replayable research sessions (2015 pilot, LAD 2016 draft)
+research/runbooks/      replayable research sessions (2015 pilot, LAD 2016 draft + outcomes, LAD 2017 cohorts)
+docs/evidence/          certification evidence packages for human reviewers
 scripts/ci/             credential scan
 tests/db/               schema/rule tests on PostgreSQL 17
 tests/app/              app tests

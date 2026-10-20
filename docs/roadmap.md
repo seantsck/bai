@@ -44,6 +44,13 @@
 - **Outcome audit details and economics views,** with rates gated on census-level, certified, fully audited cohorts.
 - **First non-pilot class, LAD 2016 draft (local):** 42 of 42 picks, census coverage, conflicts resolved, 7 bonuses explicitly unknown; READY_FOR_REVIEW, awaiting human certification.
 
+## In progress: Wave 1 (`feature/lad-2016-outcomes-and-cohorts`)
+
+- **Framework release:** PR #4 merged; migration 019 deployed to hosted, with parity, security and verification passing.
+- **LAD 2016 draft:** outcome audits for 42 of 42 picks (migration 020 outcomes channel). Evidence package ready; awaiting human certification.
+- **LAD 2017 draft:** 40 of 40 picks, census coverage, 10 of 10 slots, 13 of 31 bonuses. 18 bonus jobs and 40 outcome audits open; batch paused.
+- **LAD international 2016-17 and 2017-18:** 45 and 50 candidate amateur signings, discovered on the MLB transaction wire by a documented rule. PARTIAL_RECONSTRUCTION; universe, bonuses and the classification still to verify.
+
 ## Next
 
 ### Phase 2b: hardening before scale (small)
