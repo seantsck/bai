@@ -39,7 +39,7 @@ function nested (client) {
 
 async function tableCounts () {
   const tables = (await raw.query(`select n.nspname || '.' || c.relname t from pg_class c join pg_namespace n on n.oid = c.relnamespace
-    where n.nspname in ('public', 'analytics', 'ingest', 'bai_meta') and c.relkind = 'r' order by 1`)).rows.map((r) => r.t)
+    where n.nspname in ('public', 'analytics', 'ingest', 'research', 'bai_meta') and c.relkind = 'r' order by 1`)).rows.map((r) => r.t)
   const out = {}
   for (const t of tables) out[t] = Number((await raw.query(`select count(*) n from ${t}`)).rows[0].n)
   out['read_model_generation'] = Number((await raw.query('select coalesce(max(generation_id), 0) g from public.read_model_refreshes')).rows[0].g)
