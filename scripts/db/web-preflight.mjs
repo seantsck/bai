@@ -8,7 +8,7 @@ const ref = process.env.BAI_SUPABASE_PROJECT_REF
 const die = (m) => { console.error(`hosted preflight: ${m}`); process.exit(1) }
 if (!url) die('BAI_PUBLIC_DATABASE_URL is not set (run npm run hosted:web-role -- --confirm-hosted <ref>)')
 if (!ref || supabaseProjectRef(url) !== ref) die('BAI_PUBLIC_DATABASE_URL does not point at the BAI project')
-if (decodeURIComponent(new URL(url).username) !== 'bai_web') die('the web server must connect as bai_web, not the owner role')
+if (!/^bai_web(\.[a-z0-9]{20})?$/.test(decodeURIComponent(new URL(url).username))) die('the web server must connect as bai_web, not the owner role')
 for (const k of Object.keys(process.env)) {
   if (k.startsWith('NEXT_PUBLIC_') && /SECRET|SERVICE|PASSWORD|DATABASE_URL/i.test(k)) die(`${k} would expose a server-only credential to the browser`)
 }

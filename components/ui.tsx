@@ -60,7 +60,10 @@ export async function load<T> (fn: () => Promise<T>): Promise<Loaded<T>> {
   try {
     return { ok: true, data: await fn() }
   } catch (err) {
-    if (err instanceof DatabaseUnavailableError) return { ok: false, message: 'Database not configured. Start PostgreSQL 17 with `npm run db:server`, then `npm run db:migrate`.' }
+    if (err instanceof DatabaseUnavailableError) {
+      console.error(`database unavailable: ${err.message}`)
+      return { ok: false, message: process.env.NODE_ENV === 'production' ? 'Data is temporarily unavailable.' : 'Database not configured. Start PostgreSQL 17 with `npm run db:server`, then `npm run db:migrate`.' }
+    }
     console.error(err)
     return { ok: false, message: 'Data is temporarily unavailable.' }
   }

@@ -28,6 +28,7 @@ Both env files are gitignored (`.env*.local`). Neither is ever committed.
 | `SUPABASE_ACCESS_TOKEN` | `.env.hosted.local` | **secret**, server-only | Supabase CLI / Management API (link, history, advisors). Account-wide: revoke it when not needed |
 | `BAI_ALLOW_REMOTE_DB=1` | `.env.hosted.local` | flag | deliberate opt-in to a non-local database |
 | `BAI_PUBLIC_DATABASE_URL` | `.env.hosted.local` | **secret**, server-only | web read pool as `bai_web`; written by `npm run hosted:web-role` |
+| `BAI_PUBLIC_DATABASE_URL` | Vercel project `bai` | **secret** (sensitive), server-only | the same role through the IPv4 transaction pooler as `bai_web.<ref>`; set by `npm run deploy:web-env` (see [vercel.md](vercel.md)) |
 | `BAI_SUPABASE_URL`, `BAI_SUPABASE_PUBLISHABLE_KEY` | `.env.hosted.local` | client-safe | only for the live Data API probe in `hosted:security` |
 
 - BAI uses **no** secret (`sb_secret_…`) or legacy `service_role` key, and no `NEXT_PUBLIC_*` variable at all. The app reads data on the server with `pg`; the browser receives rendered HTML only. `hosted:start` refuses to start if a `NEXT_PUBLIC_*` variable looks like a credential.

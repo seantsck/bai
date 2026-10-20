@@ -1,0 +1,15 @@
+# Deployments upload only what the web app needs. Never upload credentials, local database data or research material.
+.env*
+!.env.example
+.pgdata
+.pgdata*
+.vercel
+research
+tests
+docs
+database
+scripts
+supabase/*
+!supabase/prod-ca-2021.crt
+*.log
+tsconfig.tsbuildinfo
