@@ -1,6 +1,6 @@
 # Certification evidence: LAD / DRAFT / 2017-JUNE_AMATEUR
 
-Prepared 2026-10-20 by automated research (operator `bai-backfill-research`). **This class is not certified.** Certification is a human reviewer's decision (`research:certify`; `agent:*` actors are refused). The class lives in the local research database. The hosted database holds only its PR #5 state (picks, slots and tracker, with the batch paused).
+Prepared 2026-10-20 by automated research (operator `bai-backfill-research`). **This class is not certified.** Certification is a human reviewer's decision, made on their own database login (`research:certify -- --check <id>`; see [decision-history.md](../decision-history.md)). Certification is currently disabled. The class lives in the local research database. The hosted database holds only its PR #5 state (picks, slots and tracker, with the batch paused).
 
 Replay: `research/runbooks/lad-2017-cohorts.mjs` then `research/runbooks/lad-2017-completion.mjs`.
 
@@ -8,7 +8,7 @@ Replay: `research/runbooks/lad-2017-cohorts.mjs` then `research/runbooks/lad-201
 
 | Check | Value |
 |---|---|
-| Stage / workflow | `COVERAGE_REVIEW` / `READY_FOR_REVIEW`; `research:certify` check: no blockers |
+| Stage / workflow | `COVERAGE_REVIEW` / `READY_FOR_REVIEW`; certification check (Phase 7): no blockers. Phase 8: `DECISIONS` (Witt and Casey, operator decisions awaiting ratification; see [phase8-reviewer-packages.md](phase8-reviewer-packages.md)) |
 | Coverage | `COMPLETE_CENSUS`: 40 expected (MLB official draft data), 40 tracked |
 | Signing status | **33 signed, 7 did not sign**, 0 unknown (was 31/9; corrected, see below) |
 | Signing dates | 33 of 33 signed picks dated to the day (MLB transaction wire) |
@@ -119,7 +119,8 @@ Each pick's job is `UNRESOLVED` with that rationale. Under the 2017–2021 agree
 
 ```bash
 npm run research:class   -- --org LAD --channel draft --year 2017     # expect: no blockers
-npm run research:certify -- --org LAD --channel draft --year 2017 --operator "<your name>"
+npm run research:check -- --org LAD --channel draft --year 2017          # anyone: records the check
+npm run research:certify -- --check <id>                                 # you, on your own reviewer login (BAI_REVIEWER_DATABASE_URL), once the gate is open
 npm run refresh:read-models
 ```
 

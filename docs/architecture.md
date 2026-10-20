@@ -49,8 +49,9 @@ flowchart LR
 | 017_platform_default_privileges | removes Supabase's pre-2026 default grants to anon/authenticated/service_role in public and the sequence/service_role grants they produced (no-op locally) |
 | 018_btree_gist_extensions_schema | moves btree_gist from public to the `extensions` schema |
 | 020_outcome_import_channel | `OUTCOMES` ingest channel and `OUTCOME_AUDIT` staged record type |
-| 021_research_decision_history | append-only decision history, registered human reviewers, decision proposals, guarded resolutions and certifications, revocation when evidence changes ([decision-history.md](decision-history.md)) |
-| 022_organizational_value | `TRADES` channel (`TRADE` record) and value views: season WAR, coverage, acquisition value, trade returns, class value |
+| 021_research_decision_history | append-only decision history; reviewers bound to their database logins (`bai_reviewer`, `bai_automation`); human-only SECURITY DEFINER functions; certification gate (closed) and fingerprinted certification checks; guarded resolutions and certifications; revocation triggers on every canonical table ([decision-history.md](decision-history.md)) |
+| 022_acquisition_dispositions | `acquisition_dispositions` (how each acquisition ended, separate from the player's career), consistency guard, legacy backfill, `analytics.player_acquisitions` / `acquisition_tenures` |
+| 023_organizational_value | `TRADES` channel (`TRADE` record) and value views: season WAR, coverage, acquisition value (signed acquisitions only, own tenure), trade returns, class value |
 | 019_research_backfill | private `research` schema (channels, classes, stage machine, jobs, batches, leads, import reviews, certifications, program waves, class metrics/status, the queue), franchise history names and `resolve_organization()`, `outcome_audit_details`, `analytics.player_outcome_profile` / `acquisition_economics` / `class_economics`, public `rm_research_certification` |
 
 Hosted (Supabase) databases are migrated with `supabase db push` from the same files (`supabase/migrations` is a symlink to `database/migrations`); the BAI runner then verifies the pushed history statement by statement and records checksums in `bai_meta`. See [supabase.md](supabase.md).

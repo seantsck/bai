@@ -1,0 +1,1344 @@
+{
+ "format": "bai-research-import/1",
+ "batch_key": "2017-draft-lad-dispositions",
+ "channel": "OUTCOMES",
+ "description": "LAD 2017-JUNE_AMATEUR class: per-acquisition dispositions (with exit dates) for 40 selections as of 2026-10-20 (MLB Stats API transactions); audits restated unchanged.",
+ "sources": [
+  {
+   "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+   "source_type": "OFFICIAL_LEAGUE",
+   "authority_level": "OFFICIAL",
+   "title": "MLB Stats API player outcomes (people, MLB and milb_all seasons, transactions), 40 players",
+   "publisher": "MLB Advanced Media",
+   "reference": "statsapi.mlb.com/api/v1: people/{id}?hydrate=currentTeam,stats(...); people/{id}/stats?stats=yearByYear&leagueListId=milb_all; transactions?playerId={id}; teams?sportIds=11..16&season=Y",
+   "retrieved_date": "2026-10-20",
+   "notes": "130 requests, all HTTP 200 (manifest kept with the download). Current status and transactions as of the retrieval date."
+  },
+  {
+   "source_key": "lad:mlbcom-rule5-2020-lad",
+   "source_type": "OFFICIAL_LEAGUE",
+   "authority_level": "OFFICIAL",
+   "title": "Dodgers lose 8 players in Rule 5 Draft",
+   "publisher": "MLB.com",
+   "url": "https://www.mlb.com/news/dodgers-2020-rule-5-draft-results",
+   "archived_url": "http://web.archive.org/web/20260101164013/https://www.mlb.com/news/dodgers-2020-rule-5-draft-results",
+   "published_date": "2020-12-10",
+   "retrieved_date": "2026-10-20",
+   "notes": "\"right-handed pitchers Brett de Geus and Jordan Sheffield in the Major League phase. de Geus was taken with the second pick by Texas and Sheffield with the seventh pick by Colorado ... Also in the Minor League portion, the Dodgers lost ... shortstop Errol Robinson to Cincinnati, center fielder Chris Roller to Cleveland ... and infielder Marcus Chiu to Miami.\""
+  }
+ ],
+ "records": [
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Jeren Kendall",
+    "external_ids": {
+     "MLBAM": "656607"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "transactions": [],
+   "acquisition": {
+    "draft_key": "2017-JUNE_AMATEUR",
+    "overall_pick": 23
+   },
+   "disposition": {
+    "value": "RETIRED",
+    "date": "2022-12-16",
+    "date_precision": "DAY",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "transactions?playerId=656607 RETIRED 2022-12-16"
+   },
+   "notes": "Pick 23 (2017-JUNE_AMATEUR); acquisition disposition RETIRED on 2022-12-16."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Morgan Cooper",
+    "external_ids": {
+     "MLBAM": "668729"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "transactions": [],
+   "acquisition": {
+    "draft_key": "2017-JUNE_AMATEUR",
+    "overall_pick": 62
+   },
+   "disposition": {
+    "value": "RELEASED",
+    "date": "2021-06-14",
+    "date_precision": "DAY",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "transactions?playerId=668729 RELEASED 2021-06-14"
+   },
+   "notes": "Pick 62 (2017-JUNE_AMATEUR); acquisition disposition RELEASED on 2021-06-14."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Connor Wong",
+    "external_ids": {
+     "MLBAM": "657136"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "audit_state": "AUDITED_REACHED_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "debut": {
+    "date": "2021-06-22",
+    "organization": "BOS",
+    "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "people/657136 mlbDebutDate; 2021 season splits"
+   },
+   "transactions": [
+    {
+     "ref": "mlb-tx-438093",
+     "type": "TRADE",
+     "date": "2020-02-10",
+     "from_organization": "LAD",
+     "to_organization": "BOS",
+     "description": "Los Angeles Dodgers traded CF Alex Verdugo, C Connor Wong and SS Jeter Downs to Boston Red Sox for RF Mookie Betts, LHP David Price and cash.",
+     "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+     "locator": "transactions?playerId=657136 id 438093"
+    }
+   ],
+   "acquisition": {
+    "draft_key": "2017-JUNE_AMATEUR",
+    "overall_pick": 100
+   },
+   "disposition": {
+    "value": "TRADED",
+    "date": "2020-02-10",
+    "date_precision": "DAY",
+    "transaction_ref": "mlb-tx-438093",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "transactions?playerId=657136 TRADED 2020-02-10"
+   },
+   "notes": "Pick 100 (2017-JUNE_AMATEUR); acquisition disposition TRADED on 2020-02-10."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "James Marinan",
+    "external_ids": {
+     "MLBAM": "675653"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "transactions": [
+    {
+     "ref": "mlb-tx-366301",
+     "type": "TRADE",
+     "date": "2018-07-04",
+     "from_organization": "LAD",
+     "to_organization": "CIN",
+     "description": "Cincinnati Reds traded RHP Dylan Floro, RHP Zach Neal and Future Considerations to Los Angeles Dodgers for RHP James Marinan and RHP Aneurys Zabala.",
+     "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+     "locator": "transactions?playerId=675653 id 366301"
+    }
+   ],
+   "acquisition": {
+    "draft_key": "2017-JUNE_AMATEUR",
+    "overall_pick": 130
+   },
+   "disposition": {
+    "value": "TRADED",
+    "date": "2018-07-04",
+    "date_precision": "DAY",
+    "transaction_ref": "mlb-tx-366301",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "transactions?playerId=675653 TRADED 2018-07-04"
+   },
+   "notes": "Pick 130 (2017-JUNE_AMATEUR); acquisition disposition TRADED on 2018-07-04."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Riley Ottesen",
+    "external_ids": {
+     "MLBAM": "675962"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "transactions": [],
+   "acquisition": {
+    "draft_key": "2017-JUNE_AMATEUR",
+    "overall_pick": 160
+   },
+   "disposition": {
+    "value": "RELEASED",
+    "date": "2020-07-01",
+    "date_precision": "DAY",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "transactions?playerId=675962 RELEASED 2020-07-01"
+   },
+   "notes": "Pick 160 (2017-JUNE_AMATEUR); acquisition disposition RELEASED on 2020-07-01."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Wills Montgomerie",
+    "external_ids": {
+     "MLBAM": "676377"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "transactions": [],
+   "acquisition": {
+    "draft_key": "2017-JUNE_AMATEUR",
+    "overall_pick": 190
+   },
+   "disposition": {
+    "value": "RELEASED",
+    "date": "2025-08-12",
+    "date_precision": "DAY",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "transactions?playerId=676377 RELEASED 2025-08-12"
+   },
+   "notes": "Pick 190 (2017-JUNE_AMATEUR); acquisition disposition RELEASED on 2025-08-12."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Zach Pop",
+    "external_ids": {
+     "MLBAM": "647315"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "audit_state": "AUDITED_REACHED_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "debut": {
+    "date": "2021-04-03",
+    "organization": "MIA",
+    "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "people/647315 mlbDebutDate; 2021 season splits"
+   },
+   "transactions": [
+    {
+     "ref": "mlb-tx-369676",
+     "type": "TRADE",
+     "date": "2018-07-18",
+     "from_organization": "LAD",
+     "to_organization": "BAL",
+     "description": "Baltimore Orioles traded SS Manny Machado to Los Angeles Dodgers for 2B Breyvic Valera, RF Yusniel Diaz, RHP Zach Pop, RHP Dean Kremer and 3B Rylan Bannon.",
+     "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+     "locator": "transactions?playerId=647315 id 369676"
+    }
+   ],
+   "acquisition": {
+    "draft_key": "2017-JUNE_AMATEUR",
+    "overall_pick": 220
+   },
+   "disposition": {
+    "value": "TRADED",
+    "date": "2018-07-18",
+    "date_precision": "DAY",
+    "transaction_ref": "mlb-tx-369676",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "transactions?playerId=647315 TRADED 2018-07-18"
+   },
+   "notes": "Pick 220 (2017-JUNE_AMATEUR); acquisition disposition TRADED on 2018-07-18."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Rylan Bannon",
+    "external_ids": {
+     "MLBAM": "676625"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "audit_state": "AUDITED_REACHED_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "debut": {
+    "date": "2022-05-12",
+    "organization": "BAL",
+    "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "people/676625 mlbDebutDate; 2022 season splits"
+   },
+   "transactions": [
+    {
+     "ref": "mlb-tx-369676",
+     "type": "TRADE",
+     "date": "2018-07-18",
+     "from_organization": "LAD",
+     "to_organization": "BAL",
+     "description": "Baltimore Orioles traded SS Manny Machado to Los Angeles Dodgers for 2B Breyvic Valera, RF Yusniel Diaz, RHP Zach Pop, RHP Dean Kremer and 3B Rylan Bannon.",
+     "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+     "locator": "transactions?playerId=676625 id 369676"
+    }
+   ],
+   "acquisition": {
+    "draft_key": "2017-JUNE_AMATEUR",
+    "overall_pick": 250
+   },
+   "disposition": {
+    "value": "TRADED",
+    "date": "2018-07-18",
+    "date_precision": "DAY",
+    "transaction_ref": "mlb-tx-369676",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "transactions?playerId=676625 TRADED 2018-07-18"
+   },
+   "notes": "Pick 250 (2017-JUNE_AMATEUR); acquisition disposition TRADED on 2018-07-18."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Connor Strain",
+    "external_ids": {
+     "MLBAM": "676150"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "transactions": [],
+   "acquisition": {
+    "draft_key": "2017-JUNE_AMATEUR",
+    "overall_pick": 280
+   },
+   "disposition": {
+    "value": "RELEASED",
+    "date": "2020-03-05",
+    "date_precision": "DAY",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "transactions?playerId=676150 RELEASED 2020-03-05"
+   },
+   "notes": "Pick 280 (2017-JUNE_AMATEUR); acquisition disposition RELEASED on 2020-03-05."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Zach Reks",
+    "external_ids": {
+     "MLBAM": "676646"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "audit_state": "AUDITED_REACHED_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "debut": {
+    "date": "2021-06-21",
+    "organization": "LAD",
+    "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "people/676646 mlbDebutDate; 2021 season splits"
+   },
+   "transactions": [
+    {
+     "ref": "mlb-tx-600521",
+     "type": "TRADE",
+     "date": "2021-11-22",
+     "from_organization": "LAD",
+     "to_organization": "TEX",
+     "description": "Los Angeles Dodgers traded LF Billy McKinney and OF Zach Reks to Texas Rangers for cash.",
+     "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+     "locator": "transactions?playerId=676646 id 600521"
+    }
+   ],
+   "acquisition": {
+    "draft_key": "2017-JUNE_AMATEUR",
+    "overall_pick": 310
+   },
+   "disposition": {
+    "value": "TRADED",
+    "date": "2021-11-22",
+    "date_precision": "DAY",
+    "transaction_ref": "mlb-tx-600521",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "transactions?playerId=676646 TRADED 2021-11-22"
+   },
+   "notes": "Pick 310 (2017-JUNE_AMATEUR); acquisition disposition TRADED on 2021-11-22."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Jacob Amaya",
+    "external_ids": {
+     "MLBAM": "676070"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "audit_state": "AUDITED_REACHED_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "debut": {
+    "date": "2023-06-18",
+    "organization": "MIA",
+    "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "people/676070 mlbDebutDate; 2023 season splits"
+   },
+   "transactions": [
+    {
+     "ref": "mlb-tx-665172",
+     "type": "TRADE",
+     "date": "2023-01-11",
+     "from_organization": "LAD",
+     "to_organization": "MIA",
+     "description": "Miami Marlins traded SS Miguel Rojas to Los Angeles Dodgers for SS Jacob Amaya.",
+     "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+     "locator": "transactions?playerId=676070 id 665172"
+    }
+   ],
+   "acquisition": {
+    "draft_key": "2017-JUNE_AMATEUR",
+    "overall_pick": 340
+   },
+   "disposition": {
+    "value": "TRADED",
+    "date": "2023-01-11",
+    "date_precision": "DAY",
+    "transaction_ref": "mlb-tx-665172",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "transactions?playerId=676070 TRADED 2023-01-11"
+   },
+   "notes": "Pick 340 (2017-JUNE_AMATEUR); acquisition disposition TRADED on 2023-01-11."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Andre Jackson",
+    "external_ids": {
+     "MLBAM": "656578"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "audit_state": "AUDITED_REACHED_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "debut": {
+    "date": "2021-08-16",
+    "organization": "LAD",
+    "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "people/656578 mlbDebutDate; 2021 season splits"
+   },
+   "transactions": [
+    {
+     "ref": "mlb-tx-706670",
+     "type": "TRADE",
+     "date": "2023-06-25",
+     "from_organization": "LAD",
+     "to_organization": "PIT",
+     "description": "Los Angeles Dodgers traded RHP Andre Jackson to Pittsburgh Pirates for cash.",
+     "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+     "locator": "transactions?playerId=656578 id 706670"
+    }
+   ],
+   "acquisition": {
+    "draft_key": "2017-JUNE_AMATEUR",
+    "overall_pick": 370
+   },
+   "disposition": {
+    "value": "TRADED",
+    "date": "2023-06-25",
+    "date_precision": "DAY",
+    "transaction_ref": "mlb-tx-706670",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "transactions?playerId=656578 TRADED 2023-06-25"
+   },
+   "notes": "Pick 370 (2017-JUNE_AMATEUR); acquisition disposition TRADED on 2023-06-25."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Marshall Kasowski",
+    "external_ids": {
+     "MLBAM": "667445"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "transactions": [],
+   "acquisition": {
+    "draft_key": "2017-JUNE_AMATEUR",
+    "overall_pick": 400
+   },
+   "disposition": {
+    "value": "RELEASED",
+    "date": "2023-05-30",
+    "date_precision": "DAY",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "transactions?playerId=667445 RELEASED 2023-05-30"
+   },
+   "notes": "Pick 400 (2017-JUNE_AMATEUR); acquisition disposition RELEASED on 2023-05-30."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Josh McLain",
+    "external_ids": {
+     "MLBAM": "656717"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "transactions": [],
+   "acquisition": {
+    "draft_key": "2017-JUNE_AMATEUR",
+    "overall_pick": 430
+   },
+   "disposition": {
+    "value": "UNSIGNED",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "people/656717; transactions?playerId=656717"
+   },
+   "notes": "Pick 430 (2017-JUNE_AMATEUR); acquisition disposition UNSIGNED."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Marcus Chiu",
+    "external_ids": {
+     "MLBAM": "676722"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "transactions": [],
+   "acquisition": {
+    "draft_key": "2017-JUNE_AMATEUR",
+    "overall_pick": 460
+   },
+   "disposition": {
+    "value": "LOST_RULE_5",
+    "date": "2020-12-10",
+    "date_precision": "DAY",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad:mlbcom-rule5-2020-lad",
+    "locator": "transactions?playerId=676722 LOST_RULE_5 2020-12-10"
+   },
+   "notes": "Pick 460 (2017-JUNE_AMATEUR); acquisition disposition LOST_RULE_5 on 2020-12-10."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Evy Ruibal",
+    "external_ids": {
+     "MLBAM": "656918"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "transactions": [],
+   "acquisition": {
+    "draft_key": "2017-JUNE_AMATEUR",
+    "overall_pick": 490
+   },
+   "disposition": {
+    "value": "RELEASED",
+    "date": "2019-03-27",
+    "date_precision": "DAY",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "transactions?playerId=656918 RELEASED 2019-03-27"
+   },
+   "notes": "Pick 490 (2017-JUNE_AMATEUR); acquisition disposition RELEASED on 2019-03-27."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Nathan Witt",
+    "external_ids": {
+     "MLBAM": "676739"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "transactions": [
+    {
+     "ref": "mlb-tx-414912",
+     "type": "TRADE",
+     "date": "2019-07-03",
+     "from_organization": "LAD",
+     "to_organization": "TB",
+     "description": "Tampa Bay Rays traded RHP Casey Sadler to Los Angeles Dodgers for RHP Nathan Witt.",
+     "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+     "locator": "transactions?playerId=676739 id 414912"
+    }
+   ],
+   "acquisition": {
+    "draft_key": "2017-JUNE_AMATEUR",
+    "overall_pick": 520
+   },
+   "disposition": {
+    "value": "TRADED",
+    "date": "2019-07-03",
+    "date_precision": "DAY",
+    "transaction_ref": "mlb-tx-414912",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "transactions?playerId=676739 TRADED 2019-07-03"
+   },
+   "notes": "Pick 520 (2017-JUNE_AMATEUR); acquisition disposition TRADED on 2019-07-03."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Max Gamboa",
+    "external_ids": {
+     "MLBAM": "676451"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "transactions": [],
+   "acquisition": {
+    "draft_key": "2017-JUNE_AMATEUR",
+    "overall_pick": 550
+   },
+   "disposition": {
+    "value": "RETIRED",
+    "date": "2023-03-05",
+    "date_precision": "DAY",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "transactions?playerId=676451 RETIRED 2023-03-05"
+   },
+   "notes": "Pick 550 (2017-JUNE_AMATEUR); acquisition disposition RETIRED on 2023-03-05."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Zach Willeman",
+    "external_ids": {
+     "MLBAM": "657116"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "transactions": [
+    {
+     "ref": "mlb-tx-522138",
+     "type": "TRADE",
+     "date": "2021-10-20",
+     "from_organization": "LAD",
+     "to_organization": "KC",
+     "description": "Los Angeles Dodgers traded RHP Zach Willeman to Kansas City Royals.",
+     "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+     "locator": "transactions?playerId=657116 id 522138"
+    }
+   ],
+   "acquisition": {
+    "draft_key": "2017-JUNE_AMATEUR",
+    "overall_pick": 580
+   },
+   "disposition": {
+    "value": "TRADED",
+    "date": "2021-10-20",
+    "date_precision": "DAY",
+    "transaction_ref": "mlb-tx-522138",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "transactions?playerId=657116 TRADED 2021-10-20"
+   },
+   "notes": "Pick 580 (2017-JUNE_AMATEUR); acquisition disposition TRADED on 2021-10-20."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Donovan Casey",
+    "external_ids": {
+     "MLBAM": "661541"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "transactions": [
+    {
+     "ref": "mlb-tx-508180",
+     "type": "TRADE",
+     "date": "2021-07-30",
+     "from_organization": "LAD",
+     "to_organization": "WSH",
+     "description": "Washington Nationals traded RHP Max Scherzer and SS Trea Turner to Los Angeles Dodgers for C Keibert Ruiz, RHP Josiah Gray, RHP Gerardo Carrillo and OF Donovan Casey.",
+     "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+     "locator": "transactions?playerId=661541 id 508180"
+    }
+   ],
+   "acquisition": {
+    "draft_key": "2017-JUNE_AMATEUR",
+    "overall_pick": 610
+   },
+   "disposition": {
+    "value": "TRADED",
+    "date": "2021-07-30",
+    "date_precision": "DAY",
+    "transaction_ref": "mlb-tx-508180",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "transactions?playerId=661541 TRADED 2021-07-30"
+   },
+   "notes": "Pick 610 (2017-JUNE_AMATEUR); acquisition disposition TRADED on 2021-07-30."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Joshua Rivera",
+    "external_ids": {
+     "MLBAM": "676448"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "transactions": [],
+   "acquisition": {
+    "draft_key": "2017-JUNE_AMATEUR",
+    "overall_pick": 640
+   },
+   "disposition": {
+    "value": "UNSIGNED",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "people/676448; transactions?playerId=676448"
+   },
+   "notes": "Pick 640 (2017-JUNE_AMATEUR); acquisition disposition UNSIGNED."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Justin Hoyt",
+    "external_ids": {
+     "MLBAM": "676795"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "transactions": [],
+   "acquisition": {
+    "draft_key": "2017-JUNE_AMATEUR",
+    "overall_pick": 670
+   },
+   "disposition": {
+    "value": "RELEASED",
+    "date": "2018-06-29",
+    "date_precision": "DAY",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "transactions?playerId=676795 RELEASED 2018-06-29"
+   },
+   "notes": "Pick 670 (2017-JUNE_AMATEUR); acquisition disposition RELEASED on 2018-06-29."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Connor Heady",
+    "external_ids": {
+     "MLBAM": "624506"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "transactions": [],
+   "acquisition": {
+    "draft_key": "2017-JUNE_AMATEUR",
+    "overall_pick": 700
+   },
+   "disposition": {
+    "value": "RELEASED",
+    "date": "2019-10-14",
+    "date_precision": "DAY",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "transactions?playerId=624506 RELEASED 2019-10-14"
+   },
+   "notes": "Pick 700 (2017-JUNE_AMATEUR); acquisition disposition RELEASED on 2019-10-14."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Preston Grand Pre",
+    "external_ids": {
+     "MLBAM": "676375"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "transactions": [],
+   "acquisition": {
+    "draft_key": "2017-JUNE_AMATEUR",
+    "overall_pick": 730
+   },
+   "disposition": {
+    "value": "RELEASED",
+    "date": "2019-11-14",
+    "date_precision": "DAY",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "transactions?playerId=676375 RELEASED 2019-11-14"
+   },
+   "notes": "Pick 730 (2017-JUNE_AMATEUR); acquisition disposition RELEASED on 2019-11-14."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Mark Washington",
+    "external_ids": {
+     "MLBAM": "675976"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "transactions": [],
+   "acquisition": {
+    "draft_key": "2017-JUNE_AMATEUR",
+    "overall_pick": 760
+   },
+   "disposition": {
+    "value": "LEFT_AS_FREE_AGENT",
+    "date": "2023-11-06",
+    "date_precision": "DAY",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "transactions?playerId=675976 LEFT_AS_FREE_AGENT 2023-11-06"
+   },
+   "notes": "Pick 760 (2017-JUNE_AMATEUR); acquisition disposition LEFT_AS_FREE_AGENT on 2023-11-06."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Devin Hemmerich",
+    "external_ids": {
+     "MLBAM": "676820"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "transactions": [],
+   "acquisition": {
+    "draft_key": "2017-JUNE_AMATEUR",
+    "overall_pick": 790
+   },
+   "disposition": {
+    "value": "UNKNOWN",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "people/676820; transactions?playerId=676820"
+   },
+   "notes": "Pick 790 (2017-JUNE_AMATEUR); acquisition disposition UNKNOWN."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Jeremy Arocho",
+    "external_ids": {
+     "MLBAM": "671080"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "transactions": [],
+   "acquisition": {
+    "draft_key": "2017-JUNE_AMATEUR",
+    "overall_pick": 820
+   },
+   "disposition": {
+    "value": "RELEASED",
+    "date": "2019-11-14",
+    "date_precision": "DAY",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "transactions?playerId=671080 RELEASED 2019-11-14"
+   },
+   "notes": "Pick 820 (2017-JUNE_AMATEUR); acquisition disposition RELEASED on 2019-11-14."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Justin Lewis",
+    "external_ids": {
+     "MLBAM": "676915"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "transactions": [],
+   "acquisition": {
+    "draft_key": "2017-JUNE_AMATEUR",
+    "overall_pick": 850
+   },
+   "disposition": {
+    "value": "RELEASED",
+    "date": "2019-03-21",
+    "date_precision": "DAY",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "transactions?playerId=676915 RELEASED 2019-03-21"
+   },
+   "notes": "Pick 850 (2017-JUNE_AMATEUR); acquisition disposition RELEASED on 2019-03-21."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Deacon Liput",
+    "external_ids": {
+     "MLBAM": "663937"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "transactions": [],
+   "acquisition": {
+    "draft_key": "2017-JUNE_AMATEUR",
+    "overall_pick": 880
+   },
+   "disposition": {
+    "value": "UNSIGNED",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "people/663937; transactions?playerId=663937"
+   },
+   "notes": "Pick 880 (2017-JUNE_AMATEUR); acquisition disposition UNSIGNED."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Chris Roller",
+    "external_ids": {
+     "MLBAM": "676896"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "audit_state": "AUDITED_REACHED_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "debut": {
+    "date": "2024-05-15",
+    "organization": "MIL",
+    "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "people/676896 mlbDebutDate; 2024 season splits"
+   },
+   "transactions": [],
+   "acquisition": {
+    "draft_key": "2017-JUNE_AMATEUR",
+    "overall_pick": 910
+   },
+   "disposition": {
+    "value": "LOST_RULE_5",
+    "date": "2020-12-10",
+    "date_precision": "DAY",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad:mlbcom-rule5-2020-lad",
+    "locator": "transactions?playerId=676896 LOST_RULE_5 2020-12-10"
+   },
+   "notes": "Pick 910 (2017-JUNE_AMATEUR); acquisition disposition LOST_RULE_5 on 2020-12-10."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Hunter Mercado-Hood",
+    "external_ids": {
+     "MLBAM": "643453"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "transactions": [],
+   "acquisition": {
+    "draft_key": "2017-JUNE_AMATEUR",
+    "overall_pick": 940
+   },
+   "disposition": {
+    "value": "UNSIGNED",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "people/643453; transactions?playerId=643453"
+   },
+   "notes": "Pick 940 (2017-JUNE_AMATEUR); acquisition disposition UNSIGNED."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Tyler Adkison",
+    "external_ids": {
+     "MLBAM": "676956"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "transactions": [],
+   "acquisition": {
+    "draft_key": "2017-JUNE_AMATEUR",
+    "overall_pick": 970
+   },
+   "disposition": {
+    "value": "UNKNOWN",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "people/676956; transactions?playerId=676956"
+   },
+   "notes": "Pick 970 (2017-JUNE_AMATEUR); acquisition disposition UNKNOWN."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Brett de Geus",
+    "external_ids": {
+     "MLBAM": "676969"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "audit_state": "AUDITED_REACHED_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "debut": {
+    "date": "2021-04-01",
+    "organization": "TEX",
+    "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "people/676969 mlbDebutDate; 2021 season splits"
+   },
+   "transactions": [],
+   "acquisition": {
+    "draft_key": "2017-JUNE_AMATEUR",
+    "overall_pick": 1000
+   },
+   "disposition": {
+    "value": "LOST_RULE_5",
+    "date": "2020-12-10",
+    "date_precision": "DAY",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad:mlbcom-rule5-2020-lad",
+    "locator": "transactions?playerId=676969 LOST_RULE_5 2020-12-10"
+   },
+   "notes": "Pick 1000 (2017-JUNE_AMATEUR); acquisition disposition LOST_RULE_5 on 2020-12-10."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Dan Jagiello",
+    "external_ids": {
+     "MLBAM": "668966"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "transactions": [],
+   "acquisition": {
+    "draft_key": "2017-JUNE_AMATEUR",
+    "overall_pick": 1030
+   },
+   "disposition": {
+    "value": "RETIRED",
+    "date": "2019-04-03",
+    "date_precision": "DAY",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "transactions?playerId=668966 RETIRED 2019-04-03"
+   },
+   "notes": "Pick 1030 (2017-JUNE_AMATEUR); acquisition disposition RETIRED on 2019-04-03."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Colby Nealy",
+    "external_ids": {
+     "MLBAM": "676999"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "transactions": [],
+   "acquisition": {
+    "draft_key": "2017-JUNE_AMATEUR",
+    "overall_pick": 1060
+   },
+   "disposition": {
+    "value": "RELEASED",
+    "date": "2018-06-29",
+    "date_precision": "DAY",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "transactions?playerId=676999 RELEASED 2018-06-29"
+   },
+   "notes": "Pick 1060 (2017-JUNE_AMATEUR); acquisition disposition RELEASED on 2018-06-29."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Riley Richert",
+    "external_ids": {
+     "MLBAM": "667458"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "transactions": [],
+   "acquisition": {
+    "draft_key": "2017-JUNE_AMATEUR",
+    "overall_pick": 1090
+   },
+   "disposition": {
+    "value": "UNKNOWN",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "people/667458; transactions?playerId=667458"
+   },
+   "notes": "Pick 1090 (2017-JUNE_AMATEUR); acquisition disposition UNKNOWN."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Corey Merrill",
+    "external_ids": {
+     "MLBAM": "641865"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "transactions": [],
+   "acquisition": {
+    "draft_key": "2017-JUNE_AMATEUR",
+    "overall_pick": 1120
+   },
+   "disposition": {
+    "value": "UNKNOWN",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "people/641865; transactions?playerId=641865"
+   },
+   "notes": "Pick 1120 (2017-JUNE_AMATEUR); acquisition disposition UNKNOWN."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Preston White",
+    "external_ids": {
+     "MLBAM": "677039"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "transactions": [],
+   "acquisition": {
+    "draft_key": "2017-JUNE_AMATEUR",
+    "overall_pick": 1150
+   },
+   "disposition": {
+    "value": "UNSIGNED",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "people/677039; transactions?playerId=677039"
+   },
+   "notes": "Pick 1150 (2017-JUNE_AMATEUR); acquisition disposition UNSIGNED."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Logan White",
+    "external_ids": {
+     "MLBAM": "676253"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "transactions": [],
+   "acquisition": {
+    "draft_key": "2017-JUNE_AMATEUR",
+    "overall_pick": 1180
+   },
+   "disposition": {
+    "value": "UNSIGNED",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "people/676253; transactions?playerId=676253"
+   },
+   "notes": "Pick 1180 (2017-JUNE_AMATEUR); acquisition disposition UNSIGNED."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Clayton Andrews",
+    "external_ids": {
+     "MLBAM": "677076"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "audit_state": "AUDITED_REACHED_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "debut": {
+    "date": "2023-07-01",
+    "organization": "MIL",
+    "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "people/677076 mlbDebutDate; 2023 season splits"
+   },
+   "transactions": [],
+   "acquisition": {
+    "draft_key": "2017-JUNE_AMATEUR",
+    "overall_pick": 1210
+   },
+   "disposition": {
+    "value": "UNSIGNED",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "people/677076; transactions?playerId=677076"
+   },
+   "notes": "Pick 1210 (2017-JUNE_AMATEUR); acquisition disposition UNSIGNED."
+  }
+ ]
+}

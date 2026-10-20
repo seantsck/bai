@@ -272,22 +272,32 @@ Every fact table above, apart from identity and lookup tables, also references `
 - An outcome record attaches to an existing player by a strong identity and never creates one. It writes `outcome_audits`, `mlb_debuts`, `outcome_audit_details`, `war_observations` (per provider) and trade `transactions`; a trade that moved several audited players is shared.
 - Rival debut dates or WAR values become conflicts (`mlb_debuts.debut_date` and `war_observations.war_value` are resolvable fields). `NOT_AUDITED` is never imported: it is the absence of an audit.
 
-### Decision history (021, schema `research`, private)
+### Decision history and the human certification boundary (021, schema `research`, private)
 
-- `research.decision_history`: append-only (trigger), one row per resolution, re-decision, reconsideration, certification, revocation and certified-class evidence change; it records values, sources, decider, reason, evidence and certification impact.
-- `research.reviewers`: registered human reviewers. Certification and reconsideration require an active one; automation names are refused.
-- `research.decision_proposals`: proposed decisions (anyone may file one) that only a registered reviewer accepts or rejects.
-- Guards on `public.fact_resolutions` (no delete; same-evidence changes only through `research:reconsider`) and `research.certifications` (immutable, one final revocation, never deleted).
-- `research.classes_of_subject(table, id)` maps a canonical record to its research classes. `research.revoke_for_evidence_change` and `research.record_evidence_change` revoke certifications whose evidence changed.
+- `research.decision_history`: append-only (trigger), one row per resolution, re-decision, reconsideration, ratification, certification, revocation, gate change and certified-class evidence change. Each row records values, sources, decider, the authenticated login (`session_role`, `reviewer_session`), reason, evidence and certification impact.
+- `research.reviewers`: a display name bound to the PostgreSQL login a human authenticates with (`db_role`); enrolled only by that login, which must be a member of `bai_reviewer` with no administrative attribute, not `bai_automation`, and unable to act as an owner. `research.session_reviewer()` derives the reviewer from `session_user`.
+- Human-only SECURITY DEFINER functions, executable only by `bai_reviewer`: `enroll_reviewer`, `accept_proposal`, `reject_proposal`, `reconsider_resolution`, `ratify_resolution`, `set_certification_gate`, `certify_class`. The tables refuse the same changes from any other session.
+- `research.certification_gate` (closed): while closed, nothing is certified. `research.certification_checks`: append-only deterministic checks with a fingerprint (`research.class_fingerprint`); a reviewer certifies a check only while the fingerprint is unchanged.
+- `research.decision_proposals`: proposed decisions (anyone may file one) that only a reviewer session accepts or rejects.
+- Guards on `public.fact_resolutions` (no delete; same-evidence changes only in a reviewer session) and `research.certifications` (only through `certify_class`; immutable, one final revocation, never deleted). `research.unratified_decisions(class)` lists operator-label decisions awaiting a reviewer.
+- `research.on_evidence_change` triggers on every canonical table revoke the certification of an affected class in the same transaction, from any session (`research.classes_of_subject` maps a record to its classes).
 - Full rules: [decision-history.md](decision-history.md).
 
-### Organizational value (022)
+### Acquisition dispositions (022)
+
+- `public.acquisition_dispositions`: how one acquisition (a draft selection or an international signing, exactly one) ended: `disposition`, the exit date and precision, the trade that ended it (`TRADED`), as of a date, cited. The player's career outcome (`outcome_audits`, debut, details, WAR) stays on the player; `outcome_audit_details.disposition` is legacy and ignored by the value views.
+- A deferred trigger refuses contradictions: `UNSIGNED` on a signed pick or an international signing; an exit on a pick that did not sign; a `TRADED` exit whose trade did not send this player from this organization; an exit before the acquisition; another club's player or organization.
+- Backfill: a legacy disposition moved to the player's acquisition only when the player had exactly one.
+- `analytics.player_acquisitions` (every acquisition with its signing status) and `analytics.acquisition_tenures` (with its disposition and whether the tenure's end is known).
+- OUTCOME_AUDIT records name their `acquisition` and give its `disposition` (see [research-ingestion.md](research-ingestion.md)).
+
+### Organizational value (023)
 
 - `ingest.batch_channel` gains `TRADES`, and staged records may be `TRADE` (every package of one trade, players by MLBAM id, their observed WAR, non-player assets). A trade may add a traded-in player by strong id. Both sides of a trade share one transaction.
 - Views (private `analytics`):
   - `player_season_war` and `player_career_war`: the latest observation per key;
   - `player_war_coverage`: `COMPLETE` / `PARTIAL` / `CAREER_ONLY` / `NO_MLB` / `NOT_OBSERVED`, per provider;
-  - `trade_returns`: per package sent, the WAR the received players produced for the club from the trade season on;
-  - `acquisition_value`: career, original-organization and other-organization WAR, the trade return, cost, debut timeline and coverage, per provider;
-  - `class_value`: known sums with coverage counts; a total only when every member is covered; each package counted once per class, with shared packages flagged.
+  - `trade_returns`: per package sent, the WAR the received players produced for the club from the trade season until the club next traded them away;
+  - `acquisition_value`: per acquisition and provider. Only an acquisition that signed is `credited` (otherwise `NOT_SIGNED` / `SIGNING_UNKNOWN` and every value NULL). `original_org_war` counts the acquisition's own tenure (acquisition season to exit season); `returning_stint_war` (a later return to the club) is reported and never credited; `other_org_war`; the return of the trade that ended this acquisition (`trade_package_return_war`, the whole package, never split); cost, debut timeline and coverage;
+  - `class_value`: known sums over credited acquisitions with coverage counts; a total only when every credited member is covered; each package counted once per class, with shared packages flagged.
 - Baseball-Reference and FanGraphs are never mixed or used to fill each other. A provider not observed is NULL, never zero.

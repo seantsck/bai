@@ -1,6 +1,6 @@
 # Human review checklist: LAD / DRAFT / 2016-JUNE_AMATEUR
 
-Prepared 2026-10-20 by automated research (Phase 6). **Not certified.** Only a human reviewer runs `research:certify`; the framework refuses `agent:*` actors and has no force option. Evidence: [lad-2016-draft-certification.md](lad-2016-draft-certification.md).
+Prepared 2026-10-20 by automated research (Phase 6). **Not certified.** Only a human reviewer certifies, on their own database login (Phase 8: identity is the authenticated login, not a name; certification is disabled until the conditions in [decision-history.md](../decision-history.md#what-remains-before-certification) hold). There is no force option. Evidence: [lad-2016-draft-certification.md](lad-2016-draft-certification.md).
 
 ## Where the class stands
 
@@ -50,9 +50,10 @@ Each item has a recommendation; the decision is yours.
 ## Recording decisions (Phase 7, migration 021)
 
 Every decision is now kept in `research.decision_history`, and no recorded judgment is silently overwritten ([../decision-history.md](../decision-history.md)).
-- **Register first:** register yourself as a reviewer (`research:reviewer --add "<you>" --operator "<you>"`). Certification and reconsideration refuse unregistered names and automation.
-- **Item 1 (Smeltzer) is filed as proposal 1** (`research:proposals`). Automated research proposed it (`agent:bai-research`) with the evidence in `research/evidence/smeltzer-2016-bonus.json`, and it decides nothing. Accept it: `research:resolve -- --table draft_signings --id <signing> --field signing_bonus_usd --observation <Baseball America obs> --operator "<you>" --rationale "<reason>" --proposal 1 --write`. Or reject it: `research:proposals -- --reject 1 --reviewer "<you>" --reason "..."`, then decide the conflict yourself.
-- **Item 7 (Sheffield):** if you disagree with the recorded operator decision, `research:reconsider ... --reviewer "<you>" --reason "..." --authorize --write` now re-decides it, and the earlier judgment stays in the history.
+- **Enroll first:** an administrator creates your PostgreSQL login and grants it `bai_reviewer`; you log in with it (`BAI_REVIEWER_DATABASE_URL`) and run `research:reviewer -- --enroll "<you>"`. Every reviewer command then acts as that login; none takes a name. The full set of open items is in [phase8-reviewer-packages.md](phase8-reviewer-packages.md).
+- **Item 1 (Smeltzer) is filed as proposal 1** (`research:proposals`). Automated research proposed it (`agent:bai-research`) with the evidence in `research/evidence/smeltzer-2016-bonus.json`, and it decides nothing. Accept it: `research:accept -- --proposal 1 --reason "<reason>" --write`. Or reject it: `research:proposals -- --reject 1 --reason "..."`, then decide the conflict yourself.
+- **Item 7 (Sheffield round label):** an operator decision; it blocks certification until you ratify it (`research:ratify -- --resolution <id> --reason "..." --write`) or re-decide it (`research:reconsider ... --reason "..." --authorize --write`). The earlier judgment stays in the history.
+- **Item 4 (Sheffield and Robinson Rule 5):** now proposals 3 and 4 on the per-acquisition dispositions (Phase 8); accept or reject them like proposal 1.
 
 **Smeltzer evidence (Phase 7):**
 - For 11 of the 12 Dodgers picks in rounds 1–10, MLB.com's tracker shows exactly the gross bonus minus $2,500 (the net figure).

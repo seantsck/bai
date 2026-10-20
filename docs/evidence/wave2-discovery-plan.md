@@ -21,11 +21,11 @@ for c in ATL BAL SD TB HOU NYY; do npm run research:wave -- --org $c --wave 2 --
 
 ## No organization-specific code
 
-- **Search:** I searched `scripts/research/` and migrations 019–022 for club literals and team ids. The only hits are:
+- **Search:** I searched `scripts/research/` and migrations 019–023 for club literals and team ids. The only hits are:
   - the complete 30-club Baseball-Reference team-code map (`sources/lib/bref-player.mjs`);
   - the default club label in `mlbcom-draft-money-import.mjs`, which now handles multi-word nicknames (Red Sox, White Sox, Blue Jays).
 - **Builders:** every builder takes the club as `--org` / `--team-id` / `--club-label`.
-- **Attribution views:** the 022 views key on `organization_id` only.
+- **Attribution views:** the 022/023 views key on `organization_id` only.
 - **Tests:** the value tests use LAD- and BAL-shaped fixtures, and the decision tests use KC; neither needs club-specific code.
 
 ## Prepared (local, `research/runbooks/wave2-2016-slice.mjs`)

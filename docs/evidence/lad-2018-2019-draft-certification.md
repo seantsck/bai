@@ -34,8 +34,8 @@ Prepared 2026-10-20 by automated research (Phase 7). **Neither class is certifie
 | 194 | 6 | Bryan Warzek (679338) | Yes 2018-06-18 | $202,500 (1) | $233,800 | University of New Orleans | No MLB; affiliated from 2018 | RELEASED |  |
 | 224 | 7 | James Outman (681546) | Yes 2018-06-19 | $157,500 (1) | $184,200 | California State University, Sacramento | MLB 2022-07-31 (LAD, age 25); 361 G, 1057 PA | TRADED | 2.5 |
 | 254 | 8 | Luke Heyer (679691) | Yes 2018-06-19 | $47,500 (1) | $155,300 | University of Kentucky | No MLB; affiliated from 2018 | RELEASED |  |
-| 284 | 9 | Josh McLain (656717) | Yes 2018-06-18 | $7,500 (1) | $143,600 | North Carolina State University | No MLB; affiliated from 2018 | UNSIGNED |  |
-| 314 | 10 | Deacon Liput (663937) | Yes 2018-07-03 | $134,300 (1) | $136,800 | University of Florida | No MLB; affiliated from 2018 | UNSIGNED |  |
+| 284 | 9 | Josh McLain (656717) | Yes 2018-06-18 | $7,500 (1) | $143,600 | North Carolina State University | No MLB; affiliated from 2018 | RETIRED 2019-11-07 |  |
+| 314 | 10 | Deacon Liput (663937) | Yes 2018-07-03 | $134,300 (1) | $136,800 | University of Florida | No MLB; affiliated from 2018 | UNKNOWN |  |
 | 344 | 11 | Stephen Kolek (663568) | Yes 2018-06-14 | $125,000 (1) | — | Texas A&M University | MLB 2024-03-21 (SD, age 26); 71 G, 213.1 IP | TRADED | 1.8 |
 | 374 | 12 | Hunter Feduccia (676439) | Yes 2018-06-14 | $125,000 (1) | — | Louisiana State University | MLB 2024-07-31 (LAD, age 27); 136 G, 370 PA | TRADED | -0.3 |
 | 404 | 13 | Dillon Paulson (663516) | Yes 2018-06-19 | $125,000 (1) | — | University of Southern California | No MLB; affiliated from 2018 | TRADED |  |
@@ -115,11 +115,11 @@ Prepared 2026-10-20 by automated research (Phase 7). **Neither class is certifie
 
 ## Items for the reviewer
 
-1. **Re-drafted players: a known model limitation.** Josh McLain and Deacon Liput were drafted and unsigned in 2017, then drafted again in 2018 and signed.
-   - An outcome audit is stored per player, so their 2018 audits (dispositions RETIRED and UNKNOWN) were held as "details" conflicts against the 2017 audits (UNSIGNED).
-   - Those conflicts are not observation conflicts, so `research:conflicts` does not list them. Both players therefore show UNSIGNED in the 2018 class views.
-   - Recommendation: before certifying 2018, decide whether to accept this (the 2017 audit is correct for 2017; the 2018 disposition is in the import file). The fix is per-acquisition dispositions (proposed follow-up).
-2. **Jimmy Lewis #78:** confirm MLB's structure (C-2, pick 1), the same decision as Sheffield 2016. Re-decide with `research:reconsider` if needed.
+1. **Re-drafted players: fixed in Phase 8 (migration 022).** Josh McLain and Deacon Liput were drafted and unsigned in 2017, then drafted again in 2018 and signed.
+   - In Phase 7 their dispositions lived on the player's outcome audit, so the 2018 class showed the 2017 UNSIGNED.
+   - Dispositions now belong to each acquisition: 2017 UNSIGNED; 2018 RETIRED 2019-11-07 (McLain) and UNKNOWN (Liput: no exit on the wire). The database refuses UNSIGNED on a signed acquisition.
+   - Nothing to decide; see [phase8-reviewer-packages.md](phase8-reviewer-packages.md#5-josh-mclain-and-deacon-liput-two-acquisitions-each-data-correction-no-decision-needed).
+2. **Jimmy Lewis #78:** confirm MLB's structure (C-2, pick 1), the same decision as Sheffield 2016. The decision was taken by an operator label, so it blocks certification until you ratify it (`research:ratify`) or re-decide it (`research:reconsider`).
 3. **Kody Hoese #25, $2,740,300:** this equals the slot. In 2019 both Baseball-Reference and Dodgers Digest record Busch (#31) at exactly slot as well, so for these first-rounders the figure is the reported one. The Dodgers' $2,500 per-pick deduction (see Smeltzer 2016) means a net figure could be $2,500 lower; no source gives one.
 4. **Bonus discrepancies kept as evidence, not imported:**
    - Jimmy Lewis: Dodgers Digest $1,100,000 vs Baseball-Reference $1,097,500 (gross vs net);

@@ -128,7 +128,8 @@ The class currently lives in the local research database. To review and certify 
 npm run db:server                                         # local PostgreSQL 17
 npm run research:class   -- --org LAD --channel draft --year 2016     # state, counts, blockers (expect: no blockers)
 npm run research:conflicts                                 # expect: 0 open
-npm run research:certify -- --org LAD --channel draft --year 2016 --operator "<your name>"
+npm run research:check -- --org LAD --channel draft --year 2016          # anyone: records the check
+npm run research:certify -- --check <id>                                 # you, on your own reviewer login (BAI_REVIEWER_DATABASE_URL), once the gate is open
 npm run refresh:read-models                                # the ✓ appears on /research
 ```
 
