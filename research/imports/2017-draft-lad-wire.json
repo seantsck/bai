@@ -1,0 +1,911 @@
+{
+ "format": "bai-research-import/1",
+ "batch_key": "2017-draft-lad-wire",
+ "channel": "DRAFT",
+ "description": "LAD 2017 Rule 4 draft: 33 of 40 picks signed per the MLB transaction wire, dated to the day (no bonuses).",
+ "sources": [
+  {
+   "source_key": "lad2017:mlb-transactions-draft-2017",
+   "source_type": "OFFICIAL_LEAGUE",
+   "authority_level": "OFFICIAL",
+   "title": "MLB transaction wire, team 119, 2017-06-12 to 2017-08-31",
+   "publisher": "MLB Advanced Media",
+   "url": "https://statsapi.mlb.com/api/v1/transactions?teamId=119&startDate=2017-06-12&endDate=2017-08-31",
+   "retrieved_date": "2026-10-20",
+   "notes": "SGN entries for the club's official picks. A pick without an entry is not claimed either way."
+  }
+ ],
+ "records": [
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2017:mlb-statsapi-draft-2017-lad",
+   "draft_key": "2017-JUNE_AMATEUR",
+   "round_code": "1",
+   "overall_pick": 23,
+   "round_pick": 23,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Jeren Kendall",
+    "birth_date": "1996-02-04",
+    "external_ids": {
+     "MLBAM": "656607"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2017-07-07",
+    "date_precision": "DAY",
+    "source_key": "lad2017:mlb-transactions-draft-2017",
+    "locator": "transaction 323103"
+   },
+   "notes": "MLB transaction 323103 (2017-07-07): Los Angeles Dodgers signed CF Jeren Kendall."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2017:mlb-statsapi-draft-2017-lad",
+   "draft_key": "2017-JUNE_AMATEUR",
+   "round_code": "2",
+   "overall_pick": 62,
+   "round_pick": 26,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Morgan Cooper",
+    "birth_date": "1994-09-12",
+    "external_ids": {
+     "MLBAM": "668729"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2017-07-07",
+    "date_precision": "DAY",
+    "source_key": "lad2017:mlb-transactions-draft-2017",
+    "locator": "transaction 323104"
+   },
+   "notes": "MLB transaction 323104 (2017-07-07): Los Angeles Dodgers signed RHP Morgan Cooper."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2017:mlb-statsapi-draft-2017-lad",
+   "draft_key": "2017-JUNE_AMATEUR",
+   "round_code": "3",
+   "overall_pick": 100,
+   "round_pick": 25,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Connor Wong",
+    "birth_date": "1996-05-19",
+    "external_ids": {
+     "MLBAM": "657136"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2017-07-07",
+    "date_precision": "DAY",
+    "source_key": "lad2017:mlb-transactions-draft-2017",
+    "locator": "transaction 323105"
+   },
+   "notes": "MLB transaction 323105 (2017-07-07): Los Angeles Dodgers signed C Connor Wong."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2017:mlb-statsapi-draft-2017-lad",
+   "draft_key": "2017-JUNE_AMATEUR",
+   "round_code": "4",
+   "overall_pick": 130,
+   "round_pick": 25,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "James Marinan",
+    "birth_date": "1998-10-10",
+    "external_ids": {
+     "MLBAM": "675653"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2017-06-18",
+    "date_precision": "DAY",
+    "source_key": "lad2017:mlb-transactions-draft-2017",
+    "locator": "transaction 323106"
+   },
+   "notes": "MLB transaction 323106 (2017-06-18): Los Angeles Dodgers signed RHP James Marinan."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2017:mlb-statsapi-draft-2017-lad",
+   "draft_key": "2017-JUNE_AMATEUR",
+   "round_code": "5",
+   "overall_pick": 160,
+   "round_pick": 25,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Riley Ottesen",
+    "birth_date": "1994-10-30",
+    "external_ids": {
+     "MLBAM": "675962"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2017-07-02",
+    "date_precision": "DAY",
+    "source_key": "lad2017:mlb-transactions-draft-2017",
+    "locator": "transaction 321868"
+   },
+   "notes": "MLB transaction 321868 (2017-07-02): Los Angeles Dodgers signed RHP Riley Ottesen."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2017:mlb-statsapi-draft-2017-lad",
+   "draft_key": "2017-JUNE_AMATEUR",
+   "round_code": "6",
+   "overall_pick": 190,
+   "round_pick": 25,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Wills Montgomerie",
+    "birth_date": "1995-06-02",
+    "external_ids": {
+     "MLBAM": "676377"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2017-07-02",
+    "date_precision": "DAY",
+    "source_key": "lad2017:mlb-transactions-draft-2017",
+    "locator": "transaction 321866"
+   },
+   "notes": "MLB transaction 321866 (2017-07-02): Los Angeles Dodgers signed RHP Wills Montgomerie."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2017:mlb-statsapi-draft-2017-lad",
+   "draft_key": "2017-JUNE_AMATEUR",
+   "round_code": "7",
+   "overall_pick": 220,
+   "round_pick": 25,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Zach Pop",
+    "birth_date": "1996-09-20",
+    "external_ids": {
+     "MLBAM": "647315"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2017-06-19",
+    "date_precision": "DAY",
+    "source_key": "lad2017:mlb-transactions-draft-2017",
+    "locator": "transaction 323107"
+   },
+   "notes": "MLB transaction 323107 (2017-06-19): Los Angeles Dodgers signed RHP Zach Pop."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2017:mlb-statsapi-draft-2017-lad",
+   "draft_key": "2017-JUNE_AMATEUR",
+   "round_code": "8",
+   "overall_pick": 250,
+   "round_pick": 25,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Rylan Bannon",
+    "birth_date": "1996-04-22",
+    "external_ids": {
+     "MLBAM": "676625"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2017-06-19",
+    "date_precision": "DAY",
+    "source_key": "lad2017:mlb-transactions-draft-2017",
+    "locator": "transaction 319889"
+   },
+   "notes": "MLB transaction 319889 (2017-06-19): Los Angeles Dodgers signed 3B Rylan Bannon."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2017:mlb-statsapi-draft-2017-lad",
+   "draft_key": "2017-JUNE_AMATEUR",
+   "round_code": "9",
+   "overall_pick": 280,
+   "round_pick": 25,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Connor Strain",
+    "birth_date": "1994-08-04",
+    "external_ids": {
+     "MLBAM": "676150"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2017-06-20",
+    "date_precision": "DAY",
+    "source_key": "lad2017:mlb-transactions-draft-2017",
+    "locator": "transaction 323108"
+   },
+   "notes": "MLB transaction 323108 (2017-06-20): Los Angeles Dodgers signed RHP Connor Strain."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2017:mlb-statsapi-draft-2017-lad",
+   "draft_key": "2017-JUNE_AMATEUR",
+   "round_code": "10",
+   "overall_pick": 310,
+   "round_pick": 25,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Zach Reks",
+    "birth_date": "1993-11-12",
+    "external_ids": {
+     "MLBAM": "676646"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2017-06-15",
+    "date_precision": "DAY",
+    "source_key": "lad2017:mlb-transactions-draft-2017",
+    "locator": "transaction 319892"
+   },
+   "notes": "MLB transaction 319892 (2017-06-15): Los Angeles Dodgers signed OF Zach Reks."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2017:mlb-statsapi-draft-2017-lad",
+   "draft_key": "2017-JUNE_AMATEUR",
+   "round_code": "11",
+   "overall_pick": 340,
+   "round_pick": 25,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Jacob Amaya",
+    "birth_date": "1998-09-03",
+    "external_ids": {
+     "MLBAM": "676070"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2017-07-06",
+    "date_precision": "DAY",
+    "source_key": "lad2017:mlb-transactions-draft-2017",
+    "locator": "transaction 323109"
+   },
+   "notes": "MLB transaction 323109 (2017-07-06): Los Angeles Dodgers signed SS Jacob Amaya."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2017:mlb-statsapi-draft-2017-lad",
+   "draft_key": "2017-JUNE_AMATEUR",
+   "round_code": "12",
+   "overall_pick": 370,
+   "round_pick": 25,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Andre Jackson",
+    "birth_date": "1996-05-01",
+    "external_ids": {
+     "MLBAM": "656578"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2017-07-02",
+    "date_precision": "DAY",
+    "source_key": "lad2017:mlb-transactions-draft-2017",
+    "locator": "transaction 321864"
+   },
+   "notes": "MLB transaction 321864 (2017-07-02): Los Angeles Dodgers signed RHP Andre Jackson."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2017:mlb-statsapi-draft-2017-lad",
+   "draft_key": "2017-JUNE_AMATEUR",
+   "round_code": "13",
+   "overall_pick": 400,
+   "round_pick": 25,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Marshall Kasowski",
+    "birth_date": "1995-03-10",
+    "external_ids": {
+     "MLBAM": "667445"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2017-06-19",
+    "date_precision": "DAY",
+    "source_key": "lad2017:mlb-transactions-draft-2017",
+    "locator": "transaction 323110"
+   },
+   "notes": "MLB transaction 323110 (2017-06-19): Los Angeles Dodgers signed RHP Marshall Kasowski."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2017:mlb-statsapi-draft-2017-lad",
+   "draft_key": "2017-JUNE_AMATEUR",
+   "round_code": "15",
+   "overall_pick": 460,
+   "round_pick": 25,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Marcus Chiu",
+    "birth_date": "1997-01-13",
+    "external_ids": {
+     "MLBAM": "676722"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2017-06-24",
+    "date_precision": "DAY",
+    "source_key": "lad2017:mlb-transactions-draft-2017",
+    "locator": "transaction 319658"
+   },
+   "notes": "MLB transaction 319658 (2017-06-24): Los Angeles Dodgers signed 2B Marcus Chiu."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2017:mlb-statsapi-draft-2017-lad",
+   "draft_key": "2017-JUNE_AMATEUR",
+   "round_code": "16",
+   "overall_pick": 490,
+   "round_pick": 25,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Evy Ruibal",
+    "birth_date": "1995-09-29",
+    "external_ids": {
+     "MLBAM": "656918"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2017-06-30",
+    "date_precision": "DAY",
+    "source_key": "lad2017:mlb-transactions-draft-2017",
+    "locator": "transaction 321656"
+   },
+   "notes": "MLB transaction 321656 (2017-06-30): Los Angeles Dodgers signed RHP Evy Ruibal."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2017:mlb-statsapi-draft-2017-lad",
+   "draft_key": "2017-JUNE_AMATEUR",
+   "round_code": "17",
+   "overall_pick": 520,
+   "round_pick": 25,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Nathan Witt",
+    "birth_date": "1996-04-19",
+    "external_ids": {
+     "MLBAM": "676739"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2017-07-06",
+    "date_precision": "DAY",
+    "source_key": "lad2017:mlb-transactions-draft-2017",
+    "locator": "transaction 323111"
+   },
+   "notes": "MLB transaction 323111 (2017-07-06): Los Angeles Dodgers signed RHP Nathan Witt."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2017:mlb-statsapi-draft-2017-lad",
+   "draft_key": "2017-JUNE_AMATEUR",
+   "round_code": "18",
+   "overall_pick": 550,
+   "round_pick": 25,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Max Gamboa",
+    "birth_date": "1995-11-22",
+    "external_ids": {
+     "MLBAM": "676451"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2017-06-24",
+    "date_precision": "DAY",
+    "source_key": "lad2017:mlb-transactions-draft-2017",
+    "locator": "transaction 319671"
+   },
+   "notes": "MLB transaction 319671 (2017-06-24): Los Angeles Dodgers signed RHP Max Gamboa."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2017:mlb-statsapi-draft-2017-lad",
+   "draft_key": "2017-JUNE_AMATEUR",
+   "round_code": "19",
+   "overall_pick": 580,
+   "round_pick": 25,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Zach Willeman",
+    "birth_date": "1996-03-27",
+    "external_ids": {
+     "MLBAM": "657116"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2017-06-24",
+    "date_precision": "DAY",
+    "source_key": "lad2017:mlb-transactions-draft-2017",
+    "locator": "transaction 319674"
+   },
+   "notes": "MLB transaction 319674 (2017-06-24): Los Angeles Dodgers signed RHP Zach Willeman."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2017:mlb-statsapi-draft-2017-lad",
+   "draft_key": "2017-JUNE_AMATEUR",
+   "round_code": "20",
+   "overall_pick": 610,
+   "round_pick": 25,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Donovan Casey",
+    "birth_date": "1996-02-23",
+    "external_ids": {
+     "MLBAM": "661541"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2017-07-06",
+    "date_precision": "DAY",
+    "source_key": "lad2017:mlb-transactions-draft-2017",
+    "locator": "transaction 323112"
+   },
+   "notes": "MLB transaction 323112 (2017-07-06): Los Angeles Dodgers signed OF Donovan Casey."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2017:mlb-statsapi-draft-2017-lad",
+   "draft_key": "2017-JUNE_AMATEUR",
+   "round_code": "22",
+   "overall_pick": 670,
+   "round_pick": 25,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Justin Hoyt",
+    "birth_date": "1995-04-30",
+    "external_ids": {
+     "MLBAM": "676795"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2017-06-30",
+    "date_precision": "DAY",
+    "source_key": "lad2017:mlb-transactions-draft-2017",
+    "locator": "transaction 321338"
+   },
+   "notes": "MLB transaction 321338 (2017-06-30): Los Angeles Dodgers signed LHP Justi Hoyt."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2017:mlb-statsapi-draft-2017-lad",
+   "draft_key": "2017-JUNE_AMATEUR",
+   "round_code": "23",
+   "overall_pick": 700,
+   "round_pick": 25,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Connor Heady",
+    "birth_date": "1994-07-03",
+    "external_ids": {
+     "MLBAM": "624506"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2017-06-15",
+    "date_precision": "DAY",
+    "source_key": "lad2017:mlb-transactions-draft-2017",
+    "locator": "transaction 319887"
+   },
+   "notes": "MLB transaction 319887 (2017-06-15): Los Angeles Dodgers signed SS Connor Heady."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2017:mlb-statsapi-draft-2017-lad",
+   "draft_key": "2017-JUNE_AMATEUR",
+   "round_code": "24",
+   "overall_pick": 730,
+   "round_pick": 25,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Preston Grand Pre",
+    "birth_date": "1995-07-15",
+    "external_ids": {
+     "MLBAM": "676375"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2017-06-24",
+    "date_precision": "DAY",
+    "source_key": "lad2017:mlb-transactions-draft-2017",
+    "locator": "transaction 319656"
+   },
+   "notes": "MLB transaction 319656 (2017-06-24): Los Angeles Dodgers signed SS Preston Grand Pre."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2017:mlb-statsapi-draft-2017-lad",
+   "draft_key": "2017-JUNE_AMATEUR",
+   "round_code": "25",
+   "overall_pick": 760,
+   "round_pick": 25,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Mark Washington",
+    "birth_date": "1996-03-22",
+    "external_ids": {
+     "MLBAM": "675976"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2017-07-06",
+    "date_precision": "DAY",
+    "source_key": "lad2017:mlb-transactions-draft-2017",
+    "locator": "transaction 323113"
+   },
+   "notes": "MLB transaction 323113 (2017-07-06): Los Angeles Dodgers signed RHP Mark Washington."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2017:mlb-statsapi-draft-2017-lad",
+   "draft_key": "2017-JUNE_AMATEUR",
+   "round_code": "26",
+   "overall_pick": 790,
+   "round_pick": 25,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Devin Hemmerich",
+    "birth_date": "1995-07-11",
+    "external_ids": {
+     "MLBAM": "676820"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2017-06-30",
+    "date_precision": "DAY",
+    "source_key": "lad2017:mlb-transactions-draft-2017",
+    "locator": "transaction 321334"
+   },
+   "notes": "MLB transaction 321334 (2017-06-30): Los Angeles Dodgers signed LHP Devin Hemmerich."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2017:mlb-statsapi-draft-2017-lad",
+   "draft_key": "2017-JUNE_AMATEUR",
+   "round_code": "27",
+   "overall_pick": 820,
+   "round_pick": 25,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Jeremy Arocho",
+    "birth_date": "1998-10-06",
+    "external_ids": {
+     "MLBAM": "671080"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2017-06-24",
+    "date_precision": "DAY",
+    "source_key": "lad2017:mlb-transactions-draft-2017",
+    "locator": "transaction 319652"
+   },
+   "notes": "MLB transaction 319652 (2017-06-24): Los Angeles Dodgers signed SS Jeremy Arocho."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2017:mlb-statsapi-draft-2017-lad",
+   "draft_key": "2017-JUNE_AMATEUR",
+   "round_code": "28",
+   "overall_pick": 850,
+   "round_pick": 25,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Justin Lewis",
+    "birth_date": "1996-10-12",
+    "external_ids": {
+     "MLBAM": "676915"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2017-06-30",
+    "date_precision": "DAY",
+    "source_key": "lad2017:mlb-transactions-draft-2017",
+    "locator": "transaction 321336"
+   },
+   "notes": "MLB transaction 321336 (2017-06-30): Los Angeles Dodgers signed LHP Justin Lewis."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2017:mlb-statsapi-draft-2017-lad",
+   "draft_key": "2017-JUNE_AMATEUR",
+   "round_code": "30",
+   "overall_pick": 910,
+   "round_pick": 25,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Chris Roller",
+    "birth_date": "1996-10-08",
+    "external_ids": {
+     "MLBAM": "676896"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2017-06-24",
+    "date_precision": "DAY",
+    "source_key": "lad2017:mlb-transactions-draft-2017",
+    "locator": "transaction 319666"
+   },
+   "notes": "MLB transaction 319666 (2017-06-24): Los Angeles Dodgers signed CF Chris Roller."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2017:mlb-statsapi-draft-2017-lad",
+   "draft_key": "2017-JUNE_AMATEUR",
+   "round_code": "32",
+   "overall_pick": 970,
+   "round_pick": 25,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Tyler Adkison",
+    "birth_date": "1995-05-08",
+    "external_ids": {
+     "MLBAM": "676956"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2017-06-19",
+    "date_precision": "DAY",
+    "source_key": "lad2017:mlb-transactions-draft-2017",
+    "locator": "transaction 319893"
+   },
+   "notes": "MLB transaction 319893 (2017-06-19): Los Angeles Dodgers signed OF Tyler Adkison."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2017:mlb-statsapi-draft-2017-lad",
+   "draft_key": "2017-JUNE_AMATEUR",
+   "round_code": "33",
+   "overall_pick": 1000,
+   "round_pick": 25,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Brett de Geus",
+    "birth_date": "1997-11-04",
+    "external_ids": {
+     "MLBAM": "676969"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2017-06-19",
+    "date_precision": "DAY",
+    "source_key": "lad2017:mlb-transactions-draft-2017",
+    "locator": "transaction 323114"
+   },
+   "notes": "MLB transaction 323114 (2017-06-19): Los Angeles Dodgers signed RHP Brett De Geus."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2017:mlb-statsapi-draft-2017-lad",
+   "draft_key": "2017-JUNE_AMATEUR",
+   "round_code": "34",
+   "overall_pick": 1030,
+   "round_pick": 25,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Dan Jagiello",
+    "birth_date": "1995-05-23",
+    "external_ids": {
+     "MLBAM": "668966"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2017-06-30",
+    "date_precision": "DAY",
+    "source_key": "lad2017:mlb-transactions-draft-2017",
+    "locator": "transaction 321652"
+   },
+   "notes": "MLB transaction 321652 (2017-06-30): Los Angeles Dodgers signed RHP Dan Jagiello."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2017:mlb-statsapi-draft-2017-lad",
+   "draft_key": "2017-JUNE_AMATEUR",
+   "round_code": "35",
+   "overall_pick": 1060,
+   "round_pick": 25,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Colby Nealy",
+    "birth_date": "1996-03-18",
+    "external_ids": {
+     "MLBAM": "676999"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2017-06-30",
+    "date_precision": "DAY",
+    "source_key": "lad2017:mlb-transactions-draft-2017",
+    "locator": "transaction 321654"
+   },
+   "notes": "MLB transaction 321654 (2017-06-30): Los Angeles Dodgers signed RHP Colby Nealy."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2017:mlb-statsapi-draft-2017-lad",
+   "draft_key": "2017-JUNE_AMATEUR",
+   "round_code": "36",
+   "overall_pick": 1090,
+   "round_pick": 25,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Riley Richert",
+    "birth_date": "1997-01-28",
+    "external_ids": {
+     "MLBAM": "667458"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2017-07-06",
+    "date_precision": "DAY",
+    "source_key": "lad2017:mlb-transactions-draft-2017",
+    "locator": "transaction 323115"
+   },
+   "notes": "MLB transaction 323115 (2017-07-06): Los Angeles Dodgers signed RHP Riley Richert."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2017:mlb-statsapi-draft-2017-lad",
+   "draft_key": "2017-JUNE_AMATEUR",
+   "round_code": "37",
+   "overall_pick": 1120,
+   "round_pick": 25,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Corey Merrill",
+    "birth_date": "1994-10-11",
+    "external_ids": {
+     "MLBAM": "641865"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2017-06-19",
+    "date_precision": "DAY",
+    "source_key": "lad2017:mlb-transactions-draft-2017",
+    "locator": "transaction 323116"
+   },
+   "notes": "MLB transaction 323116 (2017-06-19): Los Angeles Dodgers signed RHP Corey Merrill."
+  }
+ ]
+}

@@ -1,0 +1,28 @@
+{
+ "description": "Reported 2016-17 Dodgers international signings with a bonus (Dodgers Digest, 2016-07-02 and 2017-07-04), matched by hand to MLBAM ids. Used by scripts/research/sources/intl-list-corroboration.mjs.",
+ "period_key": "2016-17",
+ "organization": "LAD",
+ "source": {
+  "source_key": "lad201617:dodgersdigest-ifa-2016-07-02",
+  "source_type": "NEWS_REPORT",
+  "authority_level": "REPUTABLE_SECONDARY",
+  "title": "Dodgers sign Dominican SS Albert Suarez for $300,000",
+  "publisher": "Dodgers Digest (Dustin Nosler)",
+  "published_date": "2016-07-02",
+  "url": "https://dodgersdigest.com/2016/07/02/dodgers-sign-dominican-ss-albert-suarez-for-300000/",
+  "archived_url": "http://web.archive.org/web/20260308174241/https://dodgersdigest.com/2016/07/02/dodgers-sign-dominican-ss-albert-suarez-for-300000/",
+  "retrieved_date": "2026-10-20",
+  "notes": "\"Suarez signed for a reported $300,000. The Dodgers have $2,118,900 to spend during this period, but they cannot spend more than $300,000 on any prospect.\" Repeated as $300,000 in the 2017-07-04 article."
+ },
+ "entries": [
+  {
+   "name": "Albert Suarez",
+   "position": "SS",
+   "country": "Dominican Republic",
+   "mlbam": "672766",
+   "mlb_name": "Albert Suarez",
+   "bonus_usd": 300000,
+   "bonus_note": "reported bonus"
+  }
+ ]
+}

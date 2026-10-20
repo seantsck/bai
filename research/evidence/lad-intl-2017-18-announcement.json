@@ -1,0 +1,207 @@
+{
+ "description": "The Dodgers' announcement of 26 international signings on 2017-07-03 (2017-18 period), as transcribed by Dodgers Digest, matched by hand to MLBAM ids from the candidate batch. Used by scripts/research/sources/intl-list-corroboration.mjs.",
+ "period_key": "2017-18",
+ "organization": "LAD",
+ "source": {
+  "source_key": "lad201718:dodgersdigest-ifa-2017-07-04",
+  "source_type": "NEWS_REPORT",
+  "authority_level": "REPUTABLE_SECONDARY",
+  "title": "July 2 signing update: Dodgers announce signings of 26 prospects",
+  "publisher": "Dodgers Digest (Dustin Nosler)",
+  "published_date": "2017-07-04",
+  "url": "https://dodgersdigest.com/2017/07/04/july-2-signing-update-dodgers-announce-signings-of-26-prospects/",
+  "archived_url": "http://web.archive.org/web/20260309213502/https://dodgersdigest.com/2017/07/04/july-2-signing-update-dodgers-announce-signings-of-26-prospects/",
+  "retrieved_date": "2026-10-20",
+  "notes": "\"The Dodgers announced on Monday they have signed 26 international free agents ... Baseball America has been able to confirm three bonuses thus far: Heredia, $300,000 A. Valdez, $300,000 Leonard, $200,000\". Also: pool $4.75 million, no single bonus over $300,000 (penalty from 2015-16). Not imported: a reported Jaime Perez (Cuba) signing the article itself doubts, and a second report of Enrique $300,000 / Perez $200,000 it calls unreliable (2017-07-03 article)."
+ },
+ "entries": [
+  {
+   "name": "Mayron Cathalina",
+   "position": "OF",
+   "country": "Aruba",
+   "mlbam": "678886",
+   "mlb_name": "Mayron Cathalina"
+  },
+  {
+   "name": "Julio Enrique",
+   "position": "OF",
+   "country": "Cuba",
+   "mlbam": "678294",
+   "mlb_name": "Julio Enrique"
+  },
+  {
+   "name": "Rushenten Tomjansen",
+   "position": "OF",
+   "country": "Curacao",
+   "mlbam": "678751",
+   "mlb_name": "Rushenten Tomsjansen"
+  },
+  {
+   "name": "Jeffry Abreu",
+   "position": "RHP",
+   "country": "Dominican Republic",
+   "mlbam": "674100",
+   "mlb_name": "Jeffry Abreu"
+  },
+  {
+   "name": "Axel Acevedo",
+   "position": "RHP",
+   "country": "Dominican Republic",
+   "mlbam": "678677",
+   "mlb_name": "Axel Acevedo"
+  },
+  {
+   "name": "Jonathan Alvarez",
+   "position": "RHP",
+   "country": "Dominican Republic",
+   "mlbam": null,
+   "mlb_name": null
+  },
+  {
+   "name": "Jession Cabrera",
+   "position": "RHP",
+   "country": "Dominican Republic",
+   "mlbam": "678922",
+   "mlb_name": "Jeisson Cabrera"
+  },
+  {
+   "name": "Darlin Camilo",
+   "position": "RHP",
+   "country": "Dominican Republic",
+   "mlbam": "678480",
+   "mlb_name": "Darlin Camilo"
+  },
+  {
+   "name": "Daniel Cruz",
+   "position": "RHP",
+   "country": "Dominican Republic",
+   "mlbam": "677645",
+   "mlb_name": "Daniel Cruz"
+  },
+  {
+   "name": "Carlos De Los Santos",
+   "position": "RHP",
+   "country": "Dominican Republic",
+   "mlbam": "678914",
+   "mlb_name": "Carlos De Los Santos"
+  },
+  {
+   "name": "Jimmie Feliz",
+   "position": "OF",
+   "country": "Dominican Republic",
+   "mlbam": "678491",
+   "mlb_name": "Jimmie Feliz"
+  },
+  {
+   "name": "George Heredia",
+   "position": "OF",
+   "country": "Dominican Republic",
+   "mlbam": "678734",
+   "mlb_name": "Gorge Heredia",
+   "bonus_usd": 300000,
+   "bonus_note": "confirmed by Baseball America per the article"
+  },
+  {
+   "name": "Eddys Leonard",
+   "position": "SS",
+   "country": "Dominican Republic",
+   "mlbam": "678760",
+   "mlb_name": "Eddys Leonard",
+   "bonus_usd": 200000,
+   "bonus_note": "confirmed by Baseball America per the article"
+  },
+  {
+   "name": "Vladimir Perez",
+   "position": "SS",
+   "country": "Dominican Republic",
+   "mlbam": "678892",
+   "mlb_name": "Vladimir Perez"
+  },
+  {
+   "name": "Benony Robles",
+   "position": "LHP",
+   "country": "Dominican Republic",
+   "mlbam": "678840",
+   "mlb_name": "Benony Robles"
+  },
+  {
+   "name": "Brayan Rodriguez",
+   "position": "OF",
+   "country": "Dominican Republic",
+   "mlbam": "678589",
+   "mlb_name": "Brayan Rodriguez"
+  },
+  {
+   "name": "Randy Rodriguez",
+   "position": "IF",
+   "country": "Dominican Republic",
+   "mlbam": "678776",
+   "mlb_name": "Randy Rodriguez"
+  },
+  {
+   "name": "Martin Santana",
+   "position": "RHP",
+   "country": "Dominican Republic",
+   "mlbam": "679756",
+   "mlb_name": "Martin Santana"
+  },
+  {
+   "name": "Amin Valdez",
+   "position": "SS",
+   "country": "Dominican Republic",
+   "mlbam": "677576",
+   "mlb_name": "Amin Valdez",
+   "bonus_usd": 300000,
+   "bonus_note": "confirmed by Baseball America per the article"
+  },
+  {
+   "name": "Jesus Valdez",
+   "position": "IF",
+   "country": "Dominican Republic",
+   "mlbam": "678232",
+   "mlb_name": "Jesus Valdez"
+  },
+  {
+   "name": "Imanol Vargas",
+   "position": "OF",
+   "country": "Dominican Republic",
+   "mlbam": "677673",
+   "mlb_name": "Imanol Vargas"
+  },
+  {
+   "name": "Jonathan Vasquez",
+   "position": "RHP",
+   "country": "Dominican Republic",
+   "mlbam": "677675",
+   "mlb_name": "Jonathan Vasquez"
+  },
+  {
+   "name": "Andrew Budier",
+   "position": "LHP",
+   "country": "Nicaragua",
+   "mlbam": "678292",
+   "mlb_name": "Andrew Budier"
+  },
+  {
+   "name": "Jenderson Jardines",
+   "position": "C",
+   "country": "Venezuela",
+   "mlbam": "678668",
+   "mlb_name": "Jenderson Jardines"
+  },
+  {
+   "name": "Yhostin Chirinos",
+   "position": "SS",
+   "country": "Venezuela",
+   "mlbam": "678477",
+   "mlb_name": "Yhostin Chirinos"
+  },
+  {
+   "name": "Jorbit Vivas",
+   "position": "IF",
+   "country": "Venezuela",
+   "mlbam": "678391",
+   "mlb_name": "Jorbit Vivas"
+  }
+ ]
+}

@@ -1,0 +1,334 @@
+{
+ "format": "bai-research-import/1",
+ "batch_key": "2017-draft-lad-ba",
+ "channel": "DRAFT",
+ "description": "LAD 2017 Rule 4 draft: bonuses for 13 picks from Baseball America's draft selections table (27 rows show no figure and are not imported).",
+ "sources": [
+  {
+   "source_key": "lad2017:ba-draft-selections-2017",
+   "source_type": "REFERENCE_DATABASE",
+   "authority_level": "REPUTABLE_SECONDARY",
+   "title": "2017 Draft Selections",
+   "publisher": "Baseball America",
+   "url": "https://www.baseballamerica.com/stories/2017-draft-selections/",
+   "archived_url": "http://web.archive.org/web/20260911133140/https://www.baseballamerica.com/stories/2017-draft-selections/",
+   "published_date": "2018-02-14",
+   "retrieved_date": "2026-10-20",
+   "notes": "Pick-by-pick table with a Bonus column. \"—\" means no figure was published (not zero, not unsigned) and is skipped. Where a club used the $2,500 per-pick accounting deduction (LAD from 2016), the figures match the net amounts MLB.com and Baseball-Reference report."
+  }
+ ],
+ "records": [
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2017:mlb-statsapi-draft-2017-lad",
+   "draft_key": "2017-JUNE_AMATEUR",
+   "round_code": "1",
+   "overall_pick": 23,
+   "round_pick": 23,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Jeren Kendall",
+    "birth_date": "1996-02-04",
+    "external_ids": {
+     "MLBAM": "656607"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 2897500,
+    "source_key": "lad2017:ba-draft-selections-2017",
+    "locator": "row 1 / 23"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2017:mlb-statsapi-draft-2017-lad",
+   "draft_key": "2017-JUNE_AMATEUR",
+   "round_code": "2",
+   "overall_pick": 62,
+   "round_pick": 26,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Morgan Cooper",
+    "birth_date": "1994-09-12",
+    "external_ids": {
+     "MLBAM": "668729"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 867500,
+    "source_key": "lad2017:ba-draft-selections-2017",
+    "locator": "row 2 / 62"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2017:mlb-statsapi-draft-2017-lad",
+   "draft_key": "2017-JUNE_AMATEUR",
+   "round_code": "3",
+   "overall_pick": 100,
+   "round_pick": 25,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Connor Wong",
+    "birth_date": "1996-05-19",
+    "external_ids": {
+     "MLBAM": "657136"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 547500,
+    "source_key": "lad2017:ba-draft-selections-2017",
+    "locator": "row 3 / 100"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2017:mlb-statsapi-draft-2017-lad",
+   "draft_key": "2017-JUNE_AMATEUR",
+   "round_code": "4",
+   "overall_pick": 130,
+   "round_pick": 25,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "James Marinan",
+    "birth_date": "1998-10-10",
+    "external_ids": {
+     "MLBAM": "675653"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 822500,
+    "source_key": "lad2017:ba-draft-selections-2017",
+    "locator": "row 4 / 130"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2017:mlb-statsapi-draft-2017-lad",
+   "draft_key": "2017-JUNE_AMATEUR",
+   "round_code": "5",
+   "overall_pick": 160,
+   "round_pick": 25,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Riley Ottesen",
+    "birth_date": "1994-10-30",
+    "external_ids": {
+     "MLBAM": "675962"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 197500,
+    "source_key": "lad2017:ba-draft-selections-2017",
+    "locator": "row 5 / 160"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2017:mlb-statsapi-draft-2017-lad",
+   "draft_key": "2017-JUNE_AMATEUR",
+   "round_code": "6",
+   "overall_pick": 190,
+   "round_pick": 25,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Wills Montgomerie",
+    "birth_date": "1995-06-02",
+    "external_ids": {
+     "MLBAM": "676377"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 197500,
+    "source_key": "lad2017:ba-draft-selections-2017",
+    "locator": "row 6 / 190"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2017:mlb-statsapi-draft-2017-lad",
+   "draft_key": "2017-JUNE_AMATEUR",
+   "round_code": "7",
+   "overall_pick": 220,
+   "round_pick": 25,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Zach Pop",
+    "birth_date": "1996-09-20",
+    "external_ids": {
+     "MLBAM": "647315"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 147500,
+    "source_key": "lad2017:ba-draft-selections-2017",
+    "locator": "row 7 / 220"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2017:mlb-statsapi-draft-2017-lad",
+   "draft_key": "2017-JUNE_AMATEUR",
+   "round_code": "8",
+   "overall_pick": 250,
+   "round_pick": 25,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Rylan Bannon",
+    "birth_date": "1996-04-22",
+    "external_ids": {
+     "MLBAM": "676625"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 122500,
+    "source_key": "lad2017:ba-draft-selections-2017",
+    "locator": "row 8 / 250"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2017:mlb-statsapi-draft-2017-lad",
+   "draft_key": "2017-JUNE_AMATEUR",
+   "round_code": "9",
+   "overall_pick": 280,
+   "round_pick": 25,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Connor Strain",
+    "birth_date": "1994-08-04",
+    "external_ids": {
+     "MLBAM": "676150"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 1500,
+    "source_key": "lad2017:ba-draft-selections-2017",
+    "locator": "row 9 / 280"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2017:mlb-statsapi-draft-2017-lad",
+   "draft_key": "2017-JUNE_AMATEUR",
+   "round_code": "10",
+   "overall_pick": 310,
+   "round_pick": 25,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Zach Reks",
+    "birth_date": "1993-11-12",
+    "external_ids": {
+     "MLBAM": "676646"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 1500,
+    "source_key": "lad2017:ba-draft-selections-2017",
+    "locator": "row 10 / 310"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2017:mlb-statsapi-draft-2017-lad",
+   "draft_key": "2017-JUNE_AMATEUR",
+   "round_code": "11",
+   "overall_pick": 340,
+   "round_pick": 25,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Jacob Amaya",
+    "birth_date": "1998-09-03",
+    "external_ids": {
+     "MLBAM": "676070"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 247500,
+    "source_key": "lad2017:ba-draft-selections-2017",
+    "locator": "row 11 / 340"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2017:mlb-statsapi-draft-2017-lad",
+   "draft_key": "2017-JUNE_AMATEUR",
+   "round_code": "12",
+   "overall_pick": 370,
+   "round_pick": 25,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Andre Jackson",
+    "birth_date": "1996-05-01",
+    "external_ids": {
+     "MLBAM": "656578"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 247500,
+    "source_key": "lad2017:ba-draft-selections-2017",
+    "locator": "row 12 / 370"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2017:mlb-statsapi-draft-2017-lad",
+   "draft_key": "2017-JUNE_AMATEUR",
+   "round_code": "13",
+   "overall_pick": 400,
+   "round_pick": 25,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Marshall Kasowski",
+    "birth_date": "1995-03-10",
+    "external_ids": {
+     "MLBAM": "667445"
+    },
+    "source_key": "lad2017:mlb-statsapi-draft-2017-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 125000,
+    "source_key": "lad2017:ba-draft-selections-2017",
+    "locator": "row 13 / 400"
+   }
+  }
+ ]
+}
