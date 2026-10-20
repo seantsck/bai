@@ -1,0 +1,1711 @@
+{
+ "format": "bai-research-import/1",
+ "batch_key": "2016-draft-atl",
+ "channel": "DRAFT",
+ "description": "Atlanta Braves, 2016 Rule 4 draft: 42 selections (MLB Stats API universe; Baseball-Reference signing status, bonus, school).",
+ "coverage_claims": [
+  {
+   "domain": "DRAFT",
+   "scope_key": "2016-JUNE_AMATEUR",
+   "organization": "ATL",
+   "coverage_state": "COMPLETE_CENSUS",
+   "expected_count": 42,
+   "source_key": "atl2016:mlb-statsapi-draft-2016-atl",
+   "gap_notes": "Population: the 42 selections MLB's official draft data lists for the club; Baseball-Reference lists the same 42 by overall pick and name. Census of selections only: bonuses published for 28 of 34 signed picks, no slot values, no outcomes audited."
+  }
+ ],
+ "sources": [
+  {
+   "source_key": "atl2016:mlb-statsapi-draft-2016-atl",
+   "source_type": "OFFICIAL_LEAGUE",
+   "authority_level": "OFFICIAL",
+   "title": "MLB Stats API draft endpoint, 2016, teamId=144",
+   "publisher": "MLB Advanced Media",
+   "url": "https://statsapi.mlb.com/api/v1/draft/2016?teamId=144",
+   "retrieved_date": "2026-10-20",
+   "notes": "JSON; 42 picks: pickRound, pickNumber, roundPickNumber, person (MLBAM id, name, birth date, country), school label. No signing status, bonus or slot value."
+  },
+  {
+   "source_key": "atl2016:bref-atl-2016",
+   "source_type": "REFERENCE_DATABASE",
+   "authority_level": "AGGREGATOR",
+   "title": "Baseball-Reference: 2016 June amateur draft, Atlanta Braves",
+   "publisher": "Baseball-Reference (Sports Reference)",
+   "url": "https://www.baseball-reference.com/draft/index.fcgi?query_type=franch_year&team_ID=ATL&year_ID=2016&draft_type=junreg",
+   "archived_url": "http://web.archive.org/web/20250823182338/https://www.baseball-reference.com/draft/index.fcgi?query_type=franch_year&team_ID=ATL&year_ID=2016&draft_type=junreg",
+   "retrieved_date": "2026-10-20",
+   "notes": "Columns used: Rnd, OvPck, RdPck, Signed, Bonus, Name (ids), Pos, Type, Drafted Out of. Read through the archive capture (the live site refuses automated requests)."
+  }
+ ],
+ "records": [
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "atl2016:mlb-statsapi-draft-2016-atl",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "1",
+   "overall_pick": 3,
+   "round_pick": 3,
+   "organization": "ATL",
+   "selection_type": "STANDARD",
+   "position": "RHP",
+   "field_sources": {
+    "position": "atl2016:bref-atl-2016",
+    "school": "atl2016:bref-atl-2016"
+   },
+   "player": {
+    "full_name": "Ian Anderson",
+    "birth_date": "1998-05-02",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "666120",
+     "BBREF": "anderia01",
+     "BBREF_MINORS": "anders000ian"
+    },
+    "source_key": "atl2016:mlb-statsapi-draft-2016-atl"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 4000000,
+    "source_key": "atl2016:bref-atl-2016"
+   },
+   "notes": "MLB school label: Shenendehowa (NY) HS.",
+   "school": {
+    "name": "Shenendehowa HS",
+    "school_type": "HIGH_SCHOOL",
+    "city": "Clifton Park",
+    "region": "NY",
+    "country": "USA",
+    "source_key": "atl2016:bref-atl-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "atl2016:mlb-statsapi-draft-2016-atl",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "CB-A",
+   "overall_pick": 40,
+   "round_pick": 6,
+   "organization": "ATL",
+   "selection_type": "COMPETITIVE_BALANCE",
+   "position": "LHP",
+   "field_sources": {
+    "position": "atl2016:bref-atl-2016",
+    "school": "atl2016:bref-atl-2016"
+   },
+   "player": {
+    "full_name": "Joey Wentz",
+    "birth_date": "1997-10-06",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "666214",
+     "BBREF": "wentzjo01",
+     "BBREF_MINORS": "wentz-000joe"
+    },
+    "source_key": "atl2016:mlb-statsapi-draft-2016-atl"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 3050000,
+    "source_key": "atl2016:bref-atl-2016"
+   },
+   "notes": "MLB school label: Shawnee Mission East (KS) HS.",
+   "school": {
+    "name": "Shawnee Mission East HS",
+    "school_type": "HIGH_SCHOOL",
+    "city": "Prairie Village",
+    "region": "KS",
+    "country": "USA",
+    "source_key": "atl2016:bref-atl-2016"
+   },
+   "evidence": [
+    {
+     "subject": "selection",
+     "field": "round_code",
+     "value": "1",
+     "source_key": "atl2016:bref-atl-2016",
+     "locator": "draft table round column"
+    },
+    {
+     "subject": "selection",
+     "field": "round_pick",
+     "value": 40,
+     "source_key": "atl2016:bref-atl-2016",
+     "locator": "draft table pick-in-round column"
+    }
+   ]
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "atl2016:mlb-statsapi-draft-2016-atl",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "2",
+   "overall_pick": 44,
+   "round_pick": 3,
+   "organization": "ATL",
+   "selection_type": "STANDARD",
+   "position": "LHP",
+   "field_sources": {
+    "position": "atl2016:bref-atl-2016",
+    "school": "atl2016:bref-atl-2016"
+   },
+   "player": {
+    "full_name": "Kyle Muller",
+    "birth_date": "1997-10-07",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "666205",
+     "BBREF": "mulleky01",
+     "BBREF_MINORS": "muller000kyl"
+    },
+    "source_key": "atl2016:mlb-statsapi-draft-2016-atl"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 2500000,
+    "source_key": "atl2016:bref-atl-2016"
+   },
+   "notes": "MLB school label: Jesuit College Prep (TX).",
+   "school": {
+    "name": "Jesuit College Preparatory School of Dallas",
+    "school_type": "HIGH_SCHOOL",
+    "city": "Dallas",
+    "region": "TX",
+    "country": "USA",
+    "source_key": "atl2016:bref-atl-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "atl2016:mlb-statsapi-draft-2016-atl",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "CB-B",
+   "overall_pick": 76,
+   "round_pick": 6,
+   "organization": "ATL",
+   "selection_type": "COMPETITIVE_BALANCE",
+   "position": "C",
+   "field_sources": {
+    "position": "atl2016:bref-atl-2016",
+    "school": "atl2016:bref-atl-2016"
+   },
+   "player": {
+    "full_name": "Brett Cumberland",
+    "birth_date": "1995-06-25",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "656340",
+     "BBREF_MINORS": "cumber000bre"
+    },
+    "source_key": "atl2016:mlb-statsapi-draft-2016-atl"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 1500000,
+    "source_key": "atl2016:bref-atl-2016"
+   },
+   "notes": "MLB school label: California.",
+   "school": {
+    "name": "University of California, Berkeley",
+    "school_type": "COLLEGE",
+    "city": "Berkeley",
+    "region": "CA",
+    "country": "USA",
+    "source_key": "atl2016:bref-atl-2016"
+   },
+   "evidence": [
+    {
+     "subject": "selection",
+     "field": "round_code",
+     "value": "2",
+     "source_key": "atl2016:bref-atl-2016",
+     "locator": "draft table round column"
+    },
+    {
+     "subject": "selection",
+     "field": "round_pick",
+     "value": 35,
+     "source_key": "atl2016:bref-atl-2016",
+     "locator": "draft table pick-in-round column"
+    }
+   ]
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "atl2016:mlb-statsapi-draft-2016-atl",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "3",
+   "overall_pick": 80,
+   "round_pick": 3,
+   "organization": "ATL",
+   "selection_type": "STANDARD",
+   "position": "LHP",
+   "field_sources": {
+    "position": "atl2016:bref-atl-2016",
+    "school": "atl2016:bref-atl-2016"
+   },
+   "player": {
+    "full_name": "Drew Harrington",
+    "birth_date": "1995-03-30",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "641666",
+     "BBREF_MINORS": "harrin000dre"
+    },
+    "source_key": "atl2016:mlb-statsapi-draft-2016-atl"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 900000,
+    "source_key": "atl2016:bref-atl-2016"
+   },
+   "notes": "MLB school label: Louisville.",
+   "school": {
+    "name": "University of Louisville",
+    "school_type": "COLLEGE",
+    "city": "Louisville",
+    "region": "KY",
+    "country": "USA",
+    "source_key": "atl2016:bref-atl-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "atl2016:mlb-statsapi-draft-2016-atl",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "4",
+   "overall_pick": 109,
+   "round_pick": 3,
+   "organization": "ATL",
+   "selection_type": "STANDARD",
+   "position": "RHP",
+   "field_sources": {
+    "position": "atl2016:bref-atl-2016",
+    "school": "atl2016:bref-atl-2016"
+   },
+   "player": {
+    "full_name": "Bryse Wilson",
+    "birth_date": "1997-12-20",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "669060",
+     "BBREF": "wilsobr02",
+     "BBREF_MINORS": "wilson004bry"
+    },
+    "source_key": "atl2016:mlb-statsapi-draft-2016-atl"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 1200000,
+    "source_key": "atl2016:bref-atl-2016"
+   },
+   "notes": "MLB school label: Orange (NC) HS.",
+   "school": {
+    "name": "Orange HS",
+    "school_type": "HIGH_SCHOOL",
+    "city": "Hillsborough",
+    "region": "NC",
+    "country": "USA",
+    "source_key": "atl2016:bref-atl-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "atl2016:mlb-statsapi-draft-2016-atl",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "5",
+   "overall_pick": 139,
+   "round_pick": 3,
+   "organization": "ATL",
+   "selection_type": "STANDARD",
+   "position": "RHP",
+   "field_sources": {
+    "position": "atl2016:bref-atl-2016",
+    "school": "atl2016:bref-atl-2016"
+   },
+   "player": {
+    "full_name": "Jeremy Walker",
+    "birth_date": "1995-06-12",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "668683",
+     "BBREF": "walkeje02",
+     "BBREF_MINORS": "walker003jer"
+    },
+    "source_key": "atl2016:mlb-statsapi-draft-2016-atl"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 275000,
+    "source_key": "atl2016:bref-atl-2016"
+   },
+   "notes": "MLB school label: Gardner-Webb.",
+   "school": {
+    "name": "Gardner-Webb University",
+    "school_type": "COLLEGE",
+    "city": "Boiling Springs",
+    "region": "NC",
+    "country": "USA",
+    "source_key": "atl2016:bref-atl-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "atl2016:mlb-statsapi-draft-2016-atl",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "6",
+   "overall_pick": 169,
+   "round_pick": 3,
+   "organization": "ATL",
+   "selection_type": "STANDARD",
+   "position": "2B",
+   "field_sources": {
+    "position": "atl2016:bref-atl-2016",
+    "school": "atl2016:bref-atl-2016"
+   },
+   "player": {
+    "full_name": "Matt Gonzalez",
+    "birth_date": "1993-11-30",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "623178",
+     "BBREF_MINORS": "gonzal007ale"
+    },
+    "source_key": "atl2016:mlb-statsapi-draft-2016-atl"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 25000,
+    "source_key": "atl2016:bref-atl-2016"
+   },
+   "notes": "MLB school label: Georgia Tech.",
+   "school": {
+    "name": "Georgia Institute of Technology",
+    "school_type": "COLLEGE",
+    "city": "Atlanta",
+    "region": "GA",
+    "country": "USA",
+    "source_key": "atl2016:bref-atl-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "atl2016:mlb-statsapi-draft-2016-atl",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "7",
+   "overall_pick": 199,
+   "round_pick": 3,
+   "organization": "ATL",
+   "selection_type": "STANDARD",
+   "position": "LF",
+   "field_sources": {
+    "position": "atl2016:bref-atl-2016",
+    "school": "atl2016:bref-atl-2016"
+   },
+   "player": {
+    "full_name": "J.B. Moss",
+    "birth_date": "1993-06-21",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "622111",
+     "BBREF_MINORS": "moss--000jb-"
+    },
+    "source_key": "atl2016:mlb-statsapi-draft-2016-atl"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 10000,
+    "source_key": "atl2016:bref-atl-2016"
+   },
+   "notes": "MLB school label: Texas A&M.",
+   "school": {
+    "name": "Texas A&M University",
+    "school_type": "COLLEGE",
+    "city": "College Station",
+    "region": "TX",
+    "country": "USA",
+    "source_key": "atl2016:bref-atl-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "atl2016:mlb-statsapi-draft-2016-atl",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "8",
+   "overall_pick": 229,
+   "round_pick": 3,
+   "organization": "ATL",
+   "selection_type": "STANDARD",
+   "position": "LHP",
+   "field_sources": {
+    "position": "atl2016:bref-atl-2016",
+    "school": "atl2016:bref-atl-2016"
+   },
+   "player": {
+    "full_name": "Taylor Hyssong",
+    "birth_date": "1994-01-04",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "656570",
+     "BBREF_MINORS": "hysson000tay"
+    },
+    "source_key": "atl2016:mlb-statsapi-draft-2016-atl"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 10000,
+    "source_key": "atl2016:bref-atl-2016"
+   },
+   "notes": "MLB school label: UNC Wilmington.",
+   "school": {
+    "name": "University of North Carolina at Wilmington",
+    "school_type": "COLLEGE",
+    "city": "Wilmington",
+    "region": "NC",
+    "country": "USA",
+    "source_key": "atl2016:bref-atl-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "atl2016:mlb-statsapi-draft-2016-atl",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "9",
+   "overall_pick": 259,
+   "round_pick": 3,
+   "organization": "ATL",
+   "selection_type": "STANDARD",
+   "position": "RF",
+   "field_sources": {
+    "position": "atl2016:bref-atl-2016",
+    "school": "atl2016:bref-atl-2016"
+   },
+   "player": {
+    "full_name": "Tyler Neslony",
+    "birth_date": "1994-02-13",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "664104",
+     "BBREF_MINORS": "neslon000tyl"
+    },
+    "source_key": "atl2016:mlb-statsapi-draft-2016-atl"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 8000,
+    "source_key": "atl2016:bref-atl-2016"
+   },
+   "notes": "MLB school label: Texas Tech.",
+   "school": {
+    "name": "Texas Tech University",
+    "school_type": "COLLEGE",
+    "city": "Lubbock",
+    "region": "TX",
+    "country": "USA",
+    "source_key": "atl2016:bref-atl-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "atl2016:mlb-statsapi-draft-2016-atl",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "10",
+   "overall_pick": 289,
+   "round_pick": 3,
+   "organization": "ATL",
+   "selection_type": "STANDARD",
+   "position": "SS",
+   "field_sources": {
+    "position": "atl2016:bref-atl-2016",
+    "school": "atl2016:bref-atl-2016"
+   },
+   "player": {
+    "full_name": "Marcus Mooney",
+    "birth_date": "1994-01-20",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "669129",
+     "BBREF_MINORS": "mooney003mar"
+    },
+    "source_key": "atl2016:mlb-statsapi-draft-2016-atl"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 5000,
+    "source_key": "atl2016:bref-atl-2016"
+   },
+   "notes": "MLB school label: South Carolina.",
+   "school": {
+    "name": "University of South Carolina",
+    "school_type": "COLLEGE",
+    "city": "Columbia",
+    "region": "SC",
+    "country": "USA",
+    "source_key": "atl2016:bref-atl-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "atl2016:mlb-statsapi-draft-2016-atl",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "11",
+   "overall_pick": 319,
+   "round_pick": 3,
+   "organization": "ATL",
+   "selection_type": "STANDARD",
+   "position": "RHP",
+   "field_sources": {
+    "position": "atl2016:bref-atl-2016",
+    "school": "atl2016:bref-atl-2016"
+   },
+   "player": {
+    "full_name": "Matt Rowland",
+    "birth_date": "1998-02-07",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "669117",
+     "BBREF_MINORS": "rowlan001mat"
+    },
+    "source_key": "atl2016:mlb-statsapi-draft-2016-atl"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 400000,
+    "source_key": "atl2016:bref-atl-2016"
+   },
+   "notes": "MLB school label: Pope (GA) HS.",
+   "school": {
+    "name": "Pope HS",
+    "school_type": "HIGH_SCHOOL",
+    "city": "Marietta",
+    "region": "GA",
+    "country": "USA",
+    "source_key": "atl2016:bref-atl-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "atl2016:mlb-statsapi-draft-2016-atl",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "12",
+   "overall_pick": 349,
+   "round_pick": 3,
+   "organization": "ATL",
+   "selection_type": "STANDARD",
+   "position": "RHP",
+   "field_sources": {
+    "position": "atl2016:bref-atl-2016",
+    "school": "atl2016:bref-atl-2016"
+   },
+   "player": {
+    "full_name": "Brandon White",
+    "birth_date": "1994-12-21",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "668987",
+     "BBREF_MINORS": "white-004bra"
+    },
+    "source_key": "atl2016:mlb-statsapi-draft-2016-atl"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 100000,
+    "source_key": "atl2016:bref-atl-2016"
+   },
+   "notes": "MLB school label: Lander.",
+   "school": {
+    "name": "Lander University",
+    "school_type": "COLLEGE",
+    "city": "Greenwood",
+    "region": "SC",
+    "country": "USA",
+    "source_key": "atl2016:bref-atl-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "atl2016:mlb-statsapi-draft-2016-atl",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "13",
+   "overall_pick": 379,
+   "round_pick": 3,
+   "organization": "ATL",
+   "selection_type": "STANDARD",
+   "position": "RHP",
+   "field_sources": {
+    "position": "atl2016:bref-atl-2016",
+    "school": "atl2016:bref-atl-2016"
+   },
+   "player": {
+    "full_name": "Brandon White",
+    "birth_date": "1992-12-06",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "664224",
+     "BBREF_MINORS": "white-005bra"
+    },
+    "source_key": "atl2016:mlb-statsapi-draft-2016-atl"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 85000,
+    "source_key": "atl2016:bref-atl-2016"
+   },
+   "notes": "MLB school label: Davenport.",
+   "school": {
+    "name": "Davenport University",
+    "school_type": "COLLEGE",
+    "city": "Grand Rapids",
+    "region": "MI",
+    "country": "USA",
+    "source_key": "atl2016:bref-atl-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "atl2016:mlb-statsapi-draft-2016-atl",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "14",
+   "overall_pick": 409,
+   "round_pick": 3,
+   "organization": "ATL",
+   "selection_type": "STANDARD",
+   "position": "1B",
+   "field_sources": {
+    "position": "atl2016:bref-atl-2016",
+    "school": "atl2016:bref-atl-2016"
+   },
+   "player": {
+    "full_name": "Ramon Osuna",
+    "birth_date": "1995-06-27",
+    "birth_country": "Mexico",
+    "external_ids": {
+     "MLBAM": "670153",
+     "BBREF_MINORS": "osuna-000ram"
+    },
+    "source_key": "atl2016:mlb-statsapi-draft-2016-atl"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 100000,
+    "source_key": "atl2016:bref-atl-2016"
+   },
+   "notes": "MLB school label: Walters State CC.",
+   "school": {
+    "name": "Walters State Community College",
+    "school_type": "JUNIOR_COLLEGE",
+    "city": "Morristown",
+    "region": "TN",
+    "country": "USA",
+    "source_key": "atl2016:bref-atl-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "atl2016:mlb-statsapi-draft-2016-atl",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "15",
+   "overall_pick": 439,
+   "round_pick": 3,
+   "organization": "ATL",
+   "selection_type": "STANDARD",
+   "position": "RHP",
+   "field_sources": {
+    "position": "atl2016:bref-atl-2016",
+    "school": "atl2016:bref-atl-2016"
+   },
+   "player": {
+    "full_name": "Zach Becherer",
+    "birth_date": "1995-09-04",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "670165",
+     "BBREF_MINORS": "becher000zac"
+    },
+    "source_key": "atl2016:mlb-statsapi-draft-2016-atl"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 175000,
+    "source_key": "atl2016:bref-atl-2016"
+   },
+   "notes": "MLB school label: Rend Lake College.",
+   "school": {
+    "name": "Rend Lake College",
+    "school_type": "JUNIOR_COLLEGE",
+    "city": "Ina",
+    "region": "IL",
+    "country": "USA",
+    "source_key": "atl2016:bref-atl-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "atl2016:mlb-statsapi-draft-2016-atl",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "16",
+   "overall_pick": 469,
+   "round_pick": 3,
+   "organization": "ATL",
+   "selection_type": "STANDARD",
+   "position": "3B",
+   "field_sources": {
+    "position": "atl2016:bref-atl-2016",
+    "school": "atl2016:bref-atl-2016"
+   },
+   "player": {
+    "full_name": "Josh Anthony",
+    "birth_date": "1996-07-03",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "670071",
+     "BBREF_MINORS": "anthon004jos"
+    },
+    "source_key": "atl2016:mlb-statsapi-draft-2016-atl"
+   },
+   "signing": {
+    "status": "DID_NOT_SIGN",
+    "source_key": "atl2016:bref-atl-2016"
+   },
+   "notes": "MLB school label: Western Oklahoma State College.",
+   "school": {
+    "name": "Western Oklahoma State College",
+    "school_type": "JUNIOR_COLLEGE",
+    "city": "Altus",
+    "region": "OK",
+    "country": "USA",
+    "source_key": "atl2016:bref-atl-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "atl2016:mlb-statsapi-draft-2016-atl",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "17",
+   "overall_pick": 499,
+   "round_pick": 3,
+   "organization": "ATL",
+   "selection_type": "STANDARD",
+   "position": "RHP",
+   "field_sources": {
+    "position": "atl2016:bref-atl-2016",
+    "school": "atl2016:bref-atl-2016"
+   },
+   "player": {
+    "full_name": "Devan Watts",
+    "birth_date": "1995-04-21",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "670086",
+     "BBREF_MINORS": "watts-000dev"
+    },
+    "source_key": "atl2016:mlb-statsapi-draft-2016-atl"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 60000,
+    "source_key": "atl2016:bref-atl-2016"
+   },
+   "notes": "MLB school label: Tusculum College.",
+   "school": {
+    "name": "Tusculum University",
+    "school_type": "COLLEGE",
+    "city": "Greenville",
+    "region": "TN",
+    "country": "USA",
+    "source_key": "atl2016:bref-atl-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "atl2016:mlb-statsapi-draft-2016-atl",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "18",
+   "overall_pick": 529,
+   "round_pick": 3,
+   "organization": "ATL",
+   "selection_type": "STANDARD",
+   "position": "LHP",
+   "field_sources": {
+    "position": "atl2016:bref-atl-2016",
+    "school": "atl2016:bref-atl-2016"
+   },
+   "player": {
+    "full_name": "Zach Rice",
+    "birth_date": "1995-10-15",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "670099",
+     "BBREF_MINORS": "rice--000zac"
+    },
+    "source_key": "atl2016:mlb-statsapi-draft-2016-atl"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 100000,
+    "source_key": "atl2016:bref-atl-2016"
+   },
+   "notes": "MLB school label: North Carolina.",
+   "school": {
+    "name": "University of North Carolina at Chapel Hill",
+    "school_type": "COLLEGE",
+    "city": "Chapel Hill",
+    "region": "NC",
+    "country": "USA",
+    "source_key": "atl2016:bref-atl-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "atl2016:mlb-statsapi-draft-2016-atl",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "19",
+   "overall_pick": 559,
+   "round_pick": 3,
+   "organization": "ATL",
+   "selection_type": "STANDARD",
+   "position": "LHP",
+   "field_sources": {
+    "position": "atl2016:bref-atl-2016",
+    "school": "atl2016:bref-atl-2016"
+   },
+   "player": {
+    "full_name": "Tucker Davidson",
+    "birth_date": "1996-03-25",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "656353",
+     "BBREF": "davidtu01",
+     "BBREF_MINORS": "davids000tuc"
+    },
+    "source_key": "atl2016:mlb-statsapi-draft-2016-atl"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 125000,
+    "source_key": "atl2016:bref-atl-2016"
+   },
+   "notes": "MLB school label: Midland College (TX).",
+   "school": {
+    "name": "Midland College",
+    "school_type": "JUNIOR_COLLEGE",
+    "city": "Midland",
+    "region": "TX",
+    "country": "USA",
+    "source_key": "atl2016:bref-atl-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "atl2016:mlb-statsapi-draft-2016-atl",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "20",
+   "overall_pick": 589,
+   "round_pick": 3,
+   "organization": "ATL",
+   "selection_type": "STANDARD",
+   "position": "2B",
+   "field_sources": {
+    "position": "atl2016:bref-atl-2016",
+    "school": "atl2016:bref-atl-2016"
+   },
+   "player": {
+    "full_name": "Gabe Howell",
+    "birth_date": "1998-03-12",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "669014",
+     "BBREF_MINORS": "howell000gab"
+    },
+    "source_key": "atl2016:mlb-statsapi-draft-2016-atl"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 100000,
+    "source_key": "atl2016:bref-atl-2016"
+   },
+   "notes": "MLB school label: Trion (GA) HS.",
+   "school": {
+    "name": "Trion HS",
+    "school_type": "HIGH_SCHOOL",
+    "city": "Trion",
+    "region": "GA",
+    "country": "USA",
+    "source_key": "atl2016:bref-atl-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "atl2016:mlb-statsapi-draft-2016-atl",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "21",
+   "overall_pick": 619,
+   "round_pick": 3,
+   "organization": "ATL",
+   "selection_type": "STANDARD",
+   "position": "RHP",
+   "field_sources": {
+    "position": "atl2016:bref-atl-2016",
+    "school": "atl2016:bref-atl-2016"
+   },
+   "player": {
+    "full_name": "Dalton Carroll",
+    "birth_date": "1994-05-18",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "663401",
+     "BBREF_MINORS": "carrol001dal"
+    },
+    "source_key": "atl2016:mlb-statsapi-draft-2016-atl"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "source_key": "atl2016:bref-atl-2016"
+   },
+   "notes": "MLB school label: Utah. Signed with no published bonus: unknown, not zero.",
+   "school": {
+    "name": "University of Utah",
+    "school_type": "COLLEGE",
+    "city": "Salt Lake City",
+    "region": "UT",
+    "country": "USA",
+    "source_key": "atl2016:bref-atl-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "atl2016:mlb-statsapi-draft-2016-atl",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "22",
+   "overall_pick": 649,
+   "round_pick": 3,
+   "organization": "ATL",
+   "selection_type": "STANDARD",
+   "position": "1B",
+   "field_sources": {
+    "position": "atl2016:bref-atl-2016",
+    "school": "atl2016:bref-atl-2016"
+   },
+   "player": {
+    "full_name": "Alex Lee",
+    "birth_date": "1993-10-23",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "670373",
+     "BBREF_MINORS": "lee---002ale"
+    },
+    "source_key": "atl2016:mlb-statsapi-draft-2016-atl"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "source_key": "atl2016:bref-atl-2016"
+   },
+   "notes": "MLB school label: Samford. Signed with no published bonus: unknown, not zero.",
+   "school": {
+    "name": "Samford University",
+    "school_type": "COLLEGE",
+    "city": "Homewood",
+    "region": "AL",
+    "country": "USA",
+    "source_key": "atl2016:bref-atl-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "atl2016:mlb-statsapi-draft-2016-atl",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "23",
+   "overall_pick": 679,
+   "round_pick": 3,
+   "organization": "ATL",
+   "selection_type": "STANDARD",
+   "position": "1B",
+   "field_sources": {
+    "position": "atl2016:bref-atl-2016",
+    "school": "atl2016:bref-atl-2016"
+   },
+   "player": {
+    "full_name": "Griffin Benson",
+    "birth_date": "1997-09-28",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "670392",
+     "BBREF_MINORS": "benson000gri"
+    },
+    "source_key": "atl2016:mlb-statsapi-draft-2016-atl"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 100000,
+    "source_key": "atl2016:bref-atl-2016"
+   },
+   "notes": "MLB school label: Aledo HS.",
+   "school": {
+    "name": "Aledo HS",
+    "school_type": "HIGH_SCHOOL",
+    "city": "Aledo",
+    "region": "TX",
+    "country": "USA",
+    "source_key": "atl2016:bref-atl-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "atl2016:mlb-statsapi-draft-2016-atl",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "24",
+   "overall_pick": 709,
+   "round_pick": 3,
+   "organization": "ATL",
+   "selection_type": "STANDARD",
+   "position": "CF",
+   "field_sources": {
+    "position": "atl2016:bref-atl-2016",
+    "school": "atl2016:bref-atl-2016"
+   },
+   "player": {
+    "full_name": "Matt Hearn",
+    "birth_date": "1996-02-29",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "670413",
+     "BBREF_MINORS": "hearn-000mat"
+    },
+    "source_key": "atl2016:mlb-statsapi-draft-2016-atl"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "source_key": "atl2016:bref-atl-2016"
+   },
+   "notes": "MLB school label: Mission College. Signed with no published bonus: unknown, not zero.",
+   "school": {
+    "name": "Mission College",
+    "school_type": "JUNIOR_COLLEGE",
+    "city": "Santa Clara",
+    "region": "CA",
+    "country": "USA",
+    "source_key": "atl2016:bref-atl-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "atl2016:mlb-statsapi-draft-2016-atl",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "25",
+   "overall_pick": 739,
+   "round_pick": 3,
+   "organization": "ATL",
+   "selection_type": "STANDARD",
+   "position": "3B",
+   "field_sources": {
+    "position": "atl2016:bref-atl-2016",
+    "school": "atl2016:bref-atl-2016"
+   },
+   "player": {
+    "full_name": "Ryan O'Malley",
+    "birth_date": "1994-02-02",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "670438",
+     "BBREF_MINORS": "omalle002rya"
+    },
+    "source_key": "atl2016:mlb-statsapi-draft-2016-atl"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 100000,
+    "source_key": "atl2016:bref-atl-2016"
+   },
+   "notes": "MLB school label: Sonoma State.",
+   "school": {
+    "name": "Sonoma State University",
+    "school_type": "COLLEGE",
+    "city": "Rohnert Park",
+    "region": "CA",
+    "country": "USA",
+    "source_key": "atl2016:bref-atl-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "atl2016:mlb-statsapi-draft-2016-atl",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "26",
+   "overall_pick": 769,
+   "round_pick": 3,
+   "organization": "ATL",
+   "selection_type": "STANDARD",
+   "position": "C",
+   "field_sources": {
+    "position": "atl2016:bref-atl-2016",
+    "school": "atl2016:bref-atl-2016"
+   },
+   "player": {
+    "full_name": "Alan Crowley",
+    "birth_date": "1996-03-04",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "670409",
+     "BBREF_MINORS": "crowle000ala"
+    },
+    "source_key": "atl2016:mlb-statsapi-draft-2016-atl"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 100000,
+    "source_key": "atl2016:bref-atl-2016"
+   },
+   "notes": "MLB school label: Reedley College.",
+   "school": {
+    "name": "Reedley College",
+    "school_type": "JUNIOR_COLLEGE",
+    "city": "Reedley",
+    "region": "CA",
+    "country": "USA",
+    "source_key": "atl2016:bref-atl-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "atl2016:mlb-statsapi-draft-2016-atl",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "27",
+   "overall_pick": 799,
+   "round_pick": 3,
+   "organization": "ATL",
+   "selection_type": "STANDARD",
+   "position": "LHP",
+   "field_sources": {
+    "position": "atl2016:bref-atl-2016",
+    "school": "atl2016:bref-atl-2016"
+   },
+   "player": {
+    "full_name": "Corbin Clouse",
+    "birth_date": "1995-06-26",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "641462",
+     "BBREF_MINORS": "clouse000cor"
+    },
+    "source_key": "atl2016:mlb-statsapi-draft-2016-atl"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 65000,
+    "source_key": "atl2016:bref-atl-2016"
+   },
+   "notes": "MLB school label: Davenport.",
+   "school": {
+    "name": "Davenport University",
+    "school_type": "COLLEGE",
+    "city": "Grand Rapids",
+    "region": "MI",
+    "country": "USA",
+    "source_key": "atl2016:bref-atl-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "atl2016:mlb-statsapi-draft-2016-atl",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "28",
+   "overall_pick": 829,
+   "round_pick": 3,
+   "organization": "ATL",
+   "selection_type": "STANDARD",
+   "position": "2B",
+   "field_sources": {
+    "position": "atl2016:bref-atl-2016",
+    "school": "atl2016:bref-atl-2016"
+   },
+   "player": {
+    "full_name": "Nick Shumpert",
+    "birth_date": "1996-11-11",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "663744",
+     "BBREF_MINORS": "shumpe000nic"
+    },
+    "source_key": "atl2016:mlb-statsapi-draft-2016-atl"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "source_key": "atl2016:bref-atl-2016"
+   },
+   "notes": "MLB school label: San Jacinto College. Signed with no published bonus: unknown, not zero.",
+   "school": {
+    "name": "San Jacinto College, North Campus",
+    "school_type": "JUNIOR_COLLEGE",
+    "city": "Houston",
+    "region": "TX",
+    "country": "USA",
+    "source_key": "atl2016:bref-atl-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "atl2016:mlb-statsapi-draft-2016-atl",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "29",
+   "overall_pick": 859,
+   "round_pick": 3,
+   "organization": "ATL",
+   "selection_type": "STANDARD",
+   "position": "CF",
+   "field_sources": {
+    "position": "atl2016:bref-atl-2016",
+    "school": "atl2016:bref-atl-2016"
+   },
+   "player": {
+    "full_name": "Jackson Pokorney",
+    "birth_date": "1998-04-28",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "670228",
+     "BBREF_MINORS": "pokorn000jac"
+    },
+    "source_key": "atl2016:mlb-statsapi-draft-2016-atl"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 100000,
+    "source_key": "atl2016:bref-atl-2016"
+   },
+   "notes": "MLB school label: Mater Dei HS.",
+   "school": {
+    "name": "Mater Dei HS",
+    "school_type": "HIGH_SCHOOL",
+    "city": "Evansville",
+    "region": "IN",
+    "country": "USA",
+    "source_key": "atl2016:bref-atl-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "atl2016:mlb-statsapi-draft-2016-atl",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "30",
+   "overall_pick": 889,
+   "round_pick": 3,
+   "organization": "ATL",
+   "selection_type": "STANDARD",
+   "position": "RHP",
+   "field_sources": {
+    "position": "atl2016:bref-atl-2016",
+    "school": "atl2016:bref-atl-2016"
+   },
+   "player": {
+    "full_name": "Cameron Stanton",
+    "birth_date": "1994-06-20",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "670356",
+     "BBREF_MINORS": "stanto000cam"
+    },
+    "source_key": "atl2016:mlb-statsapi-draft-2016-atl"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "source_key": "atl2016:bref-atl-2016"
+   },
+   "notes": "MLB school label: St. Edward's. Signed with no published bonus: unknown, not zero.",
+   "school": {
+    "name": "St. Edward's University",
+    "school_type": "COLLEGE",
+    "city": "Austin",
+    "region": "TX",
+    "country": "USA",
+    "source_key": "atl2016:bref-atl-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "atl2016:mlb-statsapi-draft-2016-atl",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "31",
+   "overall_pick": 919,
+   "round_pick": 3,
+   "organization": "ATL",
+   "selection_type": "STANDARD",
+   "position": "RHP",
+   "field_sources": {
+    "position": "atl2016:bref-atl-2016",
+    "school": "atl2016:bref-atl-2016"
+   },
+   "player": {
+    "full_name": "Cameron Jabara",
+    "birth_date": "1997-09-02",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "670217",
+     "BBREF_MINORS": "jabara000cam"
+    },
+    "source_key": "atl2016:mlb-statsapi-draft-2016-atl"
+   },
+   "signing": {
+    "status": "DID_NOT_SIGN",
+    "source_key": "atl2016:bref-atl-2016"
+   },
+   "notes": "MLB school label: Newport Harbor HS.",
+   "school": {
+    "name": "Newport Harbor HS",
+    "school_type": "HIGH_SCHOOL",
+    "city": "Newport Beach",
+    "region": "CA",
+    "country": "USA",
+    "source_key": "atl2016:bref-atl-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "atl2016:mlb-statsapi-draft-2016-atl",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "32",
+   "overall_pick": 949,
+   "round_pick": 3,
+   "organization": "ATL",
+   "selection_type": "STANDARD",
+   "position": "RHP",
+   "field_sources": {
+    "position": "atl2016:bref-atl-2016",
+    "school": "atl2016:bref-atl-2016"
+   },
+   "player": {
+    "full_name": "Ryan Schlosser",
+    "birth_date": "1996-01-31",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "670275",
+     "BBREF_MINORS": "schlos000rya"
+    },
+    "source_key": "atl2016:mlb-statsapi-draft-2016-atl"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 85000,
+    "source_key": "atl2016:bref-atl-2016"
+   },
+   "notes": "MLB school label: Century College.",
+   "school": {
+    "name": "Century College",
+    "school_type": "COLLEGE",
+    "city": "White Bear Lake",
+    "region": "MN",
+    "country": "USA",
+    "source_key": "atl2016:bref-atl-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "atl2016:mlb-statsapi-draft-2016-atl",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "33",
+   "overall_pick": 979,
+   "round_pick": 3,
+   "organization": "ATL",
+   "selection_type": "STANDARD",
+   "position": "C",
+   "field_sources": {
+    "position": "atl2016:bref-atl-2016",
+    "school": "atl2016:bref-atl-2016"
+   },
+   "player": {
+    "full_name": "Handsome Monica",
+    "birth_date": "1995-08-05",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "656754",
+     "BBREF_MINORS": "monica000han"
+    },
+    "source_key": "atl2016:mlb-statsapi-draft-2016-atl"
+   },
+   "signing": {
+    "status": "DID_NOT_SIGN",
+    "source_key": "atl2016:bref-atl-2016"
+   },
+   "notes": "MLB school label: Northwest Florida State.",
+   "school": {
+    "name": "Northwest Florida State College",
+    "school_type": "JUNIOR_COLLEGE",
+    "city": "Niceville",
+    "region": "FL",
+    "country": "USA",
+    "source_key": "atl2016:bref-atl-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "atl2016:mlb-statsapi-draft-2016-atl",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "34",
+   "overall_pick": 1009,
+   "round_pick": 3,
+   "organization": "ATL",
+   "selection_type": "STANDARD",
+   "position": "LF",
+   "field_sources": {
+    "position": "atl2016:bref-atl-2016",
+    "school": "atl2016:bref-atl-2016"
+   },
+   "player": {
+    "full_name": "Jared James",
+    "birth_date": "1994-02-22",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "657623",
+     "BBREF_MINORS": "james-001jar"
+    },
+    "source_key": "atl2016:mlb-statsapi-draft-2016-atl"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "source_key": "atl2016:bref-atl-2016"
+   },
+   "notes": "MLB school label: Cal Poly Pomona. Signed with no published bonus: unknown, not zero.",
+   "school": {
+    "name": "California State Polytechnic University, Pomona",
+    "school_type": "COLLEGE",
+    "city": "Pomona",
+    "region": "CA",
+    "country": "USA",
+    "source_key": "atl2016:bref-atl-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "atl2016:mlb-statsapi-draft-2016-atl",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "35",
+   "overall_pick": 1039,
+   "round_pick": 3,
+   "organization": "ATL",
+   "selection_type": "STANDARD",
+   "position": "RHP",
+   "field_sources": {
+    "position": "atl2016:bref-atl-2016",
+    "school": "atl2016:bref-atl-2016"
+   },
+   "player": {
+    "full_name": "Michael Gizzi",
+    "birth_date": "1995-05-15",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "670265",
+     "BBREF_MINORS": "gizzi-000mic"
+    },
+    "source_key": "atl2016:mlb-statsapi-draft-2016-atl"
+   },
+   "signing": {
+    "status": "DID_NOT_SIGN",
+    "source_key": "atl2016:bref-atl-2016"
+   },
+   "notes": "MLB school label: State College of Florida, Manatee-Sarasota.",
+   "school": {
+    "name": "State College of Florida, Manatee-Sarasota",
+    "school_type": "JUNIOR_COLLEGE",
+    "city": "Bradenton",
+    "region": "FL",
+    "country": "USA",
+    "source_key": "atl2016:bref-atl-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "atl2016:mlb-statsapi-draft-2016-atl",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "36",
+   "overall_pick": 1069,
+   "round_pick": 3,
+   "organization": "ATL",
+   "selection_type": "STANDARD",
+   "position": "C",
+   "field_sources": {
+    "position": "atl2016:bref-atl-2016",
+    "school": "atl2016:bref-atl-2016"
+   },
+   "player": {
+    "full_name": "Andres Perez",
+    "birth_date": "1998-06-11",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "670227",
+     "BBREF_MINORS": "perez-007and"
+    },
+    "source_key": "atl2016:mlb-statsapi-draft-2016-atl"
+   },
+   "signing": {
+    "status": "DID_NOT_SIGN",
+    "source_key": "atl2016:bref-atl-2016"
+   },
+   "notes": "MLB school label: Pinecrest Academy.",
+   "school": {
+    "name": "Pinecrest Academy",
+    "school_type": "HIGH_SCHOOL",
+    "city": "Cumming",
+    "region": "GA",
+    "country": "USA",
+    "source_key": "atl2016:bref-atl-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "atl2016:mlb-statsapi-draft-2016-atl",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "37",
+   "overall_pick": 1099,
+   "round_pick": 3,
+   "organization": "ATL",
+   "selection_type": "STANDARD",
+   "position": "RHP",
+   "field_sources": {
+    "position": "atl2016:bref-atl-2016",
+    "school": "atl2016:bref-atl-2016"
+   },
+   "player": {
+    "full_name": "Zac Kristofak",
+    "birth_date": "1997-12-08",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "670219",
+     "BBREF": "kristza01",
+     "BBREF_MINORS": "kristo000zac"
+    },
+    "source_key": "atl2016:mlb-statsapi-draft-2016-atl"
+   },
+   "signing": {
+    "status": "DID_NOT_SIGN",
+    "source_key": "atl2016:bref-atl-2016"
+   },
+   "notes": "MLB school label: Walton HS.",
+   "school": {
+    "name": "Walton HS",
+    "school_type": "HIGH_SCHOOL",
+    "city": "Marietta",
+    "region": "GA",
+    "country": "USA",
+    "source_key": "atl2016:bref-atl-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "atl2016:mlb-statsapi-draft-2016-atl",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "38",
+   "overall_pick": 1129,
+   "round_pick": 3,
+   "organization": "ATL",
+   "selection_type": "STANDARD",
+   "position": "RHP",
+   "field_sources": {
+    "position": "atl2016:bref-atl-2016",
+    "school": "atl2016:bref-atl-2016"
+   },
+   "player": {
+    "full_name": "Dayton Tripp",
+    "birth_date": "1995-08-23",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "670273",
+     "BBREF_MINORS": "tripp-000day"
+    },
+    "source_key": "atl2016:mlb-statsapi-draft-2016-atl"
+   },
+   "signing": {
+    "status": "DID_NOT_SIGN",
+    "source_key": "atl2016:bref-atl-2016"
+   },
+   "notes": "MLB school label: Rend Lake College.",
+   "school": {
+    "name": "Rend Lake College",
+    "school_type": "JUNIOR_COLLEGE",
+    "city": "Ina",
+    "region": "IL",
+    "country": "USA",
+    "source_key": "atl2016:bref-atl-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "atl2016:mlb-statsapi-draft-2016-atl",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "39",
+   "overall_pick": 1159,
+   "round_pick": 3,
+   "organization": "ATL",
+   "selection_type": "STANDARD",
+   "position": "LHP",
+   "field_sources": {
+    "position": "atl2016:bref-atl-2016",
+    "school": "atl2016:bref-atl-2016"
+   },
+   "player": {
+    "full_name": "Parker Danciu",
+    "birth_date": "1994-03-22",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "621375",
+     "BBREF_MINORS": "danciu000par"
+    },
+    "source_key": "atl2016:mlb-statsapi-draft-2016-atl"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 75000,
+    "source_key": "atl2016:bref-atl-2016"
+   },
+   "notes": "MLB school label: Marshall.",
+   "school": {
+    "name": "Marshall University",
+    "school_type": "COLLEGE",
+    "city": "Huntington",
+    "region": "WV",
+    "country": "USA",
+    "source_key": "atl2016:bref-atl-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "atl2016:mlb-statsapi-draft-2016-atl",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "40",
+   "overall_pick": 1189,
+   "round_pick": 3,
+   "organization": "ATL",
+   "selection_type": "STANDARD",
+   "position": "RHP",
+   "field_sources": {
+    "position": "atl2016:bref-atl-2016",
+    "school": "atl2016:bref-atl-2016"
+   },
+   "player": {
+    "full_name": "Dylan Beasley",
+    "birth_date": "1997-12-02",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "670188",
+     "BBREF_MINORS": "beasle000dyl"
+    },
+    "source_key": "atl2016:mlb-statsapi-draft-2016-atl"
+   },
+   "signing": {
+    "status": "DID_NOT_SIGN",
+    "source_key": "atl2016:bref-atl-2016"
+   },
+   "notes": "MLB school label: Rome HS.",
+   "school": {
+    "name": "Rome HS",
+    "school_type": "HIGH_SCHOOL",
+    "city": "Rome",
+    "region": "GA",
+    "country": "USA",
+    "source_key": "atl2016:bref-atl-2016"
+   }
+  }
+ ]
+}

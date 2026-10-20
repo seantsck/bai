@@ -1,0 +1,907 @@
+{
+ "format": "bai-research-import/1",
+ "batch_key": "2016-17-international-atl",
+ "channel": "INTERNATIONAL",
+ "description": "ATL 2016-17 signing period: 31 candidate international amateur signings discovered on the MLB transaction wire (bonuses unknown).",
+ "coverage_claims": [
+  {
+   "domain": "INTERNATIONAL",
+   "scope_key": "2016-17",
+   "organization": "ATL",
+   "coverage_state": "PARTIAL_RECONSTRUCTION",
+   "gap_notes": "Discovered from the MLB transaction wire by a documented rule; no complete published class list consulted yet; bonuses unknown; 12 foreign-born signees outside the rule not imported."
+  }
+ ],
+ "sources": [
+  {
+   "source_key": "atl201617:mlb-transactions-2016-17",
+   "source_type": "OFFICIAL_LEAGUE",
+   "authority_level": "OFFICIAL",
+   "title": "MLB transaction wire, team 144, 2016-17 signing period",
+   "publisher": "MLB Advanced Media",
+   "reference": "statsapi.mlb.com/api/v1/transactions?teamId=144&startDate=…&endDate=… (period window)",
+   "retrieved_date": "2026-10-20",
+   "notes": "432 transactions in the window; signing entries give the day but no bonus."
+  },
+  {
+   "source_key": "atl201617:mlb-people-2016-17",
+   "source_type": "OFFICIAL_LEAGUE",
+   "authority_level": "OFFICIAL",
+   "title": "MLB Stats API people and milb_all seasons for 2016-17 signees",
+   "publisher": "MLB Advanced Media",
+   "reference": "statsapi.mlb.com/api/v1/people?personIds=…; people/{id}/stats?stats=yearByYear&leagueListId=milb_all",
+   "retrieved_date": "2026-10-20",
+   "notes": "Birth date, birth country, draft year; affiliated seasons used only to exclude players with earlier professional history."
+  }
+ ],
+ "records": [
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "atl201617:mlb-transactions-2016-17",
+   "organization": "ATL",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "SS",
+   "player": {
+    "full_name": "Kevin Maitan",
+    "birth_date": "2000-02-12",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "670867"
+    },
+    "source_key": "atl201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 276562: Atlanta Braves signed free agent SS Kevin Maitan to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "atl201617:mlb-transactions-2016-17",
+   "organization": "ATL",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "C",
+   "player": {
+    "full_name": "Abrahan Gutierrez",
+    "birth_date": "1999-10-31",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "670868"
+    },
+    "source_key": "atl201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 276563: Atlanta Braves signed C Abraham Gutierrez."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "atl201617:mlb-transactions-2016-17",
+   "organization": "ATL",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "SS",
+   "player": {
+    "full_name": "Livan Soto",
+    "birth_date": "2000-06-22",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "670869"
+    },
+    "source_key": "atl201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 276564: Atlanta Braves signed free agent SS Livan Soto to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "atl201617:mlb-transactions-2016-17",
+   "organization": "ATL",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "SS",
+   "player": {
+    "full_name": "Yunior Severino",
+    "birth_date": "1999-10-03",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "670870"
+    },
+    "source_key": "atl201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 276565: Atlanta Braves signed free agent SS Yunior Severino to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "atl201617:mlb-transactions-2016-17",
+   "organization": "ATL",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Guillo Zuñiga",
+    "birth_date": "1998-10-10",
+    "birth_country": "Colombia",
+    "external_ids": {
+     "MLBAM": "670871"
+    },
+    "source_key": "atl201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Colombia, age 17 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 276566: Atlanta Braves signed free agent RHP Guillermo Zuniga to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "atl201617:mlb-transactions-2016-17",
+   "organization": "ATL",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Juan Contreras",
+    "birth_date": "1999-09-08",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "670872"
+    },
+    "source_key": "atl201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 276570: Atlanta Braves signed free agent RHP Juan Contreras to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "atl201617:mlb-transactions-2016-17",
+   "organization": "ATL",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "LHP",
+   "player": {
+    "full_name": "Lisandro Santos",
+    "birth_date": "1998-07-24",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "670873"
+    },
+    "source_key": "atl201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 17 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 276571: Atlanta Braves signed free agent LHP Lisandro Santos to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "atl201617:mlb-transactions-2016-17",
+   "organization": "ATL",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "OF",
+   "player": {
+    "full_name": "Antonio Sucre",
+    "birth_date": "1999-11-08",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "670874"
+    },
+    "source_key": "atl201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 276576: Atlanta Braves signed free agent OF Antonio Sucre to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "atl201617:mlb-transactions-2016-17",
+   "organization": "ATL",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "OF",
+   "player": {
+    "full_name": "Franger Carrillo",
+    "birth_date": "1998-11-07",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "670876"
+    },
+    "source_key": "atl201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 17 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 276602: Atlanta Braves signed free agent OF Franger Carrillo to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "atl201617:mlb-transactions-2016-17",
+   "organization": "ATL",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "SS",
+   "player": {
+    "full_name": "Braulio Vasquez",
+    "birth_date": "1999-04-13",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "670877"
+    },
+    "source_key": "atl201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 17 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 276604: Atlanta Braves signed free agent SS Braulio Vasquez to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "atl201617:mlb-transactions-2016-17",
+   "organization": "ATL",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "C",
+   "player": {
+    "full_name": "Andres Adrianza",
+    "birth_date": "1999-02-06",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "670878"
+    },
+    "source_key": "atl201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 17 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 276605: Atlanta Braves signed free agent C Andres Adrianza to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "atl201617:mlb-transactions-2016-17",
+   "organization": "ATL",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "C",
+   "player": {
+    "full_name": "Victor De Hoyos",
+    "birth_date": "1998-02-23",
+    "birth_country": "Colombia",
+    "external_ids": {
+     "MLBAM": "670879"
+    },
+    "source_key": "atl201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Colombia, age 18 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 276606: Atlanta Braves signed free agent C Victor De Hoyos to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "atl201617:mlb-transactions-2016-17",
+   "organization": "ATL",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "OF",
+   "player": {
+    "full_name": "Jefrey Ramos",
+    "birth_date": "1999-02-10",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "671191"
+    },
+    "source_key": "atl201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 17 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 279384: Atlanta Braves signed free agent OF Jeffrey Ramos to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "atl201617:mlb-transactions-2016-17",
+   "organization": "ATL",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "IF",
+   "player": {
+    "full_name": "Luidemid Rojas",
+    "birth_date": "1999-05-04",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "670918"
+    },
+    "source_key": "atl201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 17 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 291068: Atlanta Braves signed free agent IF Luidemid Rojas to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "atl201617:mlb-transactions-2016-17",
+   "organization": "ATL",
+   "signing_date": "2016-07-13",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "SS",
+   "player": {
+    "full_name": "Yenci Pena",
+    "birth_date": "2000-07-13",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "672562"
+    },
+    "source_key": "atl201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 290186: Atlanta Braves signed free agent SS Yenci Pena to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "atl201617:mlb-transactions-2016-17",
+   "organization": "ATL",
+   "signing_date": "2016-07-29",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Yefri Del Rosario",
+    "birth_date": "1999-09-23",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "672529"
+    },
+    "source_key": "atl201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 290138: Atlanta Braves signed free agent RHP Yefri del Rosario to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "atl201617:mlb-transactions-2016-17",
+   "organization": "ATL",
+   "signing_date": "2016-09-09",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Jose Cabello",
+    "birth_date": "1998-01-25",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "672406"
+    },
+    "source_key": "atl201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 18 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 289664: Atlanta Braves signed free agent RHP Jose Cabello to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "atl201617:mlb-transactions-2016-17",
+   "organization": "ATL",
+   "signing_date": "2016-09-09",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Luis De Jesus",
+    "birth_date": "1998-10-08",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "672407"
+    },
+    "source_key": "atl201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 17 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 289665: Atlanta Braves signed free agent RHP Luis De Jesus to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "atl201617:mlb-transactions-2016-17",
+   "organization": "ATL",
+   "signing_date": "2016-09-09",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Walner Polanco",
+    "birth_date": "1996-12-24",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "672409"
+    },
+    "source_key": "atl201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 19 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 289667: Atlanta Braves signed free agent RHP Walner Polanco to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "atl201617:mlb-transactions-2016-17",
+   "organization": "ATL",
+   "signing_date": "2016-09-19",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "LHP",
+   "player": {
+    "full_name": "Carlos Caminero",
+    "birth_date": "1997-09-17",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "672397"
+    },
+    "source_key": "atl201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 19 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 289654: Atlanta Braves signed free agent LHP Carlos Caminero to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "atl201617:mlb-transactions-2016-17",
+   "organization": "ATL",
+   "signing_date": "2016-09-22",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "OF",
+   "player": {
+    "full_name": "Charles Reyes",
+    "birth_date": "1999-09-09",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "672393"
+    },
+    "source_key": "atl201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 17 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 289650: Atlanta Braves signed free agent OF Charles Reyes to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "atl201617:mlb-transactions-2016-17",
+   "organization": "ATL",
+   "signing_date": "2016-11-30",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "OF",
+   "player": {
+    "full_name": "Manuel Juan",
+    "birth_date": "1999-10-24",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "673232"
+    },
+    "source_key": "atl201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 17 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 295368: Atlanta Braves signed free agent OF Manuel Juan to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "atl201617:mlb-transactions-2016-17",
+   "organization": "ATL",
+   "signing_date": "2017-01-30",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "C",
+   "player": {
+    "full_name": "Sergio Ordonez",
+    "birth_date": "1999-04-21",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "673661"
+    },
+    "source_key": "atl201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 17 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 297751: Atlanta Braves signed free agent C Sergio Ordonez to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "atl201617:mlb-transactions-2016-17",
+   "organization": "ATL",
+   "signing_date": "2017-02-07",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Elvis Jimenez",
+    "birth_date": "1998-12-23",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "673653"
+    },
+    "source_key": "atl201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 18 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 297717: Atlanta Braves signed free agent RHP Elvis Jimenez to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "atl201617:mlb-transactions-2016-17",
+   "organization": "ATL",
+   "signing_date": "2017-02-07",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Miguel Pena",
+    "birth_date": "1998-11-26",
+    "birth_country": "DOM",
+    "external_ids": {
+     "MLBAM": "673663"
+    },
+    "source_key": "atl201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born DOM, age 18 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 297753: Atlanta Braves signed free agent RHP Miguel Pena to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "atl201617:mlb-transactions-2016-17",
+   "organization": "ATL",
+   "signing_date": "2017-02-10",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "OF",
+   "player": {
+    "full_name": "Jose Palma",
+    "birth_date": "1999-06-09",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "673744"
+    },
+    "source_key": "atl201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 17 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 297923: Atlanta Braves signed free agent OF Jose Palma to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "atl201617:mlb-transactions-2016-17",
+   "organization": "ATL",
+   "signing_date": "2017-02-13",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "C",
+   "player": {
+    "full_name": "Wiston Cerrato",
+    "birth_date": "1999-04-09",
+    "birth_country": "Nicaragua",
+    "external_ids": {
+     "MLBAM": "673817"
+    },
+    "source_key": "atl201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Nicaragua, age 17 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 298154: Atlanta Braves signed free agent C Wiston Cerrato to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "atl201617:mlb-transactions-2016-17",
+   "organization": "ATL",
+   "signing_date": "2017-05-15",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "CF",
+   "player": {
+    "full_name": "Juan Carlos Negret",
+    "birth_date": "1999-06-19",
+    "birth_country": "Cuba",
+    "external_ids": {
+     "MLBAM": "676002"
+    },
+    "source_key": "atl201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Cuba, age 17 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 312687: Atlanta Braves signed free agent CF Juan Carlos Negret to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "atl201617:mlb-transactions-2016-17",
+   "organization": "ATL",
+   "signing_date": "2017-06-01",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Madinson Colon",
+    "birth_date": "1998-02-15",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "673583"
+    },
+    "source_key": "atl201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 19 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 313087: Atlanta Braves signed free agent RHP Madinson Colon to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "atl201617:mlb-transactions-2016-17",
+   "organization": "ATL",
+   "signing_date": "2017-06-01",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "P",
+   "player": {
+    "full_name": "Jose Montilla",
+    "birth_date": "1998-06-04",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "673387"
+    },
+    "source_key": "atl201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 18 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 313099: Atlanta Braves signed free agent P Jose Montilla to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "atl201617:mlb-transactions-2016-17",
+   "organization": "ATL",
+   "signing_date": "2017-06-12",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Brando Hernandez",
+    "birth_date": "1997-11-28",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "677122"
+    },
+    "source_key": "atl201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 19 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 316582: Atlanta Braves signed free agent RHP Brando Hernandez to a minor league contract."
+  }
+ ]
+}

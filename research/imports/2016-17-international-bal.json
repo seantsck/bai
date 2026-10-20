@@ -1,0 +1,179 @@
+{
+ "format": "bai-research-import/1",
+ "batch_key": "2016-17-international-bal",
+ "channel": "INTERNATIONAL",
+ "description": "BAL 2016-17 signing period: 5 candidate international amateur signings discovered on the MLB transaction wire (bonuses unknown).",
+ "coverage_claims": [
+  {
+   "domain": "INTERNATIONAL",
+   "scope_key": "2016-17",
+   "organization": "BAL",
+   "coverage_state": "PARTIAL_RECONSTRUCTION",
+   "gap_notes": "Discovered from the MLB transaction wire by a documented rule; no complete published class list consulted yet; bonuses unknown; 15 foreign-born signees outside the rule not imported."
+  }
+ ],
+ "sources": [
+  {
+   "source_key": "bal201617:mlb-transactions-2016-17",
+   "source_type": "OFFICIAL_LEAGUE",
+   "authority_level": "OFFICIAL",
+   "title": "MLB transaction wire, team 110, 2016-17 signing period",
+   "publisher": "MLB Advanced Media",
+   "reference": "statsapi.mlb.com/api/v1/transactions?teamId=110&startDate=…&endDate=… (period window)",
+   "retrieved_date": "2026-10-20",
+   "notes": "444 transactions in the window; signing entries give the day but no bonus."
+  },
+  {
+   "source_key": "bal201617:mlb-people-2016-17",
+   "source_type": "OFFICIAL_LEAGUE",
+   "authority_level": "OFFICIAL",
+   "title": "MLB Stats API people and milb_all seasons for 2016-17 signees",
+   "publisher": "MLB Advanced Media",
+   "reference": "statsapi.mlb.com/api/v1/people?personIds=…; people/{id}/stats?stats=yearByYear&leagueListId=milb_all",
+   "retrieved_date": "2026-10-20",
+   "notes": "Birth date, birth country, draft year; affiliated seasons used only to exclude players with earlier professional history."
+  }
+ ],
+ "records": [
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "bal201617:mlb-transactions-2016-17",
+   "organization": "BAL",
+   "signing_date": "2016-11-18",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Leonardo Rodriguez",
+    "birth_date": "1997-11-25",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "673164"
+    },
+    "source_key": "bal201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 18 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 294238: Baltimore Orioles signed free agent RHP Leonardo Rodriguez to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "bal201617:mlb-transactions-2016-17",
+   "organization": "BAL",
+   "signing_date": "2016-11-24",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "LHP",
+   "player": {
+    "full_name": "Cesar Angomas",
+    "birth_date": "2000-04-19",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "673163"
+    },
+    "source_key": "bal201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 294236: Baltimore Orioles signed free agent LHP Cesar Angomas to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "bal201617:mlb-transactions-2016-17",
+   "organization": "BAL",
+   "signing_date": "2017-02-22",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "OF",
+   "player": {
+    "full_name": "Davis Tavárez",
+    "birth_date": "1999-01-07",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "673957"
+    },
+    "source_key": "bal201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 18 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 298444: Baltimore Orioles signed free agent OF Davis Tavarez to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "bal201617:mlb-transactions-2016-17",
+   "organization": "BAL",
+   "signing_date": "2017-05-10",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "SS",
+   "player": {
+    "full_name": "Edidson Rojas",
+    "birth_date": "1999-05-14",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "675852"
+    },
+    "source_key": "bal201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 17 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 310520: Baltimore Orioles signed free agent SS Edidson Rojas to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "bal201617:mlb-transactions-2016-17",
+   "organization": "BAL",
+   "signing_date": "2017-06-13",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "CF",
+   "player": {
+    "full_name": "Frank Tolentino",
+    "birth_date": "1999-08-05",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "677129"
+    },
+    "source_key": "bal201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 17 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 316596: Baltimore Orioles signed free agent CF Frank Tolentino to a minor league contract."
+  }
+ ]
+}

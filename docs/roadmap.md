@@ -59,14 +59,14 @@
 - **LAD international 2016-17 and 2017-18:** reconciled against the club's 2017 announcement and published reports. Signees are classified as amateur, exempt professional, previously affiliated or ambiguous. Still `PARTIAL_RECONSTRUCTION`.
 - **Proposals:** [organizational WAR attribution](proposals/organizational-war-attribution.md) and the [league-wide cohort roadmap](proposals/league-wide-cohort-roadmap.md).
 
-## In progress: Phase 7 (`feature/phase7-decision-history-and-attribution`)
+## Done: Phase 7 (PR #7, merged with Phase 8's corrections)
 
 - **Certification integrity (021):**
   - append-only decision history; registered human reviewers;
   - authorized reconsideration (`research:reconsider`);
   - decision proposals that decide nothing until a reviewer accepts them;
   - certifications revoked automatically when their evidence changes.
-- **Organizational value (022):**
+- **Organizational value (023; numbered 022 before Phase 8):**
   - `TRADES` channel;
   - season-by-team WAR;
   - value for the signing club kept apart from other clubs' value, and trade returns per package;
@@ -79,6 +79,20 @@
 - **Smeltzer:** the correction is filed as proposal 1 with its evidence; a human decides.
 - **International:** identification questions closed as unknown after research; Yordan Alvarez, Núñez and Zuñiga documented with recommendations.
 - **Wave 2 (ATL, BAL, SD, TB, HOU, NYY):** 2016 classes prepared with verified leads; waves await a human decision.
+
+## In progress: Phase 8 (data integrity, certification security, expansion)
+
+- **Per-acquisition dispositions (022):** how each acquisition ended, separate from the player's career; the database refuses contradictions. Fixes McLain and Liput (2017 UNSIGNED, 2018 signed). LAD 2016/2017 dispositions now have exit dates.
+- **Certification boundary (021):**
+  - reviewers are database logins, and identity comes from the authenticated session;
+  - human-only actions are SECURITY DEFINER functions;
+  - a reviewer certifies a fingerprinted check;
+  - revocation triggers fire on every canonical table;
+  - operator decisions need ratification.
+  - **Certification is disabled** until the automation no longer holds the owner credential ([decision-history.md](decision-history.md#what-remains-before-certification)).
+- **WAR attribution (023):** only signed acquisitions earn value, and only for their own tenure; a return to the club is reported separately; trade returns come from the trade that ended the acquisition and are counted once per class.
+- **Reviewer packages:** Smeltzer, Wong, Sheffield/Robinson Rule 5, Witt/Casey, McLain/Liput ([phase8-reviewer-packages.md](evidence/phase8-reviewer-packages.md)).
+- **Wave 2:** the six 2016 draft classes (MLB census, identities, B-Ref signing data) and 2016-17 international candidates from the wire ([wave2-discovery-plan.md](evidence/wave2-discovery-plan.md)).
 
 ## Next
 

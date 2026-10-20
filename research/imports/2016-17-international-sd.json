@@ -1,0 +1,1327 @@
+{
+ "format": "bai-research-import/1",
+ "batch_key": "2016-17-international-sd",
+ "channel": "INTERNATIONAL",
+ "description": "SD 2016-17 signing period: 46 candidate international amateur signings discovered on the MLB transaction wire (bonuses unknown).",
+ "coverage_claims": [
+  {
+   "domain": "INTERNATIONAL",
+   "scope_key": "2016-17",
+   "organization": "SD",
+   "coverage_state": "PARTIAL_RECONSTRUCTION",
+   "gap_notes": "Discovered from the MLB transaction wire by a documented rule; no complete published class list consulted yet; bonuses unknown; 13 foreign-born signees outside the rule not imported."
+  }
+ ],
+ "sources": [
+  {
+   "source_key": "sd201617:mlb-transactions-2016-17",
+   "source_type": "OFFICIAL_LEAGUE",
+   "authority_level": "OFFICIAL",
+   "title": "MLB transaction wire, team 135, 2016-17 signing period",
+   "publisher": "MLB Advanced Media",
+   "reference": "statsapi.mlb.com/api/v1/transactions?teamId=135&startDate=…&endDate=… (period window)",
+   "retrieved_date": "2026-10-20",
+   "notes": "433 transactions in the window; signing entries give the day but no bonus."
+  },
+  {
+   "source_key": "sd201617:mlb-people-2016-17",
+   "source_type": "OFFICIAL_LEAGUE",
+   "authority_level": "OFFICIAL",
+   "title": "MLB Stats API people and milb_all seasons for 2016-17 signees",
+   "publisher": "MLB Advanced Media",
+   "reference": "statsapi.mlb.com/api/v1/people?personIds=…; people/{id}/stats?stats=yearByYear&leagueListId=milb_all",
+   "retrieved_date": "2026-10-20",
+   "notes": "Birth date, birth country, draft year; affiliated seasons used only to exclude players with earlier professional history."
+  }
+ ],
+ "records": [
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "sd201617:mlb-transactions-2016-17",
+   "organization": "SD",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "OF",
+   "player": {
+    "full_name": "Jeisson Rosario",
+    "birth_date": "1999-10-22",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "671271"
+    },
+    "source_key": "sd201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 280720: San Diego Padres signed free agent OF Jeisson Rosario to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "sd201617:mlb-transactions-2016-17",
+   "organization": "SD",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "SS",
+   "player": {
+    "full_name": "Luis Almanzar",
+    "birth_date": "1999-11-01",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "671275"
+    },
+    "source_key": "sd201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 280811: San Diego Padres signed free agent SS Luis Almanzar to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "sd201617:mlb-transactions-2016-17",
+   "organization": "SD",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "C",
+   "player": {
+    "full_name": "Miguel Molina",
+    "birth_date": "1997-01-06",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "672703"
+    },
+    "source_key": "sd201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 19 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 290526: San Diego Padres signed free agent C Miguel Molina to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "sd201617:mlb-transactions-2016-17",
+   "organization": "SD",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Luis Patiño",
+    "birth_date": "1999-10-26",
+    "birth_country": "Colombia",
+    "external_ids": {
+     "MLBAM": "672715"
+    },
+    "source_key": "sd201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Colombia, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 290538: San Diego Padres signed free agent RHP Luis Patino to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "sd201617:mlb-transactions-2016-17",
+   "organization": "SD",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "SS",
+   "player": {
+    "full_name": "Jordy Barley",
+    "birth_date": "1999-12-03",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "672357"
+    },
+    "source_key": "sd201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 290585: San Diego Padres signed free agent SS Jordy Barley to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "sd201617:mlb-transactions-2016-17",
+   "organization": "SD",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Michell Miliano",
+    "birth_date": "1999-12-22",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "672353"
+    },
+    "source_key": "sd201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 290596: San Diego Padres signed free agent RHP Michell Miliano to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "sd201617:mlb-transactions-2016-17",
+   "organization": "SD",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "OF",
+   "player": {
+    "full_name": "Carlos Batista",
+    "birth_date": "1999-10-30",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "672776"
+    },
+    "source_key": "sd201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 290602: San Diego Padres signed free agent OF Carlos Batista to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "sd201617:mlb-transactions-2016-17",
+   "organization": "SD",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "SS",
+   "player": {
+    "full_name": "Tucupita Marcano",
+    "birth_date": "1999-09-16",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "672779"
+    },
+    "source_key": "sd201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 290605: San Diego Padres signed free agent SS Tucupita Marcano to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "sd201617:mlb-transactions-2016-17",
+   "organization": "SD",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "IF",
+   "player": {
+    "full_name": "Bryan Torres",
+    "birth_date": "1999-12-11",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "672786"
+    },
+    "source_key": "sd201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 290616: San Diego Padres signed free agent IF Bryan Torres to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "sd201617:mlb-transactions-2016-17",
+   "organization": "SD",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "C",
+   "player": {
+    "full_name": "Alison Quintero",
+    "birth_date": "2000-04-24",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "672355"
+    },
+    "source_key": "sd201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 290694: San Diego Padres signed free agent C Alison Quintero to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "sd201617:mlb-transactions-2016-17",
+   "organization": "SD",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Manny Guzman",
+    "birth_date": "1999-11-01",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "672352"
+    },
+    "source_key": "sd201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 290704: San Diego Padres signed free agent RHP Manny Guzman to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "sd201617:mlb-transactions-2016-17",
+   "organization": "SD",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "SS",
+   "player": {
+    "full_name": "Justin Lopez",
+    "birth_date": "2000-05-09",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "672358"
+    },
+    "source_key": "sd201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 290705: San Diego Padres signed free agent SS Justin Lopez to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "sd201617:mlb-transactions-2016-17",
+   "organization": "SD",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "SS",
+   "player": {
+    "full_name": "Carlos Luis",
+    "birth_date": "1999-09-04",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "672861"
+    },
+    "source_key": "sd201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 290718: San Diego Padres signed free agent SS Carlos Luis to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "sd201617:mlb-transactions-2016-17",
+   "organization": "SD",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "CF",
+   "player": {
+    "full_name": "Adrian Antunez",
+    "birth_date": "1999-01-17",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "672869"
+    },
+    "source_key": "sd201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 17 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 290726: San Diego Padres signed free agent CF Adrian Antunez to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "sd201617:mlb-transactions-2016-17",
+   "organization": "SD",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "IF",
+   "player": {
+    "full_name": "Ydie Araujo",
+    "birth_date": "1998-04-28",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "672899"
+    },
+    "source_key": "sd201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 18 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 290763: San Diego Padres signed free agent IF Ydie Araujo to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "sd201617:mlb-transactions-2016-17",
+   "organization": "SD",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "OF",
+   "player": {
+    "full_name": "Luis Castro",
+    "birth_date": "1998-06-15",
+    "birth_country": "Colombia",
+    "external_ids": {
+     "MLBAM": "672901"
+    },
+    "source_key": "sd201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Colombia, age 18 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 290765: San Diego Padres signed free agent OF Luis Castro to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "sd201617:mlb-transactions-2016-17",
+   "organization": "SD",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "LHP",
+   "player": {
+    "full_name": "Daniel Bracamonte",
+    "birth_date": "1999-01-12",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "670899"
+    },
+    "source_key": "sd201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 17 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 291065: San Diego Padres signed free agent LHP Daniel Bracamonte to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "sd201617:mlb-transactions-2016-17",
+   "organization": "SD",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "SS",
+   "player": {
+    "full_name": "Gabriel Arias",
+    "birth_date": "2000-02-27",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "672356"
+    },
+    "source_key": "sd201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 296294: San Diego Padres signed free agent SS Gabriel Arias to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "sd201617:mlb-transactions-2016-17",
+   "organization": "SD",
+   "signing_date": "2016-07-03",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "OF",
+   "player": {
+    "full_name": "Agustin Ruiz",
+    "birth_date": "1999-09-23",
+    "birth_country": "Mexico",
+    "external_ids": {
+     "MLBAM": "672361"
+    },
+    "source_key": "sd201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Mexico, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 290513: San Diego Padres signed free agent OF Agustin Ruiz to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "sd201617:mlb-transactions-2016-17",
+   "organization": "SD",
+   "signing_date": "2016-07-03",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Wen-Hua Sung",
+    "birth_date": "1996-09-02",
+    "birth_country": "Taiwan",
+    "external_ids": {
+     "MLBAM": "672354"
+    },
+    "source_key": "sd201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Taiwan, age 19 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 290760: San Diego Padres signed free agent RHP Wen-Hua Sung to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "sd201617:mlb-transactions-2016-17",
+   "organization": "SD",
+   "signing_date": "2016-07-05",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Martin Carrasco",
+    "birth_date": "1999-11-22",
+    "birth_country": "Mexico",
+    "external_ids": {
+     "MLBAM": "672693"
+    },
+    "source_key": "sd201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Mexico, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 290515: San Diego Padres signed free agent RHP Martin Carrasco to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "sd201617:mlb-transactions-2016-17",
+   "organization": "SD",
+   "signing_date": "2016-07-07",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "LHP",
+   "player": {
+    "full_name": "Adrian Morejon",
+    "birth_date": "1999-02-27",
+    "birth_country": "Cuba",
+    "external_ids": {
+     "MLBAM": "670970"
+    },
+    "source_key": "sd201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Cuba, age 17 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 280737: San Diego Padres signed free agent LHP Adrian Morejon to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "sd201617:mlb-transactions-2016-17",
+   "organization": "SD",
+   "signing_date": "2016-07-20",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "OF",
+   "player": {
+    "full_name": "Jorge Ona",
+    "birth_date": "1996-12-31",
+    "birth_country": "Cuba",
+    "external_ids": {
+     "MLBAM": "671250"
+    },
+    "source_key": "sd201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Cuba, age 19 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 280381: San Diego Padres signed free agent OF Jorge Ona to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "sd201617:mlb-transactions-2016-17",
+   "organization": "SD",
+   "signing_date": "2016-08-08",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Cesar Gonzalez",
+    "birth_date": "1999-02-24",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "665845"
+    },
+    "source_key": "sd201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 17 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 283005: San Diego Padres signed free agent RHP Cesar Gonzalez to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "sd201617:mlb-transactions-2016-17",
+   "organization": "SD",
+   "signing_date": "2016-08-08",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Daniel De La Cruz",
+    "birth_date": "1998-02-01",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "672492"
+    },
+    "source_key": "sd201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 18 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 289818: San Diego Padres signed free agent RHP Daniel De La Cruz to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "sd201617:mlb-transactions-2016-17",
+   "organization": "SD",
+   "signing_date": "2016-08-10",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Enzo Perez",
+    "birth_date": "2000-06-07",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "672490"
+    },
+    "source_key": "sd201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 289816: San Diego Padres signed free agent RHP Enzo Perez to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "sd201617:mlb-transactions-2016-17",
+   "organization": "SD",
+   "signing_date": "2016-08-11",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Ronald Bolaños",
+    "birth_date": "1996-08-23",
+    "birth_country": "Cuba",
+    "external_ids": {
+     "MLBAM": "671790"
+    },
+    "source_key": "sd201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Cuba, age 19 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 283511: San Diego Padres signed free agent RHP Ronald Bolanos to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "sd201617:mlb-transactions-2016-17",
+   "organization": "SD",
+   "signing_date": "2016-09-26",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "P",
+   "player": {
+    "full_name": "Gabe Morales",
+    "birth_date": "1999-04-14",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "672385"
+    },
+    "source_key": "sd201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 17 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 289632: San Diego Padres signed free agent P Gabriel Morales to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "sd201617:mlb-transactions-2016-17",
+   "organization": "SD",
+   "signing_date": "2016-09-26",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "P",
+   "player": {
+    "full_name": "Luis Suarez",
+    "birth_date": "1999-06-21",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "672387"
+    },
+    "source_key": "sd201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 17 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 289634: San Diego Padres signed free agent P Luis Suarez to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "sd201617:mlb-transactions-2016-17",
+   "organization": "SD",
+   "signing_date": "2016-10-04",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Duilio Ochoa",
+    "birth_date": "1998-08-02",
+    "birth_country": "Mexico",
+    "external_ids": {
+     "MLBAM": "666817"
+    },
+    "source_key": "sd201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Mexico, age 18 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 289622: San Diego Padres signed free agent RHP Duilio Ochoa to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "sd201617:mlb-transactions-2016-17",
+   "organization": "SD",
+   "signing_date": "2016-10-17",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "OF",
+   "player": {
+    "full_name": "Gilberto Vizcarra",
+    "birth_date": "1999-03-01",
+    "birth_country": "Mexico",
+    "external_ids": {
+     "MLBAM": "672953"
+    },
+    "source_key": "sd201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Mexico, age 17 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 291223: San Diego Padres signed free agent OF Gilberto Vizcarra to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "sd201617:mlb-transactions-2016-17",
+   "organization": "SD",
+   "signing_date": "2016-10-25",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "LHP",
+   "player": {
+    "full_name": "Carlos Valenzuela",
+    "birth_date": "2000-06-02",
+    "birth_country": "Mexico",
+    "external_ids": {
+     "MLBAM": "673391"
+    },
+    "source_key": "sd201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Mexico, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 296560: San Diego Padres signed free agent LHP Carlos Valenzuela to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "sd201617:mlb-transactions-2016-17",
+   "organization": "SD",
+   "signing_date": "2016-10-26",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "LHP",
+   "player": {
+    "full_name": "Diego Medina",
+    "birth_date": "1999-06-09",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "673011"
+    },
+    "source_key": "sd201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 17 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 291555: San Diego Padres signed free agent LHP Diego Medina to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "sd201617:mlb-transactions-2016-17",
+   "organization": "SD",
+   "signing_date": "2016-11-18",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Nelson Ramirez",
+    "birth_date": "1996-05-21",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "673262"
+    },
+    "source_key": "sd201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 20 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 295501: San Diego Padres signed free agent RHP Nelson Ramirez to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "sd201617:mlb-transactions-2016-17",
+   "organization": "SD",
+   "signing_date": "2016-12-05",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Luis Eusebio",
+    "birth_date": "1996-03-15",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "673259"
+    },
+    "source_key": "sd201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 20 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 295497: San Diego Padres signed free agent RHP Luis Eusebio to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "sd201617:mlb-transactions-2016-17",
+   "organization": "SD",
+   "signing_date": "2016-12-05",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Ramon Pena",
+    "birth_date": "1997-08-24",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "673261"
+    },
+    "source_key": "sd201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 19 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 295499: San Diego Padres signed free agent RHP Ramon Pena to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "sd201617:mlb-transactions-2016-17",
+   "organization": "SD",
+   "signing_date": "2016-12-19",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Michel Baez",
+    "birth_date": "1996-01-21",
+    "birth_country": "Cuba",
+    "external_ids": {
+     "MLBAM": "673258"
+    },
+    "source_key": "sd201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Cuba, age 20 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 295279: San Diego Padres signed free agent RHP Michel Baez to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "sd201617:mlb-transactions-2016-17",
+   "organization": "SD",
+   "signing_date": "2016-12-21",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "LHP",
+   "player": {
+    "full_name": "Jose Garcia",
+    "birth_date": "1998-02-19",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "673309"
+    },
+    "source_key": "sd201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 18 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 295793: San Diego Padres signed free agent LHP Jose Garcia to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "sd201617:mlb-transactions-2016-17",
+   "organization": "SD",
+   "signing_date": "2016-12-21",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "LHP",
+   "player": {
+    "full_name": "Jorge Guerra",
+    "birth_date": "1999-07-13",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "673310"
+    },
+    "source_key": "sd201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 17 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 295795: San Diego Padres signed free agent LHP Jorge Guerra to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "sd201617:mlb-transactions-2016-17",
+   "organization": "SD",
+   "signing_date": "2016-12-29",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "LHP",
+   "player": {
+    "full_name": "Ramon Perez",
+    "birth_date": "1999-07-02",
+    "birth_country": "Cuba",
+    "external_ids": {
+     "MLBAM": "673325"
+    },
+    "source_key": "sd201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Cuba, age 17 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 295840: San Diego Padres signed free agent LHP Ramon Perez to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "sd201617:mlb-transactions-2016-17",
+   "organization": "SD",
+   "signing_date": "2017-01-17",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "P",
+   "player": {
+    "full_name": "Brayan Rosario",
+    "birth_date": "1998-08-03",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "673406"
+    },
+    "source_key": "sd201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 18 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 296737: San Diego Padres signed free agent P Brayan Rosario to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "sd201617:mlb-transactions-2016-17",
+   "organization": "SD",
+   "signing_date": "2017-02-26",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Luis Nin",
+    "birth_date": "1996-11-30",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "670910"
+    },
+    "source_key": "sd201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 20 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 320492: San Diego Padres signed RHP Luis Nin."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "sd201617:mlb-transactions-2016-17",
+   "organization": "SD",
+   "signing_date": "2017-03-13",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "LHP",
+   "player": {
+    "full_name": "Osvaldo Hernandez",
+    "birth_date": "1998-05-15",
+    "birth_country": "Cuba",
+    "external_ids": {
+     "MLBAM": "674372"
+    },
+    "source_key": "sd201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Cuba, age 18 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 300366: San Diego Padres signed free agent LHP Osvaldo Hernandez to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "sd201617:mlb-transactions-2016-17",
+   "organization": "SD",
+   "signing_date": "2017-03-15",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Moises Lugo",
+    "birth_date": "1999-01-20",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "674381"
+    },
+    "source_key": "sd201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 18 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 300581: San Diego Padres signed free agent RHP Moises Lugo to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "sd201617:mlb-transactions-2016-17",
+   "organization": "SD",
+   "signing_date": "2017-03-31",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "OF",
+   "player": {
+    "full_name": "Tirso Ornelas",
+    "birth_date": "2000-03-11",
+    "birth_country": "Mexico",
+    "external_ids": {
+     "MLBAM": "672359"
+    },
+    "source_key": "sd201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Mexico, age 17 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 369053: San Diego Padres signed OF Tirso Ornelas."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "sd201617:mlb-transactions-2016-17",
+   "organization": "SD",
+   "signing_date": "2017-04-26",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "SS",
+   "player": {
+    "full_name": "Victor Nova",
+    "birth_date": "2000-01-06",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "675528"
+    },
+    "source_key": "sd201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 17 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 308802: San Diego Padres signed free agent SS Victor Nova to a minor league contract."
+  }
+ ]
+}

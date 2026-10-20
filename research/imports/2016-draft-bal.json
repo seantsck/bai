@@ -1,0 +1,1640 @@
+{
+ "format": "bai-research-import/1",
+ "batch_key": "2016-draft-bal",
+ "channel": "DRAFT",
+ "description": "Baltimore Orioles, 2016 Rule 4 draft: 41 selections (MLB Stats API universe; Baseball-Reference signing status, bonus, school).",
+ "coverage_claims": [
+  {
+   "domain": "DRAFT",
+   "scope_key": "2016-JUNE_AMATEUR",
+   "organization": "BAL",
+   "coverage_state": "COMPLETE_CENSUS",
+   "expected_count": 41,
+   "source_key": "bal2016:mlb-statsapi-draft-2016-bal",
+   "gap_notes": "Population: the 41 selections MLB's official draft data lists for the club; Baseball-Reference lists the same 41 by overall pick and name. Census of selections only: bonuses published for 25 of 34 signed picks, no slot values, no outcomes audited."
+  }
+ ],
+ "sources": [
+  {
+   "source_key": "bal2016:mlb-statsapi-draft-2016-bal",
+   "source_type": "OFFICIAL_LEAGUE",
+   "authority_level": "OFFICIAL",
+   "title": "MLB Stats API draft endpoint, 2016, teamId=110",
+   "publisher": "MLB Advanced Media",
+   "url": "https://statsapi.mlb.com/api/v1/draft/2016?teamId=110",
+   "retrieved_date": "2026-10-20",
+   "notes": "JSON; 41 picks: pickRound, pickNumber, roundPickNumber, person (MLBAM id, name, birth date, country), school label. No signing status, bonus or slot value."
+  },
+  {
+   "source_key": "bal2016:bref-bal-2016",
+   "source_type": "REFERENCE_DATABASE",
+   "authority_level": "AGGREGATOR",
+   "title": "Baseball-Reference: 2016 June amateur draft, Baltimore Orioles",
+   "publisher": "Baseball-Reference (Sports Reference)",
+   "url": "https://www.baseball-reference.com/draft/index.fcgi?query_type=franch_year&team_ID=BAL&year_ID=2016&draft_type=junreg",
+   "archived_url": "http://web.archive.org/web/20260209064948/https://www.baseball-reference.com/draft/index.fcgi?team_ID=BAL&year_ID=2016&draft_type=junreg&query_type=franch_year",
+   "retrieved_date": "2026-10-20",
+   "notes": "Columns used: Rnd, OvPck, RdPck, Signed, Bonus, Name (ids), Pos, Type, Drafted Out of. Read through the archive capture (the live site refuses automated requests)."
+  }
+ ],
+ "records": [
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "bal2016:mlb-statsapi-draft-2016-bal",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "1",
+   "overall_pick": 27,
+   "round_pick": 27,
+   "organization": "BAL",
+   "selection_type": "STANDARD",
+   "position": "RHP",
+   "field_sources": {
+    "position": "bal2016:bref-bal-2016",
+    "school": "bal2016:bref-bal-2016"
+   },
+   "player": {
+    "full_name": "Cody Sedlock",
+    "birth_date": "1995-06-19",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "642060",
+     "BBREF": "sedloco01",
+     "BBREF_MINORS": "sedloc000cod"
+    },
+    "source_key": "bal2016:mlb-statsapi-draft-2016-bal"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 2097200,
+    "source_key": "bal2016:bref-bal-2016"
+   },
+   "notes": "MLB school label: Illinois.",
+   "school": {
+    "name": "University of Illinois at Urbana-Champaign",
+    "school_type": "COLLEGE",
+    "city": "Champaign",
+    "region": "IL",
+    "country": "USA",
+    "source_key": "bal2016:bref-bal-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "bal2016:mlb-statsapi-draft-2016-bal",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "2",
+   "overall_pick": 54,
+   "round_pick": 13,
+   "organization": "BAL",
+   "selection_type": "STANDARD",
+   "position": "LHP",
+   "field_sources": {
+    "position": "bal2016:bref-bal-2016",
+    "school": "bal2016:bref-bal-2016"
+   },
+   "player": {
+    "full_name": "Keegan Akin",
+    "birth_date": "1995-04-01",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "669211",
+     "BBREF": "akinke01",
+     "BBREF_MINORS": "akin--000kee"
+    },
+    "source_key": "bal2016:mlb-statsapi-draft-2016-bal"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 1177200,
+    "source_key": "bal2016:bref-bal-2016"
+   },
+   "notes": "MLB school label: Western Michigan.",
+   "school": {
+    "name": "Western Michigan University",
+    "school_type": "COLLEGE",
+    "city": "Kalamazoo",
+    "region": "MI",
+    "country": "USA",
+    "source_key": "bal2016:bref-bal-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "bal2016:mlb-statsapi-draft-2016-bal",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "2",
+   "overall_pick": 69,
+   "round_pick": 28,
+   "organization": "BAL",
+   "selection_type": "STANDARD",
+   "position": "RHP",
+   "field_sources": {
+    "position": "bal2016:bref-bal-2016",
+    "school": "bal2016:bref-bal-2016"
+   },
+   "player": {
+    "full_name": "Matthias Dietz",
+    "birth_date": "1995-09-20",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "663990",
+     "BBREF_MINORS": "dietz-000mat"
+    },
+    "source_key": "bal2016:mlb-statsapi-draft-2016-bal"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 1300000,
+    "source_key": "bal2016:bref-bal-2016"
+   },
+   "notes": "MLB school label: John A. Logan CC .",
+   "school": {
+    "name": "John A. Logan College",
+    "school_type": "JUNIOR_COLLEGE",
+    "city": "Carterville",
+    "region": "IL",
+    "country": "USA",
+    "source_key": "bal2016:bref-bal-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "bal2016:mlb-statsapi-draft-2016-bal",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "3",
+   "overall_pick": 91,
+   "round_pick": 14,
+   "organization": "BAL",
+   "selection_type": "STANDARD",
+   "position": "RF",
+   "field_sources": {
+    "position": "bal2016:bref-bal-2016",
+    "school": "bal2016:bref-bal-2016"
+   },
+   "player": {
+    "full_name": "Austin Hays",
+    "birth_date": "1995-07-05",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "669720",
+     "BBREF": "haysau01",
+     "BBREF_MINORS": "hays--000aus"
+    },
+    "source_key": "bal2016:mlb-statsapi-draft-2016-bal"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 665800,
+    "source_key": "bal2016:bref-bal-2016"
+   },
+   "notes": "MLB school label: Jacksonville.",
+   "school": {
+    "name": "Jacksonville University",
+    "school_type": "COLLEGE",
+    "city": "Jacksonville",
+    "region": "FL",
+    "country": "USA",
+    "source_key": "bal2016:bref-bal-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "bal2016:mlb-statsapi-draft-2016-bal",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "4",
+   "overall_pick": 121,
+   "round_pick": 15,
+   "organization": "BAL",
+   "selection_type": "STANDARD",
+   "position": "RHP",
+   "field_sources": {
+    "position": "bal2016:bref-bal-2016",
+    "school": "bal2016:bref-bal-2016"
+   },
+   "player": {
+    "full_name": "Brenan Hanifee",
+    "birth_date": "1998-05-29",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "669724",
+     "BBREF": "hanifbr01",
+     "BBREF_MINORS": "hanife000bre"
+    },
+    "source_key": "bal2016:mlb-statsapi-draft-2016-bal"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 500000,
+    "source_key": "bal2016:bref-bal-2016"
+   },
+   "notes": "MLB school label: Turner Ashby (VA) HS.",
+   "school": {
+    "name": "Turner Ashby HS",
+    "school_type": "HIGH_SCHOOL",
+    "city": "Bridgewater",
+    "region": "VA",
+    "country": "USA",
+    "source_key": "bal2016:bref-bal-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "bal2016:mlb-statsapi-draft-2016-bal",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "5",
+   "overall_pick": 151,
+   "round_pick": 15,
+   "organization": "BAL",
+   "selection_type": "STANDARD",
+   "position": "SS",
+   "field_sources": {
+    "position": "bal2016:bref-bal-2016",
+    "school": "bal2016:bref-bal-2016"
+   },
+   "player": {
+    "full_name": "Alexis Torres",
+    "birth_date": "1997-12-12",
+    "birth_country": "Puerto Rico",
+    "external_ids": {
+     "MLBAM": "666145",
+     "BBREF_MINORS": "torres009ale"
+    },
+    "source_key": "bal2016:mlb-statsapi-draft-2016-bal"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 364700,
+    "source_key": "bal2016:bref-bal-2016"
+   },
+   "notes": "MLB school label: Colegio Angel David (PR) HS.",
+   "school": {
+    "name": "Colegio Angel David HS",
+    "school_type": "HIGH_SCHOOL",
+    "city": "Toa Alta",
+    "region": "Puerto Rico",
+    "country": "Puerto Rico",
+    "source_key": "bal2016:bref-bal-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "bal2016:mlb-statsapi-draft-2016-bal",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "6",
+   "overall_pick": 181,
+   "round_pick": 15,
+   "organization": "BAL",
+   "selection_type": "STANDARD",
+   "position": "RHP",
+   "field_sources": {
+    "position": "bal2016:bref-bal-2016",
+    "school": "bal2016:bref-bal-2016"
+   },
+   "player": {
+    "full_name": "Tobias Myers",
+    "birth_date": "1998-08-05",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "668964",
+     "BBREF": "myersto01",
+     "BBREF_MINORS": "myers-000tob"
+    },
+    "source_key": "bal2016:mlb-statsapi-draft-2016-bal"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 225000,
+    "source_key": "bal2016:bref-bal-2016"
+   },
+   "notes": "MLB school label: Winter Haven (FL) HS.",
+   "school": {
+    "name": "Winter Haven HS",
+    "school_type": "HIGH_SCHOOL",
+    "city": "Winter Haven",
+    "region": "FL",
+    "country": "USA",
+    "source_key": "bal2016:bref-bal-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "bal2016:mlb-statsapi-draft-2016-bal",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "7",
+   "overall_pick": 211,
+   "round_pick": 15,
+   "organization": "BAL",
+   "selection_type": "STANDARD",
+   "position": "1B",
+   "field_sources": {
+    "position": "bal2016:bref-bal-2016",
+    "school": "bal2016:bref-bal-2016"
+   },
+   "player": {
+    "full_name": "Preston Palmeiro",
+    "birth_date": "1995-01-22",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "641945",
+     "BBREF_MINORS": "palmei000pre"
+    },
+    "source_key": "bal2016:mlb-statsapi-draft-2016-bal"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 204700,
+    "source_key": "bal2016:bref-bal-2016"
+   },
+   "notes": "MLB school label: North Carolina State.",
+   "school": {
+    "name": "North Carolina State University",
+    "school_type": "COLLEGE",
+    "city": "Raleigh",
+    "region": "NC",
+    "country": "USA",
+    "source_key": "bal2016:bref-bal-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "bal2016:mlb-statsapi-draft-2016-bal",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "8",
+   "overall_pick": 241,
+   "round_pick": 15,
+   "organization": "BAL",
+   "selection_type": "STANDARD",
+   "position": "RHP",
+   "field_sources": {
+    "position": "bal2016:bref-bal-2016",
+    "school": "bal2016:bref-bal-2016"
+   },
+   "player": {
+    "full_name": "Ryan Moseley",
+    "birth_date": "1994-10-06",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "641899",
+     "BBREF_MINORS": "mosele000rya"
+    },
+    "source_key": "bal2016:mlb-statsapi-draft-2016-bal"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 150000,
+    "source_key": "bal2016:bref-bal-2016"
+   },
+   "notes": "MLB school label: Texas Tech.",
+   "school": {
+    "name": "Texas Tech University",
+    "school_type": "COLLEGE",
+    "city": "Lubbock",
+    "region": "TX",
+    "country": "USA",
+    "source_key": "bal2016:bref-bal-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "bal2016:mlb-statsapi-draft-2016-bal",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "9",
+   "overall_pick": 271,
+   "round_pick": 15,
+   "organization": "BAL",
+   "selection_type": "STANDARD",
+   "position": "RHP",
+   "field_sources": {
+    "position": "bal2016:bref-bal-2016",
+    "school": "bal2016:bref-bal-2016"
+   },
+   "player": {
+    "full_name": "Lucas Humpal",
+    "birth_date": "1993-09-05",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "621102",
+     "BBREF_MINORS": "humpal000luc"
+    },
+    "source_key": "bal2016:mlb-statsapi-draft-2016-bal"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 10000,
+    "source_key": "bal2016:bref-bal-2016"
+   },
+   "notes": "MLB school label: Texas State.",
+   "school": {
+    "name": "Texas State University",
+    "school_type": "COLLEGE",
+    "city": "San Marcos",
+    "region": "TX",
+    "country": "USA",
+    "source_key": "bal2016:bref-bal-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "bal2016:mlb-statsapi-draft-2016-bal",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "10",
+   "overall_pick": 301,
+   "round_pick": 15,
+   "organization": "BAL",
+   "selection_type": "STANDARD",
+   "position": "RHP",
+   "field_sources": {
+    "position": "bal2016:bref-bal-2016",
+    "school": "bal2016:bref-bal-2016"
+   },
+   "player": {
+    "full_name": "Cody Dube",
+    "birth_date": "1994-10-21",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "669286",
+     "BBREF_MINORS": "dube--000cod"
+    },
+    "source_key": "bal2016:mlb-statsapi-draft-2016-bal"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 5000,
+    "source_key": "bal2016:bref-bal-2016"
+   },
+   "notes": "MLB school label: Keene State.",
+   "school": {
+    "name": "Keene State College",
+    "school_type": "COLLEGE",
+    "city": "Keene",
+    "region": "NH",
+    "country": "USA",
+    "source_key": "bal2016:bref-bal-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "bal2016:mlb-statsapi-draft-2016-bal",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "11",
+   "overall_pick": 331,
+   "round_pick": 15,
+   "organization": "BAL",
+   "selection_type": "STANDARD",
+   "position": "LHP",
+   "field_sources": {
+    "position": "bal2016:bref-bal-2016",
+    "school": "bal2016:bref-bal-2016"
+   },
+   "player": {
+    "full_name": "Zach Muckenhirn",
+    "birth_date": "1995-02-27",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "669105",
+     "BBREF": "muckeza01",
+     "BBREF_MINORS": "mucken000zac"
+    },
+    "source_key": "bal2016:mlb-statsapi-draft-2016-bal"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 100000,
+    "source_key": "bal2016:bref-bal-2016"
+   },
+   "notes": "MLB school label: North Dakota.",
+   "school": {
+    "name": "University of North Dakota",
+    "school_type": "COLLEGE",
+    "city": "Grand Forks",
+    "region": "ND",
+    "country": "USA",
+    "source_key": "bal2016:bref-bal-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "bal2016:mlb-statsapi-draft-2016-bal",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "12",
+   "overall_pick": 361,
+   "round_pick": 15,
+   "organization": "BAL",
+   "selection_type": "STANDARD",
+   "position": "LHP",
+   "field_sources": {
+    "position": "bal2016:bref-bal-2016",
+    "school": "bal2016:bref-bal-2016"
+   },
+   "player": {
+    "full_name": "Max Knutson",
+    "birth_date": "1995-04-01",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "641761",
+     "BBREF_MINORS": "knutso000max"
+    },
+    "source_key": "bal2016:mlb-statsapi-draft-2016-bal"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 100000,
+    "source_key": "bal2016:bref-bal-2016"
+   },
+   "notes": "MLB school label: Nebraska.",
+   "school": {
+    "name": "University of Nebraska-Lincoln",
+    "school_type": "COLLEGE",
+    "city": "Lincoln",
+    "region": "NE",
+    "country": "USA",
+    "source_key": "bal2016:bref-bal-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "bal2016:mlb-statsapi-draft-2016-bal",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "13",
+   "overall_pick": 391,
+   "round_pick": 15,
+   "organization": "BAL",
+   "selection_type": "STANDARD",
+   "position": "LHP",
+   "field_sources": {
+    "position": "bal2016:bref-bal-2016",
+    "school": "bal2016:bref-bal-2016"
+   },
+   "player": {
+    "full_name": "Brandon Bonilla",
+    "birth_date": "1993-10-21",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "607469",
+     "BBREF_MINORS": "bonill000bra"
+    },
+    "source_key": "bal2016:mlb-statsapi-draft-2016-bal"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "source_key": "bal2016:bref-bal-2016"
+   },
+   "notes": "MLB school label: Hawaii Pacific. Signed with no published bonus: unknown, not zero.",
+   "school": {
+    "name": "Hawaii Pacific University",
+    "school_type": "COLLEGE",
+    "city": "Honolulu",
+    "region": "HI",
+    "country": "USA",
+    "source_key": "bal2016:bref-bal-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "bal2016:mlb-statsapi-draft-2016-bal",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "14",
+   "overall_pick": 421,
+   "round_pick": 15,
+   "organization": "BAL",
+   "selection_type": "STANDARD",
+   "position": "RHP",
+   "field_sources": {
+    "position": "bal2016:bref-bal-2016",
+    "school": "bal2016:bref-bal-2016"
+   },
+   "player": {
+    "full_name": "Ruben Garcia",
+    "birth_date": "1996-08-02",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "670157",
+     "BBREF_MINORS": "garcia007rub"
+    },
+    "source_key": "bal2016:mlb-statsapi-draft-2016-bal"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 100000,
+    "source_key": "bal2016:bref-bal-2016"
+   },
+   "notes": "MLB school label: Eastern Florida State.",
+   "school": {
+    "name": "Eastern Florida State College",
+    "school_type": "JUNIOR_COLLEGE",
+    "city": "Cocoa",
+    "region": "FL",
+    "country": "USA",
+    "source_key": "bal2016:bref-bal-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "bal2016:mlb-statsapi-draft-2016-bal",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "15",
+   "overall_pick": 451,
+   "round_pick": 15,
+   "organization": "BAL",
+   "selection_type": "STANDARD",
+   "position": "RHP",
+   "field_sources": {
+    "position": "bal2016:bref-bal-2016",
+    "school": "bal2016:bref-bal-2016"
+   },
+   "player": {
+    "full_name": "Nick Jobst",
+    "birth_date": "1994-04-20",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "664153",
+     "BBREF_MINORS": "jobst-000nic"
+    },
+    "source_key": "bal2016:mlb-statsapi-draft-2016-bal"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 100000,
+    "source_key": "bal2016:bref-bal-2016"
+   },
+   "notes": "MLB school label: South Carolina - Aiken.",
+   "school": {
+    "name": "University of South Carolina Aiken",
+    "school_type": "COLLEGE",
+    "city": "Aiken",
+    "region": "SC",
+    "country": "USA",
+    "source_key": "bal2016:bref-bal-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "bal2016:mlb-statsapi-draft-2016-bal",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "16",
+   "overall_pick": 481,
+   "round_pick": 15,
+   "organization": "BAL",
+   "selection_type": "STANDARD",
+   "position": "LHP",
+   "field_sources": {
+    "position": "bal2016:bref-bal-2016",
+    "school": "bal2016:bref-bal-2016"
+   },
+   "player": {
+    "full_name": "Willie Rios",
+    "birth_date": "1996-02-06",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "656895",
+     "BBREF_MINORS": "rios--002wil"
+    },
+    "source_key": "bal2016:mlb-statsapi-draft-2016-bal"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 107300,
+    "source_key": "bal2016:bref-bal-2016"
+   },
+   "notes": "MLB school label: Florida SouthWestern State College.",
+   "school": {
+    "name": "Florida SouthWestern State College",
+    "school_type": "JUNIOR_COLLEGE",
+    "city": "Fort Myers",
+    "region": "FL",
+    "country": "USA",
+    "source_key": "bal2016:bref-bal-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "bal2016:mlb-statsapi-draft-2016-bal",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "17",
+   "overall_pick": 511,
+   "round_pick": 15,
+   "organization": "BAL",
+   "selection_type": "STANDARD",
+   "position": "LHP",
+   "field_sources": {
+    "position": "bal2016:bref-bal-2016",
+    "school": "bal2016:bref-bal-2016"
+   },
+   "player": {
+    "full_name": "Tyler Blohm",
+    "birth_date": "1998-02-25",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "670091",
+     "BBREF_MINORS": "blohm-000tyl"
+    },
+    "source_key": "bal2016:mlb-statsapi-draft-2016-bal"
+   },
+   "signing": {
+    "status": "DID_NOT_SIGN",
+    "source_key": "bal2016:bref-bal-2016"
+   },
+   "notes": "MLB school label: Archbishop Spalding (MD) HS.",
+   "school": {
+    "name": "Archbishop Spalding HS",
+    "school_type": "HIGH_SCHOOL",
+    "city": "Severn",
+    "region": "MD",
+    "country": "USA",
+    "source_key": "bal2016:bref-bal-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "bal2016:mlb-statsapi-draft-2016-bal",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "18",
+   "overall_pick": 541,
+   "round_pick": 15,
+   "organization": "BAL",
+   "selection_type": "STANDARD",
+   "position": "LHP",
+   "field_sources": {
+    "position": "bal2016:bref-bal-2016",
+    "school": "bal2016:bref-bal-2016"
+   },
+   "player": {
+    "full_name": "Layne Bruner",
+    "birth_date": "1994-09-24",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "641410",
+     "BBREF_MINORS": "bruner000lay"
+    },
+    "source_key": "bal2016:mlb-statsapi-draft-2016-bal"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "source_key": "bal2016:bref-bal-2016"
+   },
+   "notes": "MLB school label: Washington State. Signed with no published bonus: unknown, not zero.",
+   "school": {
+    "name": "Washington State University",
+    "school_type": "COLLEGE",
+    "city": "Pullman",
+    "region": "WA",
+    "country": "USA",
+    "source_key": "bal2016:bref-bal-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "bal2016:mlb-statsapi-draft-2016-bal",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "19",
+   "overall_pick": 571,
+   "round_pick": 15,
+   "organization": "BAL",
+   "selection_type": "STANDARD",
+   "position": "CF",
+   "field_sources": {
+    "position": "bal2016:bref-bal-2016",
+    "school": "bal2016:bref-bal-2016"
+   },
+   "player": {
+    "full_name": "Cole Billingsley",
+    "birth_date": "1994-05-29",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "621462",
+     "BBREF_MINORS": "billin000col"
+    },
+    "source_key": "bal2016:mlb-statsapi-draft-2016-bal"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 62500,
+    "source_key": "bal2016:bref-bal-2016"
+   },
+   "notes": "MLB school label: South Alabama.",
+   "school": {
+    "name": "University of South Alabama",
+    "school_type": "COLLEGE",
+    "city": "Mobile",
+    "region": "AL",
+    "country": "USA",
+    "source_key": "bal2016:bref-bal-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "bal2016:mlb-statsapi-draft-2016-bal",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "20",
+   "overall_pick": 601,
+   "round_pick": 15,
+   "organization": "BAL",
+   "selection_type": "STANDARD",
+   "position": "LHP",
+   "field_sources": {
+    "position": "bal2016:bref-bal-2016",
+    "school": "bal2016:bref-bal-2016"
+   },
+   "player": {
+    "full_name": "Yelin Rodriguez",
+    "birth_date": "1998-11-03",
+    "birth_country": "Puerto Rico",
+    "external_ids": {
+     "MLBAM": "670120",
+     "BBREF_MINORS": "rodrig000yel"
+    },
+    "source_key": "bal2016:mlb-statsapi-draft-2016-bal"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 100000,
+    "source_key": "bal2016:bref-bal-2016"
+   },
+   "notes": "MLB school label: Puerto Rico Baseball Academy.",
+   "school": {
+    "name": "Puerto Rico Baseball Academy",
+    "school_type": "HIGH_SCHOOL",
+    "city": "Gurabo",
+    "region": "Puerto Rico",
+    "country": "Puerto Rico",
+    "source_key": "bal2016:bref-bal-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "bal2016:mlb-statsapi-draft-2016-bal",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "21",
+   "overall_pick": 631,
+   "round_pick": 15,
+   "organization": "BAL",
+   "selection_type": "STANDARD",
+   "position": "SS",
+   "field_sources": {
+    "position": "bal2016:bref-bal-2016",
+    "school": "bal2016:bref-bal-2016"
+   },
+   "player": {
+    "full_name": "Chris Clare",
+    "birth_date": "1994-11-24",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "670133",
+     "BBREF_MINORS": "clare-000chr"
+    },
+    "source_key": "bal2016:mlb-statsapi-draft-2016-bal"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 65000,
+    "source_key": "bal2016:bref-bal-2016"
+   },
+   "notes": "MLB school label: High Point.",
+   "school": {
+    "name": "High Point University",
+    "school_type": "COLLEGE",
+    "city": "High Point",
+    "region": "NC",
+    "country": "USA",
+    "source_key": "bal2016:bref-bal-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "bal2016:mlb-statsapi-draft-2016-bal",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "22",
+   "overall_pick": 661,
+   "round_pick": 15,
+   "organization": "BAL",
+   "selection_type": "STANDARD",
+   "position": "RHP",
+   "field_sources": {
+    "position": "bal2016:bref-bal-2016",
+    "school": "bal2016:bref-bal-2016"
+   },
+   "player": {
+    "full_name": "Nick Gruener",
+    "birth_date": "1995-05-16",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "670382",
+     "BBREF_MINORS": "gruene000nic"
+    },
+    "source_key": "bal2016:mlb-statsapi-draft-2016-bal"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "source_key": "bal2016:bref-bal-2016"
+   },
+   "notes": "MLB school label: Harvard. Signed with no published bonus: unknown, not zero.",
+   "school": {
+    "name": "Harvard University",
+    "school_type": "COLLEGE",
+    "city": "Cambridge",
+    "region": "MA",
+    "country": "USA",
+    "source_key": "bal2016:bref-bal-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "bal2016:mlb-statsapi-draft-2016-bal",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "23",
+   "overall_pick": 691,
+   "round_pick": 15,
+   "organization": "BAL",
+   "selection_type": "STANDARD",
+   "position": "LHP",
+   "field_sources": {
+    "position": "bal2016:bref-bal-2016",
+    "school": "bal2016:bref-bal-2016"
+   },
+   "player": {
+    "full_name": "Tyler Erwin",
+    "birth_date": "1994-08-29",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "670428",
+     "BBREF_MINORS": "erwin-000tyl"
+    },
+    "source_key": "bal2016:mlb-statsapi-draft-2016-bal"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 100000,
+    "source_key": "bal2016:bref-bal-2016"
+   },
+   "notes": "MLB school label: New Mexico State.",
+   "school": {
+    "name": "New Mexico State University",
+    "school_type": "COLLEGE",
+    "city": "Las Cruces",
+    "region": "NM",
+    "country": "USA",
+    "source_key": "bal2016:bref-bal-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "bal2016:mlb-statsapi-draft-2016-bal",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "24",
+   "overall_pick": 721,
+   "round_pick": 15,
+   "organization": "BAL",
+   "selection_type": "STANDARD",
+   "position": "LHP",
+   "field_sources": {
+    "position": "bal2016:bref-bal-2016",
+    "school": "bal2016:bref-bal-2016"
+   },
+   "player": {
+    "full_name": "Zach Matson",
+    "birth_date": "1995-10-24",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "670416",
+     "BBREF_MINORS": "matson000zac"
+    },
+    "source_key": "bal2016:mlb-statsapi-draft-2016-bal"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 75000,
+    "source_key": "bal2016:bref-bal-2016"
+   },
+   "notes": "MLB school label: Crowder CC.",
+   "school": {
+    "name": "Crowder College",
+    "school_type": "JUNIOR_COLLEGE",
+    "city": "Neosho",
+    "region": "MO",
+    "country": "USA",
+    "source_key": "bal2016:bref-bal-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "bal2016:mlb-statsapi-draft-2016-bal",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "25",
+   "overall_pick": 751,
+   "round_pick": 15,
+   "organization": "BAL",
+   "selection_type": "STANDARD",
+   "position": "3B",
+   "field_sources": {
+    "position": "bal2016:bref-bal-2016",
+    "school": "bal2016:bref-bal-2016"
+   },
+   "player": {
+    "full_name": "Will Toffey",
+    "birth_date": "1994-12-31",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "657780",
+     "BBREF_MINORS": "toffey000wil"
+    },
+    "source_key": "bal2016:mlb-statsapi-draft-2016-bal"
+   },
+   "signing": {
+    "status": "DID_NOT_SIGN",
+    "source_key": "bal2016:bref-bal-2016"
+   },
+   "notes": "MLB school label: Vanderbilt.",
+   "school": {
+    "name": "Vanderbilt University",
+    "school_type": "COLLEGE",
+    "city": "Nashville",
+    "region": "TN",
+    "country": "USA",
+    "source_key": "bal2016:bref-bal-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "bal2016:mlb-statsapi-draft-2016-bal",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "26",
+   "overall_pick": 781,
+   "round_pick": 15,
+   "organization": "BAL",
+   "selection_type": "STANDARD",
+   "position": "3B",
+   "field_sources": {
+    "position": "bal2016:bref-bal-2016",
+    "school": "bal2016:bref-bal-2016"
+   },
+   "player": {
+    "full_name": "Jaime Estrada",
+    "birth_date": "1995-12-15",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "670411",
+     "BBREF_MINORS": "estrad000jai"
+    },
+    "source_key": "bal2016:mlb-statsapi-draft-2016-bal"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 75000,
+    "source_key": "bal2016:bref-bal-2016"
+   },
+   "notes": "MLB school label: Central Arizona College.",
+   "school": {
+    "name": "Central Arizona College",
+    "school_type": "JUNIOR_COLLEGE",
+    "city": "Coolidge",
+    "region": "AZ",
+    "country": "USA",
+    "source_key": "bal2016:bref-bal-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "bal2016:mlb-statsapi-draft-2016-bal",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "27",
+   "overall_pick": 811,
+   "round_pick": 15,
+   "organization": "BAL",
+   "selection_type": "STANDARD",
+   "position": "3B",
+   "field_sources": {
+    "position": "bal2016:bref-bal-2016",
+    "school": "bal2016:bref-bal-2016"
+   },
+   "player": {
+    "full_name": "Daniel Bakst",
+    "birth_date": "1997-11-14",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "668790",
+     "BBREF_MINORS": "bakst-000dan"
+    },
+    "source_key": "bal2016:mlb-statsapi-draft-2016-bal"
+   },
+   "signing": {
+    "status": "DID_NOT_SIGN",
+    "source_key": "bal2016:bref-bal-2016"
+   },
+   "notes": "MLB school label: Poly Prep Country Day School.",
+   "school": {
+    "name": "Poly Prep Country Day School",
+    "school_type": "HIGH_SCHOOL",
+    "city": "Brooklyn",
+    "region": "NY",
+    "country": "USA",
+    "source_key": "bal2016:bref-bal-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "bal2016:mlb-statsapi-draft-2016-bal",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "28",
+   "overall_pick": 841,
+   "round_pick": 15,
+   "organization": "BAL",
+   "selection_type": "STANDARD",
+   "position": "RHP",
+   "field_sources": {
+    "position": "bal2016:bref-bal-2016",
+    "school": "bal2016:bref-bal-2016"
+   },
+   "player": {
+    "full_name": "Matt De La Rosa",
+    "birth_date": "1993-11-15",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "670325",
+     "BBREF_MINORS": "delaro000mat"
+    },
+    "source_key": "bal2016:mlb-statsapi-draft-2016-bal"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "source_key": "bal2016:bref-bal-2016"
+   },
+   "notes": "MLB school label: Lenoir-Rhyne. Signed with no published bonus: unknown, not zero.",
+   "school": {
+    "name": "Lenoir-Rhyne University",
+    "school_type": "COLLEGE",
+    "city": "Hickory",
+    "region": "NC",
+    "country": "USA",
+    "source_key": "bal2016:bref-bal-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "bal2016:mlb-statsapi-draft-2016-bal",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "29",
+   "overall_pick": 871,
+   "round_pick": 15,
+   "organization": "BAL",
+   "selection_type": "STANDARD",
+   "position": "CF",
+   "field_sources": {
+    "position": "bal2016:bref-bal-2016",
+    "school": "bal2016:bref-bal-2016"
+   },
+   "player": {
+    "full_name": "Wil Dalton",
+    "birth_date": "1997-08-27",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "670200",
+     "BBREF_MINORS": "dalton003wil"
+    },
+    "source_key": "bal2016:mlb-statsapi-draft-2016-bal"
+   },
+   "signing": {
+    "status": "DID_NOT_SIGN",
+    "source_key": "bal2016:bref-bal-2016"
+   },
+   "notes": "MLB school label: Summit HS.",
+   "school": {
+    "name": "Summit HS",
+    "school_type": "HIGH_SCHOOL",
+    "city": "Spring Hill",
+    "region": "TN",
+    "country": "USA",
+    "source_key": "bal2016:bref-bal-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "bal2016:mlb-statsapi-draft-2016-bal",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "30",
+   "overall_pick": 901,
+   "round_pick": 15,
+   "organization": "BAL",
+   "selection_type": "STANDARD",
+   "position": "2B",
+   "field_sources": {
+    "position": "bal2016:bref-bal-2016",
+    "school": "bal2016:bref-bal-2016"
+   },
+   "player": {
+    "full_name": "Garrett Copeland",
+    "birth_date": "1995-02-22",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "670284",
+     "BBREF_MINORS": "copela002gar"
+    },
+    "source_key": "bal2016:mlb-statsapi-draft-2016-bal"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 75000,
+    "source_key": "bal2016:bref-bal-2016"
+   },
+   "notes": "MLB school label: Austin Peay State.",
+   "school": {
+    "name": "Austin Peay State University",
+    "school_type": "COLLEGE",
+    "city": "Clarksville",
+    "region": "TN",
+    "country": "USA",
+    "source_key": "bal2016:bref-bal-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "bal2016:mlb-statsapi-draft-2016-bal",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "31",
+   "overall_pick": 931,
+   "round_pick": 15,
+   "organization": "BAL",
+   "selection_type": "STANDARD",
+   "position": "CF",
+   "field_sources": {
+    "position": "bal2016:bref-bal-2016",
+    "school": "bal2016:bref-bal-2016"
+   },
+   "player": {
+    "full_name": "Jake Ring",
+    "birth_date": "1994-08-11",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "642014",
+     "BBREF_MINORS": "ring--000jak"
+    },
+    "source_key": "bal2016:mlb-statsapi-draft-2016-bal"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 100000,
+    "source_key": "bal2016:bref-bal-2016"
+   },
+   "notes": "MLB school label: Missouri.",
+   "school": {
+    "name": "University of Missouri",
+    "school_type": "COLLEGE",
+    "city": "Columbia",
+    "region": "MO",
+    "country": "USA",
+    "source_key": "bal2016:bref-bal-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "bal2016:mlb-statsapi-draft-2016-bal",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "32",
+   "overall_pick": 961,
+   "round_pick": 15,
+   "organization": "BAL",
+   "selection_type": "STANDARD",
+   "position": "LHP",
+   "field_sources": {
+    "position": "bal2016:bref-bal-2016",
+    "school": "bal2016:bref-bal-2016"
+   },
+   "player": {
+    "full_name": "Ryan Mauch",
+    "birth_date": "1997-07-08",
+    "birth_country": null,
+    "external_ids": {
+     "MLBAM": "669112",
+     "BBREF_MINORS": "mauch-000rya"
+    },
+    "source_key": "bal2016:mlb-statsapi-draft-2016-bal"
+   },
+   "signing": {
+    "status": "DID_NOT_SIGN",
+    "source_key": "bal2016:bref-bal-2016"
+   },
+   "notes": "MLB school label: South Hills HS.",
+   "school": {
+    "name": "South Hills HS",
+    "school_type": "HIGH_SCHOOL",
+    "city": "West Covina",
+    "region": "CA",
+    "country": "USA",
+    "source_key": "bal2016:bref-bal-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "bal2016:mlb-statsapi-draft-2016-bal",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "33",
+   "overall_pick": 991,
+   "round_pick": 15,
+   "organization": "BAL",
+   "selection_type": "STANDARD",
+   "position": "CF",
+   "field_sources": {
+    "position": "bal2016:bref-bal-2016",
+    "school": "bal2016:bref-bal-2016"
+   },
+   "player": {
+    "full_name": "Markel Jones",
+    "birth_date": "1994-08-08",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "670278",
+     "BBREF_MINORS": "jones-016mar"
+    },
+    "source_key": "bal2016:mlb-statsapi-draft-2016-bal"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 80000,
+    "source_key": "bal2016:bref-bal-2016"
+   },
+   "notes": "MLB school label: Brunswick CC.",
+   "school": {
+    "name": "Brunswick Community College",
+    "school_type": "COLLEGE",
+    "city": "Bolivia",
+    "region": "NC",
+    "country": "USA",
+    "source_key": "bal2016:bref-bal-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "bal2016:mlb-statsapi-draft-2016-bal",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "34",
+   "overall_pick": 1021,
+   "round_pick": 15,
+   "organization": "BAL",
+   "selection_type": "STANDARD",
+   "position": "RHP",
+   "field_sources": {
+    "position": "bal2016:bref-bal-2016",
+    "school": "bal2016:bref-bal-2016"
+   },
+   "player": {
+    "full_name": "Lucas Brown",
+    "birth_date": "1993-11-11",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "670321",
+     "BBREF_MINORS": "brown-000luc"
+    },
+    "source_key": "bal2016:mlb-statsapi-draft-2016-bal"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "source_key": "bal2016:bref-bal-2016"
+   },
+   "notes": "MLB school label: Troy. Signed with no published bonus: unknown, not zero.",
+   "school": {
+    "name": "Troy University",
+    "school_type": "COLLEGE",
+    "city": "Troy",
+    "region": "AL",
+    "country": "USA",
+    "source_key": "bal2016:bref-bal-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "bal2016:mlb-statsapi-draft-2016-bal",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "35",
+   "overall_pick": 1051,
+   "round_pick": 15,
+   "organization": "BAL",
+   "selection_type": "STANDARD",
+   "position": "2B",
+   "field_sources": {
+    "position": "bal2016:bref-bal-2016",
+    "school": "bal2016:bref-bal-2016"
+   },
+   "player": {
+    "full_name": "Tanner Kirk",
+    "birth_date": "1993-08-14",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "663427",
+     "BBREF_MINORS": "kirk--000tan"
+    },
+    "source_key": "bal2016:mlb-statsapi-draft-2016-bal"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "source_key": "bal2016:bref-bal-2016"
+   },
+   "notes": "MLB school label: Wichita State. Signed with no published bonus: unknown, not zero.",
+   "school": {
+    "name": "Wichita State University",
+    "school_type": "COLLEGE",
+    "city": "Wichita",
+    "region": "KS",
+    "country": "USA",
+    "source_key": "bal2016:bref-bal-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "bal2016:mlb-statsapi-draft-2016-bal",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "36",
+   "overall_pick": 1081,
+   "round_pick": 15,
+   "organization": "BAL",
+   "selection_type": "STANDARD",
+   "position": "LHP",
+   "field_sources": {
+    "position": "bal2016:bref-bal-2016",
+    "school": "bal2016:bref-bal-2016"
+   },
+   "player": {
+    "full_name": "Ben Brecht",
+    "birth_date": "1998-01-07",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "669229",
+     "BBREF_MINORS": "brecht000ben"
+    },
+    "source_key": "bal2016:mlb-statsapi-draft-2016-bal"
+   },
+   "signing": {
+    "status": "DID_NOT_SIGN",
+    "source_key": "bal2016:bref-bal-2016"
+   },
+   "notes": "MLB school label: New Trier HS.",
+   "school": {
+    "name": "New Trier HS",
+    "school_type": "HIGH_SCHOOL",
+    "city": "Winnetka",
+    "region": "IL",
+    "country": "USA",
+    "source_key": "bal2016:bref-bal-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "bal2016:mlb-statsapi-draft-2016-bal",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "37",
+   "overall_pick": 1111,
+   "round_pick": 15,
+   "organization": "BAL",
+   "selection_type": "STANDARD",
+   "position": "RHP",
+   "field_sources": {
+    "position": "bal2016:bref-bal-2016",
+    "school": "bal2016:bref-bal-2016"
+   },
+   "player": {
+    "full_name": "James Teague",
+    "birth_date": "1994-08-29",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "667425",
+     "BBREF_MINORS": "teague002jam"
+    },
+    "source_key": "bal2016:mlb-statsapi-draft-2016-bal"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "source_key": "bal2016:bref-bal-2016"
+   },
+   "notes": "MLB school label: U Arkansas Fayetteville. Signed with no published bonus: unknown, not zero.",
+   "school": {
+    "name": "University of Arkansas",
+    "school_type": "COLLEGE",
+    "city": "Fayetteville",
+    "region": "AR",
+    "country": "USA",
+    "source_key": "bal2016:bref-bal-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "bal2016:mlb-statsapi-draft-2016-bal",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "38",
+   "overall_pick": 1141,
+   "round_pick": 15,
+   "organization": "BAL",
+   "selection_type": "STANDARD",
+   "position": "3B",
+   "field_sources": {
+    "position": "bal2016:bref-bal-2016",
+    "school": "bal2016:bref-bal-2016"
+   },
+   "player": {
+    "full_name": "Collin Woody",
+    "birth_date": "1994-08-05",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "670365",
+     "BBREF_MINORS": "woody-000col"
+    },
+    "source_key": "bal2016:mlb-statsapi-draft-2016-bal"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "source_key": "bal2016:bref-bal-2016"
+   },
+   "notes": "MLB school label: UNC Greensboro. Signed with no published bonus: unknown, not zero.",
+   "school": {
+    "name": "University of North Carolina at Greensboro",
+    "school_type": "COLLEGE",
+    "city": "Greensboro",
+    "region": "NC",
+    "country": "USA",
+    "source_key": "bal2016:bref-bal-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "bal2016:mlb-statsapi-draft-2016-bal",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "39",
+   "overall_pick": 1171,
+   "round_pick": 15,
+   "organization": "BAL",
+   "selection_type": "STANDARD",
+   "position": "RHP",
+   "field_sources": {
+    "position": "bal2016:bref-bal-2016",
+    "school": "bal2016:bref-bal-2016"
+   },
+   "player": {
+    "full_name": "Seth Shuman",
+    "birth_date": "1997-12-01",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "670234",
+     "BBREF_MINORS": "shuman000set"
+    },
+    "source_key": "bal2016:mlb-statsapi-draft-2016-bal"
+   },
+   "signing": {
+    "status": "DID_NOT_SIGN",
+    "source_key": "bal2016:bref-bal-2016"
+   },
+   "notes": "MLB school label: Valdosta HS.",
+   "school": {
+    "name": "Valdosta HS",
+    "school_type": "HIGH_SCHOOL",
+    "city": "Valdosta",
+    "region": "GA",
+    "country": "USA",
+    "source_key": "bal2016:bref-bal-2016"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "bal2016:mlb-statsapi-draft-2016-bal",
+   "draft_key": "2016-JUNE_AMATEUR",
+   "round_code": "40",
+   "overall_pick": 1201,
+   "round_pick": 15,
+   "organization": "BAL",
+   "selection_type": "STANDARD",
+   "position": "RHP",
+   "field_sources": {
+    "position": "bal2016:bref-bal-2016",
+    "school": "bal2016:bref-bal-2016"
+   },
+   "player": {
+    "full_name": "Joe Johnson",
+    "birth_date": "1994-05-24",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "670336",
+     "BBREF_MINORS": "johnso002joe"
+    },
+    "source_key": "bal2016:mlb-statsapi-draft-2016-bal"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "source_key": "bal2016:bref-bal-2016"
+   },
+   "notes": "MLB school label: Erskine College. Signed with no published bonus: unknown, not zero.",
+   "school": {
+    "name": "Erskine College",
+    "school_type": "COLLEGE",
+    "city": "Due West",
+    "region": "SC",
+    "country": "USA",
+    "source_key": "bal2016:bref-bal-2016"
+   }
+  }
+ ]
+}
