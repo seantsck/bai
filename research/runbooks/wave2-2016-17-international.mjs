@@ -11,7 +11,7 @@
 //
 // Built with scripts/research/sources/intl-signings-from-wire.mjs from MLB Stats API downloads (transactions, people,
 // milb_all seasons) retrieved 2026-10-20.
-import { cli } from './run.mjs'
+import { cli, refresh } from './run.mjs'
 
 const R = 'bai-backfill-research'
 const run = (cmd, args) => cli(cmd, args, { operator: R })
@@ -24,3 +24,4 @@ for (const org of ['ATL', 'BAL', 'HOU', 'NYY', 'SD', 'TB']) {
   run('plan', ['--org', org, '--channel', 'international', '--period', '2016-17'])
 }
 run('progress', [])
+refresh()

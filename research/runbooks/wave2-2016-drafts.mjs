@@ -14,7 +14,7 @@
 //   node --env-file-if-exists=.env.local research/runbooks/wave2-2016-drafts.mjs
 //
 // Built with scripts/research/sources/draft-class-import.mjs (--same-person for the four confirmed spellings).
-import { cli, pickObservation } from './run.mjs'
+import { cli, pickObservation, refresh } from './run.mjs'
 
 const R = 'bai-backfill-research'
 const run = (cmd, args) => cli(cmd, args, { operator: R })
@@ -40,3 +40,4 @@ for (const c of CLUBS) {
   run('plan', ['--org', c.org, '--channel', 'draft', '--year', '2016'])
 }
 run('progress', [])
+refresh()
