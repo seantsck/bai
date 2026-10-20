@@ -1,0 +1,330 @@
+{
+ "format": "bai-research-import/1",
+ "batch_key": "2019-draft-lad-slots",
+ "channel": "DRAFT",
+ "description": "LAD 2019 Rule 4 draft: slot values for 11 picks in rounds 1-10 (sum $8,069,100) (MLB.com).",
+ "sources": [
+  {
+   "source_key": "lad2019:mlb-pick-values-2019",
+   "source_type": "OFFICIAL_LEAGUE",
+   "authority_level": "OFFICIAL",
+   "title": "2019 Draft bonus pools, pick values",
+   "publisher": "MLB.com",
+   "url": "https://www.mlb.com/news/2019-mlb-draft-pools-and-bonus-values",
+   "archived_url": "http://web.archive.org/web/20260207083804/https://www.mlb.com/news/2019-mlb-draft-pools-and-bonus-values",
+   "published_date": null,
+   "retrieved_date": "2026-10-20",
+   "notes": "Values tied to overall picks by list position, which matches MLB official pick numbers."
+  }
+ ],
+ "records": [
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "1",
+   "overall_pick": 25,
+   "round_pick": 25,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Kody Hoese",
+    "birth_date": "1997-07-13",
+    "external_ids": {
+     "MLBAM": "682210"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "source_key": "lad2019:bref-lad-2019"
+   },
+   "slot_value": {
+    "usd": 2740300,
+    "source_key": "lad2019:mlb-pick-values-2019",
+    "locator": "list position 25"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "1",
+   "overall_pick": 31,
+   "round_pick": 31,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Michael Busch",
+    "birth_date": "1997-11-09",
+    "external_ids": {
+     "MLBAM": "683737"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 2312000,
+    "source_key": "lad2019:bref-lad-2019"
+   },
+   "slot_value": {
+    "usd": 2312000,
+    "source_key": "lad2019:mlb-pick-values-2019",
+    "locator": "list position 31"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "C-2",
+   "overall_pick": 78,
+   "round_pick": 1,
+   "organization": "LAD",
+   "selection_type": "COMPENSATION",
+   "player": {
+    "full_name": "Jimmy Lewis",
+    "birth_date": "2000-11-02",
+    "external_ids": {
+     "MLBAM": "683167"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 1097500,
+    "source_key": "lad2019:bref-lad-2019"
+   },
+   "slot_value": {
+    "usd": 793000,
+    "source_key": "lad2019:mlb-pick-values-2019",
+    "locator": "list position 78"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "3",
+   "overall_pick": 102,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Ryan Pepiot",
+    "birth_date": "1997-08-21",
+    "external_ids": {
+     "MLBAM": "686752"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 547500,
+    "source_key": "lad2019:bref-lad-2019"
+   },
+   "slot_value": {
+    "usd": 571400,
+    "source_key": "lad2019:mlb-pick-values-2019",
+    "locator": "list position 102"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "4",
+   "overall_pick": 131,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Brandon Lewis",
+    "birth_date": "1998-10-23",
+    "external_ids": {
+     "MLBAM": "686781"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 327500,
+    "source_key": "lad2019:bref-lad-2019"
+   },
+   "slot_value": {
+    "usd": 430800,
+    "source_key": "lad2019:mlb-pick-values-2019",
+    "locator": "list position 131"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "5",
+   "overall_pick": 161,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Jack Little",
+    "birth_date": "1998-01-10",
+    "external_ids": {
+     "MLBAM": "669193"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 318600,
+    "source_key": "lad2019:bref-lad-2019"
+   },
+   "slot_value": {
+    "usd": 321100,
+    "source_key": "lad2019:mlb-pick-values-2019",
+    "locator": "list position 161"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "6",
+   "overall_pick": 191,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Aaron Ochsenbein",
+    "birth_date": "1996-02-29",
+    "external_ids": {
+     "MLBAM": "684604"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 72500,
+    "source_key": "lad2019:bref-lad-2019"
+   },
+   "slot_value": {
+    "usd": 249000,
+    "source_key": "lad2019:mlb-pick-values-2019",
+    "locator": "list position 191"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "7",
+   "overall_pick": 221,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Nick Robertson",
+    "birth_date": "1998-07-16",
+    "external_ids": {
+     "MLBAM": "687798"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 177500,
+    "source_key": "lad2019:bref-lad-2019"
+   },
+   "slot_value": {
+    "usd": 195700,
+    "source_key": "lad2019:mlb-pick-values-2019",
+    "locator": "list position 221"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "8",
+   "overall_pick": 251,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Ryan Ward",
+    "birth_date": "1998-02-23",
+    "external_ids": {
+     "MLBAM": "669899"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 160900,
+    "source_key": "lad2019:bref-lad-2019"
+   },
+   "slot_value": {
+    "usd": 163400,
+    "source_key": "lad2019:mlb-pick-values-2019",
+    "locator": "list position 251"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "9",
+   "overall_pick": 281,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Alec Gamboa",
+    "birth_date": "1997-01-17",
+    "external_ids": {
+     "MLBAM": "687941"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 17500,
+    "source_key": "lad2019:bref-lad-2019"
+   },
+   "slot_value": {
+    "usd": 150100,
+    "source_key": "lad2019:mlb-pick-values-2019",
+    "locator": "list position 281"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "10",
+   "overall_pick": 311,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Zac Ching",
+    "birth_date": "1997-05-29",
+    "external_ids": {
+     "MLBAM": "687852"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 2500,
+    "source_key": "lad2019:bref-lad-2019"
+   },
+   "slot_value": {
+    "usd": 142300,
+    "source_key": "lad2019:mlb-pick-values-2019",
+    "locator": "list position 311"
+   }
+  }
+ ]
+}

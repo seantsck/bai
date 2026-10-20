@@ -1,0 +1,16 @@
+{
+ "description": "Dodgers Digest's final 2019 signing table (2019-07-12), transcribed for the LAD 2019 class. Only the entry for a pick whose bonus no other source gives is imported (scripts/research/sources/draft-bonus-report-import.mjs); the rest are kept here as evidence and compared with Baseball-Reference in docs/evidence/lad-2018-2019-draft-certification.md.",
+ "source": { "source_key": "lad2019:dodgersdigest-signings-2019-07-12", "source_type": "NEWS_REPORT", "authority_level": "REPUTABLE_SECONDARY",
+   "title": "2019 MLB Draft signing update: Jimmy Lewis signs, Dodgers also land Allison", "publisher": "Dodgers Digest (Dustin Nosler)", "published_date": "2019-07-12",
+   "url": "https://dodgersdigest.com/2019/07/12/2019-mlb-draft-signing-update-jimmy-lewis-signs-dodgers-also-land-allison/",
+   "archived_url": "http://web.archive.org/web/20260608073015/https://dodgersdigest.com/2019/07/12/2019-mlb-draft-signing-update-jimmy-lewis-signs-dodgers-also-land-allison/",
+   "retrieved_date": "2026-10-20", "notes": "Round / player / slot / bonus / savings table; total bonus $8,411,800 against the $8,069,100 pool. MLB.com (Jim Callis) reported the same Hoese figure, unconfirmed by the club." },
+ "import": [ { "pick": 25, "bonus_usd": 2740300, "note": "Hoese: $2,740,300 (= slot), as MLB.com also reported; Baseball-Reference shows no bonus. Busch (#31) also signed at exactly slot in both this table and Baseball-Reference." } ],
+ "evidence_only": [
+  { "pick": 31, "dd": 2312000, "bref": 2312000 }, { "pick": 78, "dd": 1100000, "bref": 1097500, "note": "differs by $2,500: gross vs net" },
+  { "pick": 102, "dd": 547500, "bref": 547500 }, { "pick": 131, "dd": 372500, "bref": 327500, "note": "transposed digits in one of the sources; not decided" },
+  { "pick": 161, "dd": 318600, "bref": 318600 }, { "pick": 191, "dd": 72500, "bref": 72500 }, { "pick": 221, "dd": 177500, "bref": 177500 }, { "pick": 251, "dd": 160900, "bref": 160900 },
+  { "pick": 341, "dd": 297500, "bref": 297500 }, { "pick": 581, "dd": 222500, "bref": 222500 }, { "pick": 731, "dd": 222500, "bref": 222500 }, { "pick": 761, "dd": 300000, "bref": 300000 },
+  { "pick": 1031, "dd": 172500, "bref": 172500 }
+ ]
+}

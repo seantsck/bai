@@ -1,0 +1,130 @@
+{
+ "format": "bai-research-import/1",
+ "batch_key": "lad-trade-returns-no-mlb",
+ "channel": "OUTCOMES",
+ "description": "LAD: outcome audits of 5 players received in those trades who have no MLB debut (as of 2026-10-20).",
+ "sources": [
+  {
+   "source_key": "lad:mlb-people-trades",
+   "source_type": "OFFICIAL_LEAGUE",
+   "authority_level": "OFFICIAL",
+   "title": "MLB Stats API people for traded players",
+   "publisher": "MLB Advanced Media",
+   "reference": "statsapi.mlb.com/api/v1/people?personIds=…",
+   "retrieved_date": "2026-10-20",
+   "notes": "Names, birth dates, MLB debut dates as of retrieval."
+  }
+ ],
+ "records": [
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad:mlb-people-trades",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Tanner Dodson",
+    "external_ids": {
+     "MLBAM": "663541"
+    },
+    "source_key": "lad:mlb-people-trades"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "details": {
+    "as_of_date": "2026-10-20",
+    "reached_affiliated": null,
+    "current_status": "UNKNOWN",
+    "disposition": "UNKNOWN",
+    "notes": "acquired by LAD in the 2022-03-18 trade; no MLB debut on MLB's people record"
+   }
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad:mlb-people-trades",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Moises Brito",
+    "external_ids": {
+     "MLBAM": "804975"
+    },
+    "source_key": "lad:mlb-people-trades"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "details": {
+    "as_of_date": "2026-10-20",
+    "reached_affiliated": null,
+    "current_status": "UNKNOWN",
+    "disposition": "UNKNOWN",
+    "notes": "acquired by LAD in the 2022-08-02 trade; no MLB debut on MLB's people record"
+   }
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad:mlb-people-trades",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Mike Sirota",
+    "external_ids": {
+     "MLBAM": "701527"
+    },
+    "source_key": "lad:mlb-people-trades"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "details": {
+    "as_of_date": "2026-10-20",
+    "reached_affiliated": null,
+    "current_status": "UNKNOWN",
+    "disposition": "UNKNOWN",
+    "notes": "acquired by LAD in the 2025-01-07 trade; no MLB debut on MLB's people record"
+   }
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad:mlb-people-trades",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Zach Ehrhard",
+    "external_ids": {
+     "MLBAM": "701394"
+    },
+    "source_key": "lad:mlb-people-trades"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "details": {
+    "as_of_date": "2026-10-20",
+    "reached_affiliated": null,
+    "current_status": "UNKNOWN",
+    "disposition": "UNKNOWN",
+    "notes": "acquired by LAD in the 2025-07-31 trade; no MLB debut on MLB's people record"
+   }
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad:mlb-people-trades",
+   "organization": "LAD",
+   "player": {
+    "full_name": "James Tibbs III",
+    "external_ids": {
+     "MLBAM": "696486"
+    },
+    "source_key": "lad:mlb-people-trades"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "details": {
+    "as_of_date": "2026-10-20",
+    "reached_affiliated": null,
+    "current_status": "UNKNOWN",
+    "disposition": "UNKNOWN",
+    "notes": "acquired by LAD in the 2025-07-31 trade; no MLB debut on MLB's people record"
+   }
+  }
+ ]
+}

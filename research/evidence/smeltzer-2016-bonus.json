@@ -1,0 +1,38 @@
+{
+ "description": "Devin Smeltzer (LAD 2016, pick 161) signing bonus: why MLB.com's $500,000 is the gross amount and $497,500 the net amount BAI records for every other pick. Prepared 2026-10-20 by automated research for the human reviewer; it decides nothing.",
+ "question": "draft_signings.signing_bonus_usd for 2016-JUNE_AMATEUR pick 161 (LAD)",
+ "claims": [
+  { "source_key": "lad2016:mlb-signing-tracker-2016", "authority": "OFFICIAL", "value": 500000, "note": "MLB.com 2016 signing and bonus tracker (archive capture 2019-09-22)" },
+  { "source_key": "lad2016:bref-lad-2016", "authority": "AGGREGATOR", "value": 497500, "note": "Baseball-Reference draft page (capture 2026-08-03)" },
+  { "source_key": "lad2016:ba-draft-selections-2016", "authority": "REPUTABLE_SECONDARY", "value": 497500, "note": "Baseball America 2016 Draft Selections (capture 2026-04-29)" }
+ ],
+ "gross_reference": {
+  "source": "Dodgers Digest, 'Dodgers sign 33 of 42 picks from 2016 MLB Draft, avoid losing picks by $2,524' (Chad Moriyama, 2016-07-18)",
+  "url": "https://dodgersdigest.com/2016/07/18/dodgers-sign-33-of-42-picks-from-2016-mlb-draft-avoid-losing-picks-by-524/",
+  "archived_url": "http://web.archive.org/web/20260609142723/https://dodgersdigest.com/2016/07/18/dodgers-sign-33-of-42-picks-from-2016-mlb-draft-avoid-losing-picks-by-524/",
+  "quote": "After factoring in the previously mentioned $2,500 discount on all bonuses for signed picks due to some accounting trick ... we can see that the Dodgers just barely avoid incurring draft pick penalties",
+  "role": "lists each pick's gross bonus; not a bonus claim BAI imports (gross is a different quantity)"
+ },
+ "practice_reference": {
+  "source": "Jim Callis (MLB.com) on Twitter, 2017-06-20, quoted by Dodgers Digest 2017-07-07",
+  "quote": "Noticing more clubs following lead of @RaysBaseball, @Dodgers and using $2,500 accounting deduction on @MLBDraft bonuses."
+ },
+ "comparison_rounds_1_to_10": [
+  { "pick": 20, "gross": 2317000, "mlb_tracker": 2314500, "bref": 2314500, "ba": 2314500 },
+  { "pick": 32, "gross": 1775000, "mlb_tracker": 1772500, "bref": 1772500, "ba": 1772500 },
+  { "pick": 36, "gross": 1850000, "mlb_tracker": 1847500, "bref": 1847500, "ba": 1847500 },
+  { "pick": 65, "gross": 590800, "mlb_tracker": 588300, "bref": 588300, "ba": 588300 },
+  { "pick": 101, "gross": 1000000, "mlb_tracker": 997500, "bref": 997500, "ba": 997500 },
+  { "pick": 131, "gross": 250000, "mlb_tracker": 247500, "bref": 247500, "ba": 247500 },
+  { "pick": 161, "gross": 500000, "mlb_tracker": 500000, "bref": 497500, "ba": 497500 },
+  { "pick": 191, "gross": 250000, "mlb_tracker": 247500, "bref": 247500, "ba": 247500 },
+  { "pick": 221, "gross": 150000, "mlb_tracker": 147500, "bref": null, "ba": 147500 },
+  { "pick": 251, "gross": 125000, "mlb_tracker": 122500, "bref": 122500, "ba": 122500 },
+  { "pick": 281, "gross": 5000, "mlb_tracker": 2500, "bref": 2500, "ba": 2500 },
+  { "pick": 311, "gross": 5000, "mlb_tracker": 2500, "bref": 2500, "ba": 2500 }
+ ],
+ "finding": "For 11 of the 12 picks in rounds 1-10, MLB.com's tracker equals the gross figure minus $2,500, i.e. the net amount, exactly as Baseball-Reference and Baseball America report. Pick 161 is the only one where the tracker equals the gross figure. The tracker's $500,000 is therefore the gross amount; $497,500 is the net amount on the convention every other recorded LAD bonus follows.",
+ "caveat": "No source states the deduction for pick 161 explicitly; the conclusion rests on the tracker's own convention for the other eleven picks and on two independent sources agreeing on $497,500. One anomaly elsewhere: Chris Mathewson (pick 581) is $202,000 in both the gross table and the net sources.",
+ "recommendation": "Choose the Baseball America observation ($497,500) with a rationale citing this file; keep MLB.com's $500,000 on record as the gross figure.",
+ "status": "PROPOSED by automated research (agent:bai-research). Not approved: only a registered human reviewer can accept it."
+}

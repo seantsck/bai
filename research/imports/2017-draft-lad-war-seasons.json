@@ -1,0 +1,710 @@
+{
+ "format": "bai-research-import/1",
+ "batch_key": "2017-draft-lad-war-seasons",
+ "channel": "OUTCOMES",
+ "description": "LAD 2017 class: Baseball-Reference season-by-team WAR for 9 players who reached MLB (archived pages captured before 20260325).",
+ "sources": [
+  {
+   "source_key": "lad:bref-player-pages-pre2026",
+   "source_type": "REFERENCE_DATABASE",
+   "authority_level": "AGGREGATOR",
+   "title": "Baseball-Reference player pages, Wayback captures before 20260325",
+   "publisher": "Sports Reference",
+   "reference": "https://www.baseball-reference.com/players/<x>/<id>.shtml via web.archive.org (per-entry locator = capture URL)",
+   "retrieved_date": "2026-10-20",
+   "notes": "Value tables (players_value_batting b_war + players_value_pitching p_war) per season and team; split seasons stay split; multi-team total rows skipped. Captures before opening day, so the last season is complete."
+  },
+  {
+   "source_key": "chadwick:register",
+   "source_type": "REFERENCE_DATABASE",
+   "authority_level": "REPUTABLE_SECONDARY",
+   "title": "Chadwick Baseball Bureau register (people)",
+   "publisher": "Chadwick Baseball Bureau",
+   "url": "https://github.com/chadwickbureau/register",
+   "retrieved_date": "2026-10-20",
+   "notes": "MLBAM -> Baseball-Reference id crosswalk, commit 781c175e748b89e5730fd3f5de0086b9355b2f92."
+  }
+ ],
+ "records": [
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Connor Wong",
+    "external_ids": {
+     "MLBAM": "657136",
+     "BBREF": "wongco01"
+    },
+    "source_key": "chadwick:register"
+   },
+   "audit_state": "AUDITED_REACHED_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "debut": {
+    "date": "2021-06-22",
+    "organization": "BOS",
+    "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "people/657136 mlbDebutDate; 2021 season splits"
+   },
+   "war": [
+    {
+     "system": "BREF",
+     "scope": "SEASON",
+     "season": 2021,
+     "organization": "BOS",
+     "through_season": 2025,
+     "value": 0.3,
+     "observed_on": "2026-03-25",
+     "source_key": "lad:bref-player-pages-pre2026",
+     "locator": "http://web.archive.org/web/20260325103747/https://www.baseball-reference.com/players/w/wongco01.shtml (2021 BOS)"
+    },
+    {
+     "system": "BREF",
+     "scope": "SEASON",
+     "season": 2022,
+     "organization": "BOS",
+     "through_season": 2025,
+     "value": -0.1,
+     "observed_on": "2026-03-25",
+     "source_key": "lad:bref-player-pages-pre2026",
+     "locator": "http://web.archive.org/web/20260325103747/https://www.baseball-reference.com/players/w/wongco01.shtml (2022 BOS)"
+    },
+    {
+     "system": "BREF",
+     "scope": "SEASON",
+     "season": 2023,
+     "organization": "BOS",
+     "through_season": 2025,
+     "value": 2.2,
+     "observed_on": "2026-03-25",
+     "source_key": "lad:bref-player-pages-pre2026",
+     "locator": "http://web.archive.org/web/20260325103747/https://www.baseball-reference.com/players/w/wongco01.shtml (2023 BOS)"
+    },
+    {
+     "system": "BREF",
+     "scope": "SEASON",
+     "season": 2024,
+     "organization": "BOS",
+     "through_season": 2025,
+     "value": 1.8,
+     "observed_on": "2026-03-25",
+     "source_key": "lad:bref-player-pages-pre2026",
+     "locator": "http://web.archive.org/web/20260325103747/https://www.baseball-reference.com/players/w/wongco01.shtml (2024 BOS)"
+    },
+    {
+     "system": "BREF",
+     "scope": "SEASON",
+     "season": 2025,
+     "organization": "BOS",
+     "through_season": 2025,
+     "value": -0.6,
+     "observed_on": "2026-03-25",
+     "source_key": "lad:bref-player-pages-pre2026",
+     "locator": "http://web.archive.org/web/20260325103747/https://www.baseball-reference.com/players/w/wongco01.shtml (2025 BOS)"
+    },
+    {
+     "system": "BREF",
+     "scope": "CAREER",
+     "through_season": 2025,
+     "value": 3.6,
+     "observed_on": "2026-03-25",
+     "source_key": "lad:bref-player-pages-pre2026",
+     "locator": "http://web.archive.org/web/20260325103747/https://www.baseball-reference.com/players/w/wongco01.shtml (summary WAR)"
+    }
+   ],
+   "notes": "Season splits through 2025 from the 2026-03-25 capture; 5 season-team rows sum to 3.6, page career 3.6."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Zach Pop",
+    "external_ids": {
+     "MLBAM": "647315",
+     "BBREF": "popza01"
+    },
+    "source_key": "chadwick:register"
+   },
+   "audit_state": "AUDITED_REACHED_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "debut": {
+    "date": "2021-04-03",
+    "organization": "MIA",
+    "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "people/647315 mlbDebutDate; 2021 season splits"
+   },
+   "war": [
+    {
+     "system": "BREF",
+     "scope": "SEASON",
+     "season": 2021,
+     "organization": "MIA",
+     "through_season": 2025,
+     "value": 0.1,
+     "observed_on": "2026-02-07",
+     "source_key": "lad:bref-player-pages-pre2026",
+     "locator": "http://web.archive.org/web/20260207140325/https://www.baseball-reference.com/players/p/popza01.shtml (2021 MIA)"
+    },
+    {
+     "system": "BREF",
+     "scope": "SEASON",
+     "season": 2022,
+     "organization": "MIA",
+     "through_season": 2025,
+     "value": 0.2,
+     "observed_on": "2026-02-07",
+     "source_key": "lad:bref-player-pages-pre2026",
+     "locator": "http://web.archive.org/web/20260207140325/https://www.baseball-reference.com/players/p/popza01.shtml (2022 MIA)"
+    },
+    {
+     "system": "BREF",
+     "scope": "SEASON",
+     "season": 2022,
+     "organization": "TOR",
+     "through_season": 2025,
+     "value": 0.5,
+     "observed_on": "2026-02-07",
+     "source_key": "lad:bref-player-pages-pre2026",
+     "locator": "http://web.archive.org/web/20260207140325/https://www.baseball-reference.com/players/p/popza01.shtml (2022 TOR)"
+    },
+    {
+     "system": "BREF",
+     "scope": "SEASON",
+     "season": 2023,
+     "organization": "TOR",
+     "through_season": 2025,
+     "value": -0.4,
+     "observed_on": "2026-02-07",
+     "source_key": "lad:bref-player-pages-pre2026",
+     "locator": "http://web.archive.org/web/20260207140325/https://www.baseball-reference.com/players/p/popza01.shtml (2023 TOR)"
+    },
+    {
+     "system": "BREF",
+     "scope": "SEASON",
+     "season": 2024,
+     "organization": "TOR",
+     "through_season": 2025,
+     "value": -1.4,
+     "observed_on": "2026-02-07",
+     "source_key": "lad:bref-player-pages-pre2026",
+     "locator": "http://web.archive.org/web/20260207140325/https://www.baseball-reference.com/players/p/popza01.shtml (2024 TOR)"
+    },
+    {
+     "system": "BREF",
+     "scope": "SEASON",
+     "season": 2025,
+     "organization": "NYM",
+     "through_season": 2025,
+     "value": -0.2,
+     "observed_on": "2026-02-07",
+     "source_key": "lad:bref-player-pages-pre2026",
+     "locator": "http://web.archive.org/web/20260207140325/https://www.baseball-reference.com/players/p/popza01.shtml (2025 NYM)"
+    },
+    {
+     "system": "BREF",
+     "scope": "SEASON",
+     "season": 2025,
+     "organization": "SEA",
+     "through_season": 2025,
+     "value": -0.4,
+     "observed_on": "2026-02-07",
+     "source_key": "lad:bref-player-pages-pre2026",
+     "locator": "http://web.archive.org/web/20260207140325/https://www.baseball-reference.com/players/p/popza01.shtml (2025 SEA)"
+    },
+    {
+     "system": "BREF",
+     "scope": "CAREER",
+     "through_season": 2025,
+     "value": -1.5,
+     "observed_on": "2026-02-07",
+     "source_key": "lad:bref-player-pages-pre2026",
+     "locator": "http://web.archive.org/web/20260207140325/https://www.baseball-reference.com/players/p/popza01.shtml (summary WAR)"
+    }
+   ],
+   "notes": "Season splits through 2025 from the 2026-02-07 capture; 7 season-team rows sum to -1.6, page career -1.5."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Rylan Bannon",
+    "external_ids": {
+     "MLBAM": "676625",
+     "BBREF": "bannory01"
+    },
+    "source_key": "chadwick:register"
+   },
+   "audit_state": "AUDITED_REACHED_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "debut": {
+    "date": "2022-05-12",
+    "organization": "BAL",
+    "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "people/676625 mlbDebutDate; 2022 season splits"
+   },
+   "war": [
+    {
+     "system": "BREF",
+     "scope": "SEASON",
+     "season": 2022,
+     "organization": "ATL",
+     "through_season": 2025,
+     "value": 0,
+     "observed_on": "2026-02-19",
+     "source_key": "lad:bref-player-pages-pre2026",
+     "locator": "http://web.archive.org/web/20260219052016/https://www.baseball-reference.com/players/b/bannory01.shtml (2022 ATL)"
+    },
+    {
+     "system": "BREF",
+     "scope": "SEASON",
+     "season": 2022,
+     "organization": "BAL",
+     "through_season": 2025,
+     "value": -0.2,
+     "observed_on": "2026-02-19",
+     "source_key": "lad:bref-player-pages-pre2026",
+     "locator": "http://web.archive.org/web/20260219052016/https://www.baseball-reference.com/players/b/bannory01.shtml (2022 BAL)"
+    },
+    {
+     "system": "BREF",
+     "scope": "SEASON",
+     "season": 2023,
+     "organization": "HOU",
+     "through_season": 2025,
+     "value": -0.2,
+     "observed_on": "2026-02-19",
+     "source_key": "lad:bref-player-pages-pre2026",
+     "locator": "http://web.archive.org/web/20260219052016/https://www.baseball-reference.com/players/b/bannory01.shtml (2023 HOU)"
+    },
+    {
+     "system": "BREF",
+     "scope": "CAREER",
+     "through_season": 2025,
+     "value": -0.3,
+     "observed_on": "2026-02-19",
+     "source_key": "lad:bref-player-pages-pre2026",
+     "locator": "http://web.archive.org/web/20260219052016/https://www.baseball-reference.com/players/b/bannory01.shtml (summary WAR)"
+    }
+   ],
+   "notes": "Season splits through 2025 from the 2026-02-19 capture; 3 season-team rows sum to -0.4, page career -0.3."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Zach Reks",
+    "external_ids": {
+     "MLBAM": "676646",
+     "BBREF": "reksza01"
+    },
+    "source_key": "chadwick:register"
+   },
+   "audit_state": "AUDITED_REACHED_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "debut": {
+    "date": "2021-06-21",
+    "organization": "LAD",
+    "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "people/676646 mlbDebutDate; 2021 season splits"
+   },
+   "war": [
+    {
+     "system": "BREF",
+     "scope": "SEASON",
+     "season": 2021,
+     "organization": "LAD",
+     "through_season": 2025,
+     "value": -0.1,
+     "observed_on": "2025-11-14",
+     "source_key": "lad:bref-player-pages-pre2026",
+     "locator": "http://web.archive.org/web/20251114065401/https://www.baseball-reference.com/players/r/reksza01.shtml (2021 LAD)"
+    },
+    {
+     "system": "BREF",
+     "scope": "SEASON",
+     "season": 2022,
+     "organization": "TEX",
+     "through_season": 2025,
+     "value": -0.5,
+     "observed_on": "2025-11-14",
+     "source_key": "lad:bref-player-pages-pre2026",
+     "locator": "http://web.archive.org/web/20251114065401/https://www.baseball-reference.com/players/r/reksza01.shtml (2022 TEX)"
+    },
+    {
+     "system": "BREF",
+     "scope": "CAREER",
+     "through_season": 2025,
+     "value": -0.6,
+     "observed_on": "2025-11-14",
+     "source_key": "lad:bref-player-pages-pre2026",
+     "locator": "http://web.archive.org/web/20251114065401/https://www.baseball-reference.com/players/r/reksza01.shtml (summary WAR)"
+    }
+   ],
+   "notes": "Season splits through 2025 from the 2025-11-14 capture; 2 season-team rows sum to -0.6, page career -0.6."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Jacob Amaya",
+    "external_ids": {
+     "MLBAM": "676070",
+     "BBREF": "amayaja01"
+    },
+    "source_key": "chadwick:register"
+   },
+   "audit_state": "AUDITED_REACHED_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "debut": {
+    "date": "2023-06-18",
+    "organization": "MIA",
+    "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "people/676070 mlbDebutDate; 2023 season splits"
+   },
+   "war": [
+    {
+     "system": "BREF",
+     "scope": "SEASON",
+     "season": 2023,
+     "organization": "MIA",
+     "through_season": 2025,
+     "value": 0,
+     "observed_on": "2026-02-18",
+     "source_key": "lad:bref-player-pages-pre2026",
+     "locator": "http://web.archive.org/web/20260218065236/https://www.baseball-reference.com/players/a/amayaja01.shtml (2023 MIA)"
+    },
+    {
+     "system": "BREF",
+     "scope": "SEASON",
+     "season": 2024,
+     "organization": "CWS",
+     "through_season": 2025,
+     "value": 0,
+     "observed_on": "2026-02-18",
+     "source_key": "lad:bref-player-pages-pre2026",
+     "locator": "http://web.archive.org/web/20260218065236/https://www.baseball-reference.com/players/a/amayaja01.shtml (2024 CHW)"
+    },
+    {
+     "system": "BREF",
+     "scope": "SEASON",
+     "season": 2024,
+     "organization": "HOU",
+     "through_season": 2025,
+     "value": 0,
+     "observed_on": "2026-02-18",
+     "source_key": "lad:bref-player-pages-pre2026",
+     "locator": "http://web.archive.org/web/20260218065236/https://www.baseball-reference.com/players/a/amayaja01.shtml (2024 HOU)"
+    },
+    {
+     "system": "BREF",
+     "scope": "SEASON",
+     "season": 2025,
+     "organization": "CWS",
+     "through_season": 2025,
+     "value": -1,
+     "observed_on": "2026-02-18",
+     "source_key": "lad:bref-player-pages-pre2026",
+     "locator": "http://web.archive.org/web/20260218065236/https://www.baseball-reference.com/players/a/amayaja01.shtml (2025 CHW)"
+    },
+    {
+     "system": "BREF",
+     "scope": "CAREER",
+     "through_season": 2025,
+     "value": -1.1,
+     "observed_on": "2026-02-18",
+     "source_key": "lad:bref-player-pages-pre2026",
+     "locator": "http://web.archive.org/web/20260218065236/https://www.baseball-reference.com/players/a/amayaja01.shtml (summary WAR)"
+    }
+   ],
+   "notes": "Season splits through 2025 from the 2026-02-18 capture; 4 season-team rows sum to -1.0, page career -1.1."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Andre Jackson",
+    "external_ids": {
+     "MLBAM": "656578",
+     "BBREF": "jacksan01"
+    },
+    "source_key": "chadwick:register"
+   },
+   "audit_state": "AUDITED_REACHED_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "debut": {
+    "date": "2021-08-16",
+    "organization": "LAD",
+    "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "people/656578 mlbDebutDate; 2021 season splits"
+   },
+   "war": [
+    {
+     "system": "BREF",
+     "scope": "SEASON",
+     "season": 2021,
+     "organization": "LAD",
+     "through_season": 2025,
+     "value": 0.2,
+     "observed_on": "2026-03-04",
+     "source_key": "lad:bref-player-pages-pre2026",
+     "locator": "http://web.archive.org/web/20260304024734/https://www.baseball-reference.com/players/j/jacksan01.shtml (2021 LAD)"
+    },
+    {
+     "system": "BREF",
+     "scope": "SEASON",
+     "season": 2022,
+     "organization": "LAD",
+     "through_season": 2025,
+     "value": 0.2,
+     "observed_on": "2026-03-04",
+     "source_key": "lad:bref-player-pages-pre2026",
+     "locator": "http://web.archive.org/web/20260304024734/https://www.baseball-reference.com/players/j/jacksan01.shtml (2022 LAD)"
+    },
+    {
+     "system": "BREF",
+     "scope": "SEASON",
+     "season": 2023,
+     "organization": "LAD",
+     "through_season": 2025,
+     "value": -0.2,
+     "observed_on": "2026-03-04",
+     "source_key": "lad:bref-player-pages-pre2026",
+     "locator": "http://web.archive.org/web/20260304024734/https://www.baseball-reference.com/players/j/jacksan01.shtml (2023 LAD)"
+    },
+    {
+     "system": "BREF",
+     "scope": "SEASON",
+     "season": 2023,
+     "organization": "PIT",
+     "through_season": 2025,
+     "value": 0.7,
+     "observed_on": "2026-03-04",
+     "source_key": "lad:bref-player-pages-pre2026",
+     "locator": "http://web.archive.org/web/20260304024734/https://www.baseball-reference.com/players/j/jacksan01.shtml (2023 PIT)"
+    },
+    {
+     "system": "BREF",
+     "scope": "CAREER",
+     "through_season": 2025,
+     "value": 1,
+     "observed_on": "2026-03-04",
+     "source_key": "lad:bref-player-pages-pre2026",
+     "locator": "http://web.archive.org/web/20260304024734/https://www.baseball-reference.com/players/j/jacksan01.shtml (summary WAR)"
+    }
+   ],
+   "notes": "Season splits through 2025 from the 2026-03-04 capture; 4 season-team rows sum to 0.9, page career 1."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Chris Roller",
+    "external_ids": {
+     "MLBAM": "676896",
+     "BBREF": "rollech01"
+    },
+    "source_key": "chadwick:register"
+   },
+   "audit_state": "AUDITED_REACHED_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "debut": {
+    "date": "2024-05-15",
+    "organization": "MIL",
+    "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "people/676896 mlbDebutDate; 2024 season splits"
+   },
+   "war": [
+    {
+     "system": "BREF",
+     "scope": "SEASON",
+     "season": 2024,
+     "organization": "MIL",
+     "through_season": 2024,
+     "value": 0,
+     "observed_on": "2025-09-19",
+     "source_key": "lad:bref-player-pages-pre2026",
+     "locator": "http://web.archive.org/web/20250919132118/https://www.baseball-reference.com/players/r/rollech01.shtml (2024 MIL)"
+    },
+    {
+     "system": "BREF",
+     "scope": "CAREER",
+     "through_season": 2024,
+     "value": 0,
+     "observed_on": "2025-09-19",
+     "source_key": "lad:bref-player-pages-pre2026",
+     "locator": "http://web.archive.org/web/20250919132118/https://www.baseball-reference.com/players/r/rollech01.shtml (summary WAR)"
+    }
+   ],
+   "notes": "Season splits through 2024 from the 2025-09-19 capture; 1 season-team rows sum to 0.0, page career 0."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Brett de Geus",
+    "external_ids": {
+     "MLBAM": "676969",
+     "BBREF": "degeubr01"
+    },
+    "source_key": "chadwick:register"
+   },
+   "audit_state": "AUDITED_REACHED_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "debut": {
+    "date": "2021-04-01",
+    "organization": "TEX",
+    "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "people/676969 mlbDebutDate; 2021 season splits"
+   },
+   "war": [
+    {
+     "system": "BREF",
+     "scope": "SEASON",
+     "season": 2021,
+     "organization": "ARI",
+     "through_season": 2025,
+     "value": -0.8,
+     "observed_on": "2026-01-14",
+     "source_key": "lad:bref-player-pages-pre2026",
+     "locator": "http://web.archive.org/web/20260114011433/https://www.baseball-reference.com/players/d/degeubr01.shtml (2021 ARI)"
+    },
+    {
+     "system": "BREF",
+     "scope": "SEASON",
+     "season": 2021,
+     "organization": "TEX",
+     "through_season": 2025,
+     "value": -0.8,
+     "observed_on": "2026-01-14",
+     "source_key": "lad:bref-player-pages-pre2026",
+     "locator": "http://web.archive.org/web/20260114011433/https://www.baseball-reference.com/players/d/degeubr01.shtml (2021 TEX)"
+    },
+    {
+     "system": "BREF",
+     "scope": "SEASON",
+     "season": 2024,
+     "organization": "MIA",
+     "through_season": 2025,
+     "value": -0.1,
+     "observed_on": "2026-01-14",
+     "source_key": "lad:bref-player-pages-pre2026",
+     "locator": "http://web.archive.org/web/20260114011433/https://www.baseball-reference.com/players/d/degeubr01.shtml (2024 MIA)"
+    },
+    {
+     "system": "BREF",
+     "scope": "SEASON",
+     "season": 2024,
+     "organization": "SEA",
+     "through_season": 2025,
+     "value": 0.1,
+     "observed_on": "2026-01-14",
+     "source_key": "lad:bref-player-pages-pre2026",
+     "locator": "http://web.archive.org/web/20260114011433/https://www.baseball-reference.com/players/d/degeubr01.shtml (2024 SEA)"
+    },
+    {
+     "system": "BREF",
+     "scope": "SEASON",
+     "season": 2024,
+     "organization": "TOR",
+     "through_season": 2025,
+     "value": -0.2,
+     "observed_on": "2026-01-14",
+     "source_key": "lad:bref-player-pages-pre2026",
+     "locator": "http://web.archive.org/web/20260114011433/https://www.baseball-reference.com/players/d/degeubr01.shtml (2024 TOR)"
+    },
+    {
+     "system": "BREF",
+     "scope": "SEASON",
+     "season": 2025,
+     "organization": "PHI",
+     "through_season": 2025,
+     "value": 0,
+     "observed_on": "2026-01-14",
+     "source_key": "lad:bref-player-pages-pre2026",
+     "locator": "http://web.archive.org/web/20260114011433/https://www.baseball-reference.com/players/d/degeubr01.shtml (2025 PHI)"
+    },
+    {
+     "system": "BREF",
+     "scope": "CAREER",
+     "through_season": 2025,
+     "value": -1.8,
+     "observed_on": "2026-01-14",
+     "source_key": "lad:bref-player-pages-pre2026",
+     "locator": "http://web.archive.org/web/20260114011433/https://www.baseball-reference.com/players/d/degeubr01.shtml (summary WAR)"
+    }
+   ],
+   "notes": "Season splits through 2025 from the 2026-01-14 capture; 6 season-team rows sum to -1.8, page career -1.8."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Clayton Andrews",
+    "external_ids": {
+     "MLBAM": "677076",
+     "BBREF": "andrecl02"
+    },
+    "source_key": "chadwick:register"
+   },
+   "audit_state": "AUDITED_REACHED_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "debut": {
+    "date": "2023-07-01",
+    "organization": "MIL",
+    "source_key": "lad2017:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "people/677076 mlbDebutDate; 2023 season splits"
+   },
+   "war": [
+    {
+     "system": "BREF",
+     "scope": "SEASON",
+     "season": 2023,
+     "organization": "MIL",
+     "through_season": 2025,
+     "value": -0.8,
+     "observed_on": "2026-02-02",
+     "source_key": "lad:bref-player-pages-pre2026",
+     "locator": "http://web.archive.org/web/20260202000513/https://www.baseball-reference.com/players/a/andrecl02.shtml (2023 MIL)"
+    },
+    {
+     "system": "BREF",
+     "scope": "SEASON",
+     "season": 2024,
+     "organization": "NYY",
+     "through_season": 2025,
+     "value": -0.1,
+     "observed_on": "2026-02-02",
+     "source_key": "lad:bref-player-pages-pre2026",
+     "locator": "http://web.archive.org/web/20260202000513/https://www.baseball-reference.com/players/a/andrecl02.shtml (2024 NYY)"
+    },
+    {
+     "system": "BREF",
+     "scope": "CAREER",
+     "through_season": 2025,
+     "value": -0.9,
+     "observed_on": "2026-02-02",
+     "source_key": "lad:bref-player-pages-pre2026",
+     "locator": "http://web.archive.org/web/20260202000513/https://www.baseball-reference.com/players/a/andrecl02.shtml (summary WAR)"
+    }
+   ],
+   "notes": "Season splits through 2025 from the 2026-02-02 capture; 2 season-team rows sum to -0.9, page career -0.9."
+  }
+ ]
+}

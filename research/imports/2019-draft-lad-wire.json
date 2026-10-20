@@ -1,0 +1,857 @@
+{
+ "format": "bai-research-import/1",
+ "batch_key": "2019-draft-lad-wire",
+ "channel": "DRAFT",
+ "description": "LAD 2019 Rule 4 draft: 31 of 41 picks signed per the MLB transaction wire, dated to the day (no bonuses).",
+ "sources": [
+  {
+   "source_key": "lad2019:mlb-transactions-draft-2019",
+   "source_type": "OFFICIAL_LEAGUE",
+   "authority_level": "OFFICIAL",
+   "title": "MLB transaction wire, team 119, 2019-06-03 to 2019-08-31",
+   "publisher": "MLB Advanced Media",
+   "url": "https://statsapi.mlb.com/api/v1/transactions?teamId=119&startDate=2019-06-03&endDate=2019-08-31",
+   "retrieved_date": "2026-10-20",
+   "notes": "SGN (or SFA) entries for the club's official picks inside the window. A pick without an entry is not claimed either way."
+  }
+ ],
+ "records": [
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "1",
+   "overall_pick": 25,
+   "round_pick": 25,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Kody Hoese",
+    "birth_date": "1997-07-13",
+    "external_ids": {
+     "MLBAM": "682210"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2019-06-11",
+    "date_precision": "DAY",
+    "source_key": "lad2019:mlb-transactions-draft-2019",
+    "locator": "transaction 407545 (SGN)"
+   },
+   "notes": "MLB transaction 407545 (2019-06-11): Los Angeles Dodgers signed 3B Kody Hoese."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "1",
+   "overall_pick": 31,
+   "round_pick": 31,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Michael Busch",
+    "birth_date": "1997-11-09",
+    "external_ids": {
+     "MLBAM": "683737"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2019-07-04",
+    "date_precision": "DAY",
+    "source_key": "lad2019:mlb-transactions-draft-2019",
+    "locator": "transaction 416400 (SGN)"
+   },
+   "notes": "MLB transaction 416400 (2019-07-04): Los Angeles Dodgers signed 2B Michael Busch."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "C-2",
+   "overall_pick": 78,
+   "round_pick": 1,
+   "organization": "LAD",
+   "selection_type": "COMPENSATION",
+   "player": {
+    "full_name": "Jimmy Lewis",
+    "birth_date": "2000-11-02",
+    "external_ids": {
+     "MLBAM": "683167"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2019-07-09",
+    "date_precision": "DAY",
+    "source_key": "lad2019:mlb-transactions-draft-2019",
+    "locator": "transaction 419561 (SGN)"
+   },
+   "notes": "MLB transaction 419561 (2019-07-09): Los Angeles Dodgers signed RHP Jimmy Lewis."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "3",
+   "overall_pick": 102,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Ryan Pepiot",
+    "birth_date": "1997-08-21",
+    "external_ids": {
+     "MLBAM": "686752"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2019-06-11",
+    "date_precision": "DAY",
+    "source_key": "lad2019:mlb-transactions-draft-2019",
+    "locator": "transaction 407546 (SGN)"
+   },
+   "notes": "MLB transaction 407546 (2019-06-11): Los Angeles Dodgers signed RHP Ryan Pepiot."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "4",
+   "overall_pick": 131,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Brandon Lewis",
+    "birth_date": "1998-10-23",
+    "external_ids": {
+     "MLBAM": "686781"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2019-06-17",
+    "date_precision": "DAY",
+    "source_key": "lad2019:mlb-transactions-draft-2019",
+    "locator": "transaction 410131 (SGN)"
+   },
+   "notes": "MLB transaction 410131 (2019-06-17): Los Angeles Dodgers signed 3B Brandon Lewis."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "5",
+   "overall_pick": 161,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Jack Little",
+    "birth_date": "1998-01-10",
+    "external_ids": {
+     "MLBAM": "669193"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2019-06-19",
+    "date_precision": "DAY",
+    "source_key": "lad2019:mlb-transactions-draft-2019",
+    "locator": "transaction 413468 (SGN)"
+   },
+   "notes": "MLB transaction 413468 (2019-06-19): Los Angeles Dodgers signed RHP Jack Little."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "6",
+   "overall_pick": 191,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Aaron Ochsenbein",
+    "birth_date": "1996-02-29",
+    "external_ids": {
+     "MLBAM": "684604"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2019-07-01",
+    "date_precision": "DAY",
+    "source_key": "lad2019:mlb-transactions-draft-2019",
+    "locator": "transaction 414517 (SGN)"
+   },
+   "notes": "MLB transaction 414517 (2019-07-01): Los Angeles Dodgers signed RHP Aaron Ochsenbein."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "7",
+   "overall_pick": 221,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Nick Robertson",
+    "birth_date": "1998-07-16",
+    "external_ids": {
+     "MLBAM": "687798"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2019-06-11",
+    "date_precision": "DAY",
+    "source_key": "lad2019:mlb-transactions-draft-2019",
+    "locator": "transaction 407547 (SGN)"
+   },
+   "notes": "MLB transaction 407547 (2019-06-11): Los Angeles Dodgers signed RHP Nick Robertson."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "8",
+   "overall_pick": 251,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Ryan Ward",
+    "birth_date": "1998-02-23",
+    "external_ids": {
+     "MLBAM": "669899"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2019-06-11",
+    "date_precision": "DAY",
+    "source_key": "lad2019:mlb-transactions-draft-2019",
+    "locator": "transaction 407548 (SGN)"
+   },
+   "notes": "MLB transaction 407548 (2019-06-11): Los Angeles Dodgers signed OF Ryan Ward."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "9",
+   "overall_pick": 281,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Alec Gamboa",
+    "birth_date": "1997-01-17",
+    "external_ids": {
+     "MLBAM": "687941"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2019-06-11",
+    "date_precision": "DAY",
+    "source_key": "lad2019:mlb-transactions-draft-2019",
+    "locator": "transaction 407549 (SGN)"
+   },
+   "notes": "MLB transaction 407549 (2019-06-11): Los Angeles Dodgers signed LHP Alec Gamboa."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "10",
+   "overall_pick": 311,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Zac Ching",
+    "birth_date": "1997-05-29",
+    "external_ids": {
+     "MLBAM": "687852"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2019-06-11",
+    "date_precision": "DAY",
+    "source_key": "lad2019:mlb-transactions-draft-2019",
+    "locator": "transaction 407550 (SGN)"
+   },
+   "notes": "MLB transaction 407550 (2019-06-11): Los Angeles Dodgers signed SS Zac Ching."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "11",
+   "overall_pick": 341,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Logan Boyer",
+    "birth_date": "1998-01-24",
+    "external_ids": {
+     "MLBAM": "669188"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2019-06-11",
+    "date_precision": "DAY",
+    "source_key": "lad2019:mlb-transactions-draft-2019",
+    "locator": "transaction 407551 (SGN)"
+   },
+   "notes": "MLB transaction 407551 (2019-06-11): Los Angeles Dodgers signed RHP Logan Boyer."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "12",
+   "overall_pick": 371,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Mitchell Tyranski",
+    "birth_date": "1997-09-02",
+    "external_ids": {
+     "MLBAM": "680454"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2019-06-11",
+    "date_precision": "DAY",
+    "source_key": "lad2019:mlb-transactions-draft-2019",
+    "locator": "transaction 407552 (SGN)"
+   },
+   "notes": "MLB transaction 407552 (2019-06-11): Los Angeles Dodgers signed LHP Mitchell Tyranski."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "13",
+   "overall_pick": 401,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Jake Cantleberry",
+    "birth_date": "1997-08-08",
+    "external_ids": {
+     "MLBAM": "681147"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2019-06-11",
+    "date_precision": "DAY",
+    "source_key": "lad2019:mlb-transactions-draft-2019",
+    "locator": "transaction 407553 (SGN)"
+   },
+   "notes": "MLB transaction 407553 (2019-06-11): Los Angeles Dodgers signed LHP Jacob Cantleberry."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "14",
+   "overall_pick": 431,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Sean Mellen",
+    "birth_date": "1998-02-20",
+    "external_ids": {
+     "MLBAM": "673920"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2019-06-11",
+    "date_precision": "DAY",
+    "source_key": "lad2019:mlb-transactions-draft-2019",
+    "locator": "transaction 407554 (SGN)"
+   },
+   "notes": "MLB transaction 407554 (2019-06-11): Los Angeles Dodgers signed LHP Sean Mellen."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "15",
+   "overall_pick": 461,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Joe Vranesh",
+    "birth_date": "1998-01-23",
+    "external_ids": {
+     "MLBAM": "687992"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2019-06-11",
+    "date_precision": "DAY",
+    "source_key": "lad2019:mlb-transactions-draft-2019",
+    "locator": "transaction 407555 (SGN)"
+   },
+   "notes": "MLB transaction 407555 (2019-06-11): Los Angeles Dodgers signed OF Joe Vranesh."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "17",
+   "overall_pick": 521,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Brandon Wulff",
+    "birth_date": "1996-12-19",
+    "external_ids": {
+     "MLBAM": "687034"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2019-06-19",
+    "date_precision": "DAY",
+    "source_key": "lad2019:mlb-transactions-draft-2019",
+    "locator": "transaction 412079 (SGN)"
+   },
+   "notes": "MLB transaction 412079 (2019-06-19): Los Angeles Dodgers signed LF Brandon Wulff."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "18",
+   "overall_pick": 551,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Jeff Belge",
+    "birth_date": "1997-12-04",
+    "external_ids": {
+     "MLBAM": "666122"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2019-06-11",
+    "date_precision": "DAY",
+    "source_key": "lad2019:mlb-transactions-draft-2019",
+    "locator": "transaction 407556 (SGN)"
+   },
+   "notes": "MLB transaction 407556 (2019-06-11): Los Angeles Dodgers signed LHP Jeff Belge."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "19",
+   "overall_pick": 581,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Braidyn Fink",
+    "birth_date": "1998-03-07",
+    "external_ids": {
+     "MLBAM": "686253"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2019-07-12",
+    "date_precision": "DAY",
+    "source_key": "lad2019:mlb-transactions-draft-2019",
+    "locator": "transaction 443624 (SGN)"
+   },
+   "notes": "MLB transaction 443624 (2019-07-12): Los Angeles Dodgers signed RHP Braidyn Fink."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "20",
+   "overall_pick": 611,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Zack Plunkett",
+    "birth_date": "1996-02-16",
+    "external_ids": {
+     "MLBAM": "667407"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2019-06-28",
+    "date_precision": "DAY",
+    "source_key": "lad2019:mlb-transactions-draft-2019",
+    "locator": "transaction 415889 (SGN)"
+   },
+   "notes": "MLB transaction 415889 (2019-06-28): Los Angeles Dodgers signed RHP Zack Plunkett."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "22",
+   "overall_pick": 671,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Jimmy Titus",
+    "birth_date": "1998-01-25",
+    "external_ids": {
+     "MLBAM": "687042"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2019-06-11",
+    "date_precision": "DAY",
+    "source_key": "lad2019:mlb-transactions-draft-2019",
+    "locator": "transaction 407557 (SGN)"
+   },
+   "notes": "MLB transaction 407557 (2019-06-11): Los Angeles Dodgers signed SS Jimmy Titus."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "23",
+   "overall_pick": 701,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Cyrillo Watson",
+    "birth_date": "1997-08-10",
+    "external_ids": {
+     "MLBAM": "687041"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2019-06-11",
+    "date_precision": "DAY",
+    "source_key": "lad2019:mlb-transactions-draft-2019",
+    "locator": "transaction 407558 (SGN)"
+   },
+   "notes": "MLB transaction 407558 (2019-06-11): Los Angeles Dodgers signed RHP Cyrillo Watson."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "24",
+   "overall_pick": 731,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Chet Allison",
+    "birth_date": "1999-04-30",
+    "external_ids": {
+     "MLBAM": "690822"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2019-07-12",
+    "date_precision": "DAY",
+    "source_key": "lad2019:mlb-transactions-draft-2019",
+    "locator": "transaction 418523 (SGN)"
+   },
+   "notes": "MLB transaction 418523 (2019-07-12): Los Angeles Dodgers signed OF Chet Allison."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "25",
+   "overall_pick": 761,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Jonny DeLuca",
+    "birth_date": "1998-07-10",
+    "external_ids": {
+     "MLBAM": "676356"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2019-07-12",
+    "date_precision": "DAY",
+    "source_key": "lad2019:mlb-transactions-draft-2019",
+    "locator": "transaction 418524 (SGN)"
+   },
+   "notes": "MLB transaction 418524 (2019-07-12): Los Angeles Dodgers signed OF Jonny Deluca."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "26",
+   "overall_pick": 791,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Mark Mixon",
+    "birth_date": "1997-05-22",
+    "external_ids": {
+     "MLBAM": "687438"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2019-06-13",
+    "date_precision": "DAY",
+    "source_key": "lad2019:mlb-transactions-draft-2019",
+    "locator": "transaction 412053 (SGN)"
+   },
+   "notes": "MLB transaction 412053 (2019-06-13): Los Angeles Dodgers signed RHP Mark Mixon."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "29",
+   "overall_pick": 881,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Breyln Jones",
+    "birth_date": "2000-10-15",
+    "external_ids": {
+     "MLBAM": "690202"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2019-06-24",
+    "date_precision": "DAY",
+    "source_key": "lad2019:mlb-transactions-draft-2019",
+    "locator": "transaction 443647 (SFA)"
+   },
+   "notes": "MLB transaction 443647 (2019-06-24): Los Angeles Dodgers signed free agent RHP Breyln Jones to a minor league contract."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "32",
+   "overall_pick": 971,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Danny Sinatro",
+    "birth_date": "1997-09-18",
+    "external_ids": {
+     "MLBAM": "670235"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2019-06-11",
+    "date_precision": "DAY",
+    "source_key": "lad2019:mlb-transactions-draft-2019",
+    "locator": "transaction 407559 (SGN)"
+   },
+   "notes": "MLB transaction 407559 (2019-06-11): Los Angeles Dodgers signed CF Danny Sinatro."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "33",
+   "overall_pick": 1001,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Julio Carrion",
+    "birth_date": "1998-12-29",
+    "external_ids": {
+     "MLBAM": "676425"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2019-06-11",
+    "date_precision": "DAY",
+    "source_key": "lad2019:mlb-transactions-draft-2019",
+    "locator": "transaction 407560 (SGN)"
+   },
+   "notes": "MLB transaction 407560 (2019-06-11): Los Angeles Dodgers signed 3B Julio Carrion."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "34",
+   "overall_pick": 1031,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Francisco Martinez",
+    "birth_date": "2001-05-04",
+    "external_ids": {
+     "MLBAM": "687923"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2019-07-12",
+    "date_precision": "DAY",
+    "source_key": "lad2019:mlb-transactions-draft-2019",
+    "locator": "transaction 417753 (SGN)"
+   },
+   "notes": "MLB transaction 417753 (2019-07-12): Los Angeles Dodgers signed LHP Francisco Martinez."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "35",
+   "overall_pick": 1061,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Justin Washington",
+    "birth_date": "1997-06-19",
+    "external_ids": {
+     "MLBAM": "689656"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2019-06-11",
+    "date_precision": "DAY",
+    "source_key": "lad2019:mlb-transactions-draft-2019",
+    "locator": "transaction 407561 (SGN)"
+   },
+   "notes": "MLB transaction 407561 (2019-06-11): Los Angeles Dodgers signed CF Justin Washington."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "38",
+   "overall_pick": 1151,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Tyler Ryan",
+    "birth_date": "1996-05-09",
+    "external_ids": {
+     "MLBAM": "690710"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2019-06-11",
+    "date_precision": "DAY",
+    "source_key": "lad2019:mlb-transactions-draft-2019",
+    "locator": "transaction 407562 (SGN)"
+   },
+   "notes": "MLB transaction 407562 (2019-06-11): Los Angeles Dodgers signed C Tyler Ryan."
+  }
+ ]
+}
