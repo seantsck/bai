@@ -185,7 +185,9 @@ test('pipeline end to end (rolled back): dry run writes nothing canonical, apply
     const rival = await run({ batch_key: 'verify-rival', channel: 'DRAFT', sources: [src('verify:blog', 'OTHER')], records: [pick({ source_key: 'verify:blog', signing: { status: 'SIGNED', bonus_usd: 450000, source_key: 'verify:blog' } })] })
     assert.equal(rival.results[0].action, 'CONFLICT')
     assert.equal((await one("select g.signing_bonus_usd::float8 b from draft_signings g join draft_selections s on s.id = g.draft_selection_id join players p on p.id = s.player_id where p.display_name = 'Verifia Fixture'")).b, 500000, 'no last-write-wins')
-    const open = (await P.openConflicts(db)).filter((c) => c.subject_table === 'draft_signings' && c.field_name === 'signing_bonus_usd')
+    // Only this fixture's conflict: the database may hold real open conflicts awaiting a reviewer.
+    const fixture = (await one("select g.id from draft_signings g join draft_selections s on s.id = g.draft_selection_id join players p on p.id = s.player_id where p.display_name = 'Verifia Fixture'")).id
+    const open = (await P.openConflicts(db)).filter((c) => c.subject_table === 'draft_signings' && c.field_name === 'signing_bonus_usd' && String(c.subject_id) === String(fixture))
     assert.equal(open.length, 1)
     assert.equal(open[0].observations.length, 2)
     assert.equal(open[0].rule_outcome, open[0].observations.find((o) => o.authority === 'OFFICIAL').observation_id, 'PREFER_HIGHER_AUTHORITY picks the strictly stronger source, but only when asked')

@@ -2,7 +2,9 @@
 // researcher (statsapi.mlb.com/api/v1/transactions?teamId=<club>&startDate=<draft>&endDate=<deadline + a few weeks>).
 // Works for any club; nothing is fetched here.
 //
-// A "signed" (SGN) entry to the club for one of its official picks is an OFFICIAL claim: SIGNED, dated to the day.
+// A "signed" entry to the club for one of its official picks inside the window is an OFFICIAL claim: SIGNED, dated to the
+// day. MLB codes most as SGN; some draft signings appear as SFA ("signed free agent ... to a minor league contract"); for
+// an official pick of the club inside the signing window both mean the draft signing, and the code is kept in the locator.
 // A pick with no SGN entry gets no record: the absence of a wire entry is not evidence that a player did not sign.
 // The wire never gives a bonus, so records carry none (the bonus stays whatever other sources say, or unknown).
 //
@@ -25,7 +27,7 @@ const SRC = `${org.toLowerCase()}${year}:mlb-transactions-draft-${year}`
 
 const first = new Map()
 for (const t of (JSON.parse(fs.readFileSync(arg('tx'), 'utf8')).transactions ?? []).sort((a, b) => (a.date + a.id).localeCompare(b.date + b.id))) {
-  if (t.typeCode !== 'SGN' || t.toTeam?.id !== teamId || t.date < from || t.date > to) continue
+  if (!['SGN', 'SFA'].includes(t.typeCode) || t.toTeam?.id !== teamId || t.date < from || t.date > to) continue
   const r = byId.get(String(t.person?.id))
   if (r && (!only || only.has(r.overall_pick)) && !first.has(r.overall_pick)) first.set(r.overall_pick, { r, t })
 }
@@ -33,7 +35,7 @@ const records = [...first.values()].sort((a, b) => a.r.overall_pick - b.r.overal
   type: r.type, source_key: r.source_key, draft_key: r.draft_key, round_code: r.round_code, overall_pick: r.overall_pick, round_pick: r.round_pick,
   organization: r.organization, selection_type: r.selection_type,
   player: { full_name: r.player.full_name, birth_date: r.player.birth_date, external_ids: { MLBAM: r.player.external_ids.MLBAM }, source_key: r.player.source_key },
-  signing: { status: 'SIGNED', bonus_usd: null, date: t.date, date_precision: 'DAY', source_key: SRC, locator: `transaction ${t.id}` },
+  signing: { status: 'SIGNED', bonus_usd: null, date: t.date, date_precision: 'DAY', source_key: SRC, locator: `transaction ${t.id} (${t.typeCode})` },
   notes: `MLB transaction ${t.id} (${t.date}): ${t.description}`
 }))
 const doc = {
@@ -44,7 +46,7 @@ const doc = {
     : `${org} ${year} Rule 4 draft: ${records.length} of ${draft.records.length} picks signed per the MLB transaction wire, dated to the day (no bonuses).`,
   sources: [{ source_key: SRC, source_type: 'OFFICIAL_LEAGUE', authority_level: 'OFFICIAL', title: `MLB transaction wire, team ${teamId}, ${from} to ${to}`, publisher: 'MLB Advanced Media',
     url: `https://statsapi.mlb.com/api/v1/transactions?teamId=${teamId}&startDate=${from}&endDate=${to}`, retrieved_date: arg('retrieved'),
-    notes: 'SGN entries for the club\'s official picks. A pick without an entry is not claimed either way.' }],
+    notes: 'SGN (or SFA) entries for the club\'s official picks inside the window. A pick without an entry is not claimed either way.' }],
   records
 }
 fs.writeFileSync(arg('out'), JSON.stringify(doc, null, 1) + '\n')

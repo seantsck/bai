@@ -16,10 +16,23 @@ import * as B from '../../scripts/research/lib/backfill.mjs'
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 let db
 const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'bai-backfill-'))
-before(async () => { await h.startServer(); db = await h.freshDatabase() }, { timeout: 120000 })
+let rv   // the fixture reviewer's own login (021): certification happens only on it
+before(async () => {
+  await h.startServer(); db = await h.freshDatabase()
+  rv = await h.login(db, 'tester_login', { reviewer: true })
+  await B.enrollReviewer(rv, { reviewer: ME, note: 'fixture reviewer' })
+  await B.setCertificationGate(rv, { enabled: true, reason: 'test cluster: the fixture reviewer holds its own login' })
+}, { timeout: 120000 })
 after(async () => { await h.stopServer(); fs.rmSync(dir, { recursive: true, force: true }) })
 
 const ME = 'tester'
+/** Records a check (anyone) and, if it passed, certifies it on the reviewer's own login. */
+async function cert (cls) {
+  const r = await B.recordCertificationCheck(db, cls, { actor: ME })
+  if (!r.check.passed) return { certified: false, blockers: r.blockers }
+  await B.certify(rv, r.check.id)
+  return { certified: true, blockers: [], coverage_state: r.coverage_state }
+}
 const src = (key, authority = 'OFFICIAL') => ({ source_key: key, source_type: 'TEST_FIXTURE', authority_level: authority, title: `Test source ${key}` })
 let n = 0
 function file (doc) {
@@ -131,11 +144,11 @@ test('stages: one step at a time, never skipped, CERTIFIED only through certific
 })
 
 test('certification (draft): fails with explicit blockers, then passes once every requirement is met; coverage is unchanged by it', async () => {
-  const first = await B.certify(db, NYY_DRAFT, { actor: ME })
+  const first = await cert(NYY_DRAFT)
   assert.equal(first.certified, false)
   const codes = first.blockers.map((b) => b.code)
   for (const c of ['STAGE', 'EXPECTED_UNIVERSE', 'COST', 'SCHOOL', 'OPEN_JOBS']) assert.ok(codes.includes(c), c)
-  assert.equal(B.certify.length, 3, 'certify(db, class, { actor }): there is no force option')
+  assert.equal(B.certify.length, 2, 'certify(db, checkId): no force option, no reviewer name')
   // A sourced census claim establishes the universe (through ingestion, never by hand).
   await run({ batch_key: 'nyy-2016-census', channel: 'DRAFT', sources: [src('t:official'), src('t:tracker')],
     coverage_claims: [{ scope_key: '2016-JUNE_AMATEUR', organization: 'NYY', coverage_state: 'COMPLETE_CENSUS', expected_count: 3, source_key: 't:tracker' }],
@@ -152,7 +165,7 @@ test('certification (draft): fails with explicit blockers, then passes once ever
   await toReview(NYY_DRAFT)
   const ready = await h.one(db, "select s.workflow_status from research.v_class_status s join research.classes c on c.id = s.class_id where c.class_key = 'NYY/DRAFT/2016-JUNE_AMATEUR'")
   assert.equal(ready.workflow_status, 'READY_FOR_REVIEW', 'open outcome audits do not hold a class back from review')
-  const ok = await B.certify(db, NYY_DRAFT, { actor: ME })
+  const ok = await cert(NYY_DRAFT)
   assert.equal(ok.certified, true, JSON.stringify(ok.blockers))
   assert.equal(ok.coverage_state, 'COMPLETE_CENSUS')
   const st = await h.one(db, "select s.workflow_status, c.stage from research.v_class_status s join research.classes c on c.id = s.class_id where c.class_key = 'NYY/DRAFT/2016-JUNE_AMATEUR'")
@@ -164,7 +177,7 @@ test('certification (draft): fails with explicit blockers, then passes once ever
   await assert.rejects(B.revokeCertification(db, NYY_DRAFT, { actor: ME }), /--reason/)
   await B.revokeCertification(db, NYY_DRAFT, { actor: ME, reason: 'review found a transcription error' })
   assert.equal((await h.one(db, "select stage from research.classes where class_key = 'NYY/DRAFT/2016-JUNE_AMATEUR'")).stage, 'COVERAGE_REVIEW')
-  assert.equal((await B.certify(db, NYY_DRAFT, { actor: ME })).certified, true, 'a revoked class can be certified again once checks pass')
+  assert.equal((await cert(NYY_DRAFT)).certified, true, 'a revoked class can be certified again once checks pass')
   assert.equal((await h.one(db, "select count(*)::int n from research.certifications c join research.classes k on k.id = c.class_id where k.class_key = 'NYY/DRAFT/2016-JUNE_AMATEUR' and c.revoked_at is not null")).n, 1, 'revocations stay on record')
   assert.equal(Number((await h.one(db, 'select refresh_research_certification() n')).n), 1)
   await h.asRole(db, 'anon', async () => {
@@ -184,12 +197,12 @@ test('international: an unknown universe is never inferred; the class can certif
   assert.ok(jobs.some((j) => j.category_key === 'EXPECTED_UNIVERSE_UNKNOWN'))
   assert.ok(jobs.some((j) => j.category_key === 'ACQUISITION_COST_MISSING' && j.subject_label === 'signing-player-mlbam-9810012'))
   await toReview(NYY_INTL)
-  const blocked = await B.certify(db, NYY_INTL, { actor: ME })
+  const blocked = await cert(NYY_INTL)
   assert.ok(blocked.blockers.some((b) => b.code === 'EXPECTED_UNIVERSE'), 'an unknown universe must be recorded as unknown after research')
   const base = 'NYY/INTERNATIONAL/2016-17'
   await B.setJobState(db, `${base}/EXPECTED_UNIVERSE_UNKNOWN/class`, 'UNRESOLVED', { actor: ME, rationale: 'no authoritative complete list of 2016-17 signings exists' })
   await B.setJobState(db, `${base}/ACQUISITION_COST_MISSING/signing-player-mlbam-9810012`, 'UNRESOLVED', { actor: ME, rationale: 'bonus never reported' })
-  const ok = await B.certify(db, NYY_INTL, { actor: ME })
+  const ok = await cert(NYY_INTL)
   assert.equal(ok.certified, true, JSON.stringify(ok.blockers))
   assert.equal(ok.coverage_state, 'PARTIAL_RECONSTRUCTION', 'two verified rows do not make a census')
   const cov = await h.one(db, "select coverage_state, expected_count from coverage_assessments c join organizations o on o.id = c.organization_id where o.franchise_key = 'NYY' and scope_key = '2016-17'")
@@ -202,7 +215,7 @@ test('international: an unknown universe is never inferred; the class can certif
   await B.planClass(db, sea, { actor: ME })
   await B.setJobState(db, 'SEA/INTERNATIONAL/2016-17/EXPECTED_UNIVERSE_UNKNOWN/class', 'UNRESOLVED', { actor: ME, rationale: 'no complete list exists' })
   await toReview(sea)
-  const r = await B.certify(db, sea, { actor: ME })
+  const r = await cert(sea)
   assert.ok(r.blockers.some((b) => b.code === 'COVERAGE' && /PARTIAL_RECONSTRUCTION/.test(b.detail)), JSON.stringify(r.blockers))
 })
 
@@ -357,8 +370,10 @@ test('automation safety: an agent may stage, validate and dry-run, never write o
   await B.reviewImport(db, batch.batch_key, { reviewer: 'reviewer-1', note: 'checked every pick against the tracker' })
   const w = await P.applyBatch(db, batch.id, { write: true })
   assert.equal(w.report.step, 'apply')
-  await assert.rejects(B.certify(db, { org: 'SEA', channel: 'draft', year: 2016 }, { actor: 'agent:scout-1' }), /agent cannot certify/)
-  await h.rejects(db, "insert into research.certifications (class_id, certified_by, coverage_state, report) select id, 'agent:x', 'UNKNOWN', '{}' from research.classes limit 1", [], /certifications_certified_by_check/)
+  // The automation's connection (here the owner's) is not a reviewer, whatever name it would give.
+  const chk = await B.recordCertificationCheck(db, { org: 'SEA', channel: 'draft', year: 2016 }, { actor: 'agent:scout-1' })
+  await assert.rejects(B.certify(db, chk.check.id), /not an enrolled, active human reviewer/)
+  await h.rejects(db, "insert into research.certifications (class_id, certified_by, coverage_state, report) select id, 'tester', 'UNKNOWN', '{}' from research.classes limit 1", [], /enrolled human reviewer in their own authenticated session/)
 })
 
 test('progress: league-wide covers all 30 organizations; no rates for incomplete classes', async () => {
@@ -386,7 +401,7 @@ test('public/private boundary: research workflow is invisible to public roles; o
 
 test('hosted-write guardrail: workflow commands refuse a hosted target without --confirm-hosted, before connecting', () => {
   const env = { ...process.env, BAI_DATABASE_URL: 'postgresql://postgres:x@db.abcdefghijklmnopqrst.supabase.co:5432/postgres', BAI_ALLOW_REMOTE_DB: '1', BAI_SUPABASE_PROJECT_REF: 'abcdefghijklmnopqrst' } // credential-scan:allow (fictional URL: fake ref, no real password)
-  for (const cmd of [['plan', '--org', 'NYY', '--channel', 'draft', '--year', '2016'], ['certify', '--org', 'NYY', '--channel', 'draft', '--year', '2016'], ['block', '--job', 'x', '--reason', 'y'], ['class', '--org', 'NYY', '--channel', 'draft', '--year', '2016', '--create']]) {
+  for (const cmd of [['plan', '--org', 'NYY', '--channel', 'draft', '--year', '2016'], ['check', '--org', 'NYY', '--channel', 'draft', '--year', '2016'], ['block', '--job', 'x', '--reason', 'y'], ['class', '--org', 'NYY', '--channel', 'draft', '--year', '2016', '--create']]) {
     const r = spawnSync(process.execPath, [path.join(root, 'scripts/research/cli.mjs'), ...cmd], { env, encoding: 'utf8', timeout: 20000 })
     assert.equal(r.status, 1, cmd.join(' '))
     assert.match(r.stderr, /--confirm-hosted abcdefghijklmnopqrst/, cmd.join(' '))

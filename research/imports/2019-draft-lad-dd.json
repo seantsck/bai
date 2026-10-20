@@ -1,0 +1,47 @@
+{
+ "format": "bai-research-import/1",
+ "batch_key": "2019-draft-lad-dd",
+ "channel": "DRAFT",
+ "description": "LAD 2019 Rule 4 draft: 1 bonus(es) from \"2019 MLB Draft signing update: Jimmy Lewis signs, Dodgers also land Allison\" (Dodgers Digest (Dustin Nosler)).",
+ "sources": [
+  {
+   "source_key": "lad2019:dodgersdigest-signings-2019-07-12",
+   "source_type": "NEWS_REPORT",
+   "authority_level": "REPUTABLE_SECONDARY",
+   "title": "2019 MLB Draft signing update: Jimmy Lewis signs, Dodgers also land Allison",
+   "publisher": "Dodgers Digest (Dustin Nosler)",
+   "published_date": "2019-07-12",
+   "url": "https://dodgersdigest.com/2019/07/12/2019-mlb-draft-signing-update-jimmy-lewis-signs-dodgers-also-land-allison/",
+   "archived_url": "http://web.archive.org/web/20260608073015/https://dodgersdigest.com/2019/07/12/2019-mlb-draft-signing-update-jimmy-lewis-signs-dodgers-also-land-allison/",
+   "retrieved_date": "2026-10-20",
+   "notes": "Round / player / slot / bonus / savings table; total bonus $8,411,800 against the $8,069,100 pool. MLB.com (Jim Callis) reported the same Hoese figure, unconfirmed by the club."
+  }
+ ],
+ "records": [
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "1",
+   "overall_pick": 25,
+   "round_pick": 25,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Kody Hoese",
+    "birth_date": "1997-07-13",
+    "external_ids": {
+     "MLBAM": "682210"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 2740300,
+    "source_key": "lad2019:dodgersdigest-signings-2019-07-12",
+    "locator": "pick 25 in the table"
+   },
+   "notes": "Hoese: $2,740,300 (= slot), as MLB.com also reported; Baseball-Reference shows no bonus. Busch (#31) also signed at exactly slot in both this table and Baseball-Reference."
+  }
+ ]
+}

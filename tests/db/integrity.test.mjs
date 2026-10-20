@@ -48,7 +48,7 @@ test('setup: a census draft cell and a partial international cell; the invariant
       player: { full_name: 'Integrity Signee', birth_date: '2002-01-01', external_ids: { MLBAM: '9830010' } }, costs: {} }] }, 'CIN')
   await db.query('select public.refresh_read_models()')
   assert.deepEqual(await keys(), [])
-  assert.equal(INTEGRITY_CHECKS.length, 5)
+  assert.equal(INTEGRITY_CHECKS.length, 8)
 })
 
 test('an unsourced census claim: refused by the schema, and detected when the constraint is gone', async () => {
@@ -72,5 +72,34 @@ test('a rate published for an uncertified or non-census class is detected', asyn
 test('a partial reconstruction shown as rate-capable or as complete in the public read model is detected', async () => {
   assert.deepEqual(await inTx(() => db.query("update rm_research_coverage set supports_population_rate = true where coverage_state = 'PARTIAL_RECONSTRUCTION'")), ['PARTIAL_PRESENTED_AS_COMPLETE'])
   assert.deepEqual(await inTx(() => db.query("update rm_research_coverage set coverage_state = 'COMPLETE_CENSUS' where coverage_state = 'PARTIAL_RECONSTRUCTION'")), ['PARTIAL_PRESENTED_AS_COMPLETE'])
+  assert.deepEqual(await keys(), [], 'every injection was rolled back')
+})
+
+test('a certification that no reviewer session made is detected, even with the guards removed', async () => {
+  const found = await inTx(async () => {
+    await db.query("insert into research.classes (class_key, organization_id, channel_key, scope_key, draft_id, created_by) select 'CIN/DRAFT/2018-JUNE_AMATEUR', o.id, 'DRAFT', '2018-JUNE_AMATEUR', d.id, 'test' from organizations o, drafts d where o.franchise_key = 'CIN' and d.draft_key = '2018-JUNE_AMATEUR'")
+    await db.query('alter table research.certifications disable trigger certifications_guard')
+    await db.query("insert into research.certifications (class_id, certified_by, coverage_state, report) select id, 'Somebody', 'COMPLETE_CENSUS', '{}' from research.classes where scope_key = '2018-JUNE_AMATEUR'")
+  })
+  assert.deepEqual(found, ['CERTIFICATION_WITHOUT_REVIEWER_SESSION'])
+})
+
+test('value credited to an acquisition that did not sign is detected', async () => {
+  const def = (await db.query("select pg_get_viewdef('analytics.acquisition_value'::regclass, true) d")).rows[0].d.replace(/;\s*$/, '')
+  const found = await inTx(async () => {
+    await db.query("update draft_signings set signing_status = 'DID_NOT_SIGN', signing_bonus_usd = null where signing_bonus_usd = 100000")
+    await db.query(`create or replace view analytics.acquisition_value as select channel, organization_id, scope_key, player_id, signing_status, acquisition_cost_usd, slot_value_usd, credited, war_system,
+      war_coverage, through_season, observed_on, career_war, career_through_season, disposition, disposition_date, tenure_end_known, coalesce(original_org_war, 1.0) as original_org_war, returning_stint_war,
+      other_org_war, trade_package_id, traded_on, trade_package_players, trade_package_return_war, trade_return_coverage, audit_state, debut_date, debut_age, debut_organization_id, first_affiliated_season,
+      acquisition_season, seasons_to_debut from (${def}) v`)
+  })
+  assert.deepEqual(found, ['UNSIGNED_ACQUISITION_CREDITED'])
+})
+
+test('two overlapping signed acquisitions of one player by one club are detected', async () => {
+  const found = await inTx(async () => {
+    await db.query(`update international_signings set player_id = (select s.player_id from draft_selections s where s.overall_pick = 30 and s.organization_id = (select id from organizations where franchise_key = 'CIN'))`)
+  })
+  assert.deepEqual(found, ['OVERLAPPING_SIGNED_ACQUISITIONS'])
   assert.deepEqual(await keys(), [], 'every injection was rolled back')
 })

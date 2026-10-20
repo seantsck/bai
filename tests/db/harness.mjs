@@ -43,6 +43,22 @@ export async function freshDatabase ({ fixtures = false, migrate = true } = {}) 
   return db
 }
 
+/**
+ * Creates a login role in the test cluster and connects as it (021: identity is the authenticated login). reviewer: a
+ * member of bai_reviewer; automation: a member of bai_automation; grants: extra SQL run as the superuser first.
+ */
+export async function login (db, role, { reviewer = false, automation = false, grants = [] } = {}) {
+  const password = `pw-${role}-${Math.random().toString(36).slice(2)}`
+  await db.query(`create role ${role} login password '${password}'`)
+  if (reviewer) await db.query(`grant bai_reviewer to ${role}`)
+  if (automation) await db.query(`grant bai_automation to ${role}`)
+  for (const g of grants) await db.query(g.replaceAll('$ROLE', role))
+  const c = new pg.Client({ host: '127.0.0.1', port, user: role, password, database: db.database })
+  await c.connect()
+  clients.push(c)
+  return c
+}
+
 export const rows = async (db, sql, params) => (await db.query(sql, params)).rows
 export const one = async (db, sql, params) => (await db.query(sql, params)).rows[0]
 

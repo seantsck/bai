@@ -1,0 +1,301 @@
+{
+ "format": "bai-research-import/1",
+ "batch_key": "2018-draft-lad-slots",
+ "channel": "DRAFT",
+ "description": "LAD 2018 Rule 4 draft: slot values for 10 picks in rounds 1-10 (sum $5,288,200) (MLB.com).",
+ "sources": [
+  {
+   "source_key": "lad2018:mlb-pick-values-2018",
+   "source_type": "OFFICIAL_LEAGUE",
+   "authority_level": "OFFICIAL",
+   "title": "2018 Draft bonus pools, pick values",
+   "publisher": "MLB.com",
+   "url": "https://www.mlb.com/news/2018-mlb-draft-bonus-pools-pick-values-c269930084",
+   "archived_url": "http://web.archive.org/web/20250717102642/https://www.mlb.com/news/2018-mlb-draft-bonus-pools-pick-values-c269930084",
+   "published_date": null,
+   "retrieved_date": "2026-10-20",
+   "notes": "Values tied to overall picks by list position, which matches MLB official pick numbers."
+  }
+ ],
+ "records": [
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2018:mlb-statsapi-draft-2018-lad",
+   "draft_key": "2018-JUNE_AMATEUR",
+   "round_code": "1",
+   "overall_pick": 30,
+   "round_pick": 30,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "J.T. Ginn",
+    "birth_date": "1999-05-20",
+    "external_ids": {
+     "MLBAM": "669372"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "signing": {
+    "status": "DID_NOT_SIGN",
+    "source_key": "lad2018:bref-lad-2018"
+   },
+   "slot_value": {
+    "usd": 2275800,
+    "source_key": "lad2018:mlb-pick-values-2018",
+    "locator": "list position 30"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2018:mlb-statsapi-draft-2018-lad",
+   "draft_key": "2018-JUNE_AMATEUR",
+   "round_code": "2",
+   "overall_pick": 68,
+   "round_pick": 25,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Michael Grove",
+    "birth_date": "1996-12-18",
+    "external_ids": {
+     "MLBAM": "675627"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 1229500,
+    "source_key": "lad2018:bref-lad-2018"
+   },
+   "slot_value": {
+    "usd": 917000,
+    "source_key": "lad2018:mlb-pick-values-2018",
+    "locator": "list position 68"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2018:mlb-statsapi-draft-2018-lad",
+   "draft_key": "2018-JUNE_AMATEUR",
+   "round_code": "3",
+   "overall_pick": 104,
+   "round_pick": 26,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "John Rooney",
+    "birth_date": "1997-01-28",
+    "external_ids": {
+     "MLBAM": "680701"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 563240,
+    "source_key": "lad2018:bref-lad-2018"
+   },
+   "slot_value": {
+    "usd": 538800,
+    "source_key": "lad2018:mlb-pick-values-2018",
+    "locator": "list position 104"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2018:mlb-statsapi-draft-2018-lad",
+   "draft_key": "2018-JUNE_AMATEUR",
+   "round_code": "4",
+   "overall_pick": 134,
+   "round_pick": 30,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Braydon Fisher",
+    "birth_date": "2000-07-26",
+    "external_ids": {
+     "MLBAM": "680755"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 497500,
+    "source_key": "lad2018:bref-lad-2018"
+   },
+   "slot_value": {
+    "usd": 402300,
+    "source_key": "lad2018:mlb-pick-values-2018",
+    "locator": "list position 134"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2018:mlb-statsapi-draft-2018-lad",
+   "draft_key": "2018-JUNE_AMATEUR",
+   "round_code": "5",
+   "overall_pick": 164,
+   "round_pick": 30,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Devin Mann",
+    "birth_date": "1997-02-11",
+    "external_ids": {
+     "MLBAM": "669471"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 272500,
+    "source_key": "lad2018:bref-lad-2018"
+   },
+   "slot_value": {
+    "usd": 300600,
+    "source_key": "lad2018:mlb-pick-values-2018",
+    "locator": "list position 164"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2018:mlb-statsapi-draft-2018-lad",
+   "draft_key": "2018-JUNE_AMATEUR",
+   "round_code": "6",
+   "overall_pick": 194,
+   "round_pick": 30,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Bryan Warzek",
+    "birth_date": "1997-01-17",
+    "external_ids": {
+     "MLBAM": "679338"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 202500,
+    "source_key": "lad2018:bref-lad-2018"
+   },
+   "slot_value": {
+    "usd": 233800,
+    "source_key": "lad2018:mlb-pick-values-2018",
+    "locator": "list position 194"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2018:mlb-statsapi-draft-2018-lad",
+   "draft_key": "2018-JUNE_AMATEUR",
+   "round_code": "7",
+   "overall_pick": 224,
+   "round_pick": 30,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "James Outman",
+    "birth_date": "1997-05-14",
+    "external_ids": {
+     "MLBAM": "681546"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 157500,
+    "source_key": "lad2018:bref-lad-2018"
+   },
+   "slot_value": {
+    "usd": 184200,
+    "source_key": "lad2018:mlb-pick-values-2018",
+    "locator": "list position 224"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2018:mlb-statsapi-draft-2018-lad",
+   "draft_key": "2018-JUNE_AMATEUR",
+   "round_code": "8",
+   "overall_pick": 254,
+   "round_pick": 30,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Luke Heyer",
+    "birth_date": "1996-09-26",
+    "external_ids": {
+     "MLBAM": "679691"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 47500,
+    "source_key": "lad2018:bref-lad-2018"
+   },
+   "slot_value": {
+    "usd": 155300,
+    "source_key": "lad2018:mlb-pick-values-2018",
+    "locator": "list position 254"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2018:mlb-statsapi-draft-2018-lad",
+   "draft_key": "2018-JUNE_AMATEUR",
+   "round_code": "9",
+   "overall_pick": 284,
+   "round_pick": 30,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Josh McLain",
+    "birth_date": "1996-09-23",
+    "external_ids": {
+     "MLBAM": "656717"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 7500,
+    "source_key": "lad2018:bref-lad-2018"
+   },
+   "slot_value": {
+    "usd": 143600,
+    "source_key": "lad2018:mlb-pick-values-2018",
+    "locator": "list position 284"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2018:mlb-statsapi-draft-2018-lad",
+   "draft_key": "2018-JUNE_AMATEUR",
+   "round_code": "10",
+   "overall_pick": 314,
+   "round_pick": 30,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Deacon Liput",
+    "birth_date": "1996-06-27",
+    "external_ids": {
+     "MLBAM": "663937"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 134300,
+    "source_key": "lad2018:bref-lad-2018"
+   },
+   "slot_value": {
+    "usd": 136800,
+    "source_key": "lad2018:mlb-pick-values-2018",
+    "locator": "list position 314"
+   }
+  }
+ ]
+}

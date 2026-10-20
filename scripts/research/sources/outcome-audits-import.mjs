@@ -7,7 +7,9 @@
 //                    IP is kept in baseball notation (748.2 = 748 2/3).
 //   current status   from active flag and current team: the acquiring club, another MLB organization, INACTIVE when
 //                    not active (RETIRED only with a retirement transaction), UNKNOWN when active outside affiliated ball
-//   disposition      UNSIGNED for picks that did not sign; else the first transaction that took the player out of the
+//   disposition      PER ACQUISITION (022: the record names its draft_key and overall_pick; a player drafted twice has two),
+//                    with the exit date: UNSIGNED for picks that did not sign; else the first transaction, after this
+//                    acquisition's own signing, that took the player out of the
 //                    acquiring organization (trade, release, waiver claim, Rule 5, declared free agency, retirement);
 //                    RETAINED when still with the club; UNKNOWN when the record shows no exit
 //   trades           every trade between two MLB organizations in the player's record (shared when one trade moved several)
@@ -18,6 +20,9 @@
 //   Rule 5           MLB's wire codes some Rule 5 selections as waiver claims. --rule5 <json> takes researcher-verified Rule 5
 //                    selections ([{ "mlbam", "date", "phase", "to", "source_key" }] plus "sources": [...]); a waiver claim on that
 //                    date to that club becomes LOST_RULE_5, citing that source. Without the file, waiver claims stay LOST_WAIVERS.
+//
+//   --dispositions-only  restate the audits and give only the acquisition dispositions (batch <year>-draft-<org>-dispositions),
+//                    for a class whose outcome batch was applied before 022.
 //
 //   node --env-file-if-exists=.env.local scripts/research/sources/outcome-audits-import.mjs --org LAD --draft-key 2016-JUNE_AMATEUR \
 //     --dir <download dir> --draft-import research/imports/2016-draft-lad.json --bref page.html --bref-source lad2016:bref-lad-2016 \
@@ -70,6 +75,7 @@ const rule5 = arg('rule5', false) ? JSON.parse(fs.readFileSync(arg('rule5'), 'ut
 const rule5By = new Map(rule5.selections.map((x) => [String(x.mlbam), x]))
 
 const SRC = `${org.toLowerCase()}${draft.records[0].draft_key.slice(0, 4)}:mlb-statsapi-outcomes-${asOf}`
+const dispositionsOnly = argv.includes('--dispositions-only')
 const records = []
 const summary = []
 for (const d of draft.records) {
@@ -108,11 +114,14 @@ for (const d of draft.records) {
 
   let disposition = 'UNKNOWN'
   let dispositionRef = null
+  let dispositionDate = null
   let rule5Source = null
   if (!signed) disposition = 'UNSIGNED'
   else {
-    const signing = tx.find((t) => t.typeCode === 'SGN' && franchiseOf(t.toTeam?.id, Number(t.date.slice(0, 4))) === org)
-    for (const t of tx.filter((x) => !signing || (x.date + x.id) > (signing.date + signing.id))) {
+    // This acquisition's signing: the club's first SGN/SFA entry from the draft year on (an earlier one would be another acquisition).
+    const signing = tx.find((t) => ['SGN', 'SFA'].includes(t.typeCode) && t.date >= `${draftYear}-01-01` && franchiseOf(t.toTeam?.id, Number(t.date.slice(0, 4))) === org)
+    for (const t of tx.filter((x) => (x.date >= `${draftYear}-01-01`) && (!signing || (x.date + x.id) > (signing.date + signing.id)))) {
+      dispositionDate = t.date
       const yr = Number(t.date.slice(0, 4))
       const fromOrg = franchiseOf(t.fromTeam?.id, yr)
       const toOrg = franchiseOf(t.toTeam?.id, yr)
@@ -132,6 +141,7 @@ for (const d of draft.records) {
   if (!p.active) status = tx.some((t) => t.typeCode === 'RET') ? 'RETIRED' : 'INACTIVE'
   else if (curOrg === org) status = 'WITH_ACQUIRING_ORGANIZATION'
   else if (curOrg) status = 'WITH_OTHER_ORGANIZATION'
+  if (['UNKNOWN', 'UNSIGNED'].includes(disposition)) dispositionDate = null
   if (signed && disposition === 'UNKNOWN' && status === 'WITH_ACQUIRING_ORGANIZATION') disposition = 'RETAINED'
 
   const isPitcher = p.primaryPosition?.abbreviation === 'P'
@@ -145,18 +155,41 @@ for (const d of draft.records) {
   const war = brefWar.has(d.overall_pick) && reached
     ? [{ system: 'BREF', scope: 'CAREER', through_season: Number(arg('bref-through', false) ?? through), value: brefWar.get(d.overall_pick), observed_on: arg('bref-captured'), source_key: arg('bref-source'), locator: 'draft table WAR column (career, as of the capture)' }]
     : []
+  const acquisition = { draft_key: d.draft_key, overall_pick: d.overall_pick }
+  const exitTx = dispositionRef ? tx.find((t) => `mlb-tx-${t.id}` === dispositionRef) : null
+  const acqDisposition = {
+    value: disposition, ...(dispositionDate ? { date: dispositionDate, date_precision: 'DAY' } : {}), ...(dispositionRef ? { transaction_ref: dispositionRef } : {}),
+    as_of_date: asOf, source_key: rule5Source ?? SRC,
+    locator: exitTx || dispositionDate ? `transactions?playerId=${id} ${disposition} ${dispositionDate}` : `people/${id}; transactions?playerId=${id}`
+  }
+  if (dispositionsOnly) {
+    // Restates the audit unchanged and gives the acquisition its own disposition (with the exit date), for a class whose
+    // outcome batch predates per-acquisition dispositions (022).
+    records.push({
+      type: 'OUTCOME_AUDIT', source_key: SRC, organization: org,
+      player: { full_name: d.player.full_name, external_ids: { MLBAM: id }, source_key: d.player.source_key },
+      audit_state: reached ? 'AUDITED_REACHED_MLB' : 'AUDITED_NO_MLB', observation_through_season: through, audited_on: asOf,
+      ...(debut ? { debut } : {}),
+      transactions: trades.filter((t) => t.ref === dispositionRef), acquisition, disposition: acqDisposition,
+      notes: `Pick ${d.overall_pick} (${d.draft_key}); acquisition disposition ${disposition}${dispositionDate ? ' on ' + dispositionDate : ''}.`
+    })
+    summary.push([d.overall_pick, d.player.full_name, disposition, dispositionDate ?? ''].join(' | '))
+    continue
+  }
   records.push({
     type: 'OUTCOME_AUDIT', source_key: SRC, organization: org,
     player: { full_name: d.player.full_name, external_ids: { MLBAM: id }, source_key: d.player.source_key },
     audit_state: reached ? 'AUDITED_REACHED_MLB' : 'AUDITED_NO_MLB', observation_through_season: through, audited_on: asOf,
     ...(debut ? { debut } : {}),
     transactions: trades,
+    acquisition,
+    disposition: acqDisposition,
     details: {
       as_of_date: asOf, reached_affiliated: seasons.length ? true : null, first_affiliated_season: seasons.length ? Math.min(...seasons) : null,
       mlb_games: reached ? Number((isPitcher ? pit : hit)?.gamesPlayed ?? (hit ?? pit)?.gamesPlayed ?? 0) : null,
       mlb_plate_appearances: reached && hit?.plateAppearances != null ? Number(hit.plateAppearances) : null,
       mlb_innings_pitched: reached && pit?.inningsPitched != null ? Number(pit.inningsPitched) : null,
-      current_status: status, disposition, ...(dispositionRef ? { disposition_transaction_ref: dispositionRef } : {}), source_key: SRC,
+      current_status: status, source_key: SRC,
       ...(notes.length ? { notes: notes.join('; ') } : {})
     },
     war,
@@ -167,9 +200,11 @@ for (const d of draft.records) {
 
 const doc = {
   format: 'bai-research-import/1',
-  batch_key: `${draft.records[0].draft_key.slice(0, 4)}-draft-${org.toLowerCase()}-outcomes`,
+  batch_key: `${draft.records[0].draft_key.slice(0, 4)}-draft-${org.toLowerCase()}-${dispositionsOnly ? 'dispositions' : 'outcomes'}`,
   channel: 'OUTCOMES',
-  description: `${org} ${draft.records[0].draft_key} class: outcome audits for ${records.length} selections as of ${asOf} (MLB Stats API; Baseball-Reference career WAR).`,
+  description: dispositionsOnly
+    ? `${org} ${draft.records[0].draft_key} class: per-acquisition dispositions (with exit dates) for ${records.length} selections as of ${asOf} (MLB Stats API transactions); audits restated unchanged.`
+    : `${org} ${draft.records[0].draft_key} class: outcome audits for ${records.length} selections as of ${asOf} (MLB Stats API; Baseball-Reference career WAR).`,
   sources: [{ source_key: SRC, source_type: 'OFFICIAL_LEAGUE', authority_level: 'OFFICIAL', title: `MLB Stats API player outcomes (people, MLB and milb_all seasons, transactions), ${records.length} players`,
     publisher: 'MLB Advanced Media', reference: 'statsapi.mlb.com/api/v1: people/{id}?hydrate=currentTeam,stats(...); people/{id}/stats?stats=yearByYear&leagueListId=milb_all; transactions?playerId={id}; teams?sportIds=11..16&season=Y',
     retrieved_date: manifest.retrieved_date, notes: `${manifest.requests.length} requests, all HTTP 200 (manifest kept with the download). Current status and transactions as of the retrieval date.` },

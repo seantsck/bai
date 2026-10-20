@@ -33,7 +33,7 @@ Rules (enforced by a trigger on `research.classes`, not by convention):
 - **One step at a time.** A skip is refused.
 - **Unresolved items may stay behind.** Moving on records how many jobs per stage were still open (`research.stage_events.open_jobs`).
 - **Moving back needs a rationale.**
-- **Certification:** `CERTIFIED` is reachable only through `research:certify`, which writes the certification row first. A class leaves `CERTIFIED` only after its certification is revoked.
+- **Certification:** `CERTIFIED` is reachable only through `research:certify` (a reviewer's login certifying a recorded check), which writes the certification row first. A class leaves `CERTIFIED` only after its certification is revoked.
 
 ## Workflow status vs coverage state
 
@@ -117,7 +117,9 @@ Every transition is logged in `research.batch_events`.
 
 ## Certification
 
-`research:certify` runs a deterministic check and certifies only when it finds no blocker. There is no force option, and an agent (`agent:*`) cannot certify.
+Certification and every research judgment are recorded in an append-only history. A certification needs a registered human reviewer, and it is revoked automatically when the evidence under the class changes ([decision-history.md](decision-history.md)).
+
+`research:check` runs the deterministic check and records it with a fingerprint of the class's evidence. A reviewer, on their own database login, certifies a passing check with `research:certify -- --check <id>`, and the database refuses it if anything changed since (see [decision-history.md](decision-history.md)). There is no force option, no reviewer name to pass, and certification stays disabled until the certification gate is opened by a reviewer.
 
 **Draft class**
 - class at `COVERAGE_REVIEW`;
@@ -233,9 +235,17 @@ Independent lists (a club announcement, a published class list) are transcribed 
 | `research:block -- --job key --reason …` / `research:unblock -- --job key` | record or lift a blocker |
 | `research:lead -- --job key --url … --source-type … --authority … --access … --retrieved … --fields a,b --note …` | record a source lead |
 | `research:stage -- --org X --channel … [--to STAGE --rationale …]` | one stage forward (or back with a rationale) |
-| `research:certify -- --org X --channel …` | deterministic certification; exits 3 with blockers |
+| `research:check -- --org X --channel …` | records the deterministic certification check (fingerprinted); exits 3 with blockers |
+| `research:certify -- --check <id>` | REVIEWER LOGIN: certifies a passing, unchanged check (gate must be open) |
+| `research:accept -- --proposal <id> --reason … --write` / `research:ratify -- --resolution <id> --reason … --write` | REVIEWER LOGIN: accept a proposal / confirm an operator decision |
+| `research:gate [-- --open|--close --reason …]` | the certification gate (closed; opening is a reviewer action) |
 | `research:revoke -- --org X --channel … --reason …` | human-only revocation (kept on record); class back to `COVERAGE_REVIEW` |
 | `research:review -- --batch key --reviewer name --note …` | human review of an agent-staged import |
+| `research:reviewer -- --add <name>` | register a human reviewer (needed to certify and reconsider; 021) |
+| `research:propose` / `research:proposals` | file a decision proposal (anyone, agents included) / list, reject or withdraw one; it decides nothing |
+| `research:reconsider -- … --reason … --authorize --write` | REVIEWER LOGIN: re-decides a recorded resolution; both judgments stay in the history |
+| `research:history -- --org X --channel …` | the append-only decision history of a class or record |
+| `research:wave -- --org X --wave 2 --rationale …` | set a program wave (a human decision) |
 
 ## Rollout
 

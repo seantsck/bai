@@ -16,7 +16,8 @@ export const CURRENT_STATUSES = ['WITH_ACQUIRING_ORGANIZATION', 'WITH_OTHER_ORGA
 export const DISPOSITIONS = ['RETAINED', 'TRADED', 'RELEASED', 'LOST_RULE_5', 'LOST_WAIVERS', 'LEFT_AS_FREE_AGENT', 'RETIRED', 'UNSIGNED', 'OTHER', 'UNKNOWN']
 export const WAR_SYSTEMS = ['BREF', 'FANGRAPHS', 'OTHER']
 export const WAR_SCOPES = ['CAREER', 'SEASON', 'ORGANIZATION_TENURE']
-export const CHANNEL_RECORD_TYPES = { DRAFT: 'DRAFT_SELECTION', INTERNATIONAL: 'INTERNATIONAL_SIGNING', OUTCOMES: 'OUTCOME_AUDIT' }
+export const CHANNEL_RECORD_TYPES = { DRAFT: 'DRAFT_SELECTION', INTERNATIONAL: 'INTERNATIONAL_SIGNING', OUTCOMES: 'OUTCOME_AUDIT', TRADES: 'TRADE' }
+export const TRADE_ASSET_TYPES = ['CASH', 'PLAYER_TO_BE_NAMED', 'DRAFT_PICK', 'INTERNATIONAL_POOL_SPACE', 'OTHER']
 export const EVIDENCE_SUBJECTS = { player: 'players', selection: 'draft_selections', draft_signing: 'draft_signings', signing: 'international_signings', slot: 'slot_values' }
 
 const KEY = /^[a-z0-9][a-z0-9_.:-]*$/
@@ -45,7 +46,7 @@ export function validateEnvelope (doc) {
   if (!doc || typeof doc !== 'object') return ['file is not a JSON object']
   if (doc.format !== FORMAT) errors.push(`format must be "${FORMAT}"`)
   if (typeof doc.batch_key !== 'string' || !KEY.test(doc.batch_key)) errors.push('batch_key must match ' + KEY)
-  if (!CHANNEL_RECORD_TYPES[doc.channel]) errors.push('channel must be DRAFT, INTERNATIONAL or OUTCOMES')
+  if (!CHANNEL_RECORD_TYPES[doc.channel]) errors.push('channel must be DRAFT, INTERNATIONAL, OUTCOMES or TRADES')
   if (!Array.isArray(doc.sources)) errors.push('sources must be an array')
   if (!Array.isArray(doc.records) || doc.records.length === 0) errors.push('records must be a non-empty array')
   for (const c of doc.coverage_claims ?? []) {
@@ -99,6 +100,7 @@ export function validateRecordShape (r, channel, declared) {
   const warnings = []
   const needSource = (k, label) => { if (!k) errors.push(`${label}: source_key required`); else if (!declared.has(k)) errors.push(`${label}: source_key ${k} is not declared in the batch or registered`) }
   needSource(r.source_key, 'record')
+  if (channel === 'TRADES') { validateTrade(r, errors, warnings, needSource); return { errors, warnings } }
   validatePlayer(r.player, errors)
   if (!r.organization) errors.push('organization (franchise key) required')
   for (const [f, k] of Object.entries(r.field_sources ?? {})) needSource(k, `field_sources.${f}`)
@@ -189,16 +191,80 @@ function validateOutcome (r, errors, warnings, needSource) {
     if (d.disposition && !DISPOSITIONS.includes(d.disposition)) errors.push('details.disposition invalid')
     if (d.disposition === 'TRADED' && !refs.has(d.disposition_transaction_ref)) errors.push('details.disposition TRADED needs disposition_transaction_ref naming one of transactions[]')
     needSource(d.source_key ?? r.source_key, 'details')
-  } else warnings.push('no outcome details given')
-  for (const [i, w] of (r.war ?? []).entries()) {
-    if (!WAR_SYSTEMS.includes(w.system)) errors.push(`war[${i}]: system must be ${WAR_SYSTEMS.join('|')} (attribute WAR to its provider)`)
-    if (!WAR_SCOPES.includes(w.scope)) errors.push(`war[${i}]: scope invalid`)
-    if (!isSeason(w.through_season)) errors.push(`war[${i}]: through_season required`)
-    if (typeof w.value !== 'number' || !Number.isFinite(w.value)) errors.push(`war[${i}]: value must be a number (omit the entry when not observed)`)
-    if (!isDate(w.observed_on)) errors.push(`war[${i}]: observed_on must be YYYY-MM-DD`)
-    if (w.scope === 'ORGANIZATION_TENURE' && !w.organization) errors.push(`war[${i}]: ORGANIZATION_TENURE needs organization`)
-    needSource(w.source_key ?? r.source_key, `war[${i}]`)
+  } else if (!r.disposition) warnings.push('no outcome details given')
+  // The acquisition this record audits (022): its disposition belongs to that acquisition, not to the player.
+  const acq = r.acquisition
+  if (acq) {
+    const draft = acq.draft_key != null || acq.overall_pick != null
+    if (draft && (!/^[0-9]{4}-[A-Z_]+$/.test(acq.draft_key ?? '') || !isInt(acq.overall_pick))) errors.push('acquisition: a draft acquisition is { draft_key, overall_pick }')
+    if (!draft && !/^[0-9]{4}-[0-9]{2}$/.test(acq.period_key ?? '')) errors.push('acquisition: { draft_key, overall_pick } or { period_key }')
   }
+  if (d?.disposition && d.disposition !== 'UNKNOWN' && !acq) warnings.push('details.disposition without an acquisition: recorded on the acquisition only when the player has exactly one with this organization (legacy form)')
+  const x = r.disposition
+  if (x) {
+    if (!acq) errors.push('disposition needs the acquisition it ends (acquisition: { draft_key, overall_pick } | { period_key })')
+    if (d?.disposition) errors.push('give the disposition once: top-level disposition (per acquisition), not details.disposition')
+    if (!DISPOSITIONS.includes(x.value)) errors.push('disposition.value must be one of ' + DISPOSITIONS.join('|'))
+    if (!isDate(x.as_of_date)) errors.push('disposition.as_of_date must be YYYY-MM-DD')
+    if (x.date != null && !isDate(x.date)) errors.push('disposition.date must be YYYY-MM-DD')
+    if (x.date != null && ['RETAINED', 'UNKNOWN', 'UNSIGNED'].includes(x.value)) errors.push(`disposition.date is the exit date; ${x.value} has none`)
+    if (x.date_precision != null && x.date == null) errors.push('disposition.date_precision without a date')
+    if (x.value === 'TRADED' && !refs.has(x.transaction_ref)) errors.push('disposition TRADED needs transaction_ref naming one of transactions[]')
+    if (x.value !== 'TRADED' && x.transaction_ref) errors.push('disposition.transaction_ref is only for TRADED')
+    needSource(x.source_key ?? r.source_key, 'disposition')
+  }
+  validateWar(r.war, 'war', r.source_key, errors, needSource)
+}
+
+/** WAR entries, one provider each; never estimated (an unobserved value is omitted, not zero). */
+function validateWar (list, label, fallbackSource, errors, needSource) {
+  for (const [i, w] of (list ?? []).entries()) {
+    const at = `${label}[${i}]`
+    if (!WAR_SYSTEMS.includes(w.system)) errors.push(`${at}: system must be ${WAR_SYSTEMS.join('|')} (attribute WAR to its provider)`)
+    if (!WAR_SCOPES.includes(w.scope)) errors.push(`${at}: scope invalid`)
+    if (!isSeason(w.through_season)) errors.push(`${at}: through_season required`)
+    if (typeof w.value !== 'number' || !Number.isFinite(w.value)) errors.push(`${at}: value must be a number (omit the entry when not observed)`)
+    if (!isDate(w.observed_on)) errors.push(`${at}: observed_on must be YYYY-MM-DD`)
+    if (w.scope === 'SEASON' && (!isSeason(w.season) || w.season > w.through_season)) errors.push(`${at}: SEASON needs season <= through_season`)
+    if (w.scope === 'SEASON' && !w.organization) errors.push(`${at}: a SEASON value names the organization it was produced for (one entry per team in a split season)`)
+    if (w.scope === 'CAREER' && (w.organization || w.season)) errors.push(`${at}: CAREER takes no organization or season`)
+    if (w.scope === 'ORGANIZATION_TENURE' && !w.organization) errors.push(`${at}: ORGANIZATION_TENURE needs organization`)
+    needSource(w.source_key ?? fallbackSource, at)
+  }
+}
+
+/**
+ * TRADE: one trade, every package (what each club sent), with the players identified by a strong external id and,
+ * optionally, their WAR as observed per provider (season splits per organization). A trade may introduce a player BAI
+ * does not hold yet (a trade acquisition), but only by a strong id. `organization` is the importing club, which must be
+ * a party to the trade.
+ */
+function validateTrade (r, errors, warnings, needSource) {
+  if (r.type !== 'TRADE') errors.push('TRADES batches hold TRADE records')
+  if (!r.organization) errors.push('organization (franchise key) required')
+  if (!/^[a-z0-9][a-z0-9_.-]*$/.test(r.ref ?? '')) errors.push('ref required (lowercase key)')
+  if (!isDate(r.date)) errors.push('date must be YYYY-MM-DD')
+  if (!Array.isArray(r.packages) || r.packages.length === 0) { errors.push('packages must be a non-empty array'); return }
+  const parties = new Set()
+  for (const [i, k] of r.packages.entries()) {
+    if (!k.from || !k.to || k.from === k.to) errors.push(`packages[${i}]: from and to required and different`)
+    parties.add(k.from); parties.add(k.to)
+    if (!(k.players ?? []).length && !(k.other_assets ?? []).length) errors.push(`packages[${i}]: no players and no other assets`)
+    for (const [j, p] of (k.players ?? []).entries()) {
+      const pe = []
+      validatePlayer(p.player, pe)
+      errors.push(...pe.map((e) => `packages[${i}].players[${j}]: ${e}`))
+      if (!p.player?.external_ids?.MLBAM) errors.push(`packages[${i}].players[${j}]: a traded player is identified by an MLBAM id`)
+      needSource(p.player?.source_key ?? r.source_key, `packages[${i}].players[${j}]`)
+      validateWar(p.war, `packages[${i}].players[${j}].war`, r.source_key, errors, needSource)
+    }
+    for (const [j, a] of (k.other_assets ?? []).entries()) {
+      if (!TRADE_ASSET_TYPES.includes(a.asset_type)) errors.push(`packages[${i}].other_assets[${j}]: asset_type must be ${TRADE_ASSET_TYPES.join('|')}`)
+      if (a.amount_usd != null && !isMoney(a.amount_usd)) errors.push(`packages[${i}].other_assets[${j}]: amount_usd must be a non-negative number or null (undisclosed)`)
+    }
+  }
+  if (r.organization && !parties.has(r.organization)) errors.push(`organization ${r.organization} is not a party to the trade`)
+  if (parties.size !== 2) warnings.push('a trade between more than two clubs: each package is recorded as given')
 }
 
 /**

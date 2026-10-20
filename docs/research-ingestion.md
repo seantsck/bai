@@ -15,7 +15,7 @@ Staging lives in the `ingest` schema, which the public roles cannot read.
 
 ## Import file
 
-Format `bai-research-import/1`. Examples: `research/imports/2015-draft-lad.json`, `research/imports/2015-international-lad.json`, `research/imports/2016-draft-lad.json` (built by `scripts/research/sources/draft-class-import.mjs` from downloaded MLB and Baseball-Reference files). Other builders in `scripts/research/sources/`: `mlbcom-draft-money-import.mjs` (slot values and tracker bonuses), `fetch-mlb-player-outcomes.mjs` + `outcome-audits-import.mjs` (outcome audits), `intl-signings-from-wire.mjs` (international discovery), `ba-draft-bonuses-import.mjs` (Baseball America draft tables), `draft-signings-from-wire.mjs` (draft signings and dates from the MLB wire), and `intl-list-corroboration.mjs` (independent international lists transcribed into `research/evidence/`). Builders never write to a database, and the only fetcher is capped and rate-limited.
+Format `bai-research-import/1`. Examples: `research/imports/2015-draft-lad.json`, `research/imports/2015-international-lad.json`, `research/imports/2016-draft-lad.json` (built by `scripts/research/sources/draft-class-import.mjs` from downloaded MLB and Baseball-Reference files). Other builders in `scripts/research/sources/`: `mlbcom-draft-money-import.mjs` (slot values and tracker bonuses), `fetch-mlb-player-outcomes.mjs` + `outcome-audits-import.mjs` (outcome audits), `intl-signings-from-wire.mjs` (international discovery), `ba-draft-bonuses-import.mjs` (Baseball America draft tables), `draft-signings-from-wire.mjs` (draft signings and dates from the MLB wire), `intl-list-corroboration.mjs` (independent international lists transcribed into `research/evidence/`), `draft-bonus-report-import.mjs` (transcribed bonus reports), `fetch-bref-player-pages.mjs` + `bref-season-war-import.mjs` (Baseball-Reference season-by-team WAR from pre-season archive captures), and `trades-from-wire.mjs` (both sides of a class's trades). Builders never write to a database, and the only fetcher is capped and rate-limited.
 
 ```jsonc
 {
@@ -48,9 +48,17 @@ Format `bai-research-import/1`. Examples: `research/imports/2015-draft-lad.json`
 - **Player:** an existing player, identified by an external id; outcome records never create players.
 - **Audit:** `audit_state` (`AUDITED_REACHED_MLB`, `AUDITED_NO_MLB`, `ACTIVE_TOO_RECENT`, `OUT_OF_SCOPE`, `UNKNOWN`; never `NOT_AUDITED`), `observation_through_season` and `audited_on`.
 - **Debut:** `debut { date, organization }`, required for `AUDITED_REACHED_MLB` and forbidden for `AUDITED_NO_MLB`.
-- **Details:** `details { as_of_date, reached_affiliated, first_affiliated_season, mlb_games, mlb_plate_appearances, mlb_innings_pitched, current_status, disposition, disposition_transaction_ref }`. Unknown values are null.
+- **Details (the player):** `details { as_of_date, reached_affiliated, first_affiliated_season, mlb_games, mlb_plate_appearances, mlb_innings_pitched, current_status }`. Unknown values are null.
+- **Acquisition and its disposition (migration 022):** `acquisition { draft_key, overall_pick }` or `{ period_key }` names the organization's acquisition this record audits; `disposition { value, date, date_precision, transaction_ref (TRADED only), as_of_date, source_key, locator, notes }` says how that acquisition ended. A player drafted twice gets one record per acquisition. RETAINED, UNSIGNED and UNKNOWN take no date. A different value from another source is a conflict; a missing exit date is filled.
+- **Legacy form:** `details.disposition` (before 022) is still accepted; it reaches an acquisition only when the player has exactly one with that organization (a validation warning says so otherwise).
 - **WAR and trades:** `war[] { system: BREF | FANGRAPHS | OTHER, scope, through_season, value, observed_on }` and `transactions[] { ref, type: TRADE, date, from_organization, to_organization }`.
 - **Organization:** `organization` is the acquiring club whose acquisition is audited (the import's `--org`).
+
+**TRADE** (channel `TRADES`, migration 023)
+- **Trade:** `ref`, `date`, `description`, and `organization` (the importing club, which must be a party).
+- **Packages:** `packages[] { from, to, players[] { player (MLBAM id required), war[] }, other_assets[] { asset_type: CASH | PLAYER_TO_BE_NAMED | DRAFT_PICK | INTERNATIONAL_POOL_SPACE | OTHER, amount_usd (null = undisclosed), description } }`.
+- **Identity:** a traded player links by strong id or is created by that id; any weaker identity is invalid until a researcher decides it.
+- **WAR:** entries as in outcome audits. A `SEASON` entry names the organization it was produced for (one entry per team in a split season).
 
 **INTERNATIONAL_SIGNING**
 - **Signing:** `organization`, `signing_date` and `signing_date_precision`, an optional `period_key`, `pathway`, `market { key, name }` and `position`.

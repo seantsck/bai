@@ -1,0 +1,1651 @@
+{
+ "format": "bai-research-import/1",
+ "batch_key": "2019-draft-lad",
+ "channel": "DRAFT",
+ "description": "Los Angeles Dodgers, 2019 Rule 4 draft: 41 selections (MLB Stats API universe; Baseball-Reference signing status, bonus, school).",
+ "coverage_claims": [
+  {
+   "domain": "DRAFT",
+   "scope_key": "2019-JUNE_AMATEUR",
+   "organization": "LAD",
+   "coverage_state": "COMPLETE_CENSUS",
+   "expected_count": 41,
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "gap_notes": "Population: the 41 selections MLB's official draft data lists for the club; Baseball-Reference lists the same 41 by overall pick and name (1 spelling difference(s) matched by hand at the same pick). Census of selections only: bonuses published for 30 of 31 signed picks, no slot values, no outcomes audited."
+  }
+ ],
+ "sources": [
+  {
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "source_type": "OFFICIAL_LEAGUE",
+   "authority_level": "OFFICIAL",
+   "title": "MLB Stats API draft endpoint, 2019, teamId=119",
+   "publisher": "MLB Advanced Media",
+   "url": "https://statsapi.mlb.com/api/v1/draft/2019?teamId=119",
+   "retrieved_date": "2026-10-20",
+   "notes": "JSON; 41 picks: pickRound, pickNumber, roundPickNumber, person (MLBAM id, name, birth date, country), school label. No signing status, bonus or slot value."
+  },
+  {
+   "source_key": "lad2019:bref-lad-2019",
+   "source_type": "REFERENCE_DATABASE",
+   "authority_level": "AGGREGATOR",
+   "title": "Baseball-Reference: 2019 June amateur draft, Los Angeles Dodgers",
+   "publisher": "Baseball-Reference (Sports Reference)",
+   "url": "https://www.baseball-reference.com/draft/?team_ID=LAD&year_ID=2019&draft_type=junreg&query_type=franch_year",
+   "archived_url": "http://web.archive.org/web/20250216101048/https://www.baseball-reference.com/draft/index.fcgi?team_ID=LAD&year_ID=2019&draft_type=junreg&query_type=franch_year",
+   "retrieved_date": "2026-10-20",
+   "notes": "Columns used: Rnd, OvPck, RdPck, Signed, Bonus, Name (ids), Pos, Type, Drafted Out of. Read through the archive capture (the live site refuses automated requests)."
+  }
+ ],
+ "records": [
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "1",
+   "overall_pick": 25,
+   "round_pick": 25,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "position": "3B",
+   "field_sources": {
+    "position": "lad2019:bref-lad-2019",
+    "school": "lad2019:bref-lad-2019"
+   },
+   "player": {
+    "full_name": "Kody Hoese",
+    "birth_date": "1997-07-13",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "682210",
+     "BBREF_MINORS": "hoese-000kod"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "source_key": "lad2019:bref-lad-2019"
+   },
+   "notes": "MLB school label: Tulane. Signed with no published bonus: unknown, not zero.",
+   "school": {
+    "name": "Tulane University",
+    "school_type": "COLLEGE",
+    "city": "New Orleans",
+    "region": "LA",
+    "country": "USA",
+    "source_key": "lad2019:bref-lad-2019"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "1",
+   "overall_pick": 31,
+   "round_pick": 31,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "position": "2B",
+   "field_sources": {
+    "position": "lad2019:bref-lad-2019",
+    "school": "lad2019:bref-lad-2019"
+   },
+   "player": {
+    "full_name": "Michael Busch",
+    "birth_date": "1997-11-09",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "683737",
+     "BBREF": "buschmi02",
+     "BBREF_MINORS": "busch-002mic"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 2312000,
+    "source_key": "lad2019:bref-lad-2019"
+   },
+   "notes": "MLB school label: North Carolina.",
+   "school": {
+    "name": "University of North Carolina at Chapel Hill",
+    "school_type": "COLLEGE",
+    "city": "Chapel Hill",
+    "region": "NC",
+    "country": "USA",
+    "source_key": "lad2019:bref-lad-2019"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "C-2",
+   "overall_pick": 78,
+   "round_pick": 1,
+   "organization": "LAD",
+   "selection_type": "COMPENSATION",
+   "position": "P",
+   "field_sources": {
+    "position": "lad2019:bref-lad-2019",
+    "school": "lad2019:bref-lad-2019"
+   },
+   "player": {
+    "full_name": "Jimmy Lewis",
+    "birth_date": "2000-11-02",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "683167",
+     "BBREF_MINORS": "lewis-011jam"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 1097500,
+    "source_key": "lad2019:bref-lad-2019"
+   },
+   "notes": "MLB school label: Lake Travis HS.",
+   "school": {
+    "name": "Lake Travis HS",
+    "school_type": "HIGH_SCHOOL",
+    "city": "Austin",
+    "region": "TX",
+    "country": "USA",
+    "source_key": "lad2019:bref-lad-2019"
+   },
+   "evidence": [
+    {
+     "subject": "selection",
+     "field": "round_code",
+     "value": "2",
+     "source_key": "lad2019:bref-lad-2019",
+     "locator": "draft table round column"
+    },
+    {
+     "subject": "selection",
+     "field": "round_pick",
+     "value": 37,
+     "source_key": "lad2019:bref-lad-2019",
+     "locator": "draft table pick-in-round column"
+    }
+   ]
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "3",
+   "overall_pick": 102,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "position": "P",
+   "field_sources": {
+    "position": "lad2019:bref-lad-2019",
+    "school": "lad2019:bref-lad-2019"
+   },
+   "player": {
+    "full_name": "Ryan Pepiot",
+    "birth_date": "1997-08-21",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "686752",
+     "BBREF": "pepiory01",
+     "BBREF_MINORS": "pepiot000rya"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 547500,
+    "source_key": "lad2019:bref-lad-2019"
+   },
+   "notes": "MLB school label: Butler.",
+   "school": {
+    "name": "Butler University",
+    "school_type": "COLLEGE",
+    "city": "Indianapolis",
+    "region": "IN",
+    "country": "USA",
+    "source_key": "lad2019:bref-lad-2019"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "4",
+   "overall_pick": 131,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "position": "3B",
+   "field_sources": {
+    "position": "lad2019:bref-lad-2019",
+    "school": "lad2019:bref-lad-2019"
+   },
+   "player": {
+    "full_name": "Brandon Lewis",
+    "birth_date": "1998-10-23",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "686781",
+     "BBREF_MINORS": "lewis-002bra"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 327500,
+    "source_key": "lad2019:bref-lad-2019"
+   },
+   "notes": "MLB school label: University of California - Irvine.",
+   "school": {
+    "name": "University of California, Irvine",
+    "school_type": "COLLEGE",
+    "city": "Irvine",
+    "region": "CA",
+    "country": "USA",
+    "source_key": "lad2019:bref-lad-2019"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "5",
+   "overall_pick": 161,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "position": "P",
+   "field_sources": {
+    "position": "lad2019:bref-lad-2019",
+    "school": "lad2019:bref-lad-2019"
+   },
+   "player": {
+    "full_name": "Jack Little",
+    "birth_date": "1998-01-10",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "669193",
+     "BBREF_MINORS": "little002jac"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 318600,
+    "source_key": "lad2019:bref-lad-2019"
+   },
+   "notes": "MLB school label: Stanford.",
+   "school": {
+    "name": "Stanford University",
+    "school_type": "COLLEGE",
+    "city": "Palo Alto",
+    "region": "CA",
+    "country": "USA",
+    "source_key": "lad2019:bref-lad-2019"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "6",
+   "overall_pick": 191,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "position": "P",
+   "field_sources": {
+    "position": "lad2019:bref-lad-2019",
+    "school": "lad2019:bref-lad-2019"
+   },
+   "player": {
+    "full_name": "Aaron Ochsenbein",
+    "birth_date": "1996-02-29",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "684604",
+     "BBREF_MINORS": "ochsen000aar"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 72500,
+    "source_key": "lad2019:bref-lad-2019"
+   },
+   "notes": "MLB school label: Eastern Kentucky.",
+   "school": {
+    "name": "Eastern Kentucky University",
+    "school_type": "COLLEGE",
+    "city": "Richmond",
+    "region": "KY",
+    "country": "USA",
+    "source_key": "lad2019:bref-lad-2019"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "7",
+   "overall_pick": 221,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "position": "P",
+   "field_sources": {
+    "position": "lad2019:bref-lad-2019",
+    "school": "lad2019:bref-lad-2019"
+   },
+   "player": {
+    "full_name": "Nick Robertson",
+    "birth_date": "1998-07-16",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "687798",
+     "BBREF": "roberni01",
+     "BBREF_MINORS": "robert004nic"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 177500,
+    "source_key": "lad2019:bref-lad-2019"
+   },
+   "notes": "MLB school label: James Madison University.",
+   "school": {
+    "name": "James Madison University",
+    "school_type": "COLLEGE",
+    "city": "Harrisonburg",
+    "region": "VA",
+    "country": "USA",
+    "source_key": "lad2019:bref-lad-2019"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "8",
+   "overall_pick": 251,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "position": "LF",
+   "field_sources": {
+    "position": "lad2019:bref-lad-2019",
+    "school": "lad2019:bref-lad-2019"
+   },
+   "player": {
+    "full_name": "Ryan Ward",
+    "birth_date": "1998-02-23",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "669899",
+     "BBREF_MINORS": "ward--003rya"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 160900,
+    "source_key": "lad2019:bref-lad-2019"
+   },
+   "notes": "MLB school label: Bryant University.",
+   "school": {
+    "name": "Bryant University",
+    "school_type": "COLLEGE",
+    "city": "Smithfield",
+    "region": "RI",
+    "country": "USA",
+    "source_key": "lad2019:bref-lad-2019"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "9",
+   "overall_pick": 281,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "position": "P",
+   "field_sources": {
+    "position": "lad2019:bref-lad-2019",
+    "school": "lad2019:bref-lad-2019"
+   },
+   "player": {
+    "full_name": "Alec Gamboa",
+    "birth_date": "1997-01-17",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "687941",
+     "BBREF_MINORS": "gamboa000ale"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 17500,
+    "source_key": "lad2019:bref-lad-2019"
+   },
+   "notes": "MLB school label: Fresno CC.",
+   "school": {
+    "name": "Fresno City College",
+    "school_type": "JUNIOR_COLLEGE",
+    "city": "Fresno",
+    "region": "CA",
+    "country": "USA",
+    "source_key": "lad2019:bref-lad-2019"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "10",
+   "overall_pick": 311,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "position": "SS",
+   "field_sources": {
+    "position": "lad2019:bref-lad-2019",
+    "school": "lad2019:bref-lad-2019"
+   },
+   "player": {
+    "full_name": "Zac Ching",
+    "birth_date": "1997-05-29",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "687852",
+     "BBREF_MINORS": "ching-000zac"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 2500,
+    "source_key": "lad2019:bref-lad-2019"
+   },
+   "notes": "MLB school label: VCU.",
+   "school": {
+    "name": "Virginia Commonwealth University",
+    "school_type": "COLLEGE",
+    "city": "Richmond",
+    "region": "VA",
+    "country": "USA",
+    "source_key": "lad2019:bref-lad-2019"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "11",
+   "overall_pick": 341,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "position": "P",
+   "field_sources": {
+    "position": "lad2019:bref-lad-2019",
+    "school": "lad2019:bref-lad-2019"
+   },
+   "player": {
+    "full_name": "Logan Boyer",
+    "birth_date": "1998-01-24",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "669188",
+     "BBREF_MINORS": "boyer-000log"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 297500,
+    "source_key": "lad2019:bref-lad-2019"
+   },
+   "notes": "MLB school label: San Diego State.",
+   "school": {
+    "name": "San Diego State University",
+    "school_type": "COLLEGE",
+    "city": "San Diego",
+    "region": "CA",
+    "country": "USA",
+    "source_key": "lad2019:bref-lad-2019"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "12",
+   "overall_pick": 371,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "position": "P",
+   "field_sources": {
+    "position": "lad2019:bref-lad-2019",
+    "school": "lad2019:bref-lad-2019"
+   },
+   "player": {
+    "full_name": "Mitchell Tyranski",
+    "birth_date": "1997-09-02",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "680454",
+     "BBREF_MINORS": "tyrans000mit"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 125000,
+    "source_key": "lad2019:bref-lad-2019"
+   },
+   "notes": "MLB school label: Michigan State.",
+   "school": {
+    "name": "Michigan State University",
+    "school_type": "COLLEGE",
+    "city": "East Lansing",
+    "region": "MI",
+    "country": "USA",
+    "source_key": "lad2019:bref-lad-2019"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "13",
+   "overall_pick": 401,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "position": "P",
+   "field_sources": {
+    "position": "lad2019:bref-lad-2019",
+    "school": "lad2019:bref-lad-2019"
+   },
+   "player": {
+    "full_name": "Jake Cantleberry",
+    "birth_date": "1997-08-08",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "681147",
+     "BBREF_MINORS": "cantle000jac"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 125000,
+    "source_key": "lad2019:bref-lad-2019"
+   },
+   "notes": "MLB school label: Missouri.",
+   "school": {
+    "name": "University of Missouri",
+    "school_type": "COLLEGE",
+    "city": "Columbia",
+    "region": "MO",
+    "country": "USA",
+    "source_key": "lad2019:bref-lad-2019"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "14",
+   "overall_pick": 431,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "position": "P",
+   "field_sources": {
+    "position": "lad2019:bref-lad-2019",
+    "school": "lad2019:bref-lad-2019"
+   },
+   "player": {
+    "full_name": "Sean Mellen",
+    "birth_date": "1998-02-20",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "673920",
+     "BBREF_MINORS": "mellen000sea"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 125000,
+    "source_key": "lad2019:bref-lad-2019"
+   },
+   "notes": "MLB school label: Northeastern.",
+   "school": {
+    "name": "Northeastern University",
+    "school_type": "COLLEGE",
+    "city": "Boston",
+    "region": "MA",
+    "country": "USA",
+    "source_key": "lad2019:bref-lad-2019"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "15",
+   "overall_pick": 461,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "position": "OF",
+   "field_sources": {
+    "position": "lad2019:bref-lad-2019",
+    "school": "lad2019:bref-lad-2019"
+   },
+   "player": {
+    "full_name": "Joe Vranesh",
+    "birth_date": "1998-01-23",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "687992",
+     "BBREF_MINORS": "vranes001joe"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 125000,
+    "source_key": "lad2019:bref-lad-2019"
+   },
+   "notes": "MLB school label: St. Marys.",
+   "school": {
+    "name": "Saint Mary's College of California",
+    "school_type": "COLLEGE",
+    "city": "Moraga",
+    "region": "CA",
+    "country": "USA",
+    "source_key": "lad2019:bref-lad-2019"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "16",
+   "overall_pick": 491,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "position": "RHP",
+   "field_sources": {
+    "position": "lad2019:bref-lad-2019",
+    "school": "lad2019:bref-lad-2019"
+   },
+   "player": {
+    "full_name": "Andrew Baker",
+    "birth_date": "2000-03-24",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "687900",
+     "BBREF_MINORS": "baker-001and"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "DID_NOT_SIGN",
+    "source_key": "lad2019:bref-lad-2019"
+   },
+   "notes": "MLB school label: Chipola College.",
+   "school": {
+    "name": "Chipola College",
+    "school_type": "JUNIOR_COLLEGE",
+    "city": "Marianna",
+    "region": "FL",
+    "country": "USA",
+    "source_key": "lad2019:bref-lad-2019"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "17",
+   "overall_pick": 521,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "position": "OF",
+   "field_sources": {
+    "position": "lad2019:bref-lad-2019",
+    "school": "lad2019:bref-lad-2019"
+   },
+   "player": {
+    "full_name": "Brandon Wulff",
+    "birth_date": "1996-12-19",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "687034",
+     "BBREF_MINORS": "wulff-000bra"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 75000,
+    "source_key": "lad2019:bref-lad-2019"
+   },
+   "notes": "MLB school label: Stanford.",
+   "school": {
+    "name": "Stanford University",
+    "school_type": "COLLEGE",
+    "city": "Palo Alto",
+    "region": "CA",
+    "country": "USA",
+    "source_key": "lad2019:bref-lad-2019"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "18",
+   "overall_pick": 551,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "position": "P",
+   "field_sources": {
+    "position": "lad2019:bref-lad-2019",
+    "school": "lad2019:bref-lad-2019"
+   },
+   "player": {
+    "full_name": "Jeff Belge",
+    "birth_date": "1997-12-04",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "666122",
+     "BBREF_MINORS": "belge-000jef"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 125000,
+    "source_key": "lad2019:bref-lad-2019"
+   },
+   "notes": "MLB school label: St. John's.",
+   "school": {
+    "name": "St. John's University",
+    "school_type": "COLLEGE",
+    "city": "Queens",
+    "region": "NY",
+    "country": "USA",
+    "source_key": "lad2019:bref-lad-2019"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "19",
+   "overall_pick": 581,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "position": "P",
+   "field_sources": {
+    "position": "lad2019:bref-lad-2019",
+    "school": "lad2019:bref-lad-2019"
+   },
+   "player": {
+    "full_name": "Braidyn Fink",
+    "birth_date": "1998-03-07",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "686253",
+     "BBREF_MINORS": "fink--000bra"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 222500,
+    "source_key": "lad2019:bref-lad-2019"
+   },
+   "notes": "MLB school label: Oklahoma.",
+   "school": {
+    "name": "University of Oklahoma",
+    "school_type": "COLLEGE",
+    "city": "Norman",
+    "region": "OK",
+    "country": "USA",
+    "source_key": "lad2019:bref-lad-2019"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "20",
+   "overall_pick": 611,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "position": "P",
+   "field_sources": {
+    "position": "lad2019:bref-lad-2019",
+    "school": "lad2019:bref-lad-2019"
+   },
+   "player": {
+    "full_name": "Zack Plunkett",
+    "birth_date": "1996-02-16",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "667407",
+     "BBREF_MINORS": "plunke000zac"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 25000,
+    "source_key": "lad2019:bref-lad-2019"
+   },
+   "notes": "MLB school label: Arkansas.",
+   "school": {
+    "name": "University of Arkansas",
+    "school_type": "COLLEGE",
+    "city": "Fayetteville",
+    "region": "AR",
+    "country": "USA",
+    "source_key": "lad2019:bref-lad-2019"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "21",
+   "overall_pick": 641,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "position": "OF",
+   "field_sources": {
+    "position": "lad2019:bref-lad-2019",
+    "school": "lad2019:bref-lad-2019"
+   },
+   "player": {
+    "full_name": "Trey LaFleur",
+    "birth_date": "2001-03-12",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "687026",
+     "BBREF_MINORS": "lafleu000ray"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "DID_NOT_SIGN",
+    "source_key": "lad2019:bref-lad-2019"
+   },
+   "notes": "MLB school label: J.M. Tate HS.",
+   "school": {
+    "name": "J. M. Tate HS",
+    "school_type": "HIGH_SCHOOL",
+    "city": "Cantonment",
+    "region": "FL",
+    "country": "USA",
+    "source_key": "lad2019:bref-lad-2019"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "22",
+   "overall_pick": 671,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "position": "SS",
+   "field_sources": {
+    "position": "lad2019:bref-lad-2019",
+    "school": "lad2019:bref-lad-2019"
+   },
+   "player": {
+    "full_name": "Jimmy Titus",
+    "birth_date": "1998-01-25",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "687042",
+     "BBREF_MINORS": "titus-000jim"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 125000,
+    "source_key": "lad2019:bref-lad-2019"
+   },
+   "notes": "MLB school label: Bryant University.",
+   "school": {
+    "name": "Bryant University",
+    "school_type": "COLLEGE",
+    "city": "Smithfield",
+    "region": "RI",
+    "country": "USA",
+    "source_key": "lad2019:bref-lad-2019"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "23",
+   "overall_pick": 701,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "position": "P",
+   "field_sources": {
+    "position": "lad2019:bref-lad-2019",
+    "school": "lad2019:bref-lad-2019"
+   },
+   "player": {
+    "full_name": "Cyrillo Watson",
+    "birth_date": "1997-08-10",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "687041",
+     "BBREF_MINORS": "watson000cyr"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 125000,
+    "source_key": "lad2019:bref-lad-2019"
+   },
+   "notes": "MLB school label: University of Illinois.",
+   "school": {
+    "name": "University of Illinois at Urbana-Champaign",
+    "school_type": "COLLEGE",
+    "city": "Champaign",
+    "region": "IL",
+    "country": "USA",
+    "source_key": "lad2019:bref-lad-2019"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "24",
+   "overall_pick": 731,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "position": "CF",
+   "field_sources": {
+    "position": "lad2019:bref-lad-2019",
+    "school": "lad2019:bref-lad-2019"
+   },
+   "player": {
+    "full_name": "Chet Allison",
+    "birth_date": "1999-04-30",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "690822",
+     "BBREF_MINORS": "alliso000che"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 222500,
+    "source_key": "lad2019:bref-lad-2019"
+   },
+   "notes": "MLB school label: Fresno CC.",
+   "school": {
+    "name": "Fresno City College",
+    "school_type": "JUNIOR_COLLEGE",
+    "city": "Fresno",
+    "region": "CA",
+    "country": "USA",
+    "source_key": "lad2019:bref-lad-2019"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "25",
+   "overall_pick": 761,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "position": "OF",
+   "field_sources": {
+    "position": "lad2019:bref-lad-2019",
+    "school": "lad2019:bref-lad-2019"
+   },
+   "player": {
+    "full_name": "Jonny DeLuca",
+    "birth_date": "1998-07-10",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "676356",
+     "BBREF": "delucjo01",
+     "BBREF_MINORS": "deluca000jon"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 300000,
+    "source_key": "lad2019:bref-lad-2019"
+   },
+   "notes": "MLB school label: Oregon.",
+   "school": {
+    "name": "University of Oregon",
+    "school_type": "COLLEGE",
+    "city": "Eugene",
+    "region": "OR",
+    "country": "USA",
+    "source_key": "lad2019:bref-lad-2019"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "26",
+   "overall_pick": 791,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "position": "P",
+   "field_sources": {
+    "position": "lad2019:bref-lad-2019",
+    "school": "lad2019:bref-lad-2019"
+   },
+   "player": {
+    "full_name": "Mark Mixon",
+    "birth_date": "1997-05-22",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "687438",
+     "BBREF_MINORS": "mixon-000mar"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 125000,
+    "source_key": "lad2019:bref-lad-2019"
+   },
+   "notes": "MLB school label: Miami.",
+   "school": {
+    "name": "University of Miami",
+    "school_type": "COLLEGE",
+    "city": "Coral Gables",
+    "region": "FL",
+    "country": "USA",
+    "source_key": "lad2019:bref-lad-2019"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "27",
+   "overall_pick": 821,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "position": "P",
+   "field_sources": {
+    "position": "lad2019:bref-lad-2019",
+    "school": "lad2019:bref-lad-2019"
+   },
+   "player": {
+    "full_name": "Parker Brahms",
+    "birth_date": "1997-12-02",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "687648",
+     "BBREF_MINORS": "brahms000par"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "DID_NOT_SIGN",
+    "source_key": "lad2019:bref-lad-2019"
+   },
+   "notes": "MLB school label: Sacramento State.",
+   "school": {
+    "name": "California State University, Sacramento",
+    "school_type": "COLLEGE",
+    "city": "Sacramento",
+    "region": "CA",
+    "country": "USA",
+    "source_key": "lad2019:bref-lad-2019"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "28",
+   "overall_pick": 851,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "position": "SS",
+   "field_sources": {
+    "position": "lad2019:bref-lad-2019",
+    "school": "lad2019:bref-lad-2019"
+   },
+   "player": {
+    "full_name": "Brennan Milone",
+    "birth_date": "2001-05-06",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "686810",
+     "BBREF_MINORS": "milone000bre"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "DID_NOT_SIGN",
+    "source_key": "lad2019:bref-lad-2019"
+   },
+   "notes": "MLB school label: Woodstock HS.",
+   "school": {
+    "name": "Woodstock HS",
+    "school_type": "HIGH_SCHOOL",
+    "city": "Woodstock",
+    "region": "GA",
+    "country": "USA",
+    "source_key": "lad2019:bref-lad-2019"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "29",
+   "overall_pick": 881,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "position": "SS",
+   "field_sources": {
+    "position": "lad2019:bref-lad-2019",
+    "school": "lad2019:bref-lad-2019"
+   },
+   "player": {
+    "full_name": "Breyln Jones",
+    "birth_date": "2000-10-15",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "690202",
+     "BBREF_MINORS": "jones-007bre"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 125000,
+    "source_key": "lad2019:bref-lad-2019"
+   },
+   "notes": "MLB school label: Rutherford HS.",
+   "school": {
+    "name": "Rutherford HS",
+    "school_type": "HIGH_SCHOOL",
+    "city": "Rutherford",
+    "region": "NJ",
+    "country": "USA",
+    "source_key": "lad2019:bref-lad-2019"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "30",
+   "overall_pick": 911,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "position": "P",
+   "field_sources": {
+    "position": "lad2019:bref-lad-2019",
+    "school": "lad2019:bref-lad-2019"
+   },
+   "player": {
+    "full_name": "Josh Ibarra",
+    "birth_date": "1999-02-04",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "687996",
+     "BBREF_MINORS": "ibarra006jos"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "DID_NOT_SIGN",
+    "source_key": "lad2019:bref-lad-2019"
+   },
+   "notes": "MLB school label: Golden West College.",
+   "school": {
+    "name": "Golden West College",
+    "school_type": "JUNIOR_COLLEGE",
+    "city": "Huntington Beach",
+    "region": "CA",
+    "country": "USA",
+    "source_key": "lad2019:bref-lad-2019"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "31",
+   "overall_pick": 941,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "position": "SS",
+   "field_sources": {
+    "position": "lad2019:bref-lad-2019",
+    "school": "lad2019:bref-lad-2019"
+   },
+   "player": {
+    "full_name": "Kayler Yates",
+    "birth_date": "2001-03-20",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "687787",
+     "BBREF_MINORS": "yates-000kay"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "DID_NOT_SIGN",
+    "source_key": "lad2019:bref-lad-2019"
+   },
+   "notes": "MLB school label: Dixie HS.",
+   "school": {
+    "name": "Dixie HS",
+    "school_type": "HIGH_SCHOOL",
+    "city": "St. George",
+    "region": "UT",
+    "country": "USA",
+    "source_key": "lad2019:bref-lad-2019"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "32",
+   "overall_pick": 971,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "position": "CF",
+   "field_sources": {
+    "position": "lad2019:bref-lad-2019",
+    "school": "lad2019:bref-lad-2019"
+   },
+   "player": {
+    "full_name": "Danny Sinatro",
+    "birth_date": "1997-09-18",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "670235",
+     "BBREF_MINORS": "sinatr000dan"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 100000,
+    "source_key": "lad2019:bref-lad-2019"
+   },
+   "notes": "Baseball-Reference lists the pick as \"Dan Sinatro\" (same overall pick; matched by hand). MLB school label: Washington State.",
+   "school": {
+    "name": "Washington State University",
+    "school_type": "COLLEGE",
+    "city": "Pullman",
+    "region": "WA",
+    "country": "USA",
+    "source_key": "lad2019:bref-lad-2019"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "33",
+   "overall_pick": 1001,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "position": "3B",
+   "field_sources": {
+    "position": "lad2019:bref-lad-2019",
+    "school": "lad2019:bref-lad-2019"
+   },
+   "player": {
+    "full_name": "Julio Carrion",
+    "birth_date": "1998-12-29",
+    "birth_country": "Puerto Rico",
+    "external_ids": {
+     "MLBAM": "676425",
+     "BBREF_MINORS": "carrio000jul"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 125000,
+    "source_key": "lad2019:bref-lad-2019"
+   },
+   "notes": "MLB school label: Chipola College.",
+   "school": {
+    "name": "Chipola College",
+    "school_type": "JUNIOR_COLLEGE",
+    "city": "Marianna",
+    "region": "FL",
+    "country": "USA",
+    "source_key": "lad2019:bref-lad-2019"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "34",
+   "overall_pick": 1031,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "position": "P",
+   "field_sources": {
+    "position": "lad2019:bref-lad-2019",
+    "school": "lad2019:bref-lad-2019"
+   },
+   "player": {
+    "full_name": "Francisco Martinez",
+    "birth_date": "2001-05-04",
+    "birth_country": "Puerto Rico",
+    "external_ids": {
+     "MLBAM": "687923",
+     "BBREF_MINORS": "martin029fra"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 172500,
+    "source_key": "lad2019:bref-lad-2019"
+   },
+   "notes": "MLB school label: Puerto Rico Baseball Academy.",
+   "school": {
+    "name": "Puerto Rico Baseball Academy",
+    "school_type": "HIGH_SCHOOL",
+    "city": "Gurabo",
+    "region": "Puerto Rico",
+    "country": "Puerto Rico",
+    "source_key": "lad2019:bref-lad-2019"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "35",
+   "overall_pick": 1061,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "position": "CF",
+   "field_sources": {
+    "position": "lad2019:bref-lad-2019",
+    "school": "lad2019:bref-lad-2019"
+   },
+   "player": {
+    "full_name": "Justin Washington",
+    "birth_date": "1997-06-19",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "689656",
+     "BBREF_MINORS": "washin000jus"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 50000,
+    "source_key": "lad2019:bref-lad-2019"
+   },
+   "notes": "MLB school label: Savannah State University.",
+   "school": {
+    "name": "Savannah State University",
+    "school_type": "COLLEGE",
+    "city": "Savannah",
+    "region": "GA",
+    "country": "USA",
+    "source_key": "lad2019:bref-lad-2019"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "36",
+   "overall_pick": 1091,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "position": "RF",
+   "field_sources": {
+    "position": "lad2019:bref-lad-2019",
+    "school": "lad2019:bref-lad-2019"
+   },
+   "player": {
+    "full_name": "Matthew Kanfer",
+    "birth_date": "1997-07-17",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "688694",
+     "BBREF_MINORS": "kanfer000mat"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "DID_NOT_SIGN",
+    "source_key": "lad2019:bref-lad-2019"
+   },
+   "notes": "MLB school label: Pepperdine University.",
+   "school": {
+    "name": "Pepperdine University",
+    "school_type": "COLLEGE",
+    "city": "Malibu",
+    "region": "CA",
+    "country": "USA",
+    "source_key": "lad2019:bref-lad-2019"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "37",
+   "overall_pick": 1121,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "position": "CF",
+   "field_sources": {
+    "position": "lad2019:bref-lad-2019",
+    "school": "lad2019:bref-lad-2019"
+   },
+   "player": {
+    "full_name": "Tres Gonzalez",
+    "birth_date": "2000-10-04",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "687206",
+     "BBREF_MINORS": "gonzal008edu"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "DID_NOT_SIGN",
+    "source_key": "lad2019:bref-lad-2019"
+   },
+   "notes": "MLB school label: Mount Vernon Presbyterian School.",
+   "school": {
+    "name": "Mount Vernon Presbyterian School",
+    "school_type": "HIGH_SCHOOL",
+    "city": "Atlanta",
+    "region": "GA",
+    "country": "USA",
+    "source_key": "lad2019:bref-lad-2019"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "38",
+   "overall_pick": 1151,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "position": "C",
+   "field_sources": {
+    "position": "lad2019:bref-lad-2019",
+    "school": "lad2019:bref-lad-2019"
+   },
+   "player": {
+    "full_name": "Tyler Ryan",
+    "birth_date": "1996-05-09",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "690710",
+     "BBREF_MINORS": "ryan--000tyl"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": 5000,
+    "source_key": "lad2019:bref-lad-2019"
+   },
+   "notes": "MLB school label: University of the Pacific.",
+   "school": {
+    "name": "University of the Pacific",
+    "school_type": "COLLEGE",
+    "city": "Stockton",
+    "region": "CA",
+    "country": "USA",
+    "source_key": "lad2019:bref-lad-2019"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "39",
+   "overall_pick": 1181,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "position": "P",
+   "field_sources": {
+    "position": "lad2019:bref-lad-2019",
+    "school": "lad2019:bref-lad-2019"
+   },
+   "player": {
+    "full_name": "Caden MacDonald",
+    "birth_date": "2000-08-14",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "689721",
+     "BBREF_MINORS": "macdon000cad"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "DID_NOT_SIGN",
+    "source_key": "lad2019:bref-lad-2019"
+   },
+   "notes": "MLB school label: Pantego Christian Academy.",
+   "school": {
+    "name": "Pantego Christian Academy",
+    "school_type": "HIGH_SCHOOL",
+    "city": "Arlington",
+    "region": "TX",
+    "country": "USA",
+    "source_key": "lad2019:bref-lad-2019"
+   }
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2019:mlb-statsapi-draft-2019-lad",
+   "draft_key": "2019-JUNE_AMATEUR",
+   "round_code": "40",
+   "overall_pick": 1211,
+   "round_pick": 24,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "position": "C",
+   "field_sources": {
+    "position": "lad2019:bref-lad-2019",
+    "school": "lad2019:bref-lad-2019"
+   },
+   "player": {
+    "full_name": "Ty Haselman",
+    "birth_date": "1998-03-23",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "674116",
+     "BBREF_MINORS": "haselm000ty-"
+    },
+    "source_key": "lad2019:mlb-statsapi-draft-2019-lad"
+   },
+   "signing": {
+    "status": "DID_NOT_SIGN",
+    "source_key": "lad2019:bref-lad-2019"
+   },
+   "notes": "MLB school label: UCLA.",
+   "school": {
+    "name": "University of California, Los Angeles",
+    "school_type": "COLLEGE",
+    "city": "Los Angeles",
+    "region": "CA",
+    "country": "USA",
+    "source_key": "lad2019:bref-lad-2019"
+   }
+  }
+ ]
+}

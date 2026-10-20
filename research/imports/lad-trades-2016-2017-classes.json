@@ -1,0 +1,3166 @@
+{
+ "format": "bai-research-import/1",
+ "batch_key": "lad-trades-2016-2017-classes",
+ "channel": "TRADES",
+ "description": "LAD: 19 trades that sent audited class players away, both sides, with received players' Baseball-Reference season WAR where observed.",
+ "sources": [
+  {
+   "source_key": "lad:mlb-transactions-trades",
+   "source_type": "OFFICIAL_LEAGUE",
+   "authority_level": "OFFICIAL",
+   "title": "MLB transaction wire, LAD trade dates",
+   "publisher": "MLB Advanced Media",
+   "reference": "statsapi.mlb.com/api/v1/transactions?teamId=<club>&startDate=<date>&endDate=<date>",
+   "retrieved_date": "2026-10-20",
+   "notes": "TR entries between the two clubs (affiliates mapped to parent clubs per season)."
+  },
+  {
+   "source_key": "lad:mlb-people-trades",
+   "source_type": "OFFICIAL_LEAGUE",
+   "authority_level": "OFFICIAL",
+   "title": "MLB Stats API people for traded players",
+   "publisher": "MLB Advanced Media",
+   "reference": "statsapi.mlb.com/api/v1/people?personIds=…",
+   "retrieved_date": "2026-10-20",
+   "notes": "Names, birth dates, MLB debut dates as of retrieval."
+  },
+  {
+   "source_key": "lad:bref-player-pages-pre2026",
+   "source_type": "REFERENCE_DATABASE",
+   "authority_level": "AGGREGATOR",
+   "title": "Baseball-Reference player pages, Wayback captures before 20260325",
+   "publisher": "Sports Reference",
+   "reference": "https://www.baseball-reference.com/players/<x>/<id>.shtml via web.archive.org (per-entry locator = capture URL)",
+   "retrieved_date": "2026-10-20",
+   "notes": "Value tables per season and team; captures before opening day."
+  },
+  {
+   "source_key": "chadwick:register",
+   "source_type": "REFERENCE_DATABASE",
+   "authority_level": "REPUTABLE_SECONDARY",
+   "title": "Chadwick Baseball Bureau register (people)",
+   "publisher": "Chadwick Baseball Bureau",
+   "url": "https://github.com/chadwickbureau/register",
+   "retrieved_date": "2026-10-20",
+   "notes": "MLBAM -> Baseball-Reference id crosswalk, commit 781c175e748b89e5730fd3f5de0086b9355b2f92."
+  }
+ ],
+ "records": [
+  {
+   "type": "TRADE",
+   "source_key": "lad:mlb-transactions-trades",
+   "organization": "LAD",
+   "ref": "tr-2017-07-31-lad-tex",
+   "date": "2017-07-31",
+   "date_precision": "DAY",
+   "description": "Texas Rangers traded RHP Yu Darvish to Los Angeles Dodgers for 2B Willie Calhoun, RHP A.J. Alexy and SS Brendon Davis.",
+   "locator": "transactions?teamId=…&startDate=2017-07-31&endDate=2017-07-31",
+   "packages": [
+    {
+     "from": "LAD",
+     "to": "TEX",
+     "players": [
+      {
+       "player": {
+        "full_name": "Willie Calhoun",
+        "birth_date": "1994-11-04",
+        "external_ids": {
+         "MLBAM": "641432",
+         "BBREF": "calhowi01"
+        },
+        "source_key": "lad:mlb-people-trades"
+       }
+      },
+      {
+       "player": {
+        "full_name": "Brendon Davis",
+        "birth_date": "1997-07-28",
+        "external_ids": {
+         "MLBAM": "663478",
+         "BBREF": "davisbr04"
+        },
+        "source_key": "lad:mlb-people-trades"
+       }
+      },
+      {
+       "player": {
+        "full_name": "A.J. Alexy",
+        "birth_date": "1998-04-21",
+        "external_ids": {
+         "MLBAM": "669935",
+         "BBREF": "alexyaj01"
+        },
+        "source_key": "lad:mlb-people-trades"
+       }
+      }
+     ]
+    },
+    {
+     "from": "TEX",
+     "to": "LAD",
+     "players": [
+      {
+       "player": {
+        "full_name": "Yu Darvish",
+        "birth_date": "1986-08-16",
+        "external_ids": {
+         "MLBAM": "506433",
+         "BBREF": "darviyu01"
+        },
+        "source_key": "lad:mlb-people-trades"
+       },
+       "war": [
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2012,
+         "organization": "TEX",
+         "through_season": 2025,
+         "value": 3.5,
+         "observed_on": "2026-03-10",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260310082426/https://www.baseball-reference.com/players/d/darviyu01.shtml (2012 TEX)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2013,
+         "organization": "TEX",
+         "through_season": 2025,
+         "value": 5.6,
+         "observed_on": "2026-03-10",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260310082426/https://www.baseball-reference.com/players/d/darviyu01.shtml (2013 TEX)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2014,
+         "organization": "TEX",
+         "through_season": 2025,
+         "value": 3.5,
+         "observed_on": "2026-03-10",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260310082426/https://www.baseball-reference.com/players/d/darviyu01.shtml (2014 TEX)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2016,
+         "organization": "TEX",
+         "through_season": 2025,
+         "value": 2.6,
+         "observed_on": "2026-03-10",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260310082426/https://www.baseball-reference.com/players/d/darviyu01.shtml (2016 TEX)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2017,
+         "organization": "LAD",
+         "through_season": 2025,
+         "value": 0.5,
+         "observed_on": "2026-03-10",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260310082426/https://www.baseball-reference.com/players/d/darviyu01.shtml (2017 LAD)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2017,
+         "organization": "TEX",
+         "through_season": 2025,
+         "value": 3.4,
+         "observed_on": "2026-03-10",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260310082426/https://www.baseball-reference.com/players/d/darviyu01.shtml (2017 TEX)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2018,
+         "organization": "CHC",
+         "through_season": 2025,
+         "value": -0.2,
+         "observed_on": "2026-03-10",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260310082426/https://www.baseball-reference.com/players/d/darviyu01.shtml (2018 CHC)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2019,
+         "organization": "CHC",
+         "through_season": 2025,
+         "value": 2.8,
+         "observed_on": "2026-03-10",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260310082426/https://www.baseball-reference.com/players/d/darviyu01.shtml (2019 CHC)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2020,
+         "organization": "CHC",
+         "through_season": 2025,
+         "value": 2.8,
+         "observed_on": "2026-03-10",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260310082426/https://www.baseball-reference.com/players/d/darviyu01.shtml (2020 CHC)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2021,
+         "organization": "SD",
+         "through_season": 2025,
+         "value": 1.3,
+         "observed_on": "2026-03-10",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260310082426/https://www.baseball-reference.com/players/d/darviyu01.shtml (2021 SDP)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2022,
+         "organization": "SD",
+         "through_season": 2025,
+         "value": 4.6,
+         "observed_on": "2026-03-10",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260310082426/https://www.baseball-reference.com/players/d/darviyu01.shtml (2022 SDP)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2023,
+         "organization": "SD",
+         "through_season": 2025,
+         "value": 0.9,
+         "observed_on": "2026-03-10",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260310082426/https://www.baseball-reference.com/players/d/darviyu01.shtml (2023 SDP)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2024,
+         "organization": "SD",
+         "through_season": 2025,
+         "value": 1.9,
+         "observed_on": "2026-03-10",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260310082426/https://www.baseball-reference.com/players/d/darviyu01.shtml (2024 SDP)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2025,
+         "organization": "SD",
+         "through_season": 2025,
+         "value": 0,
+         "observed_on": "2026-03-10",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260310082426/https://www.baseball-reference.com/players/d/darviyu01.shtml (2025 SDP)"
+        },
+        {
+         "system": "BREF",
+         "scope": "CAREER",
+         "through_season": 2025,
+         "value": 33.2,
+         "observed_on": "2026-03-10",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260310082426/https://www.baseball-reference.com/players/d/darviyu01.shtml (summary WAR)"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "TRADE",
+   "source_key": "lad:mlb-transactions-trades",
+   "organization": "LAD",
+   "ref": "tr-2018-07-04-lad-cin",
+   "date": "2018-07-04",
+   "date_precision": "DAY",
+   "description": "Cincinnati Reds traded RHP Dylan Floro, RHP Zach Neal and Future Considerations to Los Angeles Dodgers for RHP James Marinan and RHP Aneurys Zabala.",
+   "locator": "transactions?teamId=…&startDate=2018-07-04&endDate=2018-07-04",
+   "packages": [
+    {
+     "from": "LAD",
+     "to": "CIN",
+     "players": [
+      {
+       "player": {
+        "full_name": "James Marinan",
+        "birth_date": "1998-10-10",
+        "external_ids": {
+         "MLBAM": "675653"
+        },
+        "source_key": "lad:mlb-people-trades"
+       }
+      },
+      {
+       "player": {
+        "full_name": "Aneurys Zabala",
+        "birth_date": "1996-12-21",
+        "external_ids": {
+         "MLBAM": "656008",
+         "BBREF": "zabalan01"
+        },
+        "source_key": "lad:mlb-people-trades"
+       }
+      }
+     ]
+    },
+    {
+     "from": "CIN",
+     "to": "LAD",
+     "players": [
+      {
+       "player": {
+        "full_name": "Dylan Floro",
+        "birth_date": "1990-12-27",
+        "external_ids": {
+         "MLBAM": "571670",
+         "BBREF": "florody01"
+        },
+        "source_key": "lad:mlb-people-trades"
+       },
+       "war": [
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2016,
+         "organization": "TB",
+         "through_season": 2025,
+         "value": 0,
+         "observed_on": "2026-01-16",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260116153257/https://www.baseball-reference.com/players/f/florody01.shtml (2016 TBR)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2017,
+         "organization": "CHC",
+         "through_season": 2025,
+         "value": -0.2,
+         "observed_on": "2026-01-16",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260116153257/https://www.baseball-reference.com/players/f/florody01.shtml (2017 CHC)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2018,
+         "organization": "CIN",
+         "through_season": 2025,
+         "value": 0.7,
+         "observed_on": "2026-01-16",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260116153257/https://www.baseball-reference.com/players/f/florody01.shtml (2018 CIN)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2018,
+         "organization": "LAD",
+         "through_season": 2025,
+         "value": 1.1,
+         "observed_on": "2026-01-16",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260116153257/https://www.baseball-reference.com/players/f/florody01.shtml (2018 LAD)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2019,
+         "organization": "LAD",
+         "through_season": 2025,
+         "value": -0.4,
+         "observed_on": "2026-01-16",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260116153257/https://www.baseball-reference.com/players/f/florody01.shtml (2019 LAD)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2020,
+         "organization": "LAD",
+         "through_season": 2025,
+         "value": 0.5,
+         "observed_on": "2026-01-16",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260116153257/https://www.baseball-reference.com/players/f/florody01.shtml (2020 LAD)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2021,
+         "organization": "MIA",
+         "through_season": 2025,
+         "value": 1.5,
+         "observed_on": "2026-01-16",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260116153257/https://www.baseball-reference.com/players/f/florody01.shtml (2021 MIA)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2022,
+         "organization": "MIA",
+         "through_season": 2025,
+         "value": 0.8,
+         "observed_on": "2026-01-16",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260116153257/https://www.baseball-reference.com/players/f/florody01.shtml (2022 MIA)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2023,
+         "organization": "MIA",
+         "through_season": 2025,
+         "value": 0,
+         "observed_on": "2026-01-16",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260116153257/https://www.baseball-reference.com/players/f/florody01.shtml (2023 MIA)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2023,
+         "organization": "MIN",
+         "through_season": 2025,
+         "value": 0,
+         "observed_on": "2026-01-16",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260116153257/https://www.baseball-reference.com/players/f/florody01.shtml (2023 MIN)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2024,
+         "organization": "ARI",
+         "through_season": 2025,
+         "value": -0.8,
+         "observed_on": "2026-01-16",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260116153257/https://www.baseball-reference.com/players/f/florody01.shtml (2024 ARI)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2024,
+         "organization": "WSH",
+         "through_season": 2025,
+         "value": 1.6,
+         "observed_on": "2026-01-16",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260116153257/https://www.baseball-reference.com/players/f/florody01.shtml (2024 WSN)"
+        },
+        {
+         "system": "BREF",
+         "scope": "CAREER",
+         "through_season": 2025,
+         "value": 5,
+         "observed_on": "2026-01-16",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260116153257/https://www.baseball-reference.com/players/f/florody01.shtml (summary WAR)"
+        }
+       ]
+      },
+      {
+       "player": {
+        "full_name": "Zach Neal",
+        "birth_date": "1988-11-09",
+        "external_ids": {
+         "MLBAM": "594943",
+         "BBREF": "nealza01"
+        },
+        "source_key": "lad:mlb-people-trades"
+       },
+       "war": [
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2016,
+         "organization": "ATH",
+         "through_season": 2025,
+         "value": 0.9,
+         "observed_on": "2026-01-18",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260118035325/https://www.baseball-reference.com/players/n/nealza01.shtml (2016 OAK)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2017,
+         "organization": "ATH",
+         "through_season": 2025,
+         "value": -0.2,
+         "observed_on": "2026-01-18",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260118035325/https://www.baseball-reference.com/players/n/nealza01.shtml (2017 OAK)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2018,
+         "organization": "LAD",
+         "through_season": 2025,
+         "value": 0,
+         "observed_on": "2026-01-18",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260118035325/https://www.baseball-reference.com/players/n/nealza01.shtml (2018 LAD)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2023,
+         "organization": "ATH",
+         "through_season": 2025,
+         "value": -0.3,
+         "observed_on": "2026-01-18",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260118035325/https://www.baseball-reference.com/players/n/nealza01.shtml (2023 OAK)"
+        },
+        {
+         "system": "BREF",
+         "scope": "CAREER",
+         "through_season": 2025,
+         "value": 0.3,
+         "observed_on": "2026-01-18",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260118035325/https://www.baseball-reference.com/players/n/nealza01.shtml (summary WAR)"
+        }
+       ]
+      }
+     ],
+     "other_assets": [
+      {
+       "asset_type": "OTHER",
+       "description": "future considerations"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "TRADE",
+   "source_key": "lad:mlb-transactions-trades",
+   "organization": "LAD",
+   "ref": "tr-2018-07-18-lad-bal",
+   "date": "2018-07-18",
+   "date_precision": "DAY",
+   "description": "Baltimore Orioles traded SS Manny Machado to Los Angeles Dodgers for 2B Breyvic Valera, RF Yusniel Diaz, RHP Zach Pop, RHP Dean Kremer and 3B Rylan Bannon.",
+   "locator": "transactions?teamId=…&startDate=2018-07-18&endDate=2018-07-18",
+   "packages": [
+    {
+     "from": "LAD",
+     "to": "BAL",
+     "players": [
+      {
+       "player": {
+        "full_name": "Yusniel Díaz",
+        "birth_date": "1996-10-07",
+        "external_ids": {
+         "MLBAM": "666783",
+         "BBREF": "diazyu01"
+        },
+        "source_key": "lad:mlb-people-trades"
+       }
+      },
+      {
+       "player": {
+        "full_name": "Rylan Bannon",
+        "birth_date": "1996-04-22",
+        "external_ids": {
+         "MLBAM": "676625",
+         "BBREF": "bannory01"
+        },
+        "source_key": "lad:mlb-people-trades"
+       }
+      },
+      {
+       "player": {
+        "full_name": "Breyvic Valera",
+        "birth_date": "1992-01-08",
+        "external_ids": {
+         "MLBAM": "591971",
+         "BBREF": "valerbr01"
+        },
+        "source_key": "lad:mlb-people-trades"
+       }
+      },
+      {
+       "player": {
+        "full_name": "Zach Pop",
+        "birth_date": "1996-09-20",
+        "external_ids": {
+         "MLBAM": "647315",
+         "BBREF": "popza01"
+        },
+        "source_key": "lad:mlb-people-trades"
+       }
+      },
+      {
+       "player": {
+        "full_name": "Dean Kremer",
+        "birth_date": "1996-01-07",
+        "external_ids": {
+         "MLBAM": "665152",
+         "BBREF": "kremede01"
+        },
+        "source_key": "lad:mlb-people-trades"
+       }
+      }
+     ]
+    },
+    {
+     "from": "BAL",
+     "to": "LAD",
+     "players": [
+      {
+       "player": {
+        "full_name": "Manny Machado",
+        "birth_date": "1992-07-06",
+        "external_ids": {
+         "MLBAM": "592518",
+         "BBREF": "machama01"
+        },
+        "source_key": "lad:mlb-people-trades"
+       },
+       "war": [
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2012,
+         "organization": "BAL",
+         "through_season": 2025,
+         "value": 1.6,
+         "observed_on": "2026-03-25",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260325230006/https://www.baseball-reference.com/players/m/machama01.shtml (2012 BAL)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2013,
+         "organization": "BAL",
+         "through_season": 2025,
+         "value": 5.9,
+         "observed_on": "2026-03-25",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260325230006/https://www.baseball-reference.com/players/m/machama01.shtml (2013 BAL)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2014,
+         "organization": "BAL",
+         "through_season": 2025,
+         "value": 2.2,
+         "observed_on": "2026-03-25",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260325230006/https://www.baseball-reference.com/players/m/machama01.shtml (2014 BAL)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2015,
+         "organization": "BAL",
+         "through_season": 2025,
+         "value": 7.3,
+         "observed_on": "2026-03-25",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260325230006/https://www.baseball-reference.com/players/m/machama01.shtml (2015 BAL)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2016,
+         "organization": "BAL",
+         "through_season": 2025,
+         "value": 7.4,
+         "observed_on": "2026-03-25",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260325230006/https://www.baseball-reference.com/players/m/machama01.shtml (2016 BAL)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2017,
+         "organization": "BAL",
+         "through_season": 2025,
+         "value": 4.1,
+         "observed_on": "2026-03-25",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260325230006/https://www.baseball-reference.com/players/m/machama01.shtml (2017 BAL)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2018,
+         "organization": "BAL",
+         "through_season": 2025,
+         "value": 3.6,
+         "observed_on": "2026-03-25",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260325230006/https://www.baseball-reference.com/players/m/machama01.shtml (2018 BAL)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2018,
+         "organization": "LAD",
+         "through_season": 2025,
+         "value": 2.6,
+         "observed_on": "2026-03-25",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260325230006/https://www.baseball-reference.com/players/m/machama01.shtml (2018 LAD)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2019,
+         "organization": "SD",
+         "through_season": 2025,
+         "value": 2.5,
+         "observed_on": "2026-03-25",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260325230006/https://www.baseball-reference.com/players/m/machama01.shtml (2019 SDP)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2020,
+         "organization": "SD",
+         "through_season": 2025,
+         "value": 3,
+         "observed_on": "2026-03-25",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260325230006/https://www.baseball-reference.com/players/m/machama01.shtml (2020 SDP)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2021,
+         "organization": "SD",
+         "through_season": 2025,
+         "value": 5,
+         "observed_on": "2026-03-25",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260325230006/https://www.baseball-reference.com/players/m/machama01.shtml (2021 SDP)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2022,
+         "organization": "SD",
+         "through_season": 2025,
+         "value": 6.8,
+         "observed_on": "2026-03-25",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260325230006/https://www.baseball-reference.com/players/m/machama01.shtml (2022 SDP)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2023,
+         "organization": "SD",
+         "through_season": 2025,
+         "value": 2.7,
+         "observed_on": "2026-03-25",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260325230006/https://www.baseball-reference.com/players/m/machama01.shtml (2023 SDP)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2024,
+         "organization": "SD",
+         "through_season": 2025,
+         "value": 3.1,
+         "observed_on": "2026-03-25",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260325230006/https://www.baseball-reference.com/players/m/machama01.shtml (2024 SDP)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2025,
+         "organization": "SD",
+         "through_season": 2025,
+         "value": 4.1,
+         "observed_on": "2026-03-25",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260325230006/https://www.baseball-reference.com/players/m/machama01.shtml (2025 SDP)"
+        },
+        {
+         "system": "BREF",
+         "scope": "CAREER",
+         "through_season": 2025,
+         "value": 61.7,
+         "observed_on": "2026-03-25",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260325230006/https://www.baseball-reference.com/players/m/machama01.shtml (summary WAR)"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "TRADE",
+   "source_key": "lad:mlb-transactions-trades",
+   "organization": "LAD",
+   "ref": "tr-2018-07-31-lad-min",
+   "date": "2018-07-31",
+   "date_precision": "DAY",
+   "description": "Minnesota Twins traded 2B Brian Dozier to Los Angeles Dodgers for 2B Logan Forsythe, OF Luke Raley and LHP Devin Smeltzer.",
+   "locator": "transactions?teamId=…&startDate=2018-07-31&endDate=2018-07-31",
+   "packages": [
+    {
+     "from": "LAD",
+     "to": "MIN",
+     "players": [
+      {
+       "player": {
+        "full_name": "Devin Smeltzer",
+        "birth_date": "1995-09-07",
+        "external_ids": {
+         "MLBAM": "656970",
+         "BBREF": "smeltde01"
+        },
+        "source_key": "lad:mlb-people-trades"
+       }
+      },
+      {
+       "player": {
+        "full_name": "Logan Forsythe",
+        "birth_date": "1987-01-14",
+        "external_ids": {
+         "MLBAM": "523253",
+         "BBREF": "forsylo01"
+        },
+        "source_key": "lad:mlb-people-trades"
+       }
+      },
+      {
+       "player": {
+        "full_name": "Luke Raley",
+        "birth_date": "1994-09-19",
+        "external_ids": {
+         "MLBAM": "670042",
+         "BBREF": "raleylu01"
+        },
+        "source_key": "lad:mlb-people-trades"
+       }
+      }
+     ]
+    },
+    {
+     "from": "MIN",
+     "to": "LAD",
+     "players": [
+      {
+       "player": {
+        "full_name": "Brian Dozier",
+        "birth_date": "1987-05-15",
+        "external_ids": {
+         "MLBAM": "572821",
+         "BBREF": "doziebr01"
+        },
+        "source_key": "lad:mlb-people-trades"
+       },
+       "war": [
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2012,
+         "organization": "MIN",
+         "through_season": 2025,
+         "value": 0.7,
+         "observed_on": "2026-02-27",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260227145336/https://www.baseball-reference.com/players/d/doziebr01.shtml (2012 MIN)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2013,
+         "organization": "MIN",
+         "through_season": 2025,
+         "value": 2.4,
+         "observed_on": "2026-02-27",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260227145336/https://www.baseball-reference.com/players/d/doziebr01.shtml (2013 MIN)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2014,
+         "organization": "MIN",
+         "through_season": 2025,
+         "value": 5.5,
+         "observed_on": "2026-02-27",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260227145336/https://www.baseball-reference.com/players/d/doziebr01.shtml (2014 MIN)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2015,
+         "organization": "MIN",
+         "through_season": 2025,
+         "value": 3.1,
+         "observed_on": "2026-02-27",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260227145336/https://www.baseball-reference.com/players/d/doziebr01.shtml (2015 MIN)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2016,
+         "organization": "MIN",
+         "through_season": 2025,
+         "value": 5.8,
+         "observed_on": "2026-02-27",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260227145336/https://www.baseball-reference.com/players/d/doziebr01.shtml (2016 MIN)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2017,
+         "organization": "MIN",
+         "through_season": 2025,
+         "value": 4.8,
+         "observed_on": "2026-02-27",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260227145336/https://www.baseball-reference.com/players/d/doziebr01.shtml (2017 MIN)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2018,
+         "organization": "LAD",
+         "through_season": 2025,
+         "value": 0.2,
+         "observed_on": "2026-02-27",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260227145336/https://www.baseball-reference.com/players/d/doziebr01.shtml (2018 LAD)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2018,
+         "organization": "MIN",
+         "through_season": 2025,
+         "value": 1,
+         "observed_on": "2026-02-27",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260227145336/https://www.baseball-reference.com/players/d/doziebr01.shtml (2018 MIN)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2019,
+         "organization": "WSH",
+         "through_season": 2025,
+         "value": 1.2,
+         "observed_on": "2026-02-27",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260227145336/https://www.baseball-reference.com/players/d/doziebr01.shtml (2019 WSN)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2020,
+         "organization": "NYM",
+         "through_season": 2025,
+         "value": -0.4,
+         "observed_on": "2026-02-27",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260227145336/https://www.baseball-reference.com/players/d/doziebr01.shtml (2020 NYM)"
+        },
+        {
+         "system": "BREF",
+         "scope": "CAREER",
+         "through_season": 2025,
+         "value": 24.3,
+         "observed_on": "2026-02-27",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260227145336/https://www.baseball-reference.com/players/d/doziebr01.shtml (summary WAR)"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "TRADE",
+   "source_key": "lad:mlb-transactions-trades",
+   "organization": "LAD",
+   "ref": "tr-2019-07-03-lad-tb",
+   "date": "2019-07-03",
+   "date_precision": "DAY",
+   "description": "Tampa Bay Rays traded RHP Casey Sadler to Los Angeles Dodgers for RHP Nathan Witt.",
+   "locator": "transactions?teamId=…&startDate=2019-07-03&endDate=2019-07-03",
+   "packages": [
+    {
+     "from": "LAD",
+     "to": "TB",
+     "players": [
+      {
+       "player": {
+        "full_name": "Nathan Witt",
+        "birth_date": "1996-04-19",
+        "external_ids": {
+         "MLBAM": "676739"
+        },
+        "source_key": "lad:mlb-people-trades"
+       }
+      }
+     ]
+    },
+    {
+     "from": "TB",
+     "to": "LAD",
+     "players": [
+      {
+       "player": {
+        "full_name": "Casey Sadler",
+        "birth_date": "1990-07-13",
+        "external_ids": {
+         "MLBAM": "594987",
+         "BBREF": "sadleca02"
+        },
+        "source_key": "lad:mlb-people-trades"
+       },
+       "war": [
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2014,
+         "organization": "PIT",
+         "through_season": 2025,
+         "value": -0.3,
+         "observed_on": "2026-03-06",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260306002226/https://www.baseball-reference.com/players/s/sadleca02.shtml (2014 PIT)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2015,
+         "organization": "PIT",
+         "through_season": 2025,
+         "value": 0.1,
+         "observed_on": "2026-03-06",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260306002226/https://www.baseball-reference.com/players/s/sadleca02.shtml (2015 PIT)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2018,
+         "organization": "PIT",
+         "through_season": 2025,
+         "value": -0.2,
+         "observed_on": "2026-03-06",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260306002226/https://www.baseball-reference.com/players/s/sadleca02.shtml (2018 PIT)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2019,
+         "organization": "LAD",
+         "through_season": 2025,
+         "value": 0.4,
+         "observed_on": "2026-03-06",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260306002226/https://www.baseball-reference.com/players/s/sadleca02.shtml (2019 LAD)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2019,
+         "organization": "TB",
+         "through_season": 2025,
+         "value": 0.5,
+         "observed_on": "2026-03-06",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260306002226/https://www.baseball-reference.com/players/s/sadleca02.shtml (2019 TBR)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2020,
+         "organization": "CHC",
+         "through_season": 2025,
+         "value": -0.2,
+         "observed_on": "2026-03-06",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260306002226/https://www.baseball-reference.com/players/s/sadleca02.shtml (2020 CHC)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2020,
+         "organization": "SEA",
+         "through_season": 2025,
+         "value": -0.2,
+         "observed_on": "2026-03-06",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260306002226/https://www.baseball-reference.com/players/s/sadleca02.shtml (2020 SEA)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2021,
+         "organization": "SEA",
+         "through_season": 2025,
+         "value": 2.1,
+         "observed_on": "2026-03-06",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260306002226/https://www.baseball-reference.com/players/s/sadleca02.shtml (2021 SEA)"
+        },
+        {
+         "system": "BREF",
+         "scope": "CAREER",
+         "through_season": 2025,
+         "value": 2,
+         "observed_on": "2026-03-06",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260306002226/https://www.baseball-reference.com/players/s/sadleca02.shtml (summary WAR)"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "TRADE",
+   "source_key": "lad:mlb-transactions-trades",
+   "organization": "LAD",
+   "ref": "tr-2019-07-25-lad-hou",
+   "date": "2019-07-25",
+   "date_precision": "DAY",
+   "description": "Houston Astros traded 1B Tyler White to Los Angeles Dodgers for RHP Andre Scrubb.",
+   "locator": "transactions?teamId=…&startDate=2019-07-25&endDate=2019-07-25",
+   "packages": [
+    {
+     "from": "LAD",
+     "to": "HOU",
+     "players": [
+      {
+       "player": {
+        "full_name": "Andre Scrubb",
+        "birth_date": "1995-01-13",
+        "external_ids": {
+         "MLBAM": "668687",
+         "BBREF": "scruban01"
+        },
+        "source_key": "lad:mlb-people-trades"
+       }
+      }
+     ]
+    },
+    {
+     "from": "HOU",
+     "to": "LAD",
+     "players": [
+      {
+       "player": {
+        "full_name": "Tyler White",
+        "birth_date": "1990-10-29",
+        "external_ids": {
+         "MLBAM": "643603",
+         "BBREF": "whitety01"
+        },
+        "source_key": "lad:mlb-people-trades"
+       },
+       "war": [
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2016,
+         "organization": "HOU",
+         "through_season": 2025,
+         "value": -0.2,
+         "observed_on": "2026-01-16",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260116080209/https://www.baseball-reference.com/players/w/whitety01.shtml (2016 HOU)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2017,
+         "organization": "HOU",
+         "through_season": 2025,
+         "value": -0.1,
+         "observed_on": "2026-01-16",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260116080209/https://www.baseball-reference.com/players/w/whitety01.shtml (2017 HOU)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2018,
+         "organization": "HOU",
+         "through_season": 2025,
+         "value": 1.2,
+         "observed_on": "2026-01-16",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260116080209/https://www.baseball-reference.com/players/w/whitety01.shtml (2018 HOU)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2019,
+         "organization": "HOU",
+         "through_season": 2025,
+         "value": -0.7,
+         "observed_on": "2026-01-16",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260116080209/https://www.baseball-reference.com/players/w/whitety01.shtml (2019 HOU)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2019,
+         "organization": "LAD",
+         "through_season": 2025,
+         "value": -0.5,
+         "observed_on": "2026-01-16",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260116080209/https://www.baseball-reference.com/players/w/whitety01.shtml (2019 LAD)"
+        },
+        {
+         "system": "BREF",
+         "scope": "CAREER",
+         "through_season": 2025,
+         "value": -0.2,
+         "observed_on": "2026-01-16",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260116080209/https://www.baseball-reference.com/players/w/whitety01.shtml (summary WAR)"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "TRADE",
+   "source_key": "lad:mlb-transactions-trades",
+   "organization": "LAD",
+   "ref": "tr-2020-02-10-lad-bos",
+   "date": "2020-02-10",
+   "date_precision": "DAY",
+   "description": "Los Angeles Dodgers traded CF Alex Verdugo, C Connor Wong and SS Jeter Downs to Boston Red Sox for RF Mookie Betts, LHP David Price and cash.",
+   "locator": "transactions?teamId=…&startDate=2020-02-10&endDate=2020-02-10",
+   "packages": [
+    {
+     "from": "LAD",
+     "to": "BOS",
+     "players": [
+      {
+       "player": {
+        "full_name": "Jeter Downs",
+        "birth_date": "1998-07-27",
+        "external_ids": {
+         "MLBAM": "669023",
+         "BBREF": "downsje01"
+        },
+        "source_key": "lad:mlb-people-trades"
+       }
+      },
+      {
+       "player": {
+        "full_name": "Alex Verdugo",
+        "birth_date": "1996-05-15",
+        "external_ids": {
+         "MLBAM": "657077",
+         "BBREF": "verdual01"
+        },
+        "source_key": "lad:mlb-people-trades"
+       }
+      },
+      {
+       "player": {
+        "full_name": "Connor Wong",
+        "birth_date": "1996-05-19",
+        "external_ids": {
+         "MLBAM": "657136",
+         "BBREF": "wongco01"
+        },
+        "source_key": "lad:mlb-people-trades"
+       }
+      }
+     ]
+    },
+    {
+     "from": "BOS",
+     "to": "LAD",
+     "players": [
+      {
+       "player": {
+        "full_name": "David Price",
+        "birth_date": "1985-08-26",
+        "external_ids": {
+         "MLBAM": "456034",
+         "BBREF": "priceda01"
+        },
+        "source_key": "lad:mlb-people-trades"
+       },
+       "war": [
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2008,
+         "organization": "TB",
+         "through_season": 2025,
+         "value": 0.5,
+         "observed_on": "2026-03-23",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260323025220/https://www.baseball-reference.com/players/p/priceda01.shtml (2008 TBR)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2009,
+         "organization": "TB",
+         "through_season": 2025,
+         "value": 0.9,
+         "observed_on": "2026-03-23",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260323025220/https://www.baseball-reference.com/players/p/priceda01.shtml (2009 TBR)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2010,
+         "organization": "TB",
+         "through_season": 2025,
+         "value": 4.7,
+         "observed_on": "2026-03-23",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260323025220/https://www.baseball-reference.com/players/p/priceda01.shtml (2010 TBR)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2011,
+         "organization": "TB",
+         "through_season": 2025,
+         "value": 3.3,
+         "observed_on": "2026-03-23",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260323025220/https://www.baseball-reference.com/players/p/priceda01.shtml (2011 TBR)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2012,
+         "organization": "TB",
+         "through_season": 2025,
+         "value": 6.6,
+         "observed_on": "2026-03-23",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260323025220/https://www.baseball-reference.com/players/p/priceda01.shtml (2012 TBR)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2013,
+         "organization": "TB",
+         "through_season": 2025,
+         "value": 2.5,
+         "observed_on": "2026-03-23",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260323025220/https://www.baseball-reference.com/players/p/priceda01.shtml (2013 TBR)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2014,
+         "organization": "DET",
+         "through_season": 2025,
+         "value": 1.7,
+         "observed_on": "2026-03-23",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260323025220/https://www.baseball-reference.com/players/p/priceda01.shtml (2014 DET)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2014,
+         "organization": "TB",
+         "through_season": 2025,
+         "value": 2.6,
+         "observed_on": "2026-03-23",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260323025220/https://www.baseball-reference.com/players/p/priceda01.shtml (2014 TBR)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2015,
+         "organization": "DET",
+         "through_season": 2025,
+         "value": 3.7,
+         "observed_on": "2026-03-23",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260323025220/https://www.baseball-reference.com/players/p/priceda01.shtml (2015 DET)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2015,
+         "organization": "TOR",
+         "through_season": 2025,
+         "value": 2.5,
+         "observed_on": "2026-03-23",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260323025220/https://www.baseball-reference.com/players/p/priceda01.shtml (2015 TOR)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2016,
+         "organization": "BOS",
+         "through_season": 2025,
+         "value": 2.8,
+         "observed_on": "2026-03-23",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260323025220/https://www.baseball-reference.com/players/p/priceda01.shtml (2016 BOS)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2017,
+         "organization": "BOS",
+         "through_season": 2025,
+         "value": 1.6,
+         "observed_on": "2026-03-23",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260323025220/https://www.baseball-reference.com/players/p/priceda01.shtml (2017 BOS)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2018,
+         "organization": "BOS",
+         "through_season": 2025,
+         "value": 3.7,
+         "observed_on": "2026-03-23",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260323025220/https://www.baseball-reference.com/players/p/priceda01.shtml (2018 BOS)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2019,
+         "organization": "BOS",
+         "through_season": 2025,
+         "value": 1.6,
+         "observed_on": "2026-03-23",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260323025220/https://www.baseball-reference.com/players/p/priceda01.shtml (2019 BOS)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2021,
+         "organization": "LAD",
+         "through_season": 2025,
+         "value": 0.9,
+         "observed_on": "2026-03-23",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260323025220/https://www.baseball-reference.com/players/p/priceda01.shtml (2021 LAD)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2022,
+         "organization": "LAD",
+         "through_season": 2025,
+         "value": 0.7,
+         "observed_on": "2026-03-23",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260323025220/https://www.baseball-reference.com/players/p/priceda01.shtml (2022 LAD)"
+        },
+        {
+         "system": "BREF",
+         "scope": "CAREER",
+         "through_season": 2025,
+         "value": 40.2,
+         "observed_on": "2026-03-23",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260323025220/https://www.baseball-reference.com/players/p/priceda01.shtml (summary WAR)"
+        }
+       ]
+      },
+      {
+       "player": {
+        "full_name": "Mookie Betts",
+        "birth_date": "1992-10-07",
+        "external_ids": {
+         "MLBAM": "605141",
+         "BBREF": "bettsmo01"
+        },
+        "source_key": "lad:mlb-people-trades"
+       },
+       "war": [
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2014,
+         "organization": "BOS",
+         "through_season": 2025,
+         "value": 2.3,
+         "observed_on": "2026-03-25",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260325154929/https://www.baseball-reference.com/players/b/bettsmo01.shtml (2014 BOS)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2015,
+         "organization": "BOS",
+         "through_season": 2025,
+         "value": 6,
+         "observed_on": "2026-03-25",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260325154929/https://www.baseball-reference.com/players/b/bettsmo01.shtml (2015 BOS)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2016,
+         "organization": "BOS",
+         "through_season": 2025,
+         "value": 9.8,
+         "observed_on": "2026-03-25",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260325154929/https://www.baseball-reference.com/players/b/bettsmo01.shtml (2016 BOS)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2017,
+         "organization": "BOS",
+         "through_season": 2025,
+         "value": 6.5,
+         "observed_on": "2026-03-25",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260325154929/https://www.baseball-reference.com/players/b/bettsmo01.shtml (2017 BOS)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2018,
+         "organization": "BOS",
+         "through_season": 2025,
+         "value": 10.7,
+         "observed_on": "2026-03-25",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260325154929/https://www.baseball-reference.com/players/b/bettsmo01.shtml (2018 BOS)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2019,
+         "organization": "BOS",
+         "through_season": 2025,
+         "value": 7.2,
+         "observed_on": "2026-03-25",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260325154929/https://www.baseball-reference.com/players/b/bettsmo01.shtml (2019 BOS)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2020,
+         "organization": "LAD",
+         "through_season": 2025,
+         "value": 3.7,
+         "observed_on": "2026-03-25",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260325154929/https://www.baseball-reference.com/players/b/bettsmo01.shtml (2020 LAD)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2021,
+         "organization": "LAD",
+         "through_season": 2025,
+         "value": 4.1,
+         "observed_on": "2026-03-25",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260325154929/https://www.baseball-reference.com/players/b/bettsmo01.shtml (2021 LAD)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2022,
+         "organization": "LAD",
+         "through_season": 2025,
+         "value": 6.7,
+         "observed_on": "2026-03-25",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260325154929/https://www.baseball-reference.com/players/b/bettsmo01.shtml (2022 LAD)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2023,
+         "organization": "LAD",
+         "through_season": 2025,
+         "value": 8.6,
+         "observed_on": "2026-03-25",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260325154929/https://www.baseball-reference.com/players/b/bettsmo01.shtml (2023 LAD)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2024,
+         "organization": "LAD",
+         "through_season": 2025,
+         "value": 4.6,
+         "observed_on": "2026-03-25",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260325154929/https://www.baseball-reference.com/players/b/bettsmo01.shtml (2024 LAD)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2025,
+         "organization": "LAD",
+         "through_season": 2025,
+         "value": 4.9,
+         "observed_on": "2026-03-25",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260325154929/https://www.baseball-reference.com/players/b/bettsmo01.shtml (2025 LAD)"
+        },
+        {
+         "system": "BREF",
+         "scope": "CAREER",
+         "through_season": 2025,
+         "value": 75.1,
+         "observed_on": "2026-03-25",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260325154929/https://www.baseball-reference.com/players/b/bettsmo01.shtml (summary WAR)"
+        }
+       ]
+      }
+     ],
+     "other_assets": [
+      {
+       "asset_type": "CASH",
+       "amount_usd": null,
+       "description": "cash (amount undisclosed)"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "TRADE",
+   "source_key": "lad:mlb-transactions-trades",
+   "organization": "LAD",
+   "ref": "tr-2021-02-12-lad-ath",
+   "date": "2021-02-12",
+   "date_precision": "DAY",
+   "description": "Los Angeles Dodgers traded LHP Adam Kolarek and RF Cody Thomas to Oakland Athletics for 3B Sheldon Neuse and RHP Gus Varland.",
+   "locator": "transactions?teamId=…&startDate=2021-02-12&endDate=2021-02-12",
+   "packages": [
+    {
+     "from": "LAD",
+     "to": "ATH",
+     "players": [
+      {
+       "player": {
+        "full_name": "Adam Kolarek",
+        "birth_date": "1989-01-14",
+        "external_ids": {
+         "MLBAM": "592473",
+         "BBREF": "kolarad01"
+        },
+        "source_key": "lad:mlb-people-trades"
+       }
+      },
+      {
+       "player": {
+        "full_name": "Cody Thomas",
+        "birth_date": "1994-10-08",
+        "external_ids": {
+         "MLBAM": "642137",
+         "BBREF": "thomaco01"
+        },
+        "source_key": "lad:mlb-people-trades"
+       }
+      }
+     ]
+    },
+    {
+     "from": "ATH",
+     "to": "LAD",
+     "players": [
+      {
+       "player": {
+        "full_name": "Sheldon Neuse",
+        "birth_date": "1994-12-10",
+        "external_ids": {
+         "MLBAM": "641914",
+         "BBREF": "neusesh01"
+        },
+        "source_key": "lad:mlb-people-trades"
+       },
+       "war": [
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2019,
+         "organization": "ATH",
+         "through_season": 2025,
+         "value": 0.3,
+         "observed_on": "2026-02-04",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260204030108/https://www.baseball-reference.com/players/n/neusesh01.shtml (2019 OAK)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2021,
+         "organization": "LAD",
+         "through_season": 2025,
+         "value": -0.5,
+         "observed_on": "2026-02-04",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260204030108/https://www.baseball-reference.com/players/n/neusesh01.shtml (2021 LAD)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2022,
+         "organization": "ATH",
+         "through_season": 2025,
+         "value": -0.7,
+         "observed_on": "2026-02-04",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260204030108/https://www.baseball-reference.com/players/n/neusesh01.shtml (2022 OAK)"
+        },
+        {
+         "system": "BREF",
+         "scope": "CAREER",
+         "through_season": 2025,
+         "value": -0.8,
+         "observed_on": "2026-02-04",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260204030108/https://www.baseball-reference.com/players/n/neusesh01.shtml (summary WAR)"
+        }
+       ]
+      },
+      {
+       "player": {
+        "full_name": "Gus Varland",
+        "birth_date": "1996-11-06",
+        "external_ids": {
+         "MLBAM": "681402",
+         "BBREF": "varlagu01"
+        },
+        "source_key": "lad:mlb-people-trades"
+       },
+       "war": [
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2023,
+         "organization": "LAD",
+         "through_season": 2025,
+         "value": 0.1,
+         "observed_on": "2026-03-05",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260305002050/https://www.baseball-reference.com/players/v/varlagu01.shtml (2023 LAD)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2023,
+         "organization": "MIL",
+         "through_season": 2025,
+         "value": -0.4,
+         "observed_on": "2026-03-05",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260305002050/https://www.baseball-reference.com/players/v/varlagu01.shtml (2023 MIL)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2024,
+         "organization": "CWS",
+         "through_season": 2025,
+         "value": 0.3,
+         "observed_on": "2026-03-05",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260305002050/https://www.baseball-reference.com/players/v/varlagu01.shtml (2024 CHW)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2024,
+         "organization": "LAD",
+         "through_season": 2025,
+         "value": 0,
+         "observed_on": "2026-03-05",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260305002050/https://www.baseball-reference.com/players/v/varlagu01.shtml (2024 LAD)"
+        },
+        {
+         "system": "BREF",
+         "scope": "CAREER",
+         "through_season": 2025,
+         "value": 0,
+         "observed_on": "2026-03-05",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260305002050/https://www.baseball-reference.com/players/v/varlagu01.shtml (summary WAR)"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "TRADE",
+   "source_key": "lad:mlb-transactions-trades",
+   "organization": "LAD",
+   "ref": "tr-2021-07-30-lad-wsh",
+   "date": "2021-07-30",
+   "date_precision": "DAY",
+   "description": "Washington Nationals traded RHP Max Scherzer and SS Trea Turner to Los Angeles Dodgers for C Keibert Ruiz, RHP Josiah Gray, RHP Gerardo Carrillo and OF Donovan Casey.",
+   "locator": "transactions?teamId=…&startDate=2021-07-30&endDate=2021-07-30",
+   "packages": [
+    {
+     "from": "LAD",
+     "to": "WSH",
+     "players": [
+      {
+       "player": {
+        "full_name": "Keibert Ruiz",
+        "birth_date": "1998-07-20",
+        "external_ids": {
+         "MLBAM": "660688",
+         "BBREF": "ruizke01"
+        },
+        "source_key": "lad:mlb-people-trades"
+       }
+      },
+      {
+       "player": {
+        "full_name": "Josiah Gray",
+        "birth_date": "1997-12-21",
+        "external_ids": {
+         "MLBAM": "680686",
+         "BBREF": "grayjo03"
+        },
+        "source_key": "lad:mlb-people-trades"
+       }
+      },
+      {
+       "player": {
+        "full_name": "Donovan Casey",
+        "birth_date": "1996-02-23",
+        "external_ids": {
+         "MLBAM": "661541"
+        },
+        "source_key": "lad:mlb-people-trades"
+       }
+      },
+      {
+       "player": {
+        "full_name": "Gerardo Carrillo",
+        "birth_date": "1998-09-13",
+        "external_ids": {
+         "MLBAM": "672629",
+         "BBREF": "carrige01"
+        },
+        "source_key": "lad:mlb-people-trades"
+       }
+      }
+     ]
+    },
+    {
+     "from": "WSH",
+     "to": "LAD",
+     "players": [
+      {
+       "player": {
+        "full_name": "Trea Turner",
+        "birth_date": "1993-06-30",
+        "external_ids": {
+         "MLBAM": "607208",
+         "BBREF": "turnetr01"
+        },
+        "source_key": "lad:mlb-people-trades"
+       },
+       "war": [
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2015,
+         "organization": "WSH",
+         "through_season": 2025,
+         "value": 0.3,
+         "observed_on": "2026-02-27",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260227054357/https://www.baseball-reference.com/players/t/turnetr01.shtml (2015 WSN)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2016,
+         "organization": "WSH",
+         "through_season": 2025,
+         "value": 3.3,
+         "observed_on": "2026-02-27",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260227054357/https://www.baseball-reference.com/players/t/turnetr01.shtml (2016 WSN)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2017,
+         "organization": "WSH",
+         "through_season": 2025,
+         "value": 2.9,
+         "observed_on": "2026-02-27",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260227054357/https://www.baseball-reference.com/players/t/turnetr01.shtml (2017 WSN)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2018,
+         "organization": "WSH",
+         "through_season": 2025,
+         "value": 4.9,
+         "observed_on": "2026-02-27",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260227054357/https://www.baseball-reference.com/players/t/turnetr01.shtml (2018 WSN)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2019,
+         "organization": "WSH",
+         "through_season": 2025,
+         "value": 4,
+         "observed_on": "2026-02-27",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260227054357/https://www.baseball-reference.com/players/t/turnetr01.shtml (2019 WSN)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2020,
+         "organization": "WSH",
+         "through_season": 2025,
+         "value": 2.8,
+         "observed_on": "2026-02-27",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260227054357/https://www.baseball-reference.com/players/t/turnetr01.shtml (2020 WSN)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2021,
+         "organization": "LAD",
+         "through_season": 2025,
+         "value": 2.4,
+         "observed_on": "2026-02-27",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260227054357/https://www.baseball-reference.com/players/t/turnetr01.shtml (2021 LAD)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2021,
+         "organization": "WSH",
+         "through_season": 2025,
+         "value": 4.1,
+         "observed_on": "2026-02-27",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260227054357/https://www.baseball-reference.com/players/t/turnetr01.shtml (2021 WSN)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2022,
+         "organization": "LAD",
+         "through_season": 2025,
+         "value": 5.2,
+         "observed_on": "2026-02-27",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260227054357/https://www.baseball-reference.com/players/t/turnetr01.shtml (2022 LAD)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2023,
+         "organization": "PHI",
+         "through_season": 2025,
+         "value": 3.5,
+         "observed_on": "2026-02-27",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260227054357/https://www.baseball-reference.com/players/t/turnetr01.shtml (2023 PHI)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2024,
+         "organization": "PHI",
+         "through_season": 2025,
+         "value": 3,
+         "observed_on": "2026-02-27",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260227054357/https://www.baseball-reference.com/players/t/turnetr01.shtml (2024 PHI)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2025,
+         "organization": "PHI",
+         "through_season": 2025,
+         "value": 5.4,
+         "observed_on": "2026-02-27",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260227054357/https://www.baseball-reference.com/players/t/turnetr01.shtml (2025 PHI)"
+        },
+        {
+         "system": "BREF",
+         "scope": "CAREER",
+         "through_season": 2025,
+         "value": 41.9,
+         "observed_on": "2026-02-27",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260227054357/https://www.baseball-reference.com/players/t/turnetr01.shtml (summary WAR)"
+        }
+       ]
+      },
+      {
+       "player": {
+        "full_name": "Max Scherzer",
+        "birth_date": "1984-07-27",
+        "external_ids": {
+         "MLBAM": "453286",
+         "BBREF": "scherma01"
+        },
+        "source_key": "lad:mlb-people-trades"
+       },
+       "war": [
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2008,
+         "organization": "ARI",
+         "through_season": 2025,
+         "value": 1,
+         "observed_on": "2026-03-25",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260325152420/https://www.baseball-reference.com/players/s/scherma01.shtml (2008 ARI)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2009,
+         "organization": "ARI",
+         "through_season": 2025,
+         "value": 1.6,
+         "observed_on": "2026-03-25",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260325152420/https://www.baseball-reference.com/players/s/scherma01.shtml (2009 ARI)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2010,
+         "organization": "DET",
+         "through_season": 2025,
+         "value": 3.4,
+         "observed_on": "2026-03-25",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260325152420/https://www.baseball-reference.com/players/s/scherma01.shtml (2010 DET)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2011,
+         "organization": "DET",
+         "through_season": 2025,
+         "value": 1.3,
+         "observed_on": "2026-03-25",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260325152420/https://www.baseball-reference.com/players/s/scherma01.shtml (2011 DET)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2012,
+         "organization": "DET",
+         "through_season": 2025,
+         "value": 4.3,
+         "observed_on": "2026-03-25",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260325152420/https://www.baseball-reference.com/players/s/scherma01.shtml (2012 DET)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2013,
+         "organization": "DET",
+         "through_season": 2025,
+         "value": 6.6,
+         "observed_on": "2026-03-25",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260325152420/https://www.baseball-reference.com/players/s/scherma01.shtml (2013 DET)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2014,
+         "organization": "DET",
+         "through_season": 2025,
+         "value": 5.7,
+         "observed_on": "2026-03-25",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260325152420/https://www.baseball-reference.com/players/s/scherma01.shtml (2014 DET)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2015,
+         "organization": "WSH",
+         "through_season": 2025,
+         "value": 7.4,
+         "observed_on": "2026-03-25",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260325152420/https://www.baseball-reference.com/players/s/scherma01.shtml (2015 WSN)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2016,
+         "organization": "WSH",
+         "through_season": 2025,
+         "value": 6.4,
+         "observed_on": "2026-03-25",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260325152420/https://www.baseball-reference.com/players/s/scherma01.shtml (2016 WSN)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2017,
+         "organization": "WSH",
+         "through_season": 2025,
+         "value": 7.5,
+         "observed_on": "2026-03-25",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260325152420/https://www.baseball-reference.com/players/s/scherma01.shtml (2017 WSN)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2018,
+         "organization": "WSH",
+         "through_season": 2025,
+         "value": 8.7,
+         "observed_on": "2026-03-25",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260325152420/https://www.baseball-reference.com/players/s/scherma01.shtml (2018 WSN)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2019,
+         "organization": "WSH",
+         "through_season": 2025,
+         "value": 5.3,
+         "observed_on": "2026-03-25",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260325152420/https://www.baseball-reference.com/players/s/scherma01.shtml (2019 WSN)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2020,
+         "organization": "WSH",
+         "through_season": 2025,
+         "value": 2.2,
+         "observed_on": "2026-03-25",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260325152420/https://www.baseball-reference.com/players/s/scherma01.shtml (2020 WSN)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2021,
+         "organization": "LAD",
+         "through_season": 2025,
+         "value": 2.5,
+         "observed_on": "2026-03-25",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260325152420/https://www.baseball-reference.com/players/s/scherma01.shtml (2021 LAD)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2021,
+         "organization": "WSH",
+         "through_season": 2025,
+         "value": 2.9,
+         "observed_on": "2026-03-25",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260325152420/https://www.baseball-reference.com/players/s/scherma01.shtml (2021 WSN)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2022,
+         "organization": "NYM",
+         "through_season": 2025,
+         "value": 5.3,
+         "observed_on": "2026-03-25",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260325152420/https://www.baseball-reference.com/players/s/scherma01.shtml (2022 NYM)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2023,
+         "organization": "NYM",
+         "through_season": 2025,
+         "value": 2.1,
+         "observed_on": "2026-03-25",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260325152420/https://www.baseball-reference.com/players/s/scherma01.shtml (2023 NYM)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2023,
+         "organization": "TEX",
+         "through_season": 2025,
+         "value": 1,
+         "observed_on": "2026-03-25",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260325152420/https://www.baseball-reference.com/players/s/scherma01.shtml (2023 TEX)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2024,
+         "organization": "TEX",
+         "through_season": 2025,
+         "value": 0.3,
+         "observed_on": "2026-03-25",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260325152420/https://www.baseball-reference.com/players/s/scherma01.shtml (2024 TEX)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2025,
+         "organization": "TOR",
+         "through_season": 2025,
+         "value": 0.3,
+         "observed_on": "2026-03-25",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260325152420/https://www.baseball-reference.com/players/s/scherma01.shtml (2025 TOR)"
+        },
+        {
+         "system": "BREF",
+         "scope": "CAREER",
+         "through_season": 2025,
+         "value": 75.6,
+         "observed_on": "2026-03-25",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260325152420/https://www.baseball-reference.com/players/s/scherma01.shtml (summary WAR)"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "TRADE",
+   "source_key": "lad:mlb-transactions-trades",
+   "organization": "LAD",
+   "ref": "tr-2021-08-31-lad-min",
+   "date": "2021-08-31",
+   "date_precision": "DAY",
+   "description": "Minnesota Twins traded LHP Andrew Vasquez to Los Angeles Dodgers for C Stevie Berman.",
+   "locator": "transactions?teamId=…&startDate=2021-08-31&endDate=2021-08-31",
+   "packages": [
+    {
+     "from": "LAD",
+     "to": "MIN",
+     "players": [
+      {
+       "player": {
+        "full_name": "Stevie Berman",
+        "birth_date": "1994-11-28",
+        "external_ids": {
+         "MLBAM": "670281"
+        },
+        "source_key": "lad:mlb-people-trades"
+       }
+      }
+     ]
+    },
+    {
+     "from": "MIN",
+     "to": "LAD",
+     "players": [
+      {
+       "player": {
+        "full_name": "Andrew Vasquez",
+        "birth_date": "1993-09-14",
+        "external_ids": {
+         "MLBAM": "607755",
+         "BBREF": "vasquan02"
+        },
+        "source_key": "lad:mlb-people-trades"
+       },
+       "war": [
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2018,
+         "organization": "MIN",
+         "through_season": 2025,
+         "value": -0.1,
+         "observed_on": "2026-02-15",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260215045327/https://www.baseball-reference.com/players/v/vasquan02.shtml (2018 MIN)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2019,
+         "organization": "MIN",
+         "through_season": 2025,
+         "value": 0,
+         "observed_on": "2026-02-15",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260215045327/https://www.baseball-reference.com/players/v/vasquan02.shtml (2019 MIN)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2021,
+         "organization": "LAD",
+         "through_season": 2025,
+         "value": 0.1,
+         "observed_on": "2026-02-15",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260215045327/https://www.baseball-reference.com/players/v/vasquan02.shtml (2021 LAD)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2022,
+         "organization": "SF",
+         "through_season": 2025,
+         "value": 0.1,
+         "observed_on": "2026-02-15",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260215045327/https://www.baseball-reference.com/players/v/vasquan02.shtml (2022 SFG)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2022,
+         "organization": "TOR",
+         "through_season": 2025,
+         "value": -0.2,
+         "observed_on": "2026-02-15",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260215045327/https://www.baseball-reference.com/players/v/vasquan02.shtml (2022 TOR)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2023,
+         "organization": "DET",
+         "through_season": 2025,
+         "value": -0.4,
+         "observed_on": "2026-02-15",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260215045327/https://www.baseball-reference.com/players/v/vasquan02.shtml (2023 DET)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2023,
+         "organization": "PHI",
+         "through_season": 2025,
+         "value": 1,
+         "observed_on": "2026-02-15",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260215045327/https://www.baseball-reference.com/players/v/vasquan02.shtml (2023 PHI)"
+        },
+        {
+         "system": "BREF",
+         "scope": "CAREER",
+         "through_season": 2025,
+         "value": 0.6,
+         "observed_on": "2026-02-15",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260215045327/https://www.baseball-reference.com/players/v/vasquan02.shtml (summary WAR)"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "TRADE",
+   "source_key": "lad:mlb-transactions-trades",
+   "organization": "LAD",
+   "ref": "tr-2021-10-20-lad-kc",
+   "date": "2021-10-20",
+   "date_precision": "DAY",
+   "description": "Los Angeles Dodgers traded RHP Zach Willeman to Kansas City Royals.",
+   "locator": "transactions?teamId=…&startDate=2021-10-20&endDate=2021-10-20",
+   "packages": [
+    {
+     "from": "LAD",
+     "to": "KC",
+     "players": [
+      {
+       "player": {
+        "full_name": "Zach Willeman",
+        "birth_date": "1996-03-27",
+        "external_ids": {
+         "MLBAM": "657116"
+        },
+        "source_key": "lad:mlb-people-trades"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "TRADE",
+   "source_key": "lad:mlb-transactions-trades",
+   "organization": "LAD",
+   "ref": "tr-2021-11-22-lad-tex",
+   "date": "2021-11-22",
+   "date_precision": "DAY",
+   "description": "Los Angeles Dodgers traded LF Billy McKinney and OF Zach Reks to Texas Rangers for cash.",
+   "locator": "transactions?teamId=…&startDate=2021-11-22&endDate=2021-11-22",
+   "packages": [
+    {
+     "from": "LAD",
+     "to": "TEX",
+     "players": [
+      {
+       "player": {
+        "full_name": "Zach Reks",
+        "birth_date": "1993-11-12",
+        "external_ids": {
+         "MLBAM": "676646",
+         "BBREF": "reksza01"
+        },
+        "source_key": "lad:mlb-people-trades"
+       }
+      },
+      {
+       "player": {
+        "full_name": "Billy McKinney",
+        "birth_date": "1994-08-23",
+        "external_ids": {
+         "MLBAM": "641856",
+         "BBREF": "mckinbi01"
+        },
+        "source_key": "lad:mlb-people-trades"
+       }
+      }
+     ]
+    },
+    {
+     "from": "TEX",
+     "to": "LAD",
+     "players": [],
+     "other_assets": [
+      {
+       "asset_type": "CASH",
+       "amount_usd": null,
+       "description": "cash (amount undisclosed)"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "TRADE",
+   "source_key": "lad:mlb-transactions-trades",
+   "organization": "LAD",
+   "ref": "tr-2022-03-18-lad-tb",
+   "date": "2022-03-18",
+   "date_precision": "DAY",
+   "description": "Los Angeles Dodgers traded LF Luke Raley to Tampa Bay Rays for RHP Tanner Dodson.",
+   "locator": "transactions?teamId=…&startDate=2022-03-18&endDate=2022-03-18",
+   "packages": [
+    {
+     "from": "LAD",
+     "to": "TB",
+     "players": [
+      {
+       "player": {
+        "full_name": "Luke Raley",
+        "birth_date": "1994-09-19",
+        "external_ids": {
+         "MLBAM": "670042",
+         "BBREF": "raleylu01"
+        },
+        "source_key": "lad:mlb-people-trades"
+       }
+      }
+     ]
+    },
+    {
+     "from": "TB",
+     "to": "LAD",
+     "players": [
+      {
+       "player": {
+        "full_name": "Tanner Dodson",
+        "birth_date": "1997-05-09",
+        "external_ids": {
+         "MLBAM": "663541"
+        },
+        "source_key": "lad:mlb-people-trades"
+       },
+       "war": []
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "TRADE",
+   "source_key": "lad:mlb-transactions-trades",
+   "organization": "LAD",
+   "ref": "tr-2022-07-30-lad-chc",
+   "date": "2022-07-30",
+   "date_precision": "DAY",
+   "description": "Chicago Cubs traded RHP Chris Martin to Los Angeles Dodgers for 2B Zach McKinstry.",
+   "locator": "transactions?teamId=…&startDate=2022-07-30&endDate=2022-07-30",
+   "packages": [
+    {
+     "from": "LAD",
+     "to": "CHC",
+     "players": [
+      {
+       "player": {
+        "full_name": "Zach McKinstry",
+        "birth_date": "1995-04-29",
+        "external_ids": {
+         "MLBAM": "656716",
+         "BBREF": "mckinza01"
+        },
+        "source_key": "lad:mlb-people-trades"
+       }
+      }
+     ]
+    },
+    {
+     "from": "CHC",
+     "to": "LAD",
+     "players": [
+      {
+       "player": {
+        "full_name": "Chris Martin",
+        "birth_date": "1986-06-02",
+        "external_ids": {
+         "MLBAM": "455119",
+         "BBREF": "martich02"
+        },
+        "source_key": "lad:mlb-people-trades"
+       },
+       "war": [
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2014,
+         "organization": "COL",
+         "through_season": 2025,
+         "value": -0.3,
+         "observed_on": "2026-03-24",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260324190743/https://www.baseball-reference.com/players/m/martich02.shtml (2014 COL)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2015,
+         "organization": "NYY",
+         "through_season": 2025,
+         "value": -0.1,
+         "observed_on": "2026-03-24",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260324190743/https://www.baseball-reference.com/players/m/martich02.shtml (2015 NYY)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2018,
+         "organization": "TEX",
+         "through_season": 2025,
+         "value": 0.6,
+         "observed_on": "2026-03-24",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260324190743/https://www.baseball-reference.com/players/m/martich02.shtml (2018 TEX)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2019,
+         "organization": "ATL",
+         "through_season": 2025,
+         "value": 0.1,
+         "observed_on": "2026-03-24",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260324190743/https://www.baseball-reference.com/players/m/martich02.shtml (2019 ATL)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2019,
+         "organization": "TEX",
+         "through_season": 2025,
+         "value": 1.5,
+         "observed_on": "2026-03-24",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260324190743/https://www.baseball-reference.com/players/m/martich02.shtml (2019 TEX)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2020,
+         "organization": "ATL",
+         "through_season": 2025,
+         "value": 1.2,
+         "observed_on": "2026-03-24",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260324190743/https://www.baseball-reference.com/players/m/martich02.shtml (2020 ATL)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2021,
+         "organization": "ATL",
+         "through_season": 2025,
+         "value": 0.4,
+         "observed_on": "2026-03-24",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260324190743/https://www.baseball-reference.com/players/m/martich02.shtml (2021 ATL)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2022,
+         "organization": "CHC",
+         "through_season": 2025,
+         "value": 0.1,
+         "observed_on": "2026-03-24",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260324190743/https://www.baseball-reference.com/players/m/martich02.shtml (2022 CHC)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2022,
+         "organization": "LAD",
+         "through_season": 2025,
+         "value": 0.9,
+         "observed_on": "2026-03-24",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260324190743/https://www.baseball-reference.com/players/m/martich02.shtml (2022 LAD)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2023,
+         "organization": "BOS",
+         "through_season": 2025,
+         "value": 3.2,
+         "observed_on": "2026-03-24",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260324190743/https://www.baseball-reference.com/players/m/martich02.shtml (2023 BOS)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2024,
+         "organization": "BOS",
+         "through_season": 2025,
+         "value": 0.2,
+         "observed_on": "2026-03-24",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260324190743/https://www.baseball-reference.com/players/m/martich02.shtml (2024 BOS)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2025,
+         "organization": "TEX",
+         "through_season": 2025,
+         "value": -0.1,
+         "observed_on": "2026-03-24",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260324190743/https://www.baseball-reference.com/players/m/martich02.shtml (2025 TEX)"
+        },
+        {
+         "system": "BREF",
+         "scope": "CAREER",
+         "through_season": 2025,
+         "value": 7.6,
+         "observed_on": "2026-03-24",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260324190743/https://www.baseball-reference.com/players/m/martich02.shtml (summary WAR)"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "TRADE",
+   "source_key": "lad:mlb-transactions-trades",
+   "organization": "LAD",
+   "ref": "tr-2022-08-02-lad-tor",
+   "date": "2022-08-02",
+   "date_precision": "DAY",
+   "description": "Los Angeles Dodgers traded RHP Mitch White and 2B Alex De Jesus to Toronto Blue Jays for RHP Nick Frasso and LHP Moises Brito.",
+   "locator": "transactions?teamId=…&startDate=2022-08-02&endDate=2022-08-02",
+   "packages": [
+    {
+     "from": "LAD",
+     "to": "TOR",
+     "players": [
+      {
+       "player": {
+        "full_name": "Mitch White",
+        "birth_date": "1994-12-28",
+        "external_ids": {
+         "MLBAM": "669952",
+         "BBREF": "whitemi03"
+        },
+        "source_key": "lad:mlb-people-trades"
+       }
+      },
+      {
+       "player": {
+        "full_name": "Alex De Jesus",
+        "birth_date": "2002-03-22",
+        "external_ids": {
+         "MLBAM": "682942"
+        },
+        "source_key": "lad:mlb-people-trades"
+       }
+      }
+     ]
+    },
+    {
+     "from": "TOR",
+     "to": "LAD",
+     "players": [
+      {
+       "player": {
+        "full_name": "Moises Brito",
+        "birth_date": "2002-07-09",
+        "external_ids": {
+         "MLBAM": "804975"
+        },
+        "source_key": "lad:mlb-people-trades"
+       },
+       "war": []
+      },
+      {
+       "player": {
+        "full_name": "Nick Frasso",
+        "birth_date": "1998-10-18",
+        "external_ids": {
+         "MLBAM": "693308",
+         "BBREF": "frassni01"
+        },
+        "source_key": "lad:mlb-people-trades"
+       },
+       "war": []
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "TRADE",
+   "source_key": "lad:mlb-transactions-trades",
+   "organization": "LAD",
+   "ref": "tr-2023-01-11-lad-mia",
+   "date": "2023-01-11",
+   "date_precision": "DAY",
+   "description": "Miami Marlins traded SS Miguel Rojas to Los Angeles Dodgers for SS Jacob Amaya.",
+   "locator": "transactions?teamId=…&startDate=2023-01-11&endDate=2023-01-11",
+   "packages": [
+    {
+     "from": "LAD",
+     "to": "MIA",
+     "players": [
+      {
+       "player": {
+        "full_name": "Jacob Amaya",
+        "birth_date": "1998-09-03",
+        "external_ids": {
+         "MLBAM": "676070",
+         "BBREF": "amayaja01"
+        },
+        "source_key": "lad:mlb-people-trades"
+       }
+      }
+     ]
+    },
+    {
+     "from": "MIA",
+     "to": "LAD",
+     "players": [
+      {
+       "player": {
+        "full_name": "Miguel Rojas",
+        "birth_date": "1989-02-24",
+        "external_ids": {
+         "MLBAM": "500743",
+         "BBREF": "rojasmi02"
+        },
+        "source_key": "lad:mlb-people-trades"
+       },
+       "war": [
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2014,
+         "organization": "LAD",
+         "through_season": 2025,
+         "value": 0.9,
+         "observed_on": "2026-03-25",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260325152344/https://www.baseball-reference.com/players/r/rojasmi02.shtml (2014 LAD)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2015,
+         "organization": "MIA",
+         "through_season": 2025,
+         "value": 1.2,
+         "observed_on": "2026-03-25",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260325152344/https://www.baseball-reference.com/players/r/rojasmi02.shtml (2015 MIA)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2016,
+         "organization": "MIA",
+         "through_season": 2025,
+         "value": -0.4,
+         "observed_on": "2026-03-25",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260325152344/https://www.baseball-reference.com/players/r/rojasmi02.shtml (2016 MIA)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2017,
+         "organization": "MIA",
+         "through_season": 2025,
+         "value": 2,
+         "observed_on": "2026-03-25",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260325152344/https://www.baseball-reference.com/players/r/rojasmi02.shtml (2017 MIA)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2018,
+         "organization": "MIA",
+         "through_season": 2025,
+         "value": 1.2,
+         "observed_on": "2026-03-25",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260325152344/https://www.baseball-reference.com/players/r/rojasmi02.shtml (2018 MIA)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2019,
+         "organization": "MIA",
+         "through_season": 2025,
+         "value": 0.8,
+         "observed_on": "2026-03-25",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260325152344/https://www.baseball-reference.com/players/r/rojasmi02.shtml (2019 MIA)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2020,
+         "organization": "MIA",
+         "through_season": 2025,
+         "value": 1.6,
+         "observed_on": "2026-03-25",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260325152344/https://www.baseball-reference.com/players/r/rojasmi02.shtml (2020 MIA)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2021,
+         "organization": "MIA",
+         "through_season": 2025,
+         "value": 2.6,
+         "observed_on": "2026-03-25",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260325152344/https://www.baseball-reference.com/players/r/rojasmi02.shtml (2021 MIA)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2022,
+         "organization": "MIA",
+         "through_season": 2025,
+         "value": 2.5,
+         "observed_on": "2026-03-25",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260325152344/https://www.baseball-reference.com/players/r/rojasmi02.shtml (2022 MIA)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2023,
+         "organization": "LAD",
+         "through_season": 2025,
+         "value": 1.4,
+         "observed_on": "2026-03-25",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260325152344/https://www.baseball-reference.com/players/r/rojasmi02.shtml (2023 LAD)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2024,
+         "organization": "LAD",
+         "through_season": 2025,
+         "value": 3.4,
+         "observed_on": "2026-03-25",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260325152344/https://www.baseball-reference.com/players/r/rojasmi02.shtml (2024 LAD)"
+        },
+        {
+         "system": "BREF",
+         "scope": "SEASON",
+         "season": 2025,
+         "organization": "LAD",
+         "through_season": 2025,
+         "value": 1.9,
+         "observed_on": "2026-03-25",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260325152344/https://www.baseball-reference.com/players/r/rojasmi02.shtml (2025 LAD)"
+        },
+        {
+         "system": "BREF",
+         "scope": "CAREER",
+         "through_season": 2025,
+         "value": 19,
+         "observed_on": "2026-03-25",
+         "source_key": "lad:bref-player-pages-pre2026",
+         "locator": "http://web.archive.org/web/20260325152344/https://www.baseball-reference.com/players/r/rojasmi02.shtml (summary WAR)"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "TRADE",
+   "source_key": "lad:mlb-transactions-trades",
+   "organization": "LAD",
+   "ref": "tr-2023-06-25-lad-pit",
+   "date": "2023-06-25",
+   "date_precision": "DAY",
+   "description": "Los Angeles Dodgers traded RHP Andre Jackson to Pittsburgh Pirates for cash.",
+   "locator": "transactions?teamId=…&startDate=2023-06-25&endDate=2023-06-25",
+   "packages": [
+    {
+     "from": "LAD",
+     "to": "PIT",
+     "players": [
+      {
+       "player": {
+        "full_name": "Andre Jackson",
+        "birth_date": "1996-05-01",
+        "external_ids": {
+         "MLBAM": "656578",
+         "BBREF": "jacksan01"
+        },
+        "source_key": "lad:mlb-people-trades"
+       }
+      }
+     ]
+    },
+    {
+     "from": "PIT",
+     "to": "LAD",
+     "players": [],
+     "other_assets": [
+      {
+       "asset_type": "CASH",
+       "amount_usd": null,
+       "description": "cash (amount undisclosed)"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "TRADE",
+   "source_key": "lad:mlb-transactions-trades",
+   "organization": "LAD",
+   "ref": "tr-2025-01-07-lad-cin",
+   "date": "2025-01-07",
+   "date_precision": "DAY",
+   "description": "Los Angeles Dodgers traded 2B Gavin Lux to Cincinnati Reds for CF Mike Sirota and Draft Pick.",
+   "locator": "transactions?teamId=…&startDate=2025-01-07&endDate=2025-01-07",
+   "packages": [
+    {
+     "from": "LAD",
+     "to": "CIN",
+     "players": [
+      {
+       "player": {
+        "full_name": "Gavin Lux",
+        "birth_date": "1997-11-23",
+        "external_ids": {
+         "MLBAM": "666158",
+         "BBREF": "luxga01"
+        },
+        "source_key": "lad:mlb-people-trades"
+       }
+      }
+     ]
+    },
+    {
+     "from": "CIN",
+     "to": "LAD",
+     "players": [
+      {
+       "player": {
+        "full_name": "Mike Sirota",
+        "birth_date": "2003-06-16",
+        "external_ids": {
+         "MLBAM": "701527"
+        },
+        "source_key": "lad:mlb-people-trades"
+       },
+       "war": []
+      }
+     ],
+     "other_assets": [
+      {
+       "asset_type": "DRAFT_PICK",
+       "description": "draft pick (per the wire)"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "TRADE",
+   "source_key": "lad:mlb-transactions-trades",
+   "organization": "LAD",
+   "ref": "tr-2025-07-31-lad-bos",
+   "date": "2025-07-31",
+   "date_precision": "DAY",
+   "description": "Los Angeles Dodgers traded RHP Dustin May to Boston Red Sox for RF James Tibbs III and OF Zach Ehrhard.",
+   "locator": "transactions?teamId=…&startDate=2025-07-31&endDate=2025-07-31",
+   "packages": [
+    {
+     "from": "LAD",
+     "to": "BOS",
+     "players": [
+      {
+       "player": {
+        "full_name": "Dustin May",
+        "birth_date": "1997-09-06",
+        "external_ids": {
+         "MLBAM": "669160",
+         "BBREF": "maydu01"
+        },
+        "source_key": "lad:mlb-people-trades"
+       }
+      }
+     ]
+    },
+    {
+     "from": "BOS",
+     "to": "LAD",
+     "players": [
+      {
+       "player": {
+        "full_name": "Zach Ehrhard",
+        "birth_date": "2003-01-21",
+        "external_ids": {
+         "MLBAM": "701394"
+        },
+        "source_key": "lad:mlb-people-trades"
+       },
+       "war": []
+      },
+      {
+       "player": {
+        "full_name": "James Tibbs III",
+        "birth_date": "2002-10-01",
+        "external_ids": {
+         "MLBAM": "696486"
+        },
+        "source_key": "lad:mlb-people-trades"
+       },
+       "war": []
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

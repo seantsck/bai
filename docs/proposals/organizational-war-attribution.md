@@ -1,6 +1,6 @@
 # Proposal: organizational WAR attribution
 
-Status: **proposal** (Phase 6, 2026-10-20). Not implemented and not part of the 020 release. It builds on tables that already exist (`war_observations`, `transactions`, `trade_packages`, `trade_package_assets`, `organization_value_attributions` from 008/010) and adds what they lack.
+Status: **phase 1 implemented** in migration 023 (Phase 7, revised Phase 8, 2026-10-20); see data-model.md. Phase 8 added what the tenure table was for, from per-acquisition dispositions (022): value for the acquiring club counts only the acquisition's own tenure (acquisition season to exit season); a later return to the club is reported separately and never credited; a trade return comes from the trade that ended that acquisition; an acquisition that did not sign earns nothing. Still open: a received player's return ends at his next trade away from the club, not at a release (unknown exits leave it open), and a season in which a player left and returned to the same club is one row. Originally a proposal (Phase 6), not part of the 020 release. It builds on tables that already exist (`war_observations`, `transactions`, `trade_packages`, `trade_package_assets`, `organization_value_attributions` from 008/010) and adds what they lack.
 
 ## Problem
 

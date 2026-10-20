@@ -1,0 +1,884 @@
+{
+ "format": "bai-research-import/1",
+ "batch_key": "2018-draft-lad-wire",
+ "channel": "DRAFT",
+ "description": "LAD 2018 Rule 4 draft: 32 of 40 picks signed per the MLB transaction wire, dated to the day (no bonuses).",
+ "sources": [
+  {
+   "source_key": "lad2018:mlb-transactions-draft-2018",
+   "source_type": "OFFICIAL_LEAGUE",
+   "authority_level": "OFFICIAL",
+   "title": "MLB transaction wire, team 119, 2018-06-04 to 2018-08-31",
+   "publisher": "MLB Advanced Media",
+   "url": "https://statsapi.mlb.com/api/v1/transactions?teamId=119&startDate=2018-06-04&endDate=2018-08-31",
+   "retrieved_date": "2026-10-20",
+   "notes": "SGN (or SFA) entries for the club's official picks inside the window. A pick without an entry is not claimed either way."
+  }
+ ],
+ "records": [
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2018:mlb-statsapi-draft-2018-lad",
+   "draft_key": "2018-JUNE_AMATEUR",
+   "round_code": "2",
+   "overall_pick": 68,
+   "round_pick": 25,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Michael Grove",
+    "birth_date": "1996-12-18",
+    "external_ids": {
+     "MLBAM": "675627"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2018-07-05",
+    "date_precision": "DAY",
+    "source_key": "lad2018:mlb-transactions-draft-2018",
+    "locator": "transaction 367765 (SGN)"
+   },
+   "notes": "MLB transaction 367765 (2018-07-05): Los Angeles Dodgers signed RHP Michael Grove."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2018:mlb-statsapi-draft-2018-lad",
+   "draft_key": "2018-JUNE_AMATEUR",
+   "round_code": "3",
+   "overall_pick": 104,
+   "round_pick": 26,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "John Rooney",
+    "birth_date": "1997-01-28",
+    "external_ids": {
+     "MLBAM": "680701"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2018-07-03",
+    "date_precision": "DAY",
+    "source_key": "lad2018:mlb-transactions-draft-2018",
+    "locator": "transaction 367766 (SGN)"
+   },
+   "notes": "MLB transaction 367766 (2018-07-03): Los Angeles Dodgers signed LHP John Rooney."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2018:mlb-statsapi-draft-2018-lad",
+   "draft_key": "2018-JUNE_AMATEUR",
+   "round_code": "4",
+   "overall_pick": 134,
+   "round_pick": 30,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Braydon Fisher",
+    "birth_date": "2000-07-26",
+    "external_ids": {
+     "MLBAM": "680755"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2018-06-27",
+    "date_precision": "DAY",
+    "source_key": "lad2018:mlb-transactions-draft-2018",
+    "locator": "transaction 364816 (SGN)"
+   },
+   "notes": "MLB transaction 364816 (2018-06-27): Los Angeles Dodgers signed RHP Braydon Fisher."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2018:mlb-statsapi-draft-2018-lad",
+   "draft_key": "2018-JUNE_AMATEUR",
+   "round_code": "5",
+   "overall_pick": 164,
+   "round_pick": 30,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Devin Mann",
+    "birth_date": "1997-02-11",
+    "external_ids": {
+     "MLBAM": "669471"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2018-06-17",
+    "date_precision": "DAY",
+    "source_key": "lad2018:mlb-transactions-draft-2018",
+    "locator": "transaction 362026 (SGN)"
+   },
+   "notes": "MLB transaction 362026 (2018-06-17): Los Angeles Dodgers signed 2B Devin Mann."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2018:mlb-statsapi-draft-2018-lad",
+   "draft_key": "2018-JUNE_AMATEUR",
+   "round_code": "6",
+   "overall_pick": 194,
+   "round_pick": 30,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Bryan Warzek",
+    "birth_date": "1997-01-17",
+    "external_ids": {
+     "MLBAM": "679338"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2018-06-18",
+    "date_precision": "DAY",
+    "source_key": "lad2018:mlb-transactions-draft-2018",
+    "locator": "transaction 365700 (SGN)"
+   },
+   "notes": "MLB transaction 365700 (2018-06-18): Los Angeles Dodgers signed LHP Bryan Warzek."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2018:mlb-statsapi-draft-2018-lad",
+   "draft_key": "2018-JUNE_AMATEUR",
+   "round_code": "7",
+   "overall_pick": 224,
+   "round_pick": 30,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "James Outman",
+    "birth_date": "1997-05-14",
+    "external_ids": {
+     "MLBAM": "681546"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2018-06-19",
+    "date_precision": "DAY",
+    "source_key": "lad2018:mlb-transactions-draft-2018",
+    "locator": "transaction 363072 (SGN)"
+   },
+   "notes": "MLB transaction 363072 (2018-06-19): Los Angeles Dodgers signed OF James Outman."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2018:mlb-statsapi-draft-2018-lad",
+   "draft_key": "2018-JUNE_AMATEUR",
+   "round_code": "8",
+   "overall_pick": 254,
+   "round_pick": 30,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Luke Heyer",
+    "birth_date": "1996-09-26",
+    "external_ids": {
+     "MLBAM": "679691"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2018-06-19",
+    "date_precision": "DAY",
+    "source_key": "lad2018:mlb-transactions-draft-2018",
+    "locator": "transaction 363071 (SGN)"
+   },
+   "notes": "MLB transaction 363071 (2018-06-19): Los Angeles Dodgers signed 3B Luke Heyer."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2018:mlb-statsapi-draft-2018-lad",
+   "draft_key": "2018-JUNE_AMATEUR",
+   "round_code": "9",
+   "overall_pick": 284,
+   "round_pick": 30,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Josh McLain",
+    "birth_date": "1996-09-23",
+    "external_ids": {
+     "MLBAM": "656717"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2018-06-18",
+    "date_precision": "DAY",
+    "source_key": "lad2018:mlb-transactions-draft-2018",
+    "locator": "transaction 362035 (SGN)"
+   },
+   "notes": "MLB transaction 362035 (2018-06-18): Los Angeles Dodgers signed OF Josh McLain."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2018:mlb-statsapi-draft-2018-lad",
+   "draft_key": "2018-JUNE_AMATEUR",
+   "round_code": "10",
+   "overall_pick": 314,
+   "round_pick": 30,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Deacon Liput",
+    "birth_date": "1996-06-27",
+    "external_ids": {
+     "MLBAM": "663937"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2018-07-03",
+    "date_precision": "DAY",
+    "source_key": "lad2018:mlb-transactions-draft-2018",
+    "locator": "transaction 366311 (SGN)"
+   },
+   "notes": "MLB transaction 366311 (2018-07-03): Los Angeles Dodgers signed 2B Deacon Liput."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2018:mlb-statsapi-draft-2018-lad",
+   "draft_key": "2018-JUNE_AMATEUR",
+   "round_code": "11",
+   "overall_pick": 344,
+   "round_pick": 30,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Stephen Kolek",
+    "birth_date": "1997-04-18",
+    "external_ids": {
+     "MLBAM": "663568"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2018-06-14",
+    "date_precision": "DAY",
+    "source_key": "lad2018:mlb-transactions-draft-2018",
+    "locator": "transaction 365216 (SGN)"
+   },
+   "notes": "MLB transaction 365216 (2018-06-14): Los Angeles Dodgers signed RHP Stephen Kolek."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2018:mlb-statsapi-draft-2018-lad",
+   "draft_key": "2018-JUNE_AMATEUR",
+   "round_code": "12",
+   "overall_pick": 374,
+   "round_pick": 30,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Hunter Feduccia",
+    "birth_date": "1997-06-05",
+    "external_ids": {
+     "MLBAM": "676439"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2018-06-14",
+    "date_precision": "DAY",
+    "source_key": "lad2018:mlb-transactions-draft-2018",
+    "locator": "transaction 364046 (SGN)"
+   },
+   "notes": "MLB transaction 364046 (2018-06-14): Los Angeles Dodgers signed C Hunter Feduccia."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2018:mlb-statsapi-draft-2018-lad",
+   "draft_key": "2018-JUNE_AMATEUR",
+   "round_code": "13",
+   "overall_pick": 404,
+   "round_pick": 30,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Dillon Paulson",
+    "birth_date": "1997-06-10",
+    "external_ids": {
+     "MLBAM": "663516"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2018-06-19",
+    "date_precision": "DAY",
+    "source_key": "lad2018:mlb-transactions-draft-2018",
+    "locator": "transaction 363068 (SGN)"
+   },
+   "notes": "MLB transaction 363068 (2018-06-19): Los Angeles Dodgers signed 1B Dillon Paulson."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2018:mlb-statsapi-draft-2018-lad",
+   "draft_key": "2018-JUNE_AMATEUR",
+   "round_code": "15",
+   "overall_pick": 464,
+   "round_pick": 30,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Julian Smith",
+    "birth_date": "1997-06-03",
+    "external_ids": {
+     "MLBAM": "681886"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2018-07-03",
+    "date_precision": "DAY",
+    "source_key": "lad2018:mlb-transactions-draft-2018",
+    "locator": "transaction 367767 (SGN)"
+   },
+   "notes": "MLB transaction 367767 (2018-07-03): Los Angeles Dodgers signed LHP Julian Smith."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2018:mlb-statsapi-draft-2018-lad",
+   "draft_key": "2018-JUNE_AMATEUR",
+   "round_code": "17",
+   "overall_pick": 524,
+   "round_pick": 30,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Aldrich De Jongh",
+    "birth_date": "1998-09-01",
+    "external_ids": {
+     "MLBAM": "680884"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2018-06-12",
+    "date_precision": "DAY",
+    "source_key": "lad2018:mlb-transactions-draft-2018",
+    "locator": "transaction 364980 (SGN)"
+   },
+   "notes": "MLB transaction 364980 (2018-06-12): Los Angeles Dodgers signed OF Aldrich De Jongh."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2018:mlb-statsapi-draft-2018-lad",
+   "draft_key": "2018-JUNE_AMATEUR",
+   "round_code": "18",
+   "overall_pick": 554,
+   "round_pick": 30,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Niko Hulsizer",
+    "birth_date": "1997-02-01",
+    "external_ids": {
+     "MLBAM": "680881"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2018-06-19",
+    "date_precision": "DAY",
+    "source_key": "lad2018:mlb-transactions-draft-2018",
+    "locator": "transaction 363075 (SGN)"
+   },
+   "notes": "MLB transaction 363075 (2018-06-19): Los Angeles Dodgers signed OF Niko Hulsizer."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2018:mlb-statsapi-draft-2018-lad",
+   "draft_key": "2018-JUNE_AMATEUR",
+   "round_code": "19",
+   "overall_pick": 584,
+   "round_pick": 30,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Sam McWilliams",
+    "birth_date": "1998-05-26",
+    "external_ids": {
+     "MLBAM": "681955"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2018-06-17",
+    "date_precision": "DAY",
+    "source_key": "lad2018:mlb-transactions-draft-2018",
+    "locator": "transaction 365702 (SGN)"
+   },
+   "notes": "MLB transaction 365702 (2018-06-17): Los Angeles Dodgers signed OF Sam McWilliams."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2018:mlb-statsapi-draft-2018-lad",
+   "draft_key": "2018-JUNE_AMATEUR",
+   "round_code": "20",
+   "overall_pick": 614,
+   "round_pick": 30,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Caleb Sampen",
+    "birth_date": "1996-07-23",
+    "external_ids": {
+     "MLBAM": "680789"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2018-06-12",
+    "date_precision": "DAY",
+    "source_key": "lad2018:mlb-transactions-draft-2018",
+    "locator": "transaction 367768 (SGN)"
+   },
+   "notes": "MLB transaction 367768 (2018-06-12): Los Angeles Dodgers signed RHP Caleb Sampen."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2018:mlb-statsapi-draft-2018-lad",
+   "draft_key": "2018-JUNE_AMATEUR",
+   "round_code": "21",
+   "overall_pick": 644,
+   "round_pick": 30,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Tre Todd",
+    "birth_date": "1996-09-29",
+    "external_ids": {
+     "MLBAM": "681990"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2018-06-12",
+    "date_precision": "DAY",
+    "source_key": "lad2018:mlb-transactions-draft-2018",
+    "locator": "transaction 367769 (SGN)"
+   },
+   "notes": "MLB transaction 367769 (2018-06-12): Los Angeles Dodgers signed C Tre Todd."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2018:mlb-statsapi-draft-2018-lad",
+   "draft_key": "2018-JUNE_AMATEUR",
+   "round_code": "22",
+   "overall_pick": 674,
+   "round_pick": 30,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Meaux Landry",
+    "birth_date": "1998-01-18",
+    "external_ids": {
+     "MLBAM": "682009"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2018-07-06",
+    "date_precision": "DAY",
+    "source_key": "lad2018:mlb-transactions-draft-2018",
+    "locator": "transaction 367771 (SGN)"
+   },
+   "notes": "MLB transaction 367771 (2018-07-06): Los Angeles Dodgers signed 1B Simon Landry."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2018:mlb-statsapi-draft-2018-lad",
+   "draft_key": "2018-JUNE_AMATEUR",
+   "round_code": "23",
+   "overall_pick": 704,
+   "round_pick": 30,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Justin Hagenman",
+    "birth_date": "1996-10-07",
+    "external_ids": {
+     "MLBAM": "663795"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2018-06-12",
+    "date_precision": "DAY",
+    "source_key": "lad2018:mlb-transactions-draft-2018",
+    "locator": "transaction 365214 (SGN)"
+   },
+   "notes": "MLB transaction 365214 (2018-06-12): Los Angeles Dodgers signed RHP Justin Hagenman."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2018:mlb-statsapi-draft-2018-lad",
+   "draft_key": "2018-JUNE_AMATEUR",
+   "round_code": "25",
+   "overall_pick": 764,
+   "round_pick": 30,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Hunter Speer",
+    "birth_date": "1995-05-18",
+    "external_ids": {
+     "MLBAM": "682050"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2018-06-12",
+    "date_precision": "DAY",
+    "source_key": "lad2018:mlb-transactions-draft-2018",
+    "locator": "transaction 364991 (SGN)"
+   },
+   "notes": "MLB transaction 364991 (2018-06-12): Los Angeles Dodgers signed RHP Hunter Speer."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2018:mlb-statsapi-draft-2018-lad",
+   "draft_key": "2018-JUNE_AMATEUR",
+   "round_code": "26",
+   "overall_pick": 794,
+   "round_pick": 30,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Aaron Ackerman",
+    "birth_date": "1997-05-01",
+    "external_ids": {
+     "MLBAM": "679299"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2018-06-20",
+    "date_precision": "DAY",
+    "source_key": "lad2018:mlb-transactions-draft-2018",
+    "locator": "transaction 363298 (SGN)"
+   },
+   "notes": "MLB transaction 363298 (2018-06-20): Los Angeles Dodgers signed C Aaron Ackerman."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2018:mlb-statsapi-draft-2018-lad",
+   "draft_key": "2018-JUNE_AMATEUR",
+   "round_code": "27",
+   "overall_pick": 824,
+   "round_pick": 30,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Connor Mitchell",
+    "birth_date": "1995-09-11",
+    "external_ids": {
+     "MLBAM": "682097"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2018-06-12",
+    "date_precision": "DAY",
+    "source_key": "lad2018:mlb-transactions-draft-2018",
+    "locator": "transaction 365211 (SGN)"
+   },
+   "notes": "MLB transaction 365211 (2018-06-12): Los Angeles Dodgers signed LHP Connor Mitchell."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2018:mlb-statsapi-draft-2018-lad",
+   "draft_key": "2018-JUNE_AMATEUR",
+   "round_code": "28",
+   "overall_pick": 854,
+   "round_pick": 30,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Reza Aleaziz",
+    "birth_date": "1995-07-11",
+    "external_ids": {
+     "MLBAM": "641300"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2018-06-12",
+    "date_precision": "DAY",
+    "source_key": "lad2018:mlb-transactions-draft-2018",
+    "locator": "transaction 365220 (SGN)"
+   },
+   "notes": "MLB transaction 365220 (2018-06-12): Los Angeles Dodgers signed RHP Reza Aleaziz."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2018:mlb-statsapi-draft-2018-lad",
+   "draft_key": "2018-JUNE_AMATEUR",
+   "round_code": "29",
+   "overall_pick": 884,
+   "round_pick": 30,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Dan Robinson",
+    "birth_date": "1996-10-30",
+    "external_ids": {
+     "MLBAM": "674974"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2018-06-19",
+    "date_precision": "DAY",
+    "source_key": "lad2018:mlb-transactions-draft-2018",
+    "locator": "transaction 363079 (SGN)"
+   },
+   "notes": "MLB transaction 363079 (2018-06-19): Los Angeles Dodgers signed OF Daniel Robinson."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2018:mlb-statsapi-draft-2018-lad",
+   "draft_key": "2018-JUNE_AMATEUR",
+   "round_code": "30",
+   "overall_pick": 914,
+   "round_pick": 30,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Matt Cogen",
+    "birth_date": "1995-08-19",
+    "external_ids": {
+     "MLBAM": "682134"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2018-06-19",
+    "date_precision": "DAY",
+    "source_key": "lad2018:mlb-transactions-draft-2018",
+    "locator": "transaction 363076 (SGN)"
+   },
+   "notes": "MLB transaction 363076 (2018-06-19): Los Angeles Dodgers signed OF Matt Cogen."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2018:mlb-statsapi-draft-2018-lad",
+   "draft_key": "2018-JUNE_AMATEUR",
+   "round_code": "31",
+   "overall_pick": 944,
+   "round_pick": 30,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Andrew Shaps",
+    "birth_date": "1995-12-05",
+    "external_ids": {
+     "MLBAM": "656952"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2018-06-12",
+    "date_precision": "DAY",
+    "source_key": "lad2018:mlb-transactions-draft-2018",
+    "locator": "transaction 367772 (SGN)"
+   },
+   "notes": "MLB transaction 367772 (2018-06-12): Los Angeles Dodgers signed OF Andrew Shaps."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2018:mlb-statsapi-draft-2018-lad",
+   "draft_key": "2018-JUNE_AMATEUR",
+   "round_code": "32",
+   "overall_pick": 974,
+   "round_pick": 30,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Jacob Gilliland",
+    "birth_date": "2000-01-16",
+    "external_ids": {
+     "MLBAM": "681365"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2018-06-13",
+    "date_precision": "DAY",
+    "source_key": "lad2018:mlb-transactions-draft-2018",
+    "locator": "transaction 365103 (SGN)"
+   },
+   "notes": "MLB transaction 365103 (2018-06-13): Los Angeles Dodgers signed RHP Jacob Gilliland."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2018:mlb-statsapi-draft-2018-lad",
+   "draft_key": "2018-JUNE_AMATEUR",
+   "round_code": "33",
+   "overall_pick": 1004,
+   "round_pick": 30,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Drew Avans",
+    "birth_date": "1996-06-13",
+    "external_ids": {
+     "MLBAM": "682183"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2018-06-18",
+    "date_precision": "DAY",
+    "source_key": "lad2018:mlb-transactions-draft-2018",
+    "locator": "transaction 362032 (SGN)"
+   },
+   "notes": "MLB transaction 362032 (2018-06-18): Los Angeles Dodgers signed OF Drew Avans."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2018:mlb-statsapi-draft-2018-lad",
+   "draft_key": "2018-JUNE_AMATEUR",
+   "round_code": "34",
+   "overall_pick": 1034,
+   "round_pick": 30,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Austin Drury",
+    "birth_date": "1997-08-13",
+    "external_ids": {
+     "MLBAM": "682200"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2018-06-13",
+    "date_precision": "DAY",
+    "source_key": "lad2018:mlb-transactions-draft-2018",
+    "locator": "transaction 365218 (SGN)"
+   },
+   "notes": "MLB transaction 365218 (2018-06-13): Los Angeles Dodgers signed LHP Austin Drury."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2018:mlb-statsapi-draft-2018-lad",
+   "draft_key": "2018-JUNE_AMATEUR",
+   "round_code": "36",
+   "overall_pick": 1094,
+   "round_pick": 30,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Jeremiah Vison",
+    "birth_date": "1997-08-27",
+    "external_ids": {
+     "MLBAM": "682228"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2018-06-18",
+    "date_precision": "DAY",
+    "source_key": "lad2018:mlb-transactions-draft-2018",
+    "locator": "transaction 362038 (SGN)"
+   },
+   "notes": "MLB transaction 362038 (2018-06-18): Los Angeles Dodgers signed OF Jeremiah Vison."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "lad2018:mlb-statsapi-draft-2018-lad",
+   "draft_key": "2018-JUNE_AMATEUR",
+   "round_code": "37",
+   "overall_pick": 1124,
+   "round_pick": 30,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Jon Littell",
+    "birth_date": "1995-08-16",
+    "external_ids": {
+     "MLBAM": "657662"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "signing": {
+    "status": "SIGNED",
+    "bonus_usd": null,
+    "date": "2018-06-20",
+    "date_precision": "DAY",
+    "source_key": "lad2018:mlb-transactions-draft-2018",
+    "locator": "transaction 363300 (SGN)"
+   },
+   "notes": "MLB transaction 363300 (2018-06-20): Los Angeles Dodgers signed OF Jon Littell."
+  }
+ ]
+}

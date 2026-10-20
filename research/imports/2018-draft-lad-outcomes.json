@@ -1,0 +1,1943 @@
+{
+ "format": "bai-research-import/1",
+ "batch_key": "2018-draft-lad-outcomes",
+ "channel": "OUTCOMES",
+ "description": "LAD 2018-JUNE_AMATEUR class: outcome audits for 40 selections as of 2026-10-20 (MLB Stats API; Baseball-Reference career WAR).",
+ "sources": [
+  {
+   "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+   "source_type": "OFFICIAL_LEAGUE",
+   "authority_level": "OFFICIAL",
+   "title": "MLB Stats API player outcomes (people, MLB and milb_all seasons, transactions), 40 players",
+   "publisher": "MLB Advanced Media",
+   "reference": "statsapi.mlb.com/api/v1: people/{id}?hydrate=currentTeam,stats(...); people/{id}/stats?stats=yearByYear&leagueListId=milb_all; transactions?playerId={id}; teams?sportIds=11..16&season=Y",
+   "retrieved_date": "2026-10-20",
+   "notes": "129 requests, all HTTP 200 (manifest kept with the download). Current status and transactions as of the retrieval date."
+  },
+  {
+   "source_key": "lad:mlbcom-rule5-2020-lad",
+   "source_type": "OFFICIAL_LEAGUE",
+   "authority_level": "OFFICIAL",
+   "title": "Dodgers lose 8 players in Rule 5 Draft",
+   "publisher": "MLB.com",
+   "url": "https://www.mlb.com/news/dodgers-2020-rule-5-draft-results",
+   "archived_url": "http://web.archive.org/web/20260101164013/https://www.mlb.com/news/dodgers-2020-rule-5-draft-results",
+   "published_date": "2020-12-10",
+   "retrieved_date": "2026-10-20",
+   "notes": "\"right-handed pitchers Brett de Geus and Jordan Sheffield in the Major League phase. de Geus was taken with the second pick by Texas and Sheffield with the seventh pick by Colorado ... Also in the Minor League portion, the Dodgers lost ... shortstop Errol Robinson to Cincinnati, center fielder Chris Roller to Cleveland ... and infielder Marcus Chiu to Miami.\""
+  }
+ ],
+ "records": [
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "J.T. Ginn",
+    "external_ids": {
+     "MLBAM": "669372"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "audit_state": "AUDITED_REACHED_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "debut": {
+    "date": "2024-08-21",
+    "organization": "ATH",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "people/669372 mlbDebutDate; 2024 season splits"
+   },
+   "transactions": [
+    {
+     "ref": "mlb-tx-605802",
+     "type": "TRADE",
+     "date": "2022-03-12",
+     "from_organization": "NYM",
+     "to_organization": "ATH",
+     "description": "Oakland Athletics traded RHP Chris Bassitt to New York Mets for RHP Adam Oller and RHP J.T. Ginn.",
+     "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+     "locator": "transactions?playerId=669372 id 605802"
+    }
+   ],
+   "acquisition": {
+    "draft_key": "2018-JUNE_AMATEUR",
+    "overall_pick": 30
+   },
+   "disposition": {
+    "value": "UNSIGNED",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "people/669372; transactions?playerId=669372"
+   },
+   "details": {
+    "as_of_date": "2026-10-20",
+    "reached_affiliated": true,
+    "first_affiliated_season": 2021,
+    "mlb_games": 58,
+    "mlb_plate_appearances": 0,
+    "mlb_innings_pitched": 262.2,
+    "current_status": "WITH_OTHER_ORGANIZATION",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20"
+   },
+   "war": [
+    {
+     "system": "BREF",
+     "scope": "CAREER",
+     "through_season": 2025,
+     "value": 1,
+     "observed_on": "2025-10-01",
+     "source_key": "lad2018:bref-lad-2018",
+     "locator": "draft table WAR column (career, as of the capture)"
+    }
+   ],
+   "notes": "Pick 30; did not sign with LAD. FanGraphs WAR not observed (site refuses automated requests; no archive)."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Michael Grove",
+    "external_ids": {
+     "MLBAM": "675627"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "audit_state": "AUDITED_REACHED_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "debut": {
+    "date": "2022-05-15",
+    "organization": "LAD",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "people/675627 mlbDebutDate; 2022 season splits"
+   },
+   "transactions": [],
+   "acquisition": {
+    "draft_key": "2018-JUNE_AMATEUR",
+    "overall_pick": 68
+   },
+   "disposition": {
+    "value": "LEFT_AS_FREE_AGENT",
+    "date": "2025-11-06",
+    "date_precision": "DAY",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "transactions?playerId=675627 LEFT_AS_FREE_AGENT 2025-11-06"
+   },
+   "details": {
+    "as_of_date": "2026-10-20",
+    "reached_affiliated": true,
+    "first_affiliated_season": 2019,
+    "mlb_games": 67,
+    "mlb_plate_appearances": null,
+    "mlb_innings_pitched": 156.1,
+    "current_status": "WITH_OTHER_ORGANIZATION",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20"
+   },
+   "war": [
+    {
+     "system": "BREF",
+     "scope": "CAREER",
+     "through_season": 2025,
+     "value": -2,
+     "observed_on": "2025-10-01",
+     "source_key": "lad2018:bref-lad-2018",
+     "locator": "draft table WAR column (career, as of the capture)"
+    }
+   ],
+   "notes": "Pick 68; signed with LAD. FanGraphs WAR not observed (site refuses automated requests; no archive)."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "John Rooney",
+    "external_ids": {
+     "MLBAM": "680701"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "audit_state": "AUDITED_REACHED_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "debut": {
+    "date": "2025-08-24",
+    "organization": "HOU",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "people/680701 mlbDebutDate; 2025 season splits"
+   },
+   "transactions": [
+    {
+     "ref": "mlb-tx-861291",
+     "type": "TRADE",
+     "date": "2025-08-03",
+     "from_organization": "MIA",
+     "to_organization": "HOU",
+     "description": "Miami Marlins traded LHP John Rooney to Houston Astros for cash.",
+     "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+     "locator": "transactions?playerId=680701 id 861291"
+    }
+   ],
+   "acquisition": {
+    "draft_key": "2018-JUNE_AMATEUR",
+    "overall_pick": 104
+   },
+   "disposition": {
+    "value": "LEFT_AS_FREE_AGENT",
+    "date": "2024-11-04",
+    "date_precision": "DAY",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "transactions?playerId=680701 LEFT_AS_FREE_AGENT 2024-11-04"
+   },
+   "details": {
+    "as_of_date": "2026-10-20",
+    "reached_affiliated": true,
+    "first_affiliated_season": 2018,
+    "mlb_games": 1,
+    "mlb_plate_appearances": null,
+    "mlb_innings_pitched": 1.1,
+    "current_status": "WITH_OTHER_ORGANIZATION",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20"
+   },
+   "war": [
+    {
+     "system": "BREF",
+     "scope": "CAREER",
+     "through_season": 2025,
+     "value": 0,
+     "observed_on": "2025-10-01",
+     "source_key": "lad2018:bref-lad-2018",
+     "locator": "draft table WAR column (career, as of the capture)"
+    }
+   ],
+   "notes": "Pick 104; signed with LAD. FanGraphs WAR not observed (site refuses automated requests; no archive)."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Braydon Fisher",
+    "external_ids": {
+     "MLBAM": "680755"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "audit_state": "AUDITED_REACHED_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "debut": {
+    "date": "2025-05-11",
+    "organization": "TOR",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "people/680755 mlbDebutDate; 2025 season splits"
+   },
+   "transactions": [
+    {
+     "ref": "mlb-tx-779538",
+     "type": "TRADE",
+     "date": "2024-06-12",
+     "from_organization": "LAD",
+     "to_organization": "TOR",
+     "description": "Los Angeles Dodgers traded RHP Braydon Fisher to Toronto Blue Jays for 2B Cavan Biggio and cash.",
+     "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+     "locator": "transactions?playerId=680755 id 779538"
+    }
+   ],
+   "acquisition": {
+    "draft_key": "2018-JUNE_AMATEUR",
+    "overall_pick": 134
+   },
+   "disposition": {
+    "value": "TRADED",
+    "date": "2024-06-12",
+    "date_precision": "DAY",
+    "transaction_ref": "mlb-tx-779538",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "transactions?playerId=680755 TRADED 2024-06-12"
+   },
+   "details": {
+    "as_of_date": "2026-10-20",
+    "reached_affiliated": true,
+    "first_affiliated_season": 2018,
+    "mlb_games": 127,
+    "mlb_plate_appearances": null,
+    "mlb_innings_pitched": 125.2,
+    "current_status": "WITH_OTHER_ORGANIZATION",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20"
+   },
+   "war": [
+    {
+     "system": "BREF",
+     "scope": "CAREER",
+     "through_season": 2025,
+     "value": 1.4,
+     "observed_on": "2025-10-01",
+     "source_key": "lad2018:bref-lad-2018",
+     "locator": "draft table WAR column (career, as of the capture)"
+    }
+   ],
+   "notes": "Pick 134; signed with LAD. FanGraphs WAR not observed (site refuses automated requests; no archive)."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Devin Mann",
+    "external_ids": {
+     "MLBAM": "669471"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "transactions": [
+    {
+     "ref": "mlb-tx-716701",
+     "type": "TRADE",
+     "date": "2023-08-01",
+     "from_organization": "LAD",
+     "to_organization": "KC",
+     "description": "Kansas City Royals traded LHP Ryan Yarbrough to Los Angeles Dodgers for 2B Devin Mann and SS Derlin Figueroa.",
+     "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+     "locator": "transactions?playerId=669471 id 716701"
+    }
+   ],
+   "acquisition": {
+    "draft_key": "2018-JUNE_AMATEUR",
+    "overall_pick": 164
+   },
+   "disposition": {
+    "value": "TRADED",
+    "date": "2023-08-01",
+    "date_precision": "DAY",
+    "transaction_ref": "mlb-tx-716701",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "transactions?playerId=669471 TRADED 2023-08-01"
+   },
+   "details": {
+    "as_of_date": "2026-10-20",
+    "reached_affiliated": true,
+    "first_affiliated_season": 2018,
+    "mlb_games": null,
+    "mlb_plate_appearances": null,
+    "mlb_innings_pitched": null,
+    "current_status": "INACTIVE",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20"
+   },
+   "war": [],
+   "notes": "Pick 164; signed with LAD. FanGraphs WAR not observed (site refuses automated requests; no archive)."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Bryan Warzek",
+    "external_ids": {
+     "MLBAM": "679338"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "transactions": [],
+   "acquisition": {
+    "draft_key": "2018-JUNE_AMATEUR",
+    "overall_pick": 194
+   },
+   "disposition": {
+    "value": "RELEASED",
+    "date": "2021-09-04",
+    "date_precision": "DAY",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "transactions?playerId=679338 RELEASED 2021-09-04"
+   },
+   "details": {
+    "as_of_date": "2026-10-20",
+    "reached_affiliated": true,
+    "first_affiliated_season": 2018,
+    "mlb_games": null,
+    "mlb_plate_appearances": null,
+    "mlb_innings_pitched": null,
+    "current_status": "INACTIVE",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20"
+   },
+   "war": [],
+   "notes": "Pick 194; signed with LAD. FanGraphs WAR not observed (site refuses automated requests; no archive)."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "James Outman",
+    "external_ids": {
+     "MLBAM": "681546"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "audit_state": "AUDITED_REACHED_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "debut": {
+    "date": "2022-07-31",
+    "organization": "LAD",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "people/681546 mlbDebutDate; 2022 season splits"
+   },
+   "transactions": [
+    {
+     "ref": "mlb-tx-860302",
+     "type": "TRADE",
+     "date": "2025-07-31",
+     "from_organization": "LAD",
+     "to_organization": "MIN",
+     "description": "Minnesota Twins traded RHP Brock Stewart to Los Angeles Dodgers for CF James Outman.",
+     "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+     "locator": "transactions?playerId=681546 id 860302"
+    }
+   ],
+   "acquisition": {
+    "draft_key": "2018-JUNE_AMATEUR",
+    "overall_pick": 224
+   },
+   "disposition": {
+    "value": "TRADED",
+    "date": "2025-07-31",
+    "date_precision": "DAY",
+    "transaction_ref": "mlb-tx-860302",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "transactions?playerId=681546 TRADED 2025-07-31"
+   },
+   "details": {
+    "as_of_date": "2026-10-20",
+    "reached_affiliated": true,
+    "first_affiliated_season": 2018,
+    "mlb_games": 361,
+    "mlb_plate_appearances": 1057,
+    "mlb_innings_pitched": null,
+    "current_status": "WITH_OTHER_ORGANIZATION",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20"
+   },
+   "war": [
+    {
+     "system": "BREF",
+     "scope": "CAREER",
+     "through_season": 2025,
+     "value": 2.5,
+     "observed_on": "2025-10-01",
+     "source_key": "lad2018:bref-lad-2018",
+     "locator": "draft table WAR column (career, as of the capture)"
+    }
+   ],
+   "notes": "Pick 224; signed with LAD. FanGraphs WAR not observed (site refuses automated requests; no archive)."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Luke Heyer",
+    "external_ids": {
+     "MLBAM": "679691"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "transactions": [],
+   "acquisition": {
+    "draft_key": "2018-JUNE_AMATEUR",
+    "overall_pick": 254
+   },
+   "disposition": {
+    "value": "RELEASED",
+    "date": "2021-06-15",
+    "date_precision": "DAY",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "transactions?playerId=679691 RELEASED 2021-06-15"
+   },
+   "details": {
+    "as_of_date": "2026-10-20",
+    "reached_affiliated": true,
+    "first_affiliated_season": 2018,
+    "mlb_games": null,
+    "mlb_plate_appearances": null,
+    "mlb_innings_pitched": null,
+    "current_status": "INACTIVE",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20"
+   },
+   "war": [],
+   "notes": "Pick 254; signed with LAD. FanGraphs WAR not observed (site refuses automated requests; no archive)."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Josh McLain",
+    "external_ids": {
+     "MLBAM": "656717"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "transactions": [],
+   "acquisition": {
+    "draft_key": "2018-JUNE_AMATEUR",
+    "overall_pick": 284
+   },
+   "disposition": {
+    "value": "RETIRED",
+    "date": "2019-11-07",
+    "date_precision": "DAY",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "transactions?playerId=656717 RETIRED 2019-11-07"
+   },
+   "details": {
+    "as_of_date": "2026-10-20",
+    "reached_affiliated": true,
+    "first_affiliated_season": 2018,
+    "mlb_games": null,
+    "mlb_plate_appearances": null,
+    "mlb_innings_pitched": null,
+    "current_status": "RETIRED",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20"
+   },
+   "war": [],
+   "notes": "Pick 284; signed with LAD. FanGraphs WAR not observed (site refuses automated requests; no archive)."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Deacon Liput",
+    "external_ids": {
+     "MLBAM": "663937"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "transactions": [],
+   "acquisition": {
+    "draft_key": "2018-JUNE_AMATEUR",
+    "overall_pick": 314
+   },
+   "disposition": {
+    "value": "UNKNOWN",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "people/663937; transactions?playerId=663937"
+   },
+   "details": {
+    "as_of_date": "2026-10-20",
+    "reached_affiliated": true,
+    "first_affiliated_season": 2018,
+    "mlb_games": null,
+    "mlb_plate_appearances": null,
+    "mlb_innings_pitched": null,
+    "current_status": "INACTIVE",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20"
+   },
+   "war": [],
+   "notes": "Pick 314; signed with LAD. FanGraphs WAR not observed (site refuses automated requests; no archive)."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Stephen Kolek",
+    "external_ids": {
+     "MLBAM": "663568"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "audit_state": "AUDITED_REACHED_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "debut": {
+    "date": "2024-03-21",
+    "organization": "SD",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "people/663568 mlbDebutDate; 2024 season splits"
+   },
+   "transactions": [
+    {
+     "ref": "mlb-tx-481025",
+     "type": "TRADE",
+     "date": "2021-04-28",
+     "from_organization": "LAD",
+     "to_organization": "SEA",
+     "description": "Rancho Cucamonga Quakes traded RHP Stephen Kolek to Everett AquaSox.",
+     "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+     "locator": "transactions?playerId=663568 id 481025"
+    },
+    {
+     "ref": "mlb-tx-860277",
+     "type": "TRADE",
+     "date": "2025-07-31",
+     "from_organization": "SD",
+     "to_organization": "KC",
+     "description": "Kansas City Royals traded C Freddy Fermin to San Diego Padres for RHP Ryan Bergert and RHP Stephen Kolek.",
+     "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+     "locator": "transactions?playerId=663568 id 860277"
+    }
+   ],
+   "acquisition": {
+    "draft_key": "2018-JUNE_AMATEUR",
+    "overall_pick": 344
+   },
+   "disposition": {
+    "value": "TRADED",
+    "date": "2021-04-28",
+    "date_precision": "DAY",
+    "transaction_ref": "mlb-tx-481025",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "transactions?playerId=663568 TRADED 2021-04-28"
+   },
+   "details": {
+    "as_of_date": "2026-10-20",
+    "reached_affiliated": true,
+    "first_affiliated_season": 2018,
+    "mlb_games": 71,
+    "mlb_plate_appearances": null,
+    "mlb_innings_pitched": 213.1,
+    "current_status": "WITH_OTHER_ORGANIZATION",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20"
+   },
+   "war": [
+    {
+     "system": "BREF",
+     "scope": "CAREER",
+     "through_season": 2025,
+     "value": 1.8,
+     "observed_on": "2025-10-01",
+     "source_key": "lad2018:bref-lad-2018",
+     "locator": "draft table WAR column (career, as of the capture)"
+    }
+   ],
+   "notes": "Pick 344; signed with LAD. FanGraphs WAR not observed (site refuses automated requests; no archive)."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Hunter Feduccia",
+    "external_ids": {
+     "MLBAM": "676439"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "audit_state": "AUDITED_REACHED_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "debut": {
+    "date": "2024-07-31",
+    "organization": "LAD",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "people/676439 mlbDebutDate; 2024 season splits"
+   },
+   "transactions": [
+    {
+     "ref": "mlb-tx-860219",
+     "type": "TRADE",
+     "date": "2025-07-31",
+     "from_organization": "LAD",
+     "to_organization": "TB",
+     "description": "Tampa Bay Rays traded RHP Paul Gervase, LHP Adam Serwinowski and C Ben Rortvedt to Los Angeles Dodgers for 1B Hunter Feduccia.",
+     "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+     "locator": "transactions?playerId=676439 id 860219"
+    },
+    {
+     "ref": "mlb-tx-934414",
+     "type": "TRADE",
+     "date": "2026-08-03",
+     "from_organization": "TB",
+     "to_organization": "LAD",
+     "description": "Tampa Bay Rays traded C Hunter Feduccia and RHP Jacob Kmatz to Los Angeles Dodgers for CF Jack Suwinski and Other Considerations.",
+     "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+     "locator": "transactions?playerId=676439 id 934414"
+    }
+   ],
+   "acquisition": {
+    "draft_key": "2018-JUNE_AMATEUR",
+    "overall_pick": 374
+   },
+   "disposition": {
+    "value": "TRADED",
+    "date": "2025-07-31",
+    "date_precision": "DAY",
+    "transaction_ref": "mlb-tx-860219",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "transactions?playerId=676439 TRADED 2025-07-31"
+   },
+   "details": {
+    "as_of_date": "2026-10-20",
+    "reached_affiliated": true,
+    "first_affiliated_season": 2018,
+    "mlb_games": 136,
+    "mlb_plate_appearances": 370,
+    "mlb_innings_pitched": null,
+    "current_status": "WITH_ACQUIRING_ORGANIZATION",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20"
+   },
+   "war": [
+    {
+     "system": "BREF",
+     "scope": "CAREER",
+     "through_season": 2025,
+     "value": -0.3,
+     "observed_on": "2025-10-01",
+     "source_key": "lad2018:bref-lad-2018",
+     "locator": "draft table WAR column (career, as of the capture)"
+    }
+   ],
+   "notes": "Pick 374; signed with LAD. FanGraphs WAR not observed (site refuses automated requests; no archive)."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Dillon Paulson",
+    "external_ids": {
+     "MLBAM": "663516"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "transactions": [
+    {
+     "ref": "mlb-tx-459079",
+     "type": "TRADE",
+     "date": "2020-12-29",
+     "from_organization": "LAD",
+     "to_organization": "TB",
+     "description": "Tampa Bay Rays Traded LHP Jose Alvarado to Philadelphia Phillies; Los Angeles Dodgers Traded Player To Be Named Later and 1B Dillon Paulson to Tampa Bay Rays and Philadelphia Phillies Traded LHP Garrett Cleavinger to Los Angeles Dodgers.",
+     "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+     "locator": "transactions?playerId=663516 id 459079"
+    },
+    {
+     "ref": "mlb-tx-680065",
+     "type": "TRADE",
+     "date": "2023-03-31",
+     "from_organization": "TB",
+     "to_organization": "DET",
+     "description": "Tampa Bay Rays traded 1B Dillon Paulson to Detroit Tigers.",
+     "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+     "locator": "transactions?playerId=663516 id 680065"
+    }
+   ],
+   "acquisition": {
+    "draft_key": "2018-JUNE_AMATEUR",
+    "overall_pick": 404
+   },
+   "disposition": {
+    "value": "TRADED",
+    "date": "2020-12-29",
+    "date_precision": "DAY",
+    "transaction_ref": "mlb-tx-459079",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "transactions?playerId=663516 TRADED 2020-12-29"
+   },
+   "details": {
+    "as_of_date": "2026-10-20",
+    "reached_affiliated": true,
+    "first_affiliated_season": 2018,
+    "mlb_games": null,
+    "mlb_plate_appearances": null,
+    "mlb_innings_pitched": null,
+    "current_status": "INACTIVE",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20"
+   },
+   "war": [],
+   "notes": "Pick 404; signed with LAD. FanGraphs WAR not observed (site refuses automated requests; no archive)."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Brandon White",
+    "external_ids": {
+     "MLBAM": "681449"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "transactions": [],
+   "acquisition": {
+    "draft_key": "2018-JUNE_AMATEUR",
+    "overall_pick": 434
+   },
+   "disposition": {
+    "value": "UNSIGNED",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "people/681449; transactions?playerId=681449"
+   },
+   "details": {
+    "as_of_date": "2026-10-20",
+    "reached_affiliated": true,
+    "first_affiliated_season": 2023,
+    "mlb_games": null,
+    "mlb_plate_appearances": null,
+    "mlb_innings_pitched": null,
+    "current_status": "WITH_OTHER_ORGANIZATION",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20"
+   },
+   "war": [],
+   "notes": "Pick 434; did not sign with LAD. FanGraphs WAR not observed (site refuses automated requests; no archive)."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Julian Smith",
+    "external_ids": {
+     "MLBAM": "681886"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "transactions": [],
+   "acquisition": {
+    "draft_key": "2018-JUNE_AMATEUR",
+    "overall_pick": 464
+   },
+   "disposition": {
+    "value": "RELEASED",
+    "date": "2023-05-09",
+    "date_precision": "DAY",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "transactions?playerId=681886 RELEASED 2023-05-09"
+   },
+   "details": {
+    "as_of_date": "2026-10-20",
+    "reached_affiliated": true,
+    "first_affiliated_season": 2019,
+    "mlb_games": null,
+    "mlb_plate_appearances": null,
+    "mlb_innings_pitched": null,
+    "current_status": "INACTIVE",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20"
+   },
+   "war": [],
+   "notes": "Pick 464; signed with LAD. FanGraphs WAR not observed (site refuses automated requests; no archive)."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Trey Dillard",
+    "external_ids": {
+     "MLBAM": "669366"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "transactions": [],
+   "acquisition": {
+    "draft_key": "2018-JUNE_AMATEUR",
+    "overall_pick": 494
+   },
+   "disposition": {
+    "value": "UNSIGNED",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "people/669366; transactions?playerId=669366"
+   },
+   "details": {
+    "as_of_date": "2026-10-20",
+    "reached_affiliated": true,
+    "first_affiliated_season": 2023,
+    "mlb_games": null,
+    "mlb_plate_appearances": null,
+    "mlb_innings_pitched": null,
+    "current_status": "WITH_OTHER_ORGANIZATION",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20"
+   },
+   "war": [],
+   "notes": "Pick 494; did not sign with LAD. FanGraphs WAR not observed (site refuses automated requests; no archive)."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Aldrich De Jongh",
+    "external_ids": {
+     "MLBAM": "680884"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "transactions": [],
+   "acquisition": {
+    "draft_key": "2018-JUNE_AMATEUR",
+    "overall_pick": 524
+   },
+   "disposition": {
+    "value": "RELEASED",
+    "date": "2023-03-30",
+    "date_precision": "DAY",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "transactions?playerId=680884 RELEASED 2023-03-30"
+   },
+   "details": {
+    "as_of_date": "2026-10-20",
+    "reached_affiliated": true,
+    "first_affiliated_season": 2018,
+    "mlb_games": null,
+    "mlb_plate_appearances": null,
+    "mlb_innings_pitched": null,
+    "current_status": "INACTIVE",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20"
+   },
+   "war": [],
+   "notes": "Pick 524; signed with LAD. FanGraphs WAR not observed (site refuses automated requests; no archive)."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Niko Hulsizer",
+    "external_ids": {
+     "MLBAM": "680881"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "transactions": [
+    {
+     "ref": "mlb-tx-420978",
+     "type": "TRADE",
+     "date": "2019-07-31",
+     "from_organization": "LAD",
+     "to_organization": "TB",
+     "description": "Tampa Bay Rays traded LHP Adam Kolarek to Los Angeles Dodgers for RF Niko Hulsizer.",
+     "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+     "locator": "transactions?playerId=680881 id 420978"
+    }
+   ],
+   "acquisition": {
+    "draft_key": "2018-JUNE_AMATEUR",
+    "overall_pick": 554
+   },
+   "disposition": {
+    "value": "TRADED",
+    "date": "2019-07-31",
+    "date_precision": "DAY",
+    "transaction_ref": "mlb-tx-420978",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "transactions?playerId=680881 TRADED 2019-07-31"
+   },
+   "details": {
+    "as_of_date": "2026-10-20",
+    "reached_affiliated": true,
+    "first_affiliated_season": 2018,
+    "mlb_games": null,
+    "mlb_plate_appearances": null,
+    "mlb_innings_pitched": null,
+    "current_status": "UNKNOWN",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+    "notes": "active outside affiliated baseball (current team per MLB: Adelaide Giants)"
+   },
+   "war": [],
+   "notes": "Pick 554; signed with LAD. FanGraphs WAR not observed (site refuses automated requests; no archive)."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Sam McWilliams",
+    "external_ids": {
+     "MLBAM": "681955"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "transactions": [],
+   "acquisition": {
+    "draft_key": "2018-JUNE_AMATEUR",
+    "overall_pick": 584
+   },
+   "disposition": {
+    "value": "RETAINED",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "people/681955; transactions?playerId=681955"
+   },
+   "details": {
+    "as_of_date": "2026-10-20",
+    "reached_affiliated": true,
+    "first_affiliated_season": 2018,
+    "mlb_games": null,
+    "mlb_plate_appearances": null,
+    "mlb_innings_pitched": null,
+    "current_status": "WITH_ACQUIRING_ORGANIZATION",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20"
+   },
+   "war": [],
+   "notes": "Pick 584; signed with LAD. FanGraphs WAR not observed (site refuses automated requests; no archive)."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Caleb Sampen",
+    "external_ids": {
+     "MLBAM": "680789"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "transactions": [
+    {
+     "ref": "mlb-tx-386005",
+     "type": "TRADE",
+     "date": "2019-01-08",
+     "from_organization": "LAD",
+     "to_organization": "TB",
+     "description": "Tampa Bay Rays traded RHP Jaime Schultz to Los Angeles Dodgers for RHP Caleb Sampen.",
+     "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+     "locator": "transactions?playerId=680789 id 386005"
+    }
+   ],
+   "acquisition": {
+    "draft_key": "2018-JUNE_AMATEUR",
+    "overall_pick": 614
+   },
+   "disposition": {
+    "value": "TRADED",
+    "date": "2019-01-08",
+    "date_precision": "DAY",
+    "transaction_ref": "mlb-tx-386005",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "transactions?playerId=680789 TRADED 2019-01-08"
+   },
+   "details": {
+    "as_of_date": "2026-10-20",
+    "reached_affiliated": true,
+    "first_affiliated_season": 2018,
+    "mlb_games": null,
+    "mlb_plate_appearances": null,
+    "mlb_innings_pitched": null,
+    "current_status": "INACTIVE",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20"
+   },
+   "war": [],
+   "notes": "Pick 614; signed with LAD. FanGraphs WAR not observed (site refuses automated requests; no archive)."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Tre Todd",
+    "external_ids": {
+     "MLBAM": "681990"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "transactions": [],
+   "acquisition": {
+    "draft_key": "2018-JUNE_AMATEUR",
+    "overall_pick": 644
+   },
+   "disposition": {
+    "value": "RELEASED",
+    "date": "2021-06-01",
+    "date_precision": "DAY",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "transactions?playerId=681990 RELEASED 2021-06-01"
+   },
+   "details": {
+    "as_of_date": "2026-10-20",
+    "reached_affiliated": true,
+    "first_affiliated_season": 2018,
+    "mlb_games": null,
+    "mlb_plate_appearances": null,
+    "mlb_innings_pitched": null,
+    "current_status": "INACTIVE",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20"
+   },
+   "war": [],
+   "notes": "Pick 644; signed with LAD. FanGraphs WAR not observed (site refuses automated requests; no archive)."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Meaux Landry",
+    "external_ids": {
+     "MLBAM": "682009"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "transactions": [],
+   "acquisition": {
+    "draft_key": "2018-JUNE_AMATEUR",
+    "overall_pick": 674
+   },
+   "disposition": {
+    "value": "RELEASED",
+    "date": "2019-11-14",
+    "date_precision": "DAY",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "transactions?playerId=682009 RELEASED 2019-11-14"
+   },
+   "details": {
+    "as_of_date": "2026-10-20",
+    "reached_affiliated": true,
+    "first_affiliated_season": 2018,
+    "mlb_games": null,
+    "mlb_plate_appearances": null,
+    "mlb_innings_pitched": null,
+    "current_status": "INACTIVE",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20"
+   },
+   "war": [],
+   "notes": "Pick 674; signed with LAD. FanGraphs WAR not observed (site refuses automated requests; no archive)."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Justin Hagenman",
+    "external_ids": {
+     "MLBAM": "663795"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "audit_state": "AUDITED_REACHED_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "debut": {
+    "date": "2025-04-16",
+    "organization": "NYM",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "people/663795 mlbDebutDate; 2025 season splits"
+   },
+   "transactions": [
+    {
+     "ref": "mlb-tx-714476",
+     "type": "TRADE",
+     "date": "2023-07-25",
+     "from_organization": "LAD",
+     "to_organization": "BOS",
+     "description": "Boston Red Sox traded CF Enrique Hernández to Los Angeles Dodgers for RHP Nick Robertson and RHP Justin Hagenman.",
+     "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+     "locator": "transactions?playerId=663795 id 714476"
+    }
+   ],
+   "acquisition": {
+    "draft_key": "2018-JUNE_AMATEUR",
+    "overall_pick": 704
+   },
+   "disposition": {
+    "value": "TRADED",
+    "date": "2023-07-25",
+    "date_precision": "DAY",
+    "transaction_ref": "mlb-tx-714476",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "transactions?playerId=663795 TRADED 2023-07-25"
+   },
+   "details": {
+    "as_of_date": "2026-10-20",
+    "reached_affiliated": true,
+    "first_affiliated_season": 2018,
+    "mlb_games": 12,
+    "mlb_plate_appearances": null,
+    "mlb_innings_pitched": 31.2,
+    "current_status": "WITH_OTHER_ORGANIZATION",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20"
+   },
+   "war": [
+    {
+     "system": "BREF",
+     "scope": "CAREER",
+     "through_season": 2025,
+     "value": 0,
+     "observed_on": "2025-10-01",
+     "source_key": "lad2018:bref-lad-2018",
+     "locator": "draft table WAR column (career, as of the capture)"
+    }
+   ],
+   "notes": "Pick 704; signed with LAD. FanGraphs WAR not observed (site refuses automated requests; no archive)."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Jacen Roberson",
+    "external_ids": {
+     "MLBAM": "682039"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "transactions": [],
+   "acquisition": {
+    "draft_key": "2018-JUNE_AMATEUR",
+    "overall_pick": 734
+   },
+   "disposition": {
+    "value": "UNSIGNED",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "people/682039; transactions?playerId=682039"
+   },
+   "details": {
+    "as_of_date": "2026-10-20",
+    "reached_affiliated": true,
+    "first_affiliated_season": 2021,
+    "mlb_games": null,
+    "mlb_plate_appearances": null,
+    "mlb_innings_pitched": null,
+    "current_status": "INACTIVE",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20"
+   },
+   "war": [],
+   "notes": "Pick 734; did not sign with LAD. FanGraphs WAR not observed (site refuses automated requests; no archive)."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Hunter Speer",
+    "external_ids": {
+     "MLBAM": "682050"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "transactions": [],
+   "acquisition": {
+    "draft_key": "2018-JUNE_AMATEUR",
+    "overall_pick": 764
+   },
+   "disposition": {
+    "value": "RELEASED",
+    "date": "2021-06-28",
+    "date_precision": "DAY",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "transactions?playerId=682050 RELEASED 2021-06-28"
+   },
+   "details": {
+    "as_of_date": "2026-10-20",
+    "reached_affiliated": true,
+    "first_affiliated_season": 2018,
+    "mlb_games": null,
+    "mlb_plate_appearances": null,
+    "mlb_innings_pitched": null,
+    "current_status": "INACTIVE",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20"
+   },
+   "war": [],
+   "notes": "Pick 764; signed with LAD. FanGraphs WAR not observed (site refuses automated requests; no archive)."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Aaron Ackerman",
+    "external_ids": {
+     "MLBAM": "679299"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "transactions": [],
+   "acquisition": {
+    "draft_key": "2018-JUNE_AMATEUR",
+    "overall_pick": 794
+   },
+   "disposition": {
+    "value": "RELEASED",
+    "date": "2021-04-28",
+    "date_precision": "DAY",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "transactions?playerId=679299 RELEASED 2021-04-28"
+   },
+   "details": {
+    "as_of_date": "2026-10-20",
+    "reached_affiliated": true,
+    "first_affiliated_season": 2018,
+    "mlb_games": null,
+    "mlb_plate_appearances": null,
+    "mlb_innings_pitched": null,
+    "current_status": "INACTIVE",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20"
+   },
+   "war": [],
+   "notes": "Pick 794; signed with LAD. FanGraphs WAR not observed (site refuses automated requests; no archive)."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Connor Mitchell",
+    "external_ids": {
+     "MLBAM": "682097"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "transactions": [],
+   "acquisition": {
+    "draft_key": "2018-JUNE_AMATEUR",
+    "overall_pick": 824
+   },
+   "disposition": {
+    "value": "RETIRED",
+    "date": "2021-03-18",
+    "date_precision": "DAY",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "transactions?playerId=682097 RETIRED 2021-03-18"
+   },
+   "details": {
+    "as_of_date": "2026-10-20",
+    "reached_affiliated": true,
+    "first_affiliated_season": 2018,
+    "mlb_games": null,
+    "mlb_plate_appearances": null,
+    "mlb_innings_pitched": null,
+    "current_status": "RETIRED",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20"
+   },
+   "war": [],
+   "notes": "Pick 824; signed with LAD. FanGraphs WAR not observed (site refuses automated requests; no archive)."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Reza Aleaziz",
+    "external_ids": {
+     "MLBAM": "641300"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "transactions": [],
+   "acquisition": {
+    "draft_key": "2018-JUNE_AMATEUR",
+    "overall_pick": 854
+   },
+   "disposition": {
+    "value": "RELEASED",
+    "date": "2020-07-17",
+    "date_precision": "DAY",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "transactions?playerId=641300 RELEASED 2020-07-17"
+   },
+   "details": {
+    "as_of_date": "2026-10-20",
+    "reached_affiliated": true,
+    "first_affiliated_season": 2018,
+    "mlb_games": null,
+    "mlb_plate_appearances": null,
+    "mlb_innings_pitched": null,
+    "current_status": "INACTIVE",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20"
+   },
+   "war": [],
+   "notes": "Pick 854; signed with LAD. FanGraphs WAR not observed (site refuses automated requests; no archive)."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Dan Robinson",
+    "external_ids": {
+     "MLBAM": "674974"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "transactions": [],
+   "acquisition": {
+    "draft_key": "2018-JUNE_AMATEUR",
+    "overall_pick": 884
+   },
+   "disposition": {
+    "value": "RELEASED",
+    "date": "2021-04-28",
+    "date_precision": "DAY",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "transactions?playerId=674974 RELEASED 2021-04-28"
+   },
+   "details": {
+    "as_of_date": "2026-10-20",
+    "reached_affiliated": true,
+    "first_affiliated_season": 2018,
+    "mlb_games": null,
+    "mlb_plate_appearances": null,
+    "mlb_innings_pitched": null,
+    "current_status": "INACTIVE",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20"
+   },
+   "war": [],
+   "notes": "Pick 884; signed with LAD. FanGraphs WAR not observed (site refuses automated requests; no archive)."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Matt Cogen",
+    "external_ids": {
+     "MLBAM": "682134"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "transactions": [],
+   "acquisition": {
+    "draft_key": "2018-JUNE_AMATEUR",
+    "overall_pick": 914
+   },
+   "disposition": {
+    "value": "RETIRED",
+    "date": "2019-11-18",
+    "date_precision": "DAY",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "transactions?playerId=682134 RETIRED 2019-11-18"
+   },
+   "details": {
+    "as_of_date": "2026-10-20",
+    "reached_affiliated": true,
+    "first_affiliated_season": 2018,
+    "mlb_games": null,
+    "mlb_plate_appearances": null,
+    "mlb_innings_pitched": null,
+    "current_status": "RETIRED",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20"
+   },
+   "war": [],
+   "notes": "Pick 914; signed with LAD. FanGraphs WAR not observed (site refuses automated requests; no archive)."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Andrew Shaps",
+    "external_ids": {
+     "MLBAM": "656952"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "transactions": [
+    {
+     "ref": "mlb-tx-624122",
+     "type": "TRADE",
+     "date": "2022-05-22",
+     "from_organization": "LAD",
+     "to_organization": "DET",
+     "description": "Los Angeles Dodgers traded LHP Andrew Shaps to Detroit Tigers.",
+     "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+     "locator": "transactions?playerId=656952 id 624122"
+    }
+   ],
+   "acquisition": {
+    "draft_key": "2018-JUNE_AMATEUR",
+    "overall_pick": 944
+   },
+   "disposition": {
+    "value": "TRADED",
+    "date": "2022-05-22",
+    "date_precision": "DAY",
+    "transaction_ref": "mlb-tx-624122",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "transactions?playerId=656952 TRADED 2022-05-22"
+   },
+   "details": {
+    "as_of_date": "2026-10-20",
+    "reached_affiliated": true,
+    "first_affiliated_season": 2018,
+    "mlb_games": null,
+    "mlb_plate_appearances": null,
+    "mlb_innings_pitched": null,
+    "current_status": "INACTIVE",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20"
+   },
+   "war": [],
+   "notes": "Pick 944; signed with LAD. FanGraphs WAR not observed (site refuses automated requests; no archive)."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Jacob Gilliland",
+    "external_ids": {
+     "MLBAM": "681365"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "transactions": [
+    {
+     "ref": "mlb-tx-481018",
+     "type": "TRADE",
+     "date": "2021-04-28",
+     "from_organization": "LAD",
+     "to_organization": "CWS",
+     "description": "AZL Dodgers 1 traded RHP Jacob Gilliland to AZL White Sox.",
+     "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+     "locator": "transactions?playerId=681365 id 481018"
+    }
+   ],
+   "acquisition": {
+    "draft_key": "2018-JUNE_AMATEUR",
+    "overall_pick": 974
+   },
+   "disposition": {
+    "value": "TRADED",
+    "date": "2021-04-28",
+    "date_precision": "DAY",
+    "transaction_ref": "mlb-tx-481018",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "transactions?playerId=681365 TRADED 2021-04-28"
+   },
+   "details": {
+    "as_of_date": "2026-10-20",
+    "reached_affiliated": true,
+    "first_affiliated_season": 2018,
+    "mlb_games": null,
+    "mlb_plate_appearances": null,
+    "mlb_innings_pitched": null,
+    "current_status": "INACTIVE",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20"
+   },
+   "war": [],
+   "notes": "Pick 974; signed with LAD. FanGraphs WAR not observed (site refuses automated requests; no archive)."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Drew Avans",
+    "external_ids": {
+     "MLBAM": "682183"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "audit_state": "AUDITED_REACHED_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "debut": {
+    "date": "2025-05-27",
+    "organization": "ATH",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "people/682183 mlbDebutDate; 2025 season splits"
+   },
+   "transactions": [],
+   "acquisition": {
+    "draft_key": "2018-JUNE_AMATEUR",
+    "overall_pick": 1004
+   },
+   "disposition": {
+    "value": "LEFT_AS_FREE_AGENT",
+    "date": "2024-11-04",
+    "date_precision": "DAY",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "transactions?playerId=682183 LEFT_AS_FREE_AGENT 2024-11-04"
+   },
+   "details": {
+    "as_of_date": "2026-10-20",
+    "reached_affiliated": true,
+    "first_affiliated_season": 2018,
+    "mlb_games": 8,
+    "mlb_plate_appearances": 18,
+    "mlb_innings_pitched": null,
+    "current_status": "WITH_OTHER_ORGANIZATION",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20"
+   },
+   "war": [
+    {
+     "system": "BREF",
+     "scope": "CAREER",
+     "through_season": 2025,
+     "value": -0.4,
+     "observed_on": "2025-10-01",
+     "source_key": "lad2018:bref-lad-2018",
+     "locator": "draft table WAR column (career, as of the capture)"
+    }
+   ],
+   "notes": "Pick 1004; signed with LAD. FanGraphs WAR not observed (site refuses automated requests; no archive)."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Austin Drury",
+    "external_ids": {
+     "MLBAM": "682200"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "transactions": [],
+   "acquisition": {
+    "draft_key": "2018-JUNE_AMATEUR",
+    "overall_pick": 1034
+   },
+   "disposition": {
+    "value": "RELEASED",
+    "date": "2022-07-30",
+    "date_precision": "DAY",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "transactions?playerId=682200 RELEASED 2022-07-30"
+   },
+   "details": {
+    "as_of_date": "2026-10-20",
+    "reached_affiliated": true,
+    "first_affiliated_season": 2018,
+    "mlb_games": null,
+    "mlb_plate_appearances": null,
+    "mlb_innings_pitched": null,
+    "current_status": "INACTIVE",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20"
+   },
+   "war": [],
+   "notes": "Pick 1034; signed with LAD. FanGraphs WAR not observed (site refuses automated requests; no archive)."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Tyler Reichenborn",
+    "external_ids": {
+     "MLBAM": "682218"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "transactions": [],
+   "acquisition": {
+    "draft_key": "2018-JUNE_AMATEUR",
+    "overall_pick": 1064
+   },
+   "disposition": {
+    "value": "UNSIGNED",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "people/682218; transactions?playerId=682218"
+   },
+   "details": {
+    "as_of_date": "2026-10-20",
+    "reached_affiliated": true,
+    "first_affiliated_season": 2019,
+    "mlb_games": null,
+    "mlb_plate_appearances": null,
+    "mlb_innings_pitched": null,
+    "current_status": "INACTIVE",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20"
+   },
+   "war": [],
+   "notes": "Pick 1064; did not sign with LAD. FanGraphs WAR not observed (site refuses automated requests; no archive)."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Jeremiah Vison",
+    "external_ids": {
+     "MLBAM": "682228"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "transactions": [],
+   "acquisition": {
+    "draft_key": "2018-JUNE_AMATEUR",
+    "overall_pick": 1094
+   },
+   "disposition": {
+    "value": "RELEASED",
+    "date": "2020-07-01",
+    "date_precision": "DAY",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "transactions?playerId=682228 RELEASED 2020-07-01"
+   },
+   "details": {
+    "as_of_date": "2026-10-20",
+    "reached_affiliated": true,
+    "first_affiliated_season": 2018,
+    "mlb_games": null,
+    "mlb_plate_appearances": null,
+    "mlb_innings_pitched": null,
+    "current_status": "INACTIVE",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20"
+   },
+   "war": [],
+   "notes": "Pick 1094; signed with LAD. FanGraphs WAR not observed (site refuses automated requests; no archive)."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Jon Littell",
+    "external_ids": {
+     "MLBAM": "657662"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "transactions": [],
+   "acquisition": {
+    "draft_key": "2018-JUNE_AMATEUR",
+    "overall_pick": 1124
+   },
+   "disposition": {
+    "value": "RELEASED",
+    "date": "2019-11-14",
+    "date_precision": "DAY",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "transactions?playerId=657662 RELEASED 2019-11-14"
+   },
+   "details": {
+    "as_of_date": "2026-10-20",
+    "reached_affiliated": true,
+    "first_affiliated_season": 2018,
+    "mlb_games": null,
+    "mlb_plate_appearances": null,
+    "mlb_innings_pitched": null,
+    "current_status": "INACTIVE",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20"
+   },
+   "war": [],
+   "notes": "Pick 1124; signed with LAD. FanGraphs WAR not observed (site refuses automated requests; no archive)."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Connery Peters",
+    "external_ids": {
+     "MLBAM": "681553"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "transactions": [],
+   "acquisition": {
+    "draft_key": "2018-JUNE_AMATEUR",
+    "overall_pick": 1154
+   },
+   "disposition": {
+    "value": "UNSIGNED",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "people/681553; transactions?playerId=681553"
+   },
+   "details": {
+    "as_of_date": "2026-10-20",
+    "reached_affiliated": true,
+    "first_affiliated_season": 2023,
+    "mlb_games": null,
+    "mlb_plate_appearances": null,
+    "mlb_innings_pitched": null,
+    "current_status": "INACTIVE",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20"
+   },
+   "war": [],
+   "notes": "Pick 1154; did not sign with LAD. FanGraphs WAR not observed (site refuses automated requests; no archive)."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Jordan Myrow",
+    "external_ids": {
+     "MLBAM": "663919"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "transactions": [],
+   "acquisition": {
+    "draft_key": "2018-JUNE_AMATEUR",
+    "overall_pick": 1184
+   },
+   "disposition": {
+    "value": "UNSIGNED",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "people/663919; transactions?playerId=663919"
+   },
+   "details": {
+    "as_of_date": "2026-10-20",
+    "reached_affiliated": null,
+    "first_affiliated_season": null,
+    "mlb_games": null,
+    "mlb_plate_appearances": null,
+    "mlb_innings_pitched": null,
+    "current_status": "INACTIVE",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+    "notes": "MLB Stats API lists no affiliated or MLB season; affiliated reach not established"
+   },
+   "war": [],
+   "notes": "Pick 1184; did not sign with LAD. FanGraphs WAR not observed (site refuses automated requests; no archive)."
+  },
+  {
+   "type": "OUTCOME_AUDIT",
+   "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+   "organization": "LAD",
+   "player": {
+    "full_name": "Ben Specht",
+    "external_ids": {
+     "MLBAM": "681567"
+    },
+    "source_key": "lad2018:mlb-statsapi-draft-2018-lad"
+   },
+   "audit_state": "AUDITED_NO_MLB",
+   "observation_through_season": 2026,
+   "audited_on": "2026-10-20",
+   "transactions": [],
+   "acquisition": {
+    "draft_key": "2018-JUNE_AMATEUR",
+    "overall_pick": 1214
+   },
+   "disposition": {
+    "value": "UNSIGNED",
+    "as_of_date": "2026-10-20",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+    "locator": "people/681567; transactions?playerId=681567"
+   },
+   "details": {
+    "as_of_date": "2026-10-20",
+    "reached_affiliated": null,
+    "first_affiliated_season": null,
+    "mlb_games": null,
+    "mlb_plate_appearances": null,
+    "mlb_innings_pitched": null,
+    "current_status": "INACTIVE",
+    "source_key": "lad2018:mlb-statsapi-outcomes-2026-10-20",
+    "notes": "MLB Stats API lists no affiliated or MLB season; affiliated reach not established"
+   },
+   "war": [],
+   "notes": "Pick 1214; did not sign with LAD. FanGraphs WAR not observed (site refuses automated requests; no archive)."
+  }
+ ]
+}
