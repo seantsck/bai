@@ -51,6 +51,22 @@ export function ownerDatabaseUrl ({ localOnly = false } = {}) {
   return url
 }
 
+/**
+ * A reviewer's own connection (021): BAI_REVIEWER_DATABASE_URL names the human's PostgreSQL login (a member of
+ * bai_reviewer). Human-only actions run on it so the database sees who is acting; the owner connection never can.
+ * Same host rules as the owner URL. Never printed.
+ */
+export function reviewerDatabaseUrl () {
+  const url = process.env.BAI_REVIEWER_DATABASE_URL
+  if (!url) throw new Error('this is a reviewer action: set BAI_REVIEWER_DATABASE_URL to a connection that logs in with YOUR OWN reviewer role (docs/decision-history.md); the owner connection cannot act as a reviewer')
+  if (isLocalUrl(url)) return url
+  const host = new URL(url).hostname
+  if (process.env.BAI_ALLOW_REMOTE_DB !== '1') throw new Error(`refusing non-local database host ${host} (set BAI_ALLOW_REMOTE_DB=1 deliberately)`)
+  const expected = process.env.BAI_SUPABASE_PROJECT_REF
+  if (!expected || supabaseProjectRef(url) !== expected) throw new Error('refusing remote reviewer connection: it does not belong to the configured BAI project')
+  return url
+}
+
 /** For writing scripts: on a hosted target, require `--confirm-hosted <ref>` naming the configured BAI project. */
 export function requireHostedWriteConfirmation (url, argv = process.argv) {
   if (isLocalUrl(url)) return { hosted: false }

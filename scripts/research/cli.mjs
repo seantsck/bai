@@ -24,23 +24,27 @@
 //   npm run research:block    -- --job <key> --reason "source unavailable: ..."     research:unblock -- --job <key>
 //   npm run research:lead     -- --job <key> --url ... --source-type ... --authority ... --access ACCESSIBLE --retrieved 2026-10-20 --fields a,b --note "..."
 //   npm run research:stage    -- --org LAD --channel draft --year 2016 [--to STAGE --rationale "..."]
-//   npm run research:certify  -- --org LAD --channel draft --year 2016       deterministic; fails with blockers; no force option
+//   npm run research:check    -- --org LAD --channel draft --year 2016       records a deterministic certification check (certifies nothing)
+//   npm run research:certify  -- --check <id>                                REVIEWER LOGIN ONLY; certifies a passing, unchanged check
 //   npm run research:revoke   -- --org LAD --channel draft --year 2016 --reason "..."   human only; back to COVERAGE_REVIEW
 //   npm run research:review   -- --batch <import batch> --reviewer <human> --note "..."   (required before applying an agent-staged batch)
-//   npm run research:reviewer -- [--add <name> | --deactivate <name>] --operator <human>   registered human reviewers (certify, reconsider)
-//   npm run research:reconsider -- --table t --id n --field f --observation <obs> --reviewer <name> --reason "..." --authorize [--evidence url,...] [--write]
+//   npm run research:reviewer -- [--enroll "<Full Name>" (REVIEWER LOGIN) | --deactivate <name>]   reviewers, bound to their login roles
+//   npm run research:reconsider -- --table t --id n --field f --observation <obs> --reason "..." --authorize [--evidence url,...] [--write]   REVIEWER LOGIN
+//   npm run research:accept   -- --proposal <id> --reason "..." [--evidence url,...] [--write]          REVIEWER LOGIN: decide as proposed
+//   npm run research:ratify   -- --resolution <id> --reason "..." [--write]                            REVIEWER LOGIN: confirm an operator decision
+//   npm run research:gate     -- [--open --reason "..." (REVIEWER LOGIN) | --close --reason "..."]      the certification gate (closed by default)
 //   npm run research:history  -- [--table t --id n | --org LAD --channel draft --year 2016]   append-only decision history
 //   npm run research:propose  -- --table t --id n --field f --observation <obs> --rationale "..." [--evidence url,...]   decides nothing
 //   npm run research:wave     -- --org ATL --wave 2 --rationale "..." --operator <human>   program wave (priority order; human decision)
-//   npm run research:proposals -- [--all | --reject <id> --reviewer <name> --reason "..." | --withdraw <id> --reason "..."]
-//   (accept a proposal: research:resolve ... --observation <obs> --operator <reviewer> --rationale "..." --proposal <id> --write,
-//    or research:reconsider ... --proposal <id>; only a registered reviewer can)
+//   npm run research:proposals -- [--all | --reject <id> --reason "..." (REVIEWER LOGIN) | --withdraw <id> --reason "..."]
+// REVIEWER LOGIN: the command connects with BAI_REVIEWER_DATABASE_URL, the human's own PostgreSQL role (docs/decision-history.md).
+// The reviewer is whoever that login is; no command takes a reviewer name.
 //
 // Against the hosted BAI database (.env.hosted.local, `npm run hosted:research -- <command> ...`), every command that writes
 // anything, staging included, also needs --confirm-hosted <project ref>. Read-only commands (conflicts, queue, coverage,
 // batches, resolve without --write) do not.
 import pg from 'pg'
-import { ownerDatabaseUrl, requireHostedWriteConfirmation } from '../db/lib/connection.mjs'
+import { ownerDatabaseUrl, reviewerDatabaseUrl, requireHostedWriteConfirmation } from '../db/lib/connection.mjs'
 import * as P from './lib/pipeline.mjs'
 import * as B from './lib/backfill.mjs'
 
@@ -57,6 +61,7 @@ const json = Boolean(args.json)
 const print = (title, obj) => { if (json) console.log(JSON.stringify(obj, null, 2)); else { if (title) console.log(title); if (obj !== undefined) console.table(obj) } }
 const need = (k) => { if (!args[k] || args[k] === true) throw new P.PipelineError(`--${k} is required`); return args[k] }
 const operator = () => args.agent ? `agent:${args.agent}` : (args.operator ?? process.env.BAI_OPERATOR ?? process.env.USER ?? 'cli')
+const listArg = (k) => args[k] && args[k] !== true ? String(args[k]).split(',').map((e) => e.trim()).filter(Boolean) : []
 const scopeArgs = () => ({ org: args.org, channel: args.channel, year: args.year, period: args.period })
 
 function summarize (report) {
@@ -120,13 +125,40 @@ async function main (db) {
       return 0
     }
     case 'reconsider': {
-      if (!args.authorize) throw new P.PipelineError('reconsideration changes a recorded human judgment; pass --authorize to confirm you are the named reviewer')
+      if (!args.authorize) throw new P.PipelineError('reconsideration changes a recorded human judgment; pass --authorize to confirm it is your decision')
       const res = await P.reconsiderResolution(db, { subjectTable: need('table'), subjectId: need('id'), field: need('field'), observationId: need('observation'),
-        reviewer: need('reviewer'), reason: need('reason'), evidence: args.evidence ? String(args.evidence).split(',').map((e) => e.trim()).filter(Boolean) : [], proposalId: args.proposal ?? null, write: Boolean(args.write) })
-      if (res.unchanged) { console.log(`unchanged: ${res.resolution} already chooses obs ${res.to.id}`); return 0 }
-      console.log(`${res.written ? 'RECONSIDERED' : 'DRY RUN (add --write)'}: ${res.resolution} obs ${res.from} -> ${res.to.id} (${JSON.stringify(res.to.value)}, ${res.to.source_key}) by ${res.reviewer}`)
+        reason: need('reason'), evidence: listArg('evidence'), proposalId: args.proposal ?? null, write: Boolean(args.write) })
+      if (res.unchanged) { console.log(`unchanged: ${res.resolution} already chooses obs ${args.observation}`); return 0 }
+      console.log(`${res.written ? 'RECONSIDERED' : 'DRY RUN (add --write)'}: ${res.resolution} -> obs ${args.observation} by ${res.reviewer} (authenticated session)`)
       if (res.canonical_update) console.log(`  canonical ${JSON.stringify(res.canonical_update.from)} -> ${JSON.stringify(res.canonical_update.to)}`)
-      if (res.history) console.log(`  history #${res.history.id} ${res.history.kind}, certification impact ${res.history.certification_impact}`)
+      console.log(`  history #${res.history_id} ${res.kind}, certification impact ${res.certification_impact}${res.written ? '' : ' (rolled back)'}`)
+      return 0
+    }
+    case 'accept': {
+      const res = await P.acceptProposal(db, need('proposal'), { reason: need('reason'), evidence: listArg('evidence'), write: Boolean(args.write) })
+      console.log(`${res.written ? 'ACCEPTED' : 'DRY RUN (add --write)'}: proposal ${res.proposal} by ${res.reviewer} (authenticated session): history #${res.history_id} ${res.kind}, certification impact ${res.certification_impact}`)
+      if (res.canonical_update) console.log(`  canonical ${JSON.stringify(res.canonical_update.from)} -> ${JSON.stringify(res.canonical_update.to)}`)
+      return 0
+    }
+    case 'ratify': {
+      const res = await P.ratifyResolution(db, need('resolution'), { reason: need('reason'), evidence: listArg('evidence'), write: Boolean(args.write) })
+      console.log(`${res.written ? 'RATIFIED' : 'DRY RUN (add --write)'}: resolution ${args.resolution} (${res.subject_table}#${res.subject_id}.${res.field_name} = ${JSON.stringify(res.new_value)}) by ${res.decided_by}`)
+      return 0
+    }
+    case 'check': {
+      const r = await B.recordCertificationCheck(db, scopeArgs(), { actor: operator() })
+      console.log(`certification check ${r.check.id} for ${r.cls.class_key}: ${r.check.passed ? 'PASSED' : `NOT PASSED (${r.blockers.length} blocker(s))`}  fingerprint ${r.check.fingerprint.slice(0, 12)}`)
+      for (const b of r.blockers) console.log(`  ${b.code}: ${b.detail}`)
+      if (r.check.passed) console.log(`a reviewer may certify it: research:certify -- --check ${r.check.id} (their own login; certification gate must be open)`)
+      return r.check.passed ? 0 : 3
+    }
+    case 'gate': {
+      if (args.open || args.close) {
+        const g = await B.setCertificationGate(db, { enabled: Boolean(args.open), reason: args.reason, actor: operator() })
+        console.log(`certification gate ${g.enabled ? 'OPEN' : 'closed'} (changed by ${g.changed_by}, session ${g.changed_session_role})`)
+        return 0
+      }
+      print('certification gate', (await db.query('select enabled, changed_by, changed_session_role, changed_at::text, reason from research.certification_gate')).rows)
       return 0
     }
     case 'history': {
@@ -143,7 +175,7 @@ async function main (db) {
     }
     case 'proposals': {
       if (args.reject || args.withdraw) {
-        const r = await P.closeProposal(db, args.reject ?? args.withdraw, { status: args.reject ? 'REJECTED' : 'WITHDRAWN', by: args.reject ? need('reviewer') : operator(), reason: need('reason') })
+        const r = await P.closeProposal(db, args.reject ?? args.withdraw, { status: args.reject ? 'REJECTED' : 'WITHDRAWN', by: args.reject ? null : operator(), reason: need('reason') })
         console.log(`proposal ${r.id}: ${r.status} by ${r.decided_by}`)
         return 0
       }
@@ -156,9 +188,10 @@ async function main (db) {
       return 0
     }
     case 'reviewer': {
-      if (args.add) { const r = await B.addReviewer(db, { reviewer: String(args.add), actor: operator(), note: args.note ?? null }); console.log(r ? `registered reviewer ${r.reviewer}` : `${args.add} is already registered`); return 0 }
+      if (args.enroll) { const r = await B.enrollReviewer(db, { reviewer: String(args.enroll), note: args.note ?? null }); console.log(`enrolled ${r.reviewer}, bound to login role ${r.db_role}`); return 0 }
       if (args.deactivate) { const r = await B.deactivateReviewer(db, { reviewer: String(args.deactivate), actor: operator() }); console.log(r ? `deactivated ${r.reviewer}` : 'no active reviewer by that name'); return 0 }
-      print('reviewers', (await db.query('select reviewer, added_by, added_at::date::text added, active from research.reviewers order by reviewer')).rows)
+      print('reviewers', (await db.query(`select reviewer, db_role, enrolled_at::date::text enrolled, active, coalesce(research.role_review_refusal(db_role), 'ok') as role_check
+        from research.reviewers order by reviewer`)).rows)
       return 0
     }
     case 'identity': {
@@ -216,7 +249,7 @@ async function main (db) {
       if (r.byStage.length) console.table(r.byStage)
       for (const b of r.blocked) console.log(`  BLOCKED ${b.job_key}: ${b.blocking_reason}`)
       if (r.batches.length) console.table(r.batches)
-      console.log(r.blockers.length ? `certification blockers (${r.blockers.length}):` : 'certification: no blockers (run research:certify)')
+      console.log(r.blockers.length ? `certification blockers (${r.blockers.length}):` : 'certification: no blockers (record a check with research:check; a reviewer certifies it)')
       for (const b of r.blockers) console.log(`  ${b.code}: ${b.detail}`)
       return 0
     }
@@ -288,13 +321,8 @@ async function main (db) {
       return 0
     }
     case 'certify': {
-      const r = await B.certify(db, scopeArgs(), { actor: operator() })
-      if (!r.certified) {
-        console.log(`NOT CERTIFIED: ${r.cls.class_key} (${r.blockers.length} blocker(s))`)
-        for (const b of r.blockers) console.log(`  ${b.code}: ${b.detail}`)
-        return 3
-      }
-      console.log(`CERTIFIED: ${r.cls.class_key} (coverage stays ${r.coverage_state})`)
+      const c = await B.certify(db, need('check'))
+      console.log(`CERTIFIED: class ${c.class_id} by ${c.certified_by} (authenticated session; check ${c.certification_check_id}; coverage stays ${c.coverage_state})`)
       return 0
     }
     case 'revoke': {
@@ -308,20 +336,23 @@ async function main (db) {
       return 0
     }
     default:
-      console.error('usage: research <import|validate|apply|conflicts|resolve|identity|queue|coverage|batches|orgs|class|plan|next|progress|start|pause|resume|complete|fail|supersede|job|block|unblock|lead|stage|certify|revoke|review|reconsider|history|reviewer|propose|proposals|wave> [--options]')
+      console.error('usage: research <import|validate|apply|conflicts|resolve|identity|queue|coverage|batches|orgs|class|plan|next|progress|start|pause|resume|complete|fail|supersede|job|block|unblock|lead|stage|check|certify|revoke|review|reconsider|accept|ratify|gate|history|reviewer|propose|proposals|wave> [--options]')
       return 1
   }
 }
 
 const WRITES = { import: true, validate: true, apply: true, identity: true, resolve: Boolean(args.write), class: Boolean(args.create), plan: true, start: true,
-  pause: true, resume: true, complete: true, fail: true, supersede: true, job: true, block: true, unblock: true, lead: true, stage: true, certify: true, revoke: true, review: true, reconsider: Boolean(args.write), reviewer: Boolean(args.add || args.deactivate), propose: true, proposals: Boolean(args.reject || args.withdraw), wave: true }
+  pause: true, resume: true, complete: true, fail: true, supersede: true, job: true, block: true, unblock: true, lead: true, stage: true, certify: true, revoke: true, review: true, reconsider: Boolean(args.write), reviewer: Boolean(args.enroll || args.deactivate), propose: true, proposals: Boolean(args.reject || args.withdraw), wave: true,
+  accept: Boolean(args.write), ratify: Boolean(args.write), check: true, gate: Boolean(args.open || args.close) }
+// Human-only actions run on the reviewer's own login (BAI_REVIEWER_DATABASE_URL), so the database knows who acts (021).
+const REVIEWER = { reconsider: true, accept: true, ratify: true, certify: true, reviewer: Boolean(args.enroll), proposals: Boolean(args.reject), gate: Boolean(args.open) }
 let db = null
 let code = 1
 try {
   // Multi-team safety, checked before anything connects: single-organization commands never default to a club.
   if (command === 'import' && !args.org && !args.league) throw new P.PipelineError('research:import needs --org <franchise key> (records checked against it) or an explicit --league')
   if (command === 'next' && !args.org && !args.league) throw new P.PipelineError('research:next needs --org <franchise key> or an explicit --league')
-  const url = ownerDatabaseUrl()
+  const url = REVIEWER[command] ? reviewerDatabaseUrl() : ownerDatabaseUrl()
   if (WRITES[command]) requireHostedWriteConfirmation(url)
   db = new pg.Client({ connectionString: url })
   await db.connect()

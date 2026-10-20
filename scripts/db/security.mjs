@@ -14,6 +14,11 @@ import { PLATFORM_FUNCTION_FILTER } from './lib/catalog.mjs'
 
 const PUBLIC_ROLES = ['anon', 'authenticated']
 const PRIVATE_SCHEMAS = ['ingest', 'analytics', 'research', 'bai_meta']
+// Human-only actions of migration 021: SECURITY DEFINER so that a reviewer's login role needs no table privilege; the
+// identity they act under is session_user, which a SECURITY DEFINER function does not change.
+const REVIEWER_FUNCTIONS = ['research.enroll_reviewer(text, text)', 'research.set_certification_gate(boolean, text)',
+  'research.reconsider_resolution(text, bigint, text, bigint, text, jsonb, bigint)', 'research.accept_proposal(bigint, text, jsonb)',
+  'research.reject_proposal(bigint, text)', 'research.ratify_resolution(bigint, text, jsonb)', 'research.certify_class(bigint)']
 const json = process.argv.includes('--json')
 const failures = []
 const notes = []
@@ -80,7 +85,7 @@ try {
   }
 
   // ---- Functions
-  const functions = await q(db, `select n.nspname s, p.proname f, pg_get_function_identity_arguments(p.oid) args, p.prosecdef secdef, p.proconfig cfg,
+  const functions = await q(db, `select n.nspname s, p.proname f, pg_get_function_identity_arguments(p.oid) args, p.oid::regprocedure::text sig, p.prorettype = 'trigger'::regtype trg, p.prosecdef secdef, p.proconfig cfg,
         has_function_privilege('anon', p.oid, 'EXECUTE') anon_x, has_function_privilege('authenticated', p.oid, 'EXECUTE') auth_x,
         exists (select 1 from aclexplode(coalesce(p.proacl, acldefault('f', p.proowner))) a where a.grantee = 0 and a.privilege_type = 'EXECUTE') public_x,
         has_function_privilege('service_role', p.oid, 'EXECUTE') service_x
@@ -93,11 +98,38 @@ try {
       join pg_event_trigger e on e.evtfoid = p.oid where n.nspname = any($1)`, [['public', ...PRIVATE_SCHEMAS]])) {
     notes.push(`platform function ${r.f} (event trigger ${r.evtname}${r.d ? ', SECURITY DEFINER, callable only by the event-trigger system' : ''}) is Supabase's, not BAI's`)
   }
-  const fnAudit = functions.map((f) => ({ function: `${f.s}.${f.f}(${f.args})`, security: f.secdef ? 'DEFINER' : 'INVOKER', search_path: (f.cfg ?? []).find((c) => c.startsWith('search_path=')) ?? 'NOT SET', public_execute: f.public_x, anon_execute: f.anon_x, authenticated_execute: f.auth_x, service_role_execute: f.service_x }))
+  const fnAudit = functions.map((f) => ({ function: `${f.s}.${f.f}(${f.args})`, sig: f.sig, trigger: f.trg, security: f.secdef ? 'DEFINER' : 'INVOKER', search_path: (f.cfg ?? []).find((c) => c.startsWith('search_path=')) ?? 'NOT SET', public_execute: f.public_x, anon_execute: f.anon_x, authenticated_execute: f.auth_x, service_role_execute: f.service_x }))
   for (const f of fnAudit) {
     if (f.public_execute || f.anon_execute || f.authenticated_execute) fail(`${f.function} is executable by ${['PUBLIC', 'anon', 'authenticated'].filter((_, i) => [f.public_execute, f.anon_execute, f.authenticated_execute][i]).join(', ')}`)
     if (f.search_path === 'NOT SET') fail(`${f.function} does not pin search_path`)
-    if (f.security === 'DEFINER') fail(`${f.function} is SECURITY DEFINER; BAI declares none (review before allowing)`)
+    // A trigger function cannot be called directly; 021 runs the guards with the owner's rights so every writer is guarded.
+    if (f.security === 'DEFINER' && !f.trigger && !REVIEWER_FUNCTIONS.map((x) => x.replace(/ /g, '')).includes(f.sig)) fail(`${f.function} is SECURITY DEFINER; BAI declares only the reviewer functions and trigger guards of 021 (review before allowing)`)
+  }
+
+  // ---- Human certification boundary (021): the reviewer functions are the only SECURITY DEFINER functions, and only
+  // bai_reviewer (and the owner) may execute them; the reviewer group itself holds nothing else.
+  const grp = (await q(db, "select rolname, rolcanlogin, rolsuper, rolcreaterole, rolbypassrls from pg_roles where rolname in ('bai_reviewer', 'bai_automation') order by 1"))
+  const research021 = (await q(db, "select to_regclass('research.reviewers') is not null ok"))[0].ok
+  if (research021) {
+    if (grp.length !== 2) fail('roles bai_reviewer and bai_automation (021) are missing')
+    for (const g of grp) if (g.rolcanlogin || g.rolsuper || g.rolcreaterole || g.rolbypassrls) fail(`${g.rolname} must be a NOLOGIN group with no attributes`)
+    for (const f of REVIEWER_FUNCTIONS) {
+      const r = (await q(db, `select p.prosecdef d, array(select coalesce(r.rolname::text, 'PUBLIC') from aclexplode(coalesce(p.proacl, acldefault('f', p.proowner))) a
+          left join pg_roles r on r.oid = a.grantee where a.privilege_type = 'EXECUTE' and a.grantee <> p.proowner order by 1) grantees
+        from pg_proc p where p.oid = to_regprocedure($1)`, [f]))[0]
+      if (!r) { fail(`reviewer function ${f} is missing`); continue }
+      if (!r.d) fail(`${f} must be SECURITY DEFINER`)
+      if (JSON.stringify(r.grantees) !== JSON.stringify(['bai_reviewer'])) fail(`${f} must be executable only by bai_reviewer, found ${r.grantees.join(', ') || 'none'}`)
+    }
+    for (const r of await q(db, `select n.nspname s, c.relname t from pg_class c join pg_namespace n on n.oid = c.relnamespace
+        where n.nspname = any($1) and c.relkind in ('r','p','v','m') and (has_table_privilege('bai_reviewer', c.oid, 'SELECT') or has_table_privilege('bai_reviewer', c.oid, 'INSERT')
+          or has_table_privilege('bai_reviewer', c.oid, 'UPDATE') or has_table_privilege('bai_reviewer', c.oid, 'DELETE'))`, [['public', ...PRIVATE_SCHEMAS]])) fail(`bai_reviewer holds a privilege on ${r.s}.${r.t}`)
+    const gate = (await q(db, 'select enabled, changed_by from research.certification_gate'))[0]
+    const reviewers = await q(db, `select v.reviewer, v.db_role, v.active, research.role_review_refusal(v.db_role) refusal,
+        (select string_agg(coalesce(g.rolname, '?'), ',') from pg_auth_members m join pg_roles r on r.oid = m.member left join pg_roles g on g.oid = m.grantor
+          where m.roleid = 'bai_reviewer'::regrole and r.rolname = v.db_role) granted_by from research.reviewers v order by 1`)
+    const members = await q(db, "select r.rolname from pg_auth_members m join pg_roles r on r.oid = m.member where m.roleid = 'bai_reviewer'::regrole order by 1")
+    notes.push(`certification gate: ${gate.enabled ? 'ENABLED' : 'disabled'} (last changed by ${gate.changed_by}); bai_reviewer members: ${members.map((m) => m.rolname).join(', ') || 'none'}; enrolled reviewers: ${reviewers.map((r) => `${r.reviewer} (${r.db_role}, ${r.active ? 'active' : 'inactive'}, membership granted by ${r.granted_by ?? '-'}${r.refusal ? ', REFUSED: ' + r.refusal : ''})`).join('; ') || 'none'}`)
   }
 
   // ---- The web server's login role: no privileges of its own, only SET ROLE anon

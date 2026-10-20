@@ -457,6 +457,14 @@ export async function certificationBlockers (db, clsRef) {
   if (m.identity_complete !== m.tracked) block('IDENTITY', `${m.tracked - m.identity_complete} record(s) whose player has no external id`)
   if (m.provenanced !== m.tracked) block('PROVENANCE', `${m.tracked - m.provenanced} record(s) without a cited source`)
   if (m.open_conflicts > 0) block('CONFLICTS', `${m.open_conflicts} unresolved source conflict(s)`)
+  // How each of the class's own acquisitions ended is a class fact (022); a contested one blocks like any other conflict.
+  const dispConflicts = await one(db, `select count(*)::int n from public.v_open_fact_conflicts f
+    join public.acquisition_dispositions x on f.subject_table = 'acquisition_dispositions' and f.subject_id = x.id
+    left join public.draft_selections s on s.id = x.draft_selection_id left join public.international_signings i on i.id = x.international_signing_id
+    where x.organization_id = $1 and (s.draft_id = $2 or i.signing_period_id = $3)`, [cls.organization_id, cls.draft_id, cls.signing_period_id])
+  if (dispConflicts.n > 0) block('CONFLICTS', `${dispConflicts.n} unresolved conflict(s) on how the class's acquisitions ended (acquisition_dispositions)`)
+  const unratified = await rows(db, 'select * from research.unratified_decisions($1) order by fact_resolution_id', [cls.id])
+  if (unratified.length) block('DECISIONS', `${unratified.length} decision(s) taken without a reviewer session, not yet ratified: ${unratified.slice(0, 4).map((u) => `#${u.fact_resolution_id} ${u.subject_table}#${u.subject_id}.${u.field_name} (${u.decided_by})`).join(', ')}${unratified.length > 4 ? ', …' : ''} (research:ratify)`)
   const pending = jobs.filter((j) => !TERMINAL.has(j.state) && !NON_BLOCKING.has(j.category_key))
   if (pending.length) block('OPEN_JOBS', `${pending.length} open or blocked job(s) before outcome audit: ${pending.slice(0, 5).map((j) => j.job_key.split('/').slice(3).join('/')).join(', ')}${pending.length > 5 ? ', …' : ''}`)
   const held = await one(db, `select count(*)::int n from research.class_imports ci join ingest.staged_records s on s.batch_id = ci.import_batch_id
@@ -467,23 +475,37 @@ export async function certificationBlockers (db, clsRef) {
 
 function public_rate_state (state) { return state === 'COMPLETE_CENSUS' || state === 'SUBSTANTIALLY_COMPLETE' }
 
-/** Certifies only when the deterministic check passes. There is no force option. */
-export async function certify (db, clsRef, { actor }) {
-  requireActor(actor, 'certifying')
-  if (/^(agent|rule|system):/.test(actor)) throw new PipelineError('an automated agent cannot certify a class')
-  if (!(await one(db, 'select research.is_active_reviewer($1) ok', [actor])).ok) throw new PipelineError(`${actor} is not a registered, active human reviewer (research:reviewer --add, by a human)`)
+/**
+ * Records a deterministic certification check (021): the blockers, the metrics and a fingerprint of every record of the
+ * class. Anyone may run it; it certifies nothing. A reviewer then certifies THAT check (certify), which the database
+ * refuses if the class's evidence changed since.
+ */
+export async function recordCertificationCheck (db, clsRef, { actor }) {
+  requireActor(actor, 'recording a certification check')
   const { cls, metrics, blockers } = await certificationBlockers(db, clsRef)
-  if (blockers.length) return { certified: false, cls, blockers }
-  return tx(db, actor, async () => {
-    const report = { metrics, checked_at: new Date().toISOString(), rules: 'docs/backfill-methodology.md#certification' }
-    await db.query('insert into research.certifications (class_id, certified_by, coverage_state, report) values ($1, $2, $3, $4)',
-      [cls.id, actor, metrics.coverage_state ?? 'UNKNOWN', JSON.stringify(report)])
-    await db.query(`update research.jobs set state = 'DONE', completed_at = now(), completion_rationale = 'certified by research:certify'
-      where class_id = $1 and category_key = 'COVERAGE_CERTIFICATION' and not research.job_state_terminal(state)`, [cls.id])
-    await db.query("update research.classes set stage = 'CERTIFIED' where id = $1", [cls.id])
-    await db.query("insert into research.stage_events (class_id, from_stage, to_stage, actor, rationale) values ($1, 'COVERAGE_REVIEW', 'CERTIFIED', $2, 'research:certify passed')", [cls.id, actor])
-    return { certified: true, cls, blockers: [], coverage_state: metrics.coverage_state }
-  })
+  const report = { metrics, checked_at: new Date().toISOString(), rules: 'docs/backfill-methodology.md#certification' }
+  const chk = await one(db, `insert into research.certification_checks (class_id, checked_by, passed, coverage_state, blockers, report, fingerprint)
+    values ($1, $2, $3, $4, $5, $6, research.class_fingerprint($1)) returning id, passed, fingerprint`,
+  [cls.id, actor, blockers.length === 0, blockers.length === 0 ? metrics.coverage_state ?? 'UNKNOWN' : metrics.coverage_state ?? null, JSON.stringify(blockers), JSON.stringify(report)])
+  return { cls, check: chk, blockers, coverage_state: metrics.coverage_state }
+}
+
+/**
+ * Certifies a recorded, passing check. Only a reviewer session can (research.certify_class: the reviewer is the login
+ * this connection authenticated as), only while the certification gate is open, and only if nothing changed since the
+ * check. There is no force option and no name to pass.
+ */
+export async function certify (db, checkId) {
+  if (!checkId) throw new PipelineError('certify needs --check <id> (record one with research:check)')
+  await db.query('begin')
+  try {
+    const c = (await db.query('select * from research.certify_class($1)', [checkId])).rows[0]
+    await db.query('commit')
+    return c
+  } catch (err) {
+    await db.query('rollback')
+    throw err.code === '42501' ? new PipelineError(`${err.message} (connect with your own reviewer login: BAI_REVIEWER_DATABASE_URL)`) : err
+  }
 }
 
 /** Sets an organization's research program wave (priority data, no schema). A human decision with a rationale. */
@@ -498,17 +520,34 @@ export async function setWave (db, { org, wave, actor, rationale }) {
     on conflict (organization_id) do update set wave = excluded.wave, rationale = excluded.rationale, set_by = excluded.set_by, set_at = now() returning *`, [o.id, Number(wave), rationale, actor]))
 }
 
-/** Registers a human reviewer (migration 021). Only a human may register one; agent:/rule:/system: names never qualify. */
-export async function addReviewer (db, { reviewer, actor, note = null }) {
-  requireActor(actor, 'registering a reviewer')
-  if (/^(agent|rule|system):/.test(actor)) throw new PipelineError('only a human registers reviewers')
+/**
+ * Enrolls the reviewer this connection authenticated as (021): the human logs in with their own PostgreSQL role (a
+ * member of bai_reviewer, created by an administrator) and binds a display name to it. No one enrolls anyone else.
+ */
+export async function enrollReviewer (db, { reviewer, note = null }) {
   if (!reviewer || /^(agent:|rule:|system:|bai-)/.test(reviewer)) throw new PipelineError('a reviewer is a named human (not agent:, rule:, system: or a bai- operator label)')
-  return tx(db, actor, async () => one(db, 'insert into research.reviewers (reviewer, added_by, note) values ($1, $2, $3) on conflict (reviewer) do nothing returning *', [reviewer, actor, note]))
+  try {
+    return (await db.query('select * from research.enroll_reviewer($1, $2)', [reviewer, note])).rows[0]
+  } catch (err) {
+    throw err.code === '42501' ? new PipelineError(`${err.message} (enroll with your own reviewer login: BAI_REVIEWER_DATABASE_URL)`) : err
+  }
 }
 
+/** Opening the certification gate is a reviewer-session decision (021); closing it removes power, so anyone may. */
+export async function setCertificationGate (db, { enabled, reason, actor }) {
+  if (!reason || reason === true) throw new PipelineError('changing the certification gate needs --reason')
+  if (enabled) {
+    try { return (await db.query('select * from research.set_certification_gate(true, $1)', [reason])).rows[0] } catch (err) {
+      throw err.code === '42501' ? new PipelineError(`${err.message} (open the gate with your own reviewer login: BAI_REVIEWER_DATABASE_URL)`) : err
+    }
+  }
+  requireActor(actor, 'closing the certification gate')
+  return one(db, 'update research.certification_gate set enabled = false, changed_by = $1, reason = $2 returning *', [actor, reason])
+}
+
+/** Deactivating removes power, so any operator may do it (recorded with the session's role). */
 export async function deactivateReviewer (db, { reviewer, actor }) {
   requireActor(actor, 'deactivating a reviewer')
-  if (/^(agent|rule|system):/.test(actor)) throw new PipelineError('only a human deactivates reviewers')
   return tx(db, actor, async () => one(db, 'update research.reviewers set active = false, deactivated_at = now() where reviewer = $1 and active returning *', [reviewer]))
 }
 
