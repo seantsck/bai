@@ -191,7 +191,28 @@ function validateOutcome (r, errors, warnings, needSource) {
     if (d.disposition && !DISPOSITIONS.includes(d.disposition)) errors.push('details.disposition invalid')
     if (d.disposition === 'TRADED' && !refs.has(d.disposition_transaction_ref)) errors.push('details.disposition TRADED needs disposition_transaction_ref naming one of transactions[]')
     needSource(d.source_key ?? r.source_key, 'details')
-  } else warnings.push('no outcome details given')
+  } else if (!r.disposition) warnings.push('no outcome details given')
+  // The acquisition this record audits (022): its disposition belongs to that acquisition, not to the player.
+  const acq = r.acquisition
+  if (acq) {
+    const draft = acq.draft_key != null || acq.overall_pick != null
+    if (draft && (!/^[0-9]{4}-[A-Z_]+$/.test(acq.draft_key ?? '') || !isInt(acq.overall_pick))) errors.push('acquisition: a draft acquisition is { draft_key, overall_pick }')
+    if (!draft && !/^[0-9]{4}-[0-9]{2}$/.test(acq.period_key ?? '')) errors.push('acquisition: { draft_key, overall_pick } or { period_key }')
+  }
+  if (d?.disposition && d.disposition !== 'UNKNOWN' && !acq) warnings.push('details.disposition without an acquisition: recorded on the acquisition only when the player has exactly one with this organization (legacy form)')
+  const x = r.disposition
+  if (x) {
+    if (!acq) errors.push('disposition needs the acquisition it ends (acquisition: { draft_key, overall_pick } | { period_key })')
+    if (d?.disposition) errors.push('give the disposition once: top-level disposition (per acquisition), not details.disposition')
+    if (!DISPOSITIONS.includes(x.value)) errors.push('disposition.value must be one of ' + DISPOSITIONS.join('|'))
+    if (!isDate(x.as_of_date)) errors.push('disposition.as_of_date must be YYYY-MM-DD')
+    if (x.date != null && !isDate(x.date)) errors.push('disposition.date must be YYYY-MM-DD')
+    if (x.date != null && ['RETAINED', 'UNKNOWN', 'UNSIGNED'].includes(x.value)) errors.push(`disposition.date is the exit date; ${x.value} has none`)
+    if (x.date_precision != null && x.date == null) errors.push('disposition.date_precision without a date')
+    if (x.value === 'TRADED' && !refs.has(x.transaction_ref)) errors.push('disposition TRADED needs transaction_ref naming one of transactions[]')
+    if (x.value !== 'TRADED' && x.transaction_ref) errors.push('disposition.transaction_ref is only for TRADED')
+    needSource(x.source_key ?? r.source_key, 'disposition')
+  }
   validateWar(r.war, 'war', r.source_key, errors, needSource)
 }
 
