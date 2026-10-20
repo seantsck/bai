@@ -80,10 +80,17 @@ const MLB = k(`mlb-statsapi-draft-${year}-${org.toLowerCase()}`)
 const BREF = k(`bref-${org.toLowerCase()}-${year}`)
 const records = []
 const disagreements = []
+let samePersonCount = 0
 for (const p of picks.sort((a, b) => a.pickNumber - b.pickNumber)) {
   const b = bref.get(p.pickNumber)
-  if (!b || fold(b.name) !== fold(p.person.fullName)) throw new Error(`pick ${p.pickNumber}: MLB ${p.person.fullName} vs B-Ref ${b?.name ?? 'missing'}; resolve identity by hand`)
-  const code = String(p.pickRound)
+  // --same-person 971,1001: a researcher confirmed by hand that the two spellings at these overall picks are one player
+  // (e.g. "Danny" / "Dan"); the pick number already ties them. The B-Ref spelling is kept in the record's notes.
+  const samePerson = new Set((arg('same-person', false) ?? '').split(',').filter(Boolean).map(Number))
+  if (!b || (fold(b.name) !== fold(p.person.fullName) && !samePerson.has(p.pickNumber))) throw new Error(`pick ${p.pickNumber}: MLB ${p.person.fullName} vs B-Ref ${b?.name ?? 'missing'}; resolve identity by hand (--same-person ${p.pickNumber} once confirmed)`)
+  if (fold(b.name) !== fold(p.person.fullName)) samePersonCount++
+  const aka = fold(b.name) !== fold(p.person.fullName) ? `Baseball-Reference lists the pick as "${b.name}" (same overall pick; matched by hand). ` : ''
+  // MLB labels compensation rounds "1C", "2C" (after round n); BAI's code is "C-n". CB-A / CB-B and plain rounds pass through.
+  const code = /^(\d+)C$/.test(String(p.pickRound)) ? `C-${String(p.pickRound).slice(0, -1)}` : String(p.pickRound)
   const evidence = []
   if (b.round !== code) evidence.push({ subject: 'selection', field: 'round_code', value: b.round, source_key: BREF, locator: 'draft table round column' })
   if (b.roundPick !== p.roundPickNumber) evidence.push({ subject: 'selection', field: 'round_pick', value: b.roundPick, source_key: BREF, locator: 'draft table pick-in-round column' })
@@ -98,7 +105,7 @@ for (const p of picks.sort((a, b) => a.pickNumber - b.pickNumber)) {
     position: b.pos || null, field_sources: { position: BREF, school: BREF },
     player: { full_name: p.person.fullName, birth_date: p.person.birthDate ?? null, birth_country: p.person.birthCountry ?? null, external_ids: ids, source_key: MLB },
     signing: status === 'UNKNOWN' ? { status } : { status, ...(status === 'SIGNED' ? { bonus_usd: money(b.bonus) } : {}), source_key: BREF },
-    notes: `MLB school label: ${p.school?.name ?? 'none'}.${status === 'SIGNED' && money(b.bonus) == null ? ' Signed with no published bonus: unknown, not zero.' : ''}`
+    notes: `${aka}MLB school label: ${p.school?.name ?? 'none'}.${status === 'SIGNED' && money(b.bonus) == null ? ' Signed with no published bonus: unknown, not zero.' : ''}`
   }
   if (b.school) rec.school = { name: b.school.name, school_type: SCHOOL_TYPE[b.fromType] ?? 'OTHER', city: b.school.city ?? null, region: b.school.region ?? null, country: b.school.region === 'Puerto Rico' ? 'Puerto Rico' : 'USA', source_key: BREF }
   if (evidence.length) rec.evidence = evidence
@@ -113,7 +120,7 @@ const doc = {
   description: `${organization.current_name}, ${year} Rule 4 draft: ${records.length} selections (MLB Stats API universe; Baseball-Reference signing status, bonus, school).`,
   coverage_claims: [{
     domain: 'DRAFT', scope_key: `${year}-JUNE_AMATEUR`, organization: org, coverage_state: 'COMPLETE_CENSUS', expected_count: records.length, source_key: MLB,
-    gap_notes: `Population: the ${records.length} selections MLB's official draft data lists for the club; Baseball-Reference lists the same ${bref.size} by overall pick and name. ` +
+    gap_notes: `Population: the ${records.length} selections MLB's official draft data lists for the club; Baseball-Reference lists the same ${bref.size} by overall pick and name${samePersonCount ? ` (${samePersonCount} spelling difference(s) matched by hand at the same pick)` : ""}. ` +
       `Census of selections only: bonuses published for ${signed.filter((r) => r.signing.bonus_usd != null).length} of ${signed.length} signed picks, no slot values, no outcomes audited.`
   }],
   sources: [

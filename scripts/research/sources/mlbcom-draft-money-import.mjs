@@ -18,7 +18,9 @@ const kind = arg('kind')
 const org = arg('org').toUpperCase()
 const draft = JSON.parse(fs.readFileSync(arg('draft-import'), 'utf8'))
 const year = draft.records[0].draft_key.slice(0, 4)
-const label = arg('club-label', false) ?? draft.description.split(',')[0].split(' ').at(-1)   // "Los Angeles Dodgers" -> "Dodgers"
+// The club's nickname as MLB.com lists it: "Los Angeles Dodgers" -> "Dodgers", "Boston Red Sox" -> "Red Sox".
+const clubName = draft.description.split(',')[0].replace(/^[A-Z]+ \d{4} Rule 4 draft: /, '')
+const label = arg('club-label', false) ?? (clubName.match(/(Red Sox|White Sox|Blue Jays)$/)?.[1] ?? clubName.split(' ').at(-1))
 const text = (f) => fs.readFileSync(f, 'utf8').replace(/<script[\s\S]*?<\/script>/g, ' ').replace(/<style[\s\S]*?<\/style>/g, ' ').replace(/<[^>]+>/g, ' ')
   .replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&#39;/g, "'").replace(/\s+/g, ' ')
 const money = (s) => Number(s.replace(/[$,]/g, ''))
@@ -60,7 +62,9 @@ if (kind === 'slots') {
   const expectedPicks = draft.records.filter((r) => /^\d+$/.test(r.round_code) ? Number(r.round_code) <= 10 : true).map((r) => r.overall_pick).sort((a, b) => a - b)
   const got = [...values.keys()].sort((a, b) => a - b)
   if (JSON.stringify(got) !== JSON.stringify(expectedPicks)) throw new Error(`${label} values sit at picks ${got.join(',')} but MLB lists rounds 1-10 picks ${expectedPicks.join(',')}; refusing`)
-  const pool = (t.match(new RegExp(`${label}: \\$([\\d,]+)`)) ?? [])[1]
+  // Pool lists appear as "$13,821,300 - Orioles" (2019) or "Dodgers: $9,336,500" (2016); the first form is tried first
+  // because the second also matches pick lines.
+  const pool = (t.match(new RegExp(`\\$([\\d,]+) - ${label}\\b`)) ?? t.match(new RegExp(`${label}: \\$([\\d,]+)`)) ?? [])[1]
   const sum = [...values.values()].reduce((a, b) => a + b, 0)
   const stated = pool ? money(pool) : null
   console.log(stated == null ? `no club pool stated; values sum to ${sum}` : stated === sum ? `club pool $${stated.toLocaleString('en-US')} equals the sum of the values` : `WARNING: club pool $${stated.toLocaleString('en-US')} differs from the sum $${sum.toLocaleString('en-US')}; check the page`)
