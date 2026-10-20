@@ -11,7 +11,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import crypto from 'node:crypto'
-import { validateEnvelope, validateRecordShape, roundStructure, slugify, EVIDENCE_SUBJECTS } from './import-format.mjs'
+import { validateEnvelope, validateRecordShape, roundStructure, slugify, EVIDENCE_SUBJECTS, organizationScopeErrors } from './import-format.mjs'
 
 const SAFE_STATES = new Set(['EXACT_EXTERNAL_ID', 'EXACT_COMPOSITE', 'NO_MATCH'])
 const ACTION_RANK = { HELD: 6, CONFLICT: 5, INSERT: 4, UPDATE_UNKNOWN: 3, CORROBORATE: 2, NO_CHANGE: 1 }
@@ -33,7 +33,7 @@ export async function findBatch (db, ref) {
 }
 
 /** Stage a file. Same bytes => same batch (no-op). Writes only ingest.* tables. */
-export async function stageFile (db, file, { operator = 'cli', allowFixtures = false } = {}) {
+export async function stageFile (db, file, { operator = 'cli', allowFixtures = false, organization = null } = {}) {
   // Research data never shares a database with the fictional foundation fixtures.
   if (!allowFixtures && (await db.query("select 1 from public.sources where source_key = 'fixture:foundation'")).rowCount) {
     throw new PipelineError('this database holds the fictional foundation fixtures; research imports need a database without them')
@@ -45,6 +45,9 @@ export async function stageFile (db, file, { operator = 'cli', allowFixtures = f
   let doc
   try { doc = JSON.parse(raw.toString('utf8')) } catch (err) { throw new PipelineError(`not JSON: ${err.message}`) }
   const errors = validateEnvelope(doc)
+  // Multi-team safety: a batch staged for one organization may only carry that organization's records (plus records that
+  // say why they belong to another club, such as re-drafts).
+  if (organization) errors.push(...organizationScopeErrors(doc, organization))
   if (errors.length) throw new PipelineError('invalid import file:\n  ' + errors.join('\n  '))
   const clash = await db.query('select id from ingest.import_batches where batch_key = $1', [doc.batch_key])
   if (clash.rows[0]) throw new PipelineError(`batch_key ${doc.batch_key} is already used by a different file; batches are immutable, use a new key`)
@@ -110,6 +113,13 @@ export async function validateBatch (db, ref) {
       const r = rec.payload
       const { errors, warnings } = validateRecordShape(r, batch.channel, declared)
       if (r.organization && !orgs.has(r.organization)) errors.push(`unknown organization ${r.organization}`)
+      // The source's own wording (e.g. "Florida Marlins") must resolve, for that season, to the franchise the record names.
+      if (r.organization_as_named) {
+        const season = Number(String(r.draft_key ?? r.period_key ?? r.signing_date ?? '').slice(0, 4)) || null
+        const resolved = (await db.query('select o.franchise_key from public.organizations o where o.id = public.resolve_organization($1, $2)', [r.organization_as_named, season])).rows[0]
+        if (!resolved) errors.push(`organization_as_named "${r.organization_as_named}" does not resolve to one franchise${season ? ` in ${season}` : ''}`)
+        else if (resolved.franchise_key !== r.organization) errors.push(`organization_as_named "${r.organization_as_named}" is ${resolved.franchise_key}, not ${r.organization}`)
+      }
       if (batch.channel === 'DRAFT' && r.draft_key) {
         const d = (await db.query('select id, total_rounds from public.drafts where draft_key = $1', [r.draft_key])).rows[0]
         if (!d) errors.push(`draft ${r.draft_key} is not on the calendar (add it with a source first)`)
@@ -364,7 +374,8 @@ class Applier {
       [draft.id, roundId, r.overall_pick, r.round_pick ?? null, orgId, r.selection_type ?? 'STANDARD', playerId, r.position ?? null, school.id,
         r.school?.school_type ?? null, r.selection_date ?? null, src, [r.notes, school.note].filter(Boolean).join(' | ') || null])
       for (const [f, v] of Object.entries({ round_code: r.round_code, round_pick: r.round_pick, organization: r.organization, position: r.position, school: r.school?.name })) {
-        if (v != null) await this.observe(fieldSource(r, f), 'draft_selections', sel.id, f, v, null)
+        const locator = f === 'organization' && r.organization_as_named ? `as named: "${r.organization_as_named}" (batch ${this.batch.batch_key})` : null
+        if (v != null) await this.observe(fieldSource(r, f), 'draft_selections', sel.id, f, v, locator)
       }
       action = 'INSERT'
     } else {
@@ -521,6 +532,12 @@ export async function applyBatch (db, ref, { write = false, allowPartial = false
   if (batch.status === 'STAGED') throw new PipelineError(`batch ${batch.batch_key} has not been validated; run research:validate first`)
   if (batch.status === 'ABANDONED') throw new PipelineError(`batch ${batch.batch_key} was abandoned`)
   if (batch.status === 'VALIDATION_FAILED' && !allowPartial) throw new PipelineError(`batch ${batch.batch_key} failed validation; fix the file or pass --allow-partial to apply only valid records`)
+  // Automation safety: an agent may discover, stage and propose (validate, dry run), but its batch reaches canonical
+  // tables only after a human review (research:review).
+  if (write && /^agent:/.test(batch.imported_by)) {
+    const reviewed = (await db.query('select reviewed_by from research.import_reviews where import_batch_id = $1', [batch.id])).rows[0]
+    if (!reviewed) throw new PipelineError(`batch ${batch.batch_key} was staged by ${batch.imported_by}; a human must review it (research:review) before --write`)
+  }
 
   const records = (await db.query("select * from ingest.staged_records where batch_id = $1 and validation_status = 'VALID' order by record_index", [batch.id])).rows
   const skippedInvalid = Number((await db.query("select count(*) n from ingest.staged_records where batch_id = $1 and validation_status <> 'VALID'", [batch.id])).rows[0].n)

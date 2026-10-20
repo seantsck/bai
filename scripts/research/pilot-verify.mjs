@@ -55,8 +55,11 @@ const FK = {
 const RESEARCH_TABLES = ['organizations', 'sources', 'rules_eras', 'drafts', 'draft_rounds', 'international_signing_periods', 'markets', 'schools', 'school_aliases',
   'players', 'player_external_ids', 'player_aliases', 'draft_selections', 'draft_signings', 'slot_values', 'international_signings',
   'organization_signing_period_context', 'organization_draft_pools', 'source_observations', 'fact_resolutions', 'quality_flags', 'coverage_assessments', 'research_tasks']
-// Columns that record when something ran rather than what was found.
-const RUN_DATE_COLUMNS = new Set(['raised_on', 'assessed_on'])
+// Columns that record when something ran rather than what was found (the day a batch was applied, a flag raised, a
+// cell assessed). They are reported, never compared.
+const RUN_DATE_COLUMNS = new Set(['raised_on', 'assessed_on', 'observed_on'])
+// Reference sources seeded by migrations (calendars, franchise identity). Parity checks them; the pilot does not own them.
+const SEEDED_SOURCE = /^"_key":"src:(cal:|bai-reference:)/
 
 async function snapshot (db) {
   const nk = await naturalKeys(db)
@@ -98,8 +101,19 @@ async function snapshot (db) {
   return out
 }
 
+/** Comparable form of a snapshot row: run-date columns removed, migration-seeded reference sources skipped. */
+function comparable (table, rowJson) {
+  const o = JSON.parse(rowJson)
+  if (table === 'sources' && SEEDED_SOURCE.test(rowJson.slice(1))) return null
+  for (const k of RUN_DATE_COLUMNS) delete o[k]
+  return JSON.stringify(o)
+}
+
 function compare (base, cur) {
   const diffs = []
+  const norm = (t, list = []) => list.map((r) => comparable(t, r)).filter(Boolean)
+  for (const t of Object.keys(base.tables)) base.tables[t] = norm(t, base.tables[t])
+  for (const t of Object.keys(cur.tables)) cur.tables[t] = norm(t, cur.tables[t])
   const cmpList = (label, a = [], b = []) => {
     const A = new Set(a)
     const B = new Set(b)

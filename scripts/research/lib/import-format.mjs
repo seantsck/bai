@@ -140,3 +140,18 @@ export function validateRecordShape (r, channel, declared) {
   }
   return { errors, warnings }
 }
+
+/**
+ * Multi-team safety: every record must belong to the declared organization unless it says why not
+ * (cross_organization: "<reason>", e.g. a re-draft by another club). Coverage claims must be for that organization.
+ */
+export function organizationScopeErrors (doc, franchiseKey) {
+  const errors = []
+  for (const [i, r] of (doc.records ?? []).entries()) {
+    if (r.organization !== franchiseKey && !(typeof r.cross_organization === 'string' && r.cross_organization.trim().length >= 5)) {
+      errors.push(`records[${i}]: organization ${r.organization} is not ${franchiseKey} (add cross_organization: "<reason>" if this is deliberate)`)
+    }
+  }
+  for (const c of doc.coverage_claims ?? []) if (c.organization !== franchiseKey) errors.push(`coverage claim for ${c.organization} in a ${franchiseKey} batch`)
+  return errors
+}
