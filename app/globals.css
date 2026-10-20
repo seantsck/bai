@@ -54,6 +54,7 @@ footer { color: var(--muted); font-size: .8rem; padding: 16px; text-align: cente
 .matrix .cell { text-align: center; font-variant-numeric: tabular-nums; }
 .matrix .cell-empty { background: transparent; }
 .cell-code { font-weight: 700; }
+.cell-cert { font-weight: 700; }
 .cell-CC, .cell-SC { background: #dcefe0; }
 .cell-PR { background: #fff1cc; }
 .cell-RS, .cell-IV { background: #e8e4f4; }

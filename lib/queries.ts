@@ -106,8 +106,9 @@ export const getLastRefresh = async (): Promise<Row | null> =>
 export const getResearchCoverage = () =>
   publicQuery(`select c.domain, c.scope_key, c.scope_label, c.scope_start, c.organization_id, o.franchise_key, o.current_name as organization_name,
       c.tracked_records, c.audited_outcomes, c.cost_basis_records, c.cost_known_records, c.coverage_state, c.expected_count,
-      c.supports_population_rate, c.last_research_date
+      c.supports_population_rate, c.last_research_date, coalesce(r.certified, false) as certified, r.certified_on
     from rm_research_coverage c join organizations o on o.id = c.organization_id
+    left join rm_research_certification r on r.domain::text = c.domain::text and r.scope_key = c.scope_key and r.organization_id = c.organization_id
     order by c.domain, c.scope_start, o.current_name limit 1000`)
 
 // Queue sizes only; the work items themselves are internal.

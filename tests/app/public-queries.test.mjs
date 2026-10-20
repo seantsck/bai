@@ -74,6 +74,8 @@ test('coverage dashboard: one cell per calendar scope and organization, queue co
   const lad = cells.filter((c) => c.franchise_key === 'LAD' && c.tracked_records > 0).map((c) => [c.domain, c.scope_key, c.coverage_state]).sort()
   assert.deepEqual(lad, [['DRAFT', '2019-JUNE_AMATEUR', 'INDIVIDUALLY_VERIFIED'], ['INTERNATIONAL', '2019-20', 'RANKED_SAMPLE']])
   assert.ok(cells.every((c) => c.supports_population_rate === false), 'no fixture cell supports rates')
+  assert.ok(cells.every((c) => c.certified === false && c.certified_on === null), 'certification flags come from rm_research_certification; nothing is certified in fixtures')
+  assert.ok(cells.every((c) => !('notes' in c) && !('workflow_status' in c)), 'no private workflow detail reaches the page')
   const queues = await q.getResearchQueueSummary()
   assert.equal(queues.length, 10)
   assert.ok(queues.every((r) => Number.isInteger(r.open_items) && !('detail' in r)))

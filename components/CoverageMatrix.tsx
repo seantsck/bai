@@ -11,11 +11,12 @@ function cellTitle (c: Cell): string {
     `Expected: ${c.expected_count ?? 'unknown'}`,
     `Audited outcomes: ${c.audited_outcomes}`,
     `Known cost: ${formatShare(c.cost_known_records, c.cost_basis_records)}`,
-    `Last research: ${c.last_research_date ? formatDate(c.last_research_date) : 'none'}`
+    `Last research: ${c.last_research_date ? formatDate(c.last_research_date) : 'none'}`,
+    `Research class certified: ${c.certified ? `yes${c.certified_on ? `, ${formatDate(c.certified_on)}` : ''}` : 'no'}`
   ].join('\n')
 }
 
-/** Organizations x scopes grid. Each cell shows the coverage state code and the tracked count; empty cells are blank. */
+/** Organizations x scopes grid. Each cell shows the coverage state code and the tracked count (✓ = research class certified); empty cells are blank. */
 export function CoverageMatrix ({ cells, caption }: { cells: Cell[], caption: string }) {
   const scopes = [...new Map(cells.map((c) => [c.scope_key, c.scope_label])).entries()]
   const orgs = [...new Map(cells.map((c) => [c.franchise_key, c.organization_name])).entries()].sort((a, b) => a[1].localeCompare(b[1]))
@@ -33,11 +34,11 @@ export function CoverageMatrix ({ cells, caption }: { cells: Cell[], caption: st
               <th scope='row' title={name}>{key}</th>
               {scopes.map(([s]) => {
                 const c = at.get(`${key}|${s}`)
-                if (!c || (c.tracked_records === 0 && !c.coverage_state)) return <td key={s} className='cell-empty' aria-label='No records' />
+                if (!c || (c.tracked_records === 0 && !c.coverage_state && !c.certified)) return <td key={s} className='cell-empty' aria-label='No records' />
                 const code = c.coverage_state ? COVERAGE_STATE_CODES[c.coverage_state] : 'NA'
                 return (
                   <td key={s} className={`cell cell-${code}`} title={cellTitle(c)}>
-                    <span className='cell-code'>{code}</span> <span className='cell-count'>{c.tracked_records}</span>
+                    <span className='cell-code'>{code}</span> <span className='cell-count'>{c.tracked_records}</span>{c.certified && <span className='cell-cert' aria-label='certified'> ✓</span>}
                   </td>
                 )
               })}
