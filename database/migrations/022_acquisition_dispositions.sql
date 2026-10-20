@@ -36,6 +36,7 @@ create table public.acquisition_dispositions (
   check (disposition not in ('RETAINED', 'UNKNOWN', 'UNSIGNED') or disposition_date is null)
 );
 create index acquisition_dispositions_player_idx on public.acquisition_dispositions (player_id);
+alter table public.acquisition_dispositions enable row level security;
 
 comment on column public.outcome_audit_details.disposition is
   'LEGACY (before 022): a disposition recorded on the player. Acquisition dispositions live in public.acquisition_dispositions; the value views ignore this column.';
@@ -183,6 +184,10 @@ where x.disposition <> 'UNKNOWN'
   -- the latest audit of the player carries his disposition
   and oa.id = (select a2.id from public.outcome_audits a2 where a2.player_id = oa.player_id order by a2.observation_through_season desc nulls last, a2.audited_on desc limit 1);
 
+-- Check every moved disposition now (the consistency guard is deferred), so the migration fails on a contradiction
+-- instead of leaving it for a later commit, and no trigger event is pending when tables are altered below.
+set constraints all immediate;
+
 do $$
 declare
   n integer;
@@ -204,6 +209,5 @@ select v.channel, v.draft_selection_id, v.international_signing_id, v.player_id,
 from analytics.player_acquisitions v
 left join public.acquisition_dispositions x on x.draft_selection_id = v.draft_selection_id or x.international_signing_id = v.international_signing_id;
 
-alter table public.acquisition_dispositions enable row level security;
 revoke all on all tables in schema analytics from public, anon, authenticated, service_role;
 select public.apply_public_boundary();
