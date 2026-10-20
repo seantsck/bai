@@ -16,6 +16,7 @@ import pg from 'pg'
 import * as h from './harness.mjs'
 import * as P from '../../scripts/research/lib/pipeline.mjs'
 import { validateSource } from '../../scripts/research/lib/import-format.mjs'
+import { integrityViolations } from '../../scripts/research/lib/integrity.mjs'
 import { listMigrations, supabaseHistory, pushedMatchesFile } from '../../scripts/db/lib/migrations.mjs'
 import { ownerDatabaseUrl } from '../../scripts/db/lib/connection.mjs'
 
@@ -251,13 +252,9 @@ test('research queues: fixed priorities; the summary equals the internal queue',
   })
 })
 
-test('coverage states: only census-level states can support population rates; a census claim names its size and source; no rate without certification', async () => {
+test('coverage states: only census-level states support rates; census claims are sourced and whole; no rate without certification; partial never shown as complete', async () => {
   const states = await rows("select s::text state, coverage_supports_population_rate(s) ok from unnest(enum_range(null::coverage_state)) s order by 1")
   assert.deepEqual(states.filter((s) => s.ok).map((s) => s.state).sort(), ['COMPLETE_CENSUS', 'SUBSTANTIALLY_COMPLETE'])
-  // Research classes may claim census coverage (e.g. a draft class against MLB's official pick list) once they are imported;
-  // such a claim must state the expected size and cite a source.
-  assert.equal((await one(`select count(*)::int n from coverage_assessments where coverage_state in ('COMPLETE_CENSUS', 'SUBSTANTIALLY_COMPLETE')
-    and (expected_count is null or source_id is null)`)).n, 0)
-  // Coverage alone never publishes a rate: a rate needs a certified class.
-  assert.equal((await one('select count(*)::int n from analytics.class_economics where (rates_allowed or mlb_reach_rate is not null or cost_per_mlb_player is not null) and not certified')).n, 0)
+  // Shared invariants (scripts/research/lib/integrity.mjs; tests/db/integrity.test.mjs proves each detects a violation).
+  assert.deepEqual(await integrityViolations(raw), [])
 })
