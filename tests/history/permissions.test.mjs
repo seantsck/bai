@@ -8,7 +8,8 @@ import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { loadCatalog, validateCatalog, checkUse, requireUse, requireBatchUse, PermissionDenied, USES } from '../../scripts/history/lib/permissions.mjs'
+import { loadCatalog, validateCatalog, checkUse, requireUse, requireBatchUse, requireHostedPublication, PermissionDenied, USES } from '../../scripts/history/lib/permissions.mjs'
+import { stageFile, isLocalClient } from '../../scripts/research/lib/pipeline.mjs'
 import { scanForRestricted } from '../../scripts/history/lib/publication.mjs'
 import { createFetcher } from '../../scripts/history/lib/fetch.mjs'
 import { normalizePhase } from '../../scripts/history/lib/mlb.mjs'
@@ -150,6 +151,50 @@ test('batches: restricted sources cannot be published to the site; evidence used
   }
 })
 
+test('hosted publication: aliases, unknown keys and historical years cannot bypass the gate', () => {
+  const pub = (doc) => () => requireHostedPublication(catalog, doc, { now: NOW }, { root })
+  const rec = (draftKey) => ({ type: 'DRAFT_SELECTION', draft_key: draftKey, source_key: 'x' })
+  const doc = (sources, draftKey = '2006-JUNE_AMATEUR', claims = []) => ({ sources, coverage_claims: claims, records: [rec(draftKey)] })
+  // Governed by URL whatever the key: an alias for MLB's feed or an archive capture of Baseball-Reference.
+  assert.throws(pub(doc([{ source_key: 'mlb-feed-2006', url: 'https://statsapi.mlb.com/api/v1/draft/2006?draftType=JR' }])), /mlb-statsapi-draft: publish_site refused: year 2006 is before the scope/)
+  assert.throws(pub(doc([{ source_key: 'bref:2006', url: 'https://web.archive.org/web/2019id_/https://www.baseball-reference.com/draft/x' }])), /bref-draft-archive: publish_site refused/)
+  // Case and whitespace variants of a governed key resolve to the same source.
+  assert.throws(pub(doc([{ source_key: ' HIST:MLB-STATSAPI-DRAFT-2006-JR ' }])), /mlb-statsapi-draft/)
+  // An invented hist: key is refused outright; an uncatalogued source cannot carry historical records.
+  assert.throws(pub(doc([{ source_key: 'hist:new-source-2006' }])), /hist: source key the catalog does not govern/)
+  assert.throws(pub(doc([{ source_key: 'news:2006', url: 'https://example.test/2006' }])), /only from catalogued sources/)
+  // A batch's years come from its records as well as its claims; unknown years count as historical; no sources refuses.
+  const mixed = doc([{ source_key: 'news:x', url: 'https://example.test/' }], '2016-JUNE_AMATEUR', [{ scope_key: '2016-JUNE_AMATEUR' }])
+  mixed.records.push(rec('2006-JUNE_AMATEUR'))
+  assert.throws(pub(mixed), /\(2006, 2016\) may reach hosted only from catalogued sources/)
+  assert.throws(pub({ sources: [{ source_key: 'news:x' }], records: [] }), /year unknown/)
+  assert.throws(pub({ sources: [], records: [rec('1985-JUNE_AMATEUR')] }), /no declared sources/)
+  // Openly licensed sources pass for historical years; the research program (2015 on) keeps its status quo.
+  assert.deepEqual(pub(doc([{ source_key: 'hist:chadwick-register-781c175' }, { source_key: 'hist:wikipedia-2006-rev1' }]))(), { years: [2006], historical: true })
+  assert.equal(pub(doc([{ source_key: 'lad2016:mlb', url: 'https://statsapi.mlb.com/api/v1/draft/2016?teamId=119' }], '2016-JUNE_AMATEUR'))().historical, false)
+  for (const f of fs.readdirSync(path.join(root, 'research/imports')).filter((x) => x.endsWith('.json'))) {
+    assert.doesNotThrow(pub(JSON.parse(fs.readFileSync(path.join(root, 'research/imports', f), 'utf8'))), f)
+  }
+})
+
+test('pipeline: staging on a non-local database applies the gate before any write (runbooks included)', async () => {
+  assert.equal(isLocalClient({ host: '127.0.0.1' }), true)
+  assert.equal(isLocalClient({ host: '/var/run/postgresql' }), true)
+  assert.equal(isLocalClient({ host: 'db.abcdefghijklmnopqrst.supabase.co' }), false)
+  assert.equal(isLocalClient({}), false, 'unknown host: treated as hosted')
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'bai-stage-'))
+  const file = path.join(dir, 'b.json')
+  const rec = { type: 'DRAFT_SELECTION', source_key: 'alias:mlb', draft_key: '2006-JUNE_AMATEUR', round_code: '1', overall_pick: 1, round_pick: 1, organization: 'LAD',
+    player: { full_name: 'Fixture Gate', external_ids: { MLBAM: '9870301' } }, signing: { status: 'UNKNOWN' } }
+  fs.writeFileSync(file, JSON.stringify({ format: 'bai-research-import/1', batch_key: 'gate-fixture', channel: 'DRAFT',
+    sources: [{ source_key: 'alias:mlb', source_type: 'OFFICIAL_LEAGUE', authority_level: 'OFFICIAL', title: 'Fixture alias', url: 'https://statsapi.mlb.com/api/v1/draft/2006', retrieved_date: '2026-10-21' }], records: [rec] }))
+  const queries = []
+  const fake = { host: 'db.abcdefghijklmnopqrst.supabase.co', query: async (sql) => { queries.push(sql); return { rows: [], rowCount: 0 } } }
+  await assert.rejects(stageFile(fake, file, { organization: 'LAD' }), PermissionDenied)
+  assert.ok(queries.every((q) => /^\s*select/i.test(q)), `only reads before the refusal: ${queries.join(' | ')}`)
+  fs.rmSync(dir, { recursive: true, force: true })
+})
+
 test('publication check: restricted paths, restricted source keys and invented keys fail; the repository passes', () => {
   const doc = JSON.stringify(fixtureBatch())
   const scan = (files) => scanForRestricted(files, catalog, { root, now: NOW }).findings.map((f) => `${f.kind} ${f.path}`)
@@ -158,17 +203,24 @@ test('publication check: restricted paths, restricted source keys and invented k
   assert.deepEqual(scan([{ path: 'research/imports/hist-2005.json', text: doc }]), ['RESTRICTED_SOURCE research/imports/hist-2005.json', 'RESTRICTED_SOURCE research/imports/hist-2005.json'])
   assert.deepEqual(scan([{ path: 'docs/x.json', text: '{"source_key": "hist:made-up-2005"}' }]), ['UNKNOWN_HIST_KEY docs/x.json'])
   assert.deepEqual(scan([{ path: 'docs/ids.json', text: '{"source_key": "hist:chadwick-register-781c175"}' }]), [])
+  assert.deepEqual(scan([{ path: 'research/history/reports/2006-notes.md', text: 'anything' }]), ['UNREVIEWED_HISTORY_FILE research/history/reports/2006-notes.md'])
   const tracked = execFileSync('git', ['ls-files', '-z'], { cwd: root, encoding: 'utf8' }).split('\0').filter((p) => p && fs.statSync(path.join(root, p), { throwIfNoEntry: false })?.isFile())
   assert.deepEqual(scan(tracked.map((p) => ({ path: p, text: fs.readFileSync(path.join(root, p), 'utf8') }))), [])
 })
 
-test('CLI: restricted bulk downloads are refused (exit 4) before any network request', () => {
+test('CLI: restricted downloads (history importer and research downloaders) are refused (exit 4) before any request', () => {
   const out = fs.mkdtempSync(path.join(os.tmpdir(), 'bai-cli-'))
   const run = (...a) => spawnSync(process.execPath, [path.join(root, 'scripts/history/cli.mjs'), ...a], { cwd: root, encoding: 'utf8', env: { ...process.env, BAI_HISTORY_OUT: out, BAI_DATABASE_URL: 'postgresql://127.0.0.1:1/none' } })
   for (const args of [['fetch-draft', '--years', '2006', '--max-requests', '0'], ['fetch-evidence', '--year', '2006', '--max-requests', '0']]) {
     const r = run(...args)
     assert.equal(r.status, 4, `${args.join(' ')}: ${r.stderr}`)
     assert.match(r.stderr, /permission refused: (mlb-statsapi-draft|bref-draft-archive)/)
+  }
+  // The research program's own downloaders are gated the same way.
+  for (const [script, args] of [['fetch-mlb-player-outcomes.mjs', ['--ids', '1', '--out', path.join(out, 'mlb')]], ['fetch-bref-player-pages.mjs', ['--ids', 'fixtu01', '--before', '20260101', '--out', path.join(out, 'bref')]]]) {
+    const r = spawnSync(process.execPath, [path.join(root, 'scripts/research/sources', script), ...args], { cwd: root, encoding: 'utf8' })
+    assert.equal(r.status, 4, `${script}: ${r.stderr}`)
+    assert.equal(fs.existsSync(args.at(-1)), false, 'nothing written')
   }
   fs.rmSync(out, { recursive: true, force: true })
 })

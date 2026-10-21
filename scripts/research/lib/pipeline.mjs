@@ -12,6 +12,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import crypto from 'node:crypto'
 import { validateEnvelope, validateRecordShape, roundStructure, slugify, EVIDENCE_SUBJECTS, organizationScopeErrors } from './import-format.mjs'
+import { loadCatalog, requireHostedPublication } from '../../history/lib/permissions.mjs'
 
 const SAFE_STATES = new Set(['EXACT_EXTERNAL_ID', 'EXACT_COMPOSITE', 'NO_MATCH'])
 const ACTION_RANK = { HELD: 6, CONFLICT: 5, INSERT: 4, UPDATE_UNKNOWN: 3, CORROBORATE: 2, NO_CHANGE: 1 }
@@ -21,6 +22,18 @@ const fieldSource = (r, f) => r.field_sources?.[f] ?? r.source_key
 const sha256 = (buf) => crypto.createHash('sha256').update(buf).digest('hex')
 
 export class PipelineError extends Error {}
+
+// Hosted publication gate (research/history/sources.json, scripts/history/lib/permissions.mjs). Every path that stages or
+// applies a batch (both CLIs, runbooks, scripts) goes through stageFile/applyBatch, so the gate lives here: on any
+// database that is not local, a batch is refused before anything is written unless its sources permit publish_site for
+// its years, and historical years (before 2015) need every source catalogued. Unknown hosts count as hosted (fail closed).
+const REPO_ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '../../..')
+const LOCAL_DB_HOSTS = new Set(['localhost', '127.0.0.1', '::1', '[::1]'])
+export const isLocalClient = (db) => { const h = db?.host ?? db?.connectionParameters?.host; return typeof h === 'string' && (LOCAL_DB_HOSTS.has(h) || h.startsWith('/')) }
+export function requirePublishable (db, doc) {
+  if (isLocalClient(db)) return null
+  return requireHostedPublication(loadCatalog(REPO_ROOT), doc, {}, { root: REPO_ROOT })
+}
 
 // ---------------------------------------------------------------------------------------------------------------
 // Batches
@@ -49,6 +62,7 @@ export async function stageFile (db, file, { operator = 'cli', allowFixtures = f
   // say why they belong to another club, such as re-drafts).
   if (organization) errors.push(...organizationScopeErrors(doc, organization))
   if (errors.length) throw new PipelineError('invalid import file:\n  ' + errors.join('\n  '))
+  requirePublishable(db, doc)
   const clash = await db.query('select id from ingest.import_batches where batch_key = $1', [doc.batch_key])
   if (clash.rows[0]) throw new PipelineError(`batch_key ${doc.batch_key} is already used by a different file; batches are immutable, use a new key`)
 
@@ -768,6 +782,11 @@ export async function applyBatch (db, ref, { write = false, allowPartial = false
   }
 
   const records = (await db.query("select * from ingest.staged_records where batch_id = $1 and validation_status = 'VALID' order by record_index", [batch.id])).rows
+  if (write && !isLocalClient(db)) {
+    const sources = (await db.query('select payload from ingest.staged_sources where batch_id = $1', [batch.id])).rows.map((r) => r.payload)
+    const claims = (await db.query('select coverage_claim from ingest.import_batches where id = $1', [batch.id])).rows[0]?.coverage_claim ?? []
+    requirePublishable(db, { sources, coverage_claims: claims, records: records.map((r) => r.payload) })
+  }
   const skippedInvalid = Number((await db.query("select count(*) n from ingest.staged_records where batch_id = $1 and validation_status <> 'VALID'", [batch.id])).rows[0].n)
   const a = new Applier(db, batch)
   const results = []

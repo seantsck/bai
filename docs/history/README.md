@@ -78,10 +78,10 @@ maintainer to confirm.
 
 | Source | fetch_targeted | fetch_bulk | process_local | publish_repository | publish_site |
 |---|---|---|---|---|---|
-| MLB Stats API draft feed | PENDING | PENDING | LIMITED: 1965, 1985, 2005 (already cached) | PROHIBITED | PENDING |
+| MLB Stats API (draft feed, people, transactions) | PENDING | PENDING | LIMITED: 1965, 1985, 2005 (already cached) | PROHIBITED | LIMITED: 2015 on (status quo of the research program, under review); historical years refused |
 | Chadwick register (ODC-BY) | CLEARED | CLEARED | CLEARED | CLEARED (attribution) | CLEARED (attribution) |
 | Wikipedia (CC BY-SA, facts) | CLEARED | LIMITED: 70 per run | CLEARED | CLEARED | CLEARED |
-| Baseball-Reference via Internet Archive | PENDING | PROHIBITED | LIMITED: 1965, 1985, 2005 (already cached) | PROHIBITED | PROHIBITED |
+| Baseball-Reference (live or via Internet Archive) | PENDING | PROHIBITED | LIMITED: 1965, 1985, 2005 (already cached) | PROHIBITED | LIMITED: 2015 on (status quo, under review); historical years refused |
 
 **Where each gate is enforced**
 - **Fetcher.** Every call names its source and use, and the URL must match that source's hosts and URL prefixes. A
@@ -90,12 +90,26 @@ maintainer to confirm.
 - **History CLI.** `build` and `calendar` check `process_local` for the year. `import` checks every source a batch cites
   (MLB, Chadwick, and the archived page that corroborated a census claim), and a non-local target would also need
   `publish_site`. Refusals exit with code 4.
-- **Research CLI (hosted).** `import`, `validate` and `apply` refuse any batch that cites a governed source without
-  `publish_site`, before anything is staged or written.
+- **Research pipeline (hosted).** `stageFile` and `applyBatch --write` call `requireHostedPublication` on any
+  non-local database, so every path is covered: both CLIs, runbooks and scripts. An unknown host counts as hosted. A
+  batch is refused before anything is written if:
+  - a governed source (matched by key, case-insensitively, **or by URL**, so an alias key pointing at
+    `statsapi.mlb.com` or an archived `baseball-reference.com` page is still governed) lacks `publish_site` for any
+    year the batch touches;
+  - it cites an unknown `hist:` key;
+  - it touches a **historical year** (before `historical_before`, 2015) and cites any uncatalogued source;
+  - its years cannot be determined (treated as historical).
+
+  Years come from coverage claims and from every record: draft and period keys, signing dates, referenced
+  acquisitions, and for outcome audits and trades the date or season observed. The research CLI applies the same check
+  early, for a clear message.
+- **Research downloaders.** `scripts/research/sources/fetch-mlb-player-outcomes.mjs` and `fetch-bref-player-pages.mjs`
+  need `fetch_targeted` for their source and exit with code 4 before any request (currently refused).
 - **Publication check.** `npm run history:publication-check`, part of `npm run check`, fails if a tracked file:
   - lies under a restricted path (`.restricted/`, `.cache/`, `research/history/batches/`);
   - cites a governed source key without `publish_repository`;
-  - cites an unknown `hist:` key.
+  - cites an unknown `hist:` key;
+  - is a file under `research/history/` that is not on the reviewed list (`REVIEWED_HISTORY_FILES`).
 
   It also lists, as notices, older research files that cite MLB or Baseball-Reference outside the catalog (see
   [hosted-provenance.md](hosted-provenance.md)).

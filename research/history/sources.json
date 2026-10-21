@@ -1,6 +1,7 @@
 {
  "format": "bai-history-sources/2",
- "note": "Permission gates for the historical importer, enforced by scripts/history/lib/permissions.mjs. Each source has a separate grant per use (fetch_targeted, fetch_bulk, process_local, publish_repository, publish_site); a host on this list is not a permission. States: CLEARED (the license permits it), LIMITED (only inside its scope), AUTHORIZED (only with a documented authorization on file: reference, grantor, dates, scope, uses and the document with its SHA-256), PENDING (a person must decide; refused) and PROHIBITED (refused). Grants are human decisions recorded here after review; tooling never changes them. A source whose review_due date has passed is refused until it is reviewed again.",
+ "note": "Permission gates for the historical importer, enforced by scripts/history/lib/permissions.mjs. Each source has a separate grant per use (fetch_targeted, fetch_bulk, process_local, publish_repository, publish_site); a host on this list is not a permission. States: CLEARED (the license permits it), LIMITED (only inside its scope), AUTHORIZED (only with a documented authorization on file: reference, grantor, dates, scope, uses and the document with its SHA-256), PENDING (a person must decide; refused) and PROHIBITED (refused). Grants are human decisions recorded here after review; tooling never changes them. A source whose review_due date has passed is refused until it is reviewed again. historical_before: records of years before it are 'historical'; on hosted they need every source catalogued and granting publish_site (requireHostedPublication). Governance by URL (governs_hosts, governs_url_patterns) applies whatever source key a batch uses, so aliases cannot bypass a grant.",
+ "historical_before": 2015,
  "authorization_template": {
   "reference": "e.g. MLBAM letter or contract number",
   "granted_by": "name and role at the rights holder",
@@ -22,7 +23,7 @@
  "sources": [
   {
    "id": "mlb-statsapi-draft",
-   "title": "MLB Stats API draft endpoint (all amateur phases, 1965-present)",
+   "title": "MLB Stats API (draft endpoint for all amateur phases since 1965; also people, stats and transactions)",
    "publisher": "MLB Advanced Media",
    "authority_level": "OFFICIAL",
    "source_type": "OFFICIAL_LEAGUE",
@@ -30,7 +31,10 @@
     "statsapi.mlb.com"
    ],
    "url_prefixes": [
-    "https://statsapi.mlb.com/api/v1/draft"
+    "https://statsapi.mlb.com/api/v1/"
+   ],
+   "governs_hosts": [
+    "statsapi.mlb.com"
    ],
    "url_template": "https://statsapi.mlb.com/api/v1/draft/{year}?draftType={code}",
    "source_key_prefixes": [
@@ -66,7 +70,7 @@
    "uses": {
     "fetch_targeted": {
      "state": "PENDING",
-     "basis": "The terms permit only individual, non-commercial, non-bulk use without written MLBAM authorization. Whether BAI's per-class research requests qualify has not been decided; the historical importer makes no new MLB requests until it is."
+     "basis": "The terms permit only individual, non-commercial, non-bulk use without written MLBAM authorization. No decision yet on whether BAI's per-class research requests qualify: every downloader that reaches statsapi.mlb.com (the history importer, scripts/research/sources/fetch-mlb-player-outcomes.mjs) is refused until a person records one."
     },
     "fetch_bulk": {
      "state": "PENDING",
@@ -88,8 +92,11 @@
      "basis": "The public repository is redistribution. Selection lists, extracts and per-year counts derived from the feed stay out of Git (kept in .restricted/, backed up outside the repository)."
     },
     "publish_site": {
-     "state": "PENDING",
-     "basis": "Writing feed-derived historical records to the hosted database publishes them on the public site. Requires written MLBAM authorization that covers display, or a decision that the use is permitted."
+     "state": "LIMITED",
+     "scope": {
+      "years_from": 2015
+     },
+     "basis": "Status quo, under review: the per-class research program (LAD 2015-2019, Wave 2 2016) already publishes MLB-sourced records for 2015 onward (docs/history/hosted-provenance.md). Historical years (before 2015) stay refused until written MLBAM authorization covers display. A maintainer may tighten this to PENDING, which stops new research-program publication too."
     }
    },
    "authorization": null,
@@ -107,6 +114,9 @@
    ],
    "url_prefixes": [
     "https://raw.githubusercontent.com/chadwickbureau/register/"
+   ],
+   "governs_url_patterns": [
+    "chadwickbureau/register"
    ],
    "url_template": "https://raw.githubusercontent.com/chadwickbureau/register/{commit}/data/people-{shard}.csv",
    "pinned_commit": "781c175e748b89e5730fd3f5de0086b9355b2f92",
@@ -170,6 +180,9 @@
    "url_prefixes": [
     "https://en.wikipedia.org/"
    ],
+   "governs_hosts": [
+    "wikipedia.org"
+   ],
    "url_template": "https://en.wikipedia.org/w/api.php?action=query&prop=revisions&rvprop=ids|timestamp|content&rvslots=main&format=json&titles={year}_Major_League_Baseball_draft",
    "source_key_prefixes": [
     "hist:wikipedia-"
@@ -223,7 +236,7 @@
   },
   {
    "id": "bref-draft-archive",
-   "title": "Baseball-Reference draft pages, read through Internet Archive captures",
+   "title": "Baseball-Reference pages (live, and read through Internet Archive captures)",
    "publisher": "Sports Reference LLC (via the Internet Archive)",
    "authority_level": "AGGREGATOR",
    "source_type": "REFERENCE_DATABASE",
@@ -234,6 +247,13 @@
    "url_prefixes": [
     "https://web.archive.org/cdx/search/cdx?url=baseball-reference.com/",
     "https://web.archive.org/web/"
+   ],
+   "governs_hosts": [
+    "baseball-reference.com",
+    "sports-reference.com"
+   ],
+   "governs_url_patterns": [
+    "baseball-reference.com"
    ],
    "source_key_prefixes": [
     "hist:bref-archive-"
@@ -256,7 +276,7 @@
    "uses": {
     "fetch_targeted": {
      "state": "PENDING",
-     "basis": "Sports Reference restricts automated collection of its data; reading its pages through archive captures does not change whose data it is. No new captures until a person decides."
+     "basis": "Sports Reference restricts automated collection of its data; reading its pages through archive captures does not change whose data it is. Every downloader (the history importer, scripts/research/sources/fetch-bref-player-pages.mjs) is refused until a person decides."
     },
     "fetch_bulk": {
      "state": "PROHIBITED",
@@ -278,8 +298,11 @@
      "basis": "Names, counts or extracts from Baseball-Reference pages are not committed to the public repository."
     },
     "publish_site": {
-     "state": "PROHIBITED",
-     "basis": "Baseball-Reference-derived corroboration notes are not written to the hosted database."
+     "state": "LIMITED",
+     "scope": {
+      "years_from": 2015
+     },
+     "basis": "Status quo, under review: research-program batches for 2015 onward cite Baseball-Reference pages one at a time (docs/history/hosted-provenance.md). Historical years stay refused. A maintainer may tighten this to PROHIBITED."
     }
    },
    "authorization": null,

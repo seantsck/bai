@@ -29,7 +29,7 @@ import { ownerDatabaseUrl, isLocalUrl } from '../db/lib/connection.mjs'
 import * as P from '../research/lib/pipeline.mjs'
 import * as B from '../research/lib/backfill.mjs'
 import { createFetcher, BudgetExhausted } from './lib/fetch.mjs'
-import { loadCatalog, requireUse, requireBatchUse, PermissionDenied } from './lib/permissions.mjs'
+import { loadCatalog, requireUse, requireBatchUse, requireHostedPublication, PermissionDenied } from './lib/permissions.mjs'
 import { PHASES, normalizePhase, draftKey } from './lib/mlb.mjs'
 import { SHARDS, indexShard } from './lib/chadwick.mjs'
 import { buildPhaseBatches } from './lib/build.mjs'
@@ -220,7 +220,7 @@ const COMMANDS = {
     for (const file of files) {
       const doc = JSON.parse(fs.readFileSync(path.join(dir, file), 'utf8'))
       requireBatchUse(catalog, doc, 'process_local', {}, { root })
-      if (!local) requireBatchUse(catalog, doc, 'publish_site', {}, { root })
+      if (!local) requireHostedPublication(catalog, doc, {}, { root })
     }
     await withDb(async (db) => {
       for (const file of files) {

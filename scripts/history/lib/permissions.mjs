@@ -60,8 +60,33 @@ export function validateCatalog (catalog) {
 }
 
 /** The catalog source that owns a source key (by prefix) or a host; null when none does. */
-export const sourceForKey = (catalog, sourceKey) =>
-  catalog.sources.find((s) => s.id === sourceKey || (s.source_key_prefixes ?? []).some((p) => sourceKey.startsWith(p))) ?? null
+export const sourceForKey = (catalog, sourceKey) => {
+  const k = String(sourceKey ?? '').trim().toLowerCase()
+  return catalog.sources.find((s) => s.id === k || (s.source_key_prefixes ?? []).some((p) => k.startsWith(p))) ?? null
+}
+/**
+ * The catalog source that governs a URL, by the hosts and URL patterns it declares for governance (governs_hosts,
+ * governs_url_patterns): e.g. any statsapi.mlb.com URL, or an archive capture of a baseball-reference.com page.
+ */
+export function sourceForUrl (catalog, url) {
+  if (!url) return null
+  let host
+  try { host = new URL(url).hostname.toLowerCase() } catch { return null }
+  const u = String(url).toLowerCase()
+  const matchHost = (h) => host === h || host.endsWith(`.${h}`)
+  return catalog.sources.find((s) => (s.governs_hosts ?? []).some(matchHost) || (s.governs_url_patterns ?? []).some((p) => u.includes(p))) ?? null
+}
+/**
+ * The source governing a cited source ({ source_key, url }), by key first and then by URL, so a renamed key or an alias
+ * pointing at a governed host is still governed. A hist: key the catalog does not know is reported as `unknownHist`.
+ */
+export function governingSource (catalog, cited) {
+  const byKey = sourceForKey(catalog, cited.source_key)
+  if (byKey) return { source: byKey }
+  const byUrl = sourceForUrl(catalog, cited.url)
+  if (byUrl) return { source: byUrl }
+  return { source: null, unknownHist: /^hist:/i.test(String(cited.source_key ?? '').trim()) }
+}
 export const sourceForHost = (catalog, host) => catalog.sources.find((s) => (s.hosts ?? []).includes(host)) ?? null
 
 function scopeProblem (scope, ctx) {
@@ -69,6 +94,11 @@ function scopeProblem (scope, ctx) {
   if (scope.years) {
     if (ctx.year == null) return 'the scope is limited to certain years and no year was given'
     if (!scope.years.includes(Number(ctx.year))) return `year ${ctx.year} is outside the scope (${scope.years.join(', ')})`
+  }
+  if (scope.years_from != null || scope.years_to != null) {
+    if (ctx.year == null) return 'the scope is limited to a range of years and no year was given'
+    if (scope.years_from != null && Number(ctx.year) < scope.years_from) return `year ${ctx.year} is before the scope (from ${scope.years_from})`
+    if (scope.years_to != null && Number(ctx.year) > scope.years_to) return `year ${ctx.year} is after the scope (to ${scope.years_to})`
   }
   if (scope.max_requests_per_run != null && (ctx.requests ?? 0) > scope.max_requests_per_run) return `${ctx.requests} requests exceed the scope's ${scope.max_requests_per_run} per run`
   return null
@@ -140,4 +170,45 @@ export function requireBatchUse (catalog, doc, use, ctx = {}, opts = {}) {
 export function batchYear (doc) {
   const y = (doc.coverage_claims ?? []).map((c) => Number(String(c.scope_key ?? '').slice(0, 4))).find((n) => n >= 1965 && n <= 2100)
   return y ?? null
+}
+
+/**
+ * Every year a batch touches: coverage claims; records' draft keys, period keys and signing dates; the acquisitions they
+ * reference; and, for records that create no acquisition, the date or season they observe.
+ */
+export function batchYears (doc) {
+  const years = new Set()
+  const add = (v) => { const n = Number(String(v ?? '').slice(0, 4)); if (Number.isInteger(n) && n > 1800) years.add(n) }
+  for (const c of doc.coverage_claims ?? []) add(c.scope_key)
+  for (const r of doc.records ?? []) {
+    add(r.draft_key); add(r.period_key); add(r.signing_date); add(r.acquisition?.draft_key); add(r.acquisition?.period_key)
+    // Records that create no acquisition (outcome audits, trades) are dated by what they observe.
+    add(r.date); add(r.observation_through_season)
+  }
+  return [...years].sort()
+}
+
+/**
+ * Hosted publication gate: the hosted database feeds the public site, so a batch may be staged or applied there only if
+ *   * every source it cites that the catalog governs (by key or by URL) grants publish_site for every year it touches;
+ *   * no source carries a hist: key the catalog does not know;
+ *   * for historical years (before catalog.historical_before, 2015) every source is catalogued: an unknown source cannot
+ *     carry historical records to the public site. A batch whose years cannot be determined counts as historical.
+ * Fails closed: throws PermissionDenied on the first refusal.
+ */
+export function requireHostedPublication (catalog, doc, ctx = {}, opts = {}) {
+  const before = catalog.historical_before ?? 2015
+  const years = batchYears(doc)
+  const historical = !years.length || years.some((y) => y < before)
+  for (const cited of doc.sources ?? []) {
+    const { source, unknownHist } = governingSource(catalog, cited)
+    if (unknownHist) throw new PermissionDenied(`${cited.source_key}: a hist: source key the catalog does not govern`, { source: cited.source_key, use: 'publish_site' })
+    if (!source) {
+      if (historical) throw new PermissionDenied(`${cited.source_key}: historical records (${years.join(', ') || 'year unknown'}) may reach hosted only from catalogued sources`, { source: cited.source_key, use: 'publish_site' })
+      continue
+    }
+    for (const year of years.length ? years : [null]) requireUse(catalog, source, 'publish_site', { ...ctx, year }, opts)
+  }
+  if (!(doc.sources ?? []).length && historical) throw new PermissionDenied('a historical batch with no declared sources cannot reach hosted', { use: 'publish_site' })
+  return { years, historical }
 }

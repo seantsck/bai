@@ -53,7 +53,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import pg from 'pg'
 import { ownerDatabaseUrl, reviewerDatabaseUrl, requireHostedWriteConfirmation, isLocalUrl } from '../db/lib/connection.mjs'
-import { loadCatalog, requireBatchUse } from '../history/lib/permissions.mjs'
+import { loadCatalog, requireHostedPublication, PermissionDenied } from '../history/lib/permissions.mjs'
 import * as P from './lib/pipeline.mjs'
 import * as B from './lib/backfill.mjs'
 
@@ -357,20 +357,19 @@ const WRITES = { import: true, validate: true, apply: true, identity: true, reso
 const REVIEWER = { reconsider: true, accept: true, ratify: true, certify: true, reviewer: Boolean(args.enroll), proposals: Boolean(args.reject), gate: Boolean(args.open) }
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 const PUBLISHING = { import: true, validate: true, apply: true }
-/** Refuses to put a batch on the hosted database unless every governed source it cites permits publish_site. */
+/** Early, explicit refusal (the pipeline enforces the same gate on every stage and apply). */
 async function requireSitePublication (db) {
-  const catalog = loadCatalog(repoRoot)
   let doc
   if (command === 'import') doc = JSON.parse(fs.readFileSync(need('file'), 'utf8'))
   else {
-    const ref = need('batch')
-    const b = (await db.query('select id, batch_key from ingest.import_batches where batch_key = $1 or id::text = $1', [String(ref)])).rows[0]
-    if (!b) return
-    const sources = (await db.query('select source_key from ingest.staged_sources where batch_id = $1', [b.id])).rows
-    const claims = (await db.query('select payload from ingest.staged_records where batch_id = $1 limit 1', [b.id])).rows
-    doc = { batch_key: b.batch_key, sources, coverage_claims: claims.map((r) => ({ scope_key: `${r.payload.draft_key ?? ''}` })) }
+    const ref = String(need('batch'))
+    const b = (await db.query('select id, coverage_claim from ingest.import_batches where batch_key = $1 or id::text = $1', [ref])).rows[0]
+    if (!b) throw new P.PipelineError(`no batch ${ref}`)
+    const sources = (await db.query('select payload from ingest.staged_sources where batch_id = $1', [b.id])).rows.map((r) => r.payload)
+    const records = (await db.query('select payload from ingest.staged_records where batch_id = $1', [b.id])).rows.map((r) => r.payload)
+    doc = { sources, coverage_claims: b.coverage_claim ?? [], records }
   }
-  requireBatchUse(catalog, doc, 'publish_site', {}, { root: repoRoot })
+  requireHostedPublication(loadCatalog(repoRoot), doc, {}, { root: repoRoot })
 }
 
 let db = null
@@ -386,7 +385,7 @@ try {
   if (PUBLISHING[command] && !isLocalUrl(url)) await requireSitePublication(db)
   code = await main(db)
 } catch (err) {
-  console.error(err instanceof P.PipelineError ? `error: ${err.message}` : `error: ${err.message.replace(/postgres(ql)?:\/\/\S+/g, '<redacted>')}`)
+  console.error(err instanceof PermissionDenied ? `permission refused: ${err.message}` : err instanceof P.PipelineError ? `error: ${err.message}` : `error: ${err.message.replace(/postgres(ql)?:\/\/\S+/g, '<redacted>')}`)
   code = 1
 } finally { await db?.end().catch(() => {}) }
 process.exit(code)

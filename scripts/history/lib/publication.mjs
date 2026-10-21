@@ -9,10 +9,15 @@
 //                       satisfied
 //   UNKNOWN_HIST_KEY    a data file citing a hist: source key that no catalog source governs (a gate cannot be bypassed by
 //                       inventing a key)
+//   UNREVIEWED_HISTORY_FILE  a tracked file under research/history/ that is not on the reviewed list below: new historical
+//                       research files fail closed until they are reviewed and listed
 // Notices (reported, not failures): data files citing MLB or Baseball-Reference by URL outside the catalog's governance.
 // Those predate the gate (targeted per-class research) and are listed for the licensing review.
 import { checkUse, sourceForKey } from './permissions.mjs'
 
+// The only files that may be committed under research/history/ (each reviewed: catalog, metadata, openly sourced rows,
+// synthetic benchmark). Anything else there fails the check until it is reviewed and added here.
+export const REVIEWED_HISTORY_FILES = new Set(['research/history/sources.json', 'research/history/manifest.json', 'research/history/calendar.json', 'research/history/reports/benchmark.json'])
 export const RESTRICTED_PATHS = [/^\.restricted\//, /^\.cache\//, /^research\/history\/batches\//]
 const DATA_FILE = /\.(json|csv|tsv|txt|html?)$/i
 // The catalog itself and the download manifest (URL, size, SHA-256, time per file: metadata, no content) are exempt.
@@ -26,6 +31,7 @@ export function scanForRestricted (files, catalog, { root, now } = {}) {
   const notices = []
   for (const f of files) {
     if (RESTRICTED_PATHS.some((re) => re.test(f.path))) { findings.push({ kind: 'RESTRICTED_PATH', path: f.path, detail: 'restricted output directory' }); continue }
+    if (f.path.startsWith('research/history/') && !REVIEWED_HISTORY_FILES.has(f.path)) findings.push({ kind: 'UNREVIEWED_HISTORY_FILE', path: f.path, detail: 'not on the reviewed list (lib/publication.mjs)' })
     if (!DATA_FILE.test(f.path) || EXEMPT.has(f.path)) continue
     const keys = new Set([...f.text.matchAll(HIST_KEY)].map((m) => m[1]))
     for (const key of keys) {

@@ -67,3 +67,30 @@ checks for:
 
 Older research batches on `main` (`research/imports/`) cite MLB and Baseball-Reference per class. They predate the gates
 and are reviewed with the hosted records in [hosted-provenance.md](hosted-provenance.md).
+
+## Release review (Phase 9.2, 2026-10-21)
+
+The full PR #12 diff against `main` was reviewed before merge, and these gaps were closed:
+- **Aliases and unrecognized keys.**
+  - Governance now also follows URLs (`governs_hosts`, `governs_url_patterns`).
+  - Keys match case-insensitively.
+  - Unknown `hist:` keys are refused.
+  - Historical years need every source catalogued.
+- **Alternative import paths.** The hosted gate moved into the research pipeline (`stageFile`, `applyBatch --write`).
+  Runbooks and scripts that bypass the CLIs are therefore covered too.
+- **Other download paths.** The two research-program downloaders that reach MLB's Stats API and archived
+  Baseball-Reference pages are now gated (`fetch_targeted`). No other script in the repository fetches source data:
+  - `scripts/app/smoke.mjs` reads BAI's own app;
+  - `scripts/db/security.mjs` and `scripts/deploy/` call Supabase and Vercel administration APIs;
+  - the source importers read files a researcher already downloaded.
+- **New research files.** Any tracked file under `research/history/` must be on a reviewed list, or the publication
+  check fails.
+
+**Files added by PR #12 under `research/`:** `research/history/sources.json`, `manifest.json`, `calendar.json` and
+`reports/benchmark.json`. All four are reviewed:
+- the catalog;
+- the download metadata;
+- the Wikipedia-sourced calendar rows;
+- the synthetic benchmark.
+
+No other research file was added.
