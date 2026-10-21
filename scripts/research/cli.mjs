@@ -170,7 +170,7 @@ async function main (db) {
     case 'propose': {
       const r = await P.proposeDecision(db, { subjectTable: need('table'), subjectId: need('id'), field: need('field'), observationId: need('observation'), proposedBy: operator(),
         rationale: need('rationale'), evidence: args.evidence ? String(args.evidence).split(',').map((e) => e.trim()).filter(Boolean) : [] })
-      console.log(`${r.created ? 'proposal' : 'existing proposal'} ${r.proposal.id}: ${r.proposal.subject_table}#${r.proposal.subject_id}.${r.proposal.field_name} -> obs ${r.proposal.proposed_observation_id} (${JSON.stringify(r.proposal.proposed_value)}) by ${r.proposal.proposed_by}; PROPOSED, decides nothing until a registered reviewer runs research:${r.path} --proposal ${r.proposal.id}`)
+      console.log(`${r.created ? 'proposal' : 'existing proposal'} ${r.proposal.id}: ${r.proposal.subject_table}#${r.proposal.subject_id}.${r.proposal.field_name} -> obs ${r.proposal.proposed_observation_id} (${JSON.stringify(r.proposal.proposed_value)}) by ${r.proposal.proposed_by}; PROPOSED, decides nothing until a reviewer, on their own login, runs research:accept --proposal ${r.proposal.id} (or rejects it)`)
       return 0
     }
     case 'proposals': {

@@ -1,0 +1,1047 @@
+{
+ "format": "bai-research-import/1",
+ "batch_key": "2016-17-international-tb",
+ "channel": "INTERNATIONAL",
+ "description": "TB 2016-17 signing period: 36 candidate international amateur signings discovered on the MLB transaction wire (bonuses unknown).",
+ "coverage_claims": [
+  {
+   "domain": "INTERNATIONAL",
+   "scope_key": "2016-17",
+   "organization": "TB",
+   "coverage_state": "PARTIAL_RECONSTRUCTION",
+   "gap_notes": "Discovered from the MLB transaction wire by a documented rule; no complete published class list consulted yet; bonuses unknown; 3 foreign-born signees outside the rule not imported."
+  }
+ ],
+ "sources": [
+  {
+   "source_key": "tb201617:mlb-transactions-2016-17",
+   "source_type": "OFFICIAL_LEAGUE",
+   "authority_level": "OFFICIAL",
+   "title": "MLB transaction wire, team 139, 2016-17 signing period",
+   "publisher": "MLB Advanced Media",
+   "reference": "statsapi.mlb.com/api/v1/transactions?teamId=139&startDate=…&endDate=… (period window)",
+   "retrieved_date": "2026-10-20",
+   "notes": "414 transactions in the window; signing entries give the day but no bonus."
+  },
+  {
+   "source_key": "tb201617:mlb-people-2016-17",
+   "source_type": "OFFICIAL_LEAGUE",
+   "authority_level": "OFFICIAL",
+   "title": "MLB Stats API people and milb_all seasons for 2016-17 signees",
+   "publisher": "MLB Advanced Media",
+   "reference": "statsapi.mlb.com/api/v1/people?personIds=…; people/{id}/stats?stats=yearByYear&leagueListId=milb_all",
+   "retrieved_date": "2026-10-20",
+   "notes": "Birth date, birth country, draft year; affiliated seasons used only to exclude players with earlier professional history."
+  }
+ ],
+ "records": [
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "tb201617:mlb-transactions-2016-17",
+   "organization": "TB",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "SS",
+   "player": {
+    "full_name": "Dewins Verbel",
+    "birth_date": "1999-12-24",
+    "birth_country": "Colombia",
+    "external_ids": {
+     "MLBAM": "672650"
+    },
+    "source_key": "tb201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Colombia, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 290429: Tampa Bay Rays signed free agent SS Dewins Verbel to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "tb201617:mlb-transactions-2016-17",
+   "organization": "TB",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Rodolfo Sanchez",
+    "birth_date": "2000-01-12",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "672651"
+    },
+    "source_key": "tb201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 290433: Tampa Bay Rays signed free agent RHP Rodolfo Sanchez to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "tb201617:mlb-transactions-2016-17",
+   "organization": "TB",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "C",
+   "player": {
+    "full_name": "Angel Nelo",
+    "birth_date": "2000-03-29",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "672652"
+    },
+    "source_key": "tb201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 290437: Tampa Bay Rays signed free agent C Angel Nelo to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "tb201617:mlb-transactions-2016-17",
+   "organization": "TB",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "OF",
+   "player": {
+    "full_name": "Diego Infante",
+    "birth_date": "1999-10-22",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "672653"
+    },
+    "source_key": "tb201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 290440: Tampa Bay Rays signed free agent OF Diego Infante to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "tb201617:mlb-transactions-2016-17",
+   "organization": "TB",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "SS",
+   "player": {
+    "full_name": "Luis Arcendo",
+    "birth_date": "1999-11-01",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "672654"
+    },
+    "source_key": "tb201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 290442: Tampa Bay Rays signed free agent SS Luis Arcendo to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "tb201617:mlb-transactions-2016-17",
+   "organization": "TB",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Angel Ramirez",
+    "birth_date": "1996-12-25",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "672655"
+    },
+    "source_key": "tb201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 19 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 290448: Tampa Bay Rays signed free agent RHP Angel Ramirez to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "tb201617:mlb-transactions-2016-17",
+   "organization": "TB",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "SS",
+   "player": {
+    "full_name": "Abiezel Ramirez",
+    "birth_date": "2000-01-26",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "672656"
+    },
+    "source_key": "tb201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 290450: Tampa Bay Rays signed free agent SS Abiezel Ramirez to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "tb201617:mlb-transactions-2016-17",
+   "organization": "TB",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "SS",
+   "player": {
+    "full_name": "Angel Lopez",
+    "birth_date": "1999-11-14",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "672657"
+    },
+    "source_key": "tb201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 290453: Tampa Bay Rays signed free agent SS Angel Lopez to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "tb201617:mlb-transactions-2016-17",
+   "organization": "TB",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RF",
+   "player": {
+    "full_name": "Roimer Bolivar",
+    "birth_date": "1999-12-10",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "672658"
+    },
+    "source_key": "tb201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 290454: Tampa Bay Rays signed free agent RF Roimer Bolivar to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "tb201617:mlb-transactions-2016-17",
+   "organization": "TB",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Daniel Santana",
+    "birth_date": "1998-04-16",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "672659"
+    },
+    "source_key": "tb201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 18 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 290455: Tampa Bay Rays signed free agent RHP Daniel Santana to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "tb201617:mlb-transactions-2016-17",
+   "organization": "TB",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Jeremy Galan",
+    "birth_date": "1998-10-30",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "672660"
+    },
+    "source_key": "tb201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 17 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 290456: Tampa Bay Rays signed free agent RHP Jeremy Galan to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "tb201617:mlb-transactions-2016-17",
+   "organization": "TB",
+   "signing_date": "2016-07-04",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Jose De Los Santos",
+    "birth_date": "1999-09-19",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "672649"
+    },
+    "source_key": "tb201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 290427: Tampa Bay Rays signed free agent RHP Jose De Los Santos to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "tb201617:mlb-transactions-2016-17",
+   "organization": "TB",
+   "signing_date": "2016-07-17",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Edisson Gonzalez",
+    "birth_date": "1999-10-02",
+    "birth_country": "Panama",
+    "external_ids": {
+     "MLBAM": "672548"
+    },
+    "source_key": "tb201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Panama, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 290168: Tampa Bay Rays signed free agent RHP Edisson Gonzalez to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "tb201617:mlb-transactions-2016-17",
+   "organization": "TB",
+   "signing_date": "2016-07-17",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Yariel Barrios",
+    "birth_date": "2000-04-23",
+    "birth_country": "Panama",
+    "external_ids": {
+     "MLBAM": "672549"
+    },
+    "source_key": "tb201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Panama, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 290169: Tampa Bay Rays signed free agent RHP Yariel Barrios to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "tb201617:mlb-transactions-2016-17",
+   "organization": "TB",
+   "signing_date": "2016-08-01",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "IF",
+   "player": {
+    "full_name": "Johan Lopez",
+    "birth_date": "2000-07-28",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "672517"
+    },
+    "source_key": "tb201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 289972: Tampa Bay Rays signed free agent IF Johan Lopez to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "tb201617:mlb-transactions-2016-17",
+   "organization": "TB",
+   "signing_date": "2016-08-09",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Wikelman Ramirez",
+    "birth_date": "2000-08-09",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "672491"
+    },
+    "source_key": "tb201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 289817: Tampa Bay Rays signed free agent RHP Wikelman Ramirez to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "tb201617:mlb-transactions-2016-17",
+   "organization": "TB",
+   "signing_date": "2016-08-12",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "OF",
+   "player": {
+    "full_name": "Aldenis Sanchez",
+    "birth_date": "1998-09-26",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "672479"
+    },
+    "source_key": "tb201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 17 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 289810: Tampa Bay Rays signed free agent OF Aldenis Sanchez to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "tb201617:mlb-transactions-2016-17",
+   "organization": "TB",
+   "signing_date": "2016-08-25",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "2B",
+   "player": {
+    "full_name": "Amador Arias",
+    "birth_date": "2000-08-25",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "672457"
+    },
+    "source_key": "tb201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 289782: Tampa Bay Rays signed free agent 2B Amador Arias to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "tb201617:mlb-transactions-2016-17",
+   "organization": "TB",
+   "signing_date": "2016-09-08",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Leonardo Sanchez",
+    "birth_date": "1998-12-16",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "672417"
+    },
+    "source_key": "tb201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 17 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 289675: Tampa Bay Rays signed free agent RHP Leonardo Sanchez to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "tb201617:mlb-transactions-2016-17",
+   "organization": "TB",
+   "signing_date": "2016-09-09",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Dauris Lopez",
+    "birth_date": "1998-10-20",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "672403"
+    },
+    "source_key": "tb201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 17 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 289661: Tampa Bay Rays signed free agent RHP Dauris Lopez to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "tb201617:mlb-transactions-2016-17",
+   "organization": "TB",
+   "signing_date": "2016-10-09",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Carlos Gomez",
+    "birth_date": "1999-09-30",
+    "birth_country": "Colombia",
+    "external_ids": {
+     "MLBAM": "672381"
+    },
+    "source_key": "tb201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Colombia, age 17 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 289628: Tampa Bay Rays signed free agent RHP Carlos Gomez to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "tb201617:mlb-transactions-2016-17",
+   "organization": "TB",
+   "signing_date": "2016-10-20",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "LHP",
+   "player": {
+    "full_name": "Eduardo Perez",
+    "birth_date": "1997-09-27",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "673167"
+    },
+    "source_key": "tb201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 19 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 294259: Tampa Bay Rays signed free agent LHP Eduardo Perez to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "tb201617:mlb-transactions-2016-17",
+   "organization": "TB",
+   "signing_date": "2016-10-20",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "1B",
+   "player": {
+    "full_name": "Bryan Santos",
+    "birth_date": "1999-05-04",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "673169"
+    },
+    "source_key": "tb201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 17 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 294263: Tampa Bay Rays signed free agent 1B Bryan Santos to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "tb201617:mlb-transactions-2016-17",
+   "organization": "TB",
+   "signing_date": "2016-10-28",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "LHP",
+   "player": {
+    "full_name": "José Lopez",
+    "birth_date": "1999-02-15",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "673111"
+    },
+    "source_key": "tb201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 17 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 293573: Tampa Bay Rays signed free agent LHP Jose Lopez to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "tb201617:mlb-transactions-2016-17",
+   "organization": "TB",
+   "signing_date": "2016-10-28",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Luis Duran",
+    "birth_date": "2000-03-04",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "673393"
+    },
+    "source_key": "tb201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 296565: Tampa Bay Rays signed free agent RHP Luis Duran to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "tb201617:mlb-transactions-2016-17",
+   "organization": "TB",
+   "signing_date": "2016-10-31",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "LHP",
+   "player": {
+    "full_name": "Franklin Dacosta",
+    "birth_date": "2000-02-27",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "672374"
+    },
+    "source_key": "tb201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 296215: Tampa Bay Rays signed free agent LHP Franklin Dacosta to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "tb201617:mlb-transactions-2016-17",
+   "organization": "TB",
+   "signing_date": "2016-11-21",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Janick Lopez",
+    "birth_date": "1999-04-24",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "673268"
+    },
+    "source_key": "tb201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 17 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 295521: Tampa Bay Rays signed free agent RHP Janick Lopez to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "tb201617:mlb-transactions-2016-17",
+   "organization": "TB",
+   "signing_date": "2016-12-01",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Wilson Garcia",
+    "birth_date": "1996-10-14",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "673270"
+    },
+    "source_key": "tb201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 20 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 295519: Tampa Bay Rays signed free agent RHP Wilson Garcia to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "tb201617:mlb-transactions-2016-17",
+   "organization": "TB",
+   "signing_date": "2016-12-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Marquito Casilla",
+    "birth_date": "1999-11-12",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "673269"
+    },
+    "source_key": "tb201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 17 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 295517: Tampa Bay Rays signed free agent RHP Marquito Casilla to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "tb201617:mlb-transactions-2016-17",
+   "organization": "TB",
+   "signing_date": "2017-02-10",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Rafael Prensa",
+    "birth_date": "1998-02-15",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "673745"
+    },
+    "source_key": "tb201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 18 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 297925: Tampa Bay Rays signed free agent RHP Rafael Prensa to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "tb201617:mlb-transactions-2016-17",
+   "organization": "TB",
+   "signing_date": "2017-02-16",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "1B",
+   "player": {
+    "full_name": "Freddvil Chevez",
+    "birth_date": "2000-03-13",
+    "birth_country": "Nicaragua",
+    "external_ids": {
+     "MLBAM": "673882"
+    },
+    "source_key": "tb201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Nicaragua, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 298264: Tampa Bay Rays signed free agent 1B Freddvil Chevez to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "tb201617:mlb-transactions-2016-17",
+   "organization": "TB",
+   "signing_date": "2017-03-24",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "C",
+   "player": {
+    "full_name": "Fermin Villasmil",
+    "birth_date": "2000-02-04",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "674467"
+    },
+    "source_key": "tb201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 17 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 301666: Tampa Bay Rays signed free agent C Fermin Villasmil to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "tb201617:mlb-transactions-2016-17",
+   "organization": "TB",
+   "signing_date": "2017-03-27",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Emilio Alfonzo",
+    "birth_date": "2000-08-02",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "674465"
+    },
+    "source_key": "tb201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 301650: Tampa Bay Rays signed free agent RHP Emilio Alfonzo to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "tb201617:mlb-transactions-2016-17",
+   "organization": "TB",
+   "signing_date": "2017-03-28",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "C",
+   "player": {
+    "full_name": "Julio Meza",
+    "birth_date": "1999-05-04",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "674466"
+    },
+    "source_key": "tb201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 17 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 301652: Tampa Bay Rays signed free agent C Julio Meza to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "tb201617:mlb-transactions-2016-17",
+   "organization": "TB",
+   "signing_date": "2017-05-09",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "LHP",
+   "player": {
+    "full_name": "Fernando Melo",
+    "birth_date": "1999-12-31",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "675890"
+    },
+    "source_key": "tb201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 17 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 311449: Tampa Bay Rays signed free agent LHP Fernando Melo to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "tb201617:mlb-transactions-2016-17",
+   "organization": "TB",
+   "signing_date": "2017-05-26",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Matthew Peguero",
+    "birth_date": "2000-01-12",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "676014"
+    },
+    "source_key": "tb201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 17 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 312711: Tampa Bay Rays signed free agent RHP Matthew Peguero to a minor league contract."
+  }
+ ]
+}

@@ -1,0 +1,1075 @@
+{
+ "format": "bai-research-import/1",
+ "batch_key": "2016-17-international-hou",
+ "channel": "INTERNATIONAL",
+ "description": "HOU 2016-17 signing period: 37 candidate international amateur signings discovered on the MLB transaction wire (bonuses unknown).",
+ "coverage_claims": [
+  {
+   "domain": "INTERNATIONAL",
+   "scope_key": "2016-17",
+   "organization": "HOU",
+   "coverage_state": "PARTIAL_RECONSTRUCTION",
+   "gap_notes": "Discovered from the MLB transaction wire by a documented rule; no complete published class list consulted yet; bonuses unknown; 6 foreign-born signees outside the rule not imported."
+  }
+ ],
+ "sources": [
+  {
+   "source_key": "hou201617:mlb-transactions-2016-17",
+   "source_type": "OFFICIAL_LEAGUE",
+   "authority_level": "OFFICIAL",
+   "title": "MLB transaction wire, team 117, 2016-17 signing period",
+   "publisher": "MLB Advanced Media",
+   "reference": "statsapi.mlb.com/api/v1/transactions?teamId=117&startDate=…&endDate=… (period window)",
+   "retrieved_date": "2026-10-20",
+   "notes": "255 transactions in the window; signing entries give the day but no bonus."
+  },
+  {
+   "source_key": "hou201617:mlb-people-2016-17",
+   "source_type": "OFFICIAL_LEAGUE",
+   "authority_level": "OFFICIAL",
+   "title": "MLB Stats API people and milb_all seasons for 2016-17 signees",
+   "publisher": "MLB Advanced Media",
+   "reference": "statsapi.mlb.com/api/v1/people?personIds=…; people/{id}/stats?stats=yearByYear&leagueListId=milb_all",
+   "retrieved_date": "2026-10-20",
+   "notes": "Birth date, birth country, draft year; affiliated seasons used only to exclude players with earlier professional history."
+  }
+ ],
+ "records": [
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "hou201617:mlb-transactions-2016-17",
+   "organization": "HOU",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "LHP",
+   "player": {
+    "full_name": "Juan Pablo Lopez",
+    "birth_date": "1999-02-17",
+    "birth_country": "Mexico",
+    "external_ids": {
+     "MLBAM": "670940"
+    },
+    "source_key": "hou201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Mexico, age 17 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 277247: Houston Astros signed free agent LHP Juan Pablo Lopez to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "hou201617:mlb-transactions-2016-17",
+   "organization": "HOU",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Freylin Garcia",
+    "birth_date": "1997-12-06",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "671223"
+    },
+    "source_key": "hou201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 18 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 280013: Houston Astros signed free agent RHP Freylin Garcia to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "hou201617:mlb-transactions-2016-17",
+   "organization": "HOU",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "SS",
+   "player": {
+    "full_name": "Freudis Nova",
+    "birth_date": "2000-01-12",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "671265"
+    },
+    "source_key": "hou201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 280705: Houston Astros signed free agent SS Freudys Nova to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "hou201617:mlb-transactions-2016-17",
+   "organization": "HOU",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "OF",
+   "player": {
+    "full_name": "Leonardo Gonzalez",
+    "birth_date": "2000-05-27",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "672717"
+    },
+    "source_key": "hou201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 290540: Houston Astros signed free agent OF Leonardo Gonzalez to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "hou201617:mlb-transactions-2016-17",
+   "organization": "HOU",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "SS",
+   "player": {
+    "full_name": "Sean Mendoza",
+    "birth_date": "2000-06-02",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "672735"
+    },
+    "source_key": "hou201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 290558: Houston Astros signed free agent SS Sean Mendoza to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "hou201617:mlb-transactions-2016-17",
+   "organization": "HOU",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Angel Ortega",
+    "birth_date": "1999-11-18",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "672739"
+    },
+    "source_key": "hou201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 290562: Houston Astros signed free agent RHP Angel Ortega to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "hou201617:mlb-transactions-2016-17",
+   "organization": "HOU",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "SS",
+   "player": {
+    "full_name": "Deury Carrasco",
+    "birth_date": "1999-09-20",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "672767"
+    },
+    "source_key": "hou201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 290590: Houston Astros signed free agent SS Deury Carrasco to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "hou201617:mlb-transactions-2016-17",
+   "organization": "HOU",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Ronny Garcia",
+    "birth_date": "1999-12-02",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "672774"
+    },
+    "source_key": "hou201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 290600: Houston Astros signed free agent RHP Ronny Garcia to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "hou201617:mlb-transactions-2016-17",
+   "organization": "HOU",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "2B",
+   "player": {
+    "full_name": "Jeury Castillo",
+    "birth_date": "2000-01-14",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "672793"
+    },
+    "source_key": "hou201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 290627: Houston Astros signed free agent 2B Jeury Castillo to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "hou201617:mlb-transactions-2016-17",
+   "organization": "HOU",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Jairo Solis",
+    "birth_date": "1999-12-22",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "672810"
+    },
+    "source_key": "hou201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 290648: Houston Astros signed free agent RHP Jairo Solis to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "hou201617:mlb-transactions-2016-17",
+   "organization": "HOU",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Angel Macuare",
+    "birth_date": "2000-03-03",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "672836"
+    },
+    "source_key": "hou201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 290690: Houston Astros signed free agent RHP Angel Macuare to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "hou201617:mlb-transactions-2016-17",
+   "organization": "HOU",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "SS",
+   "player": {
+    "full_name": "Yorbin Ceuta",
+    "birth_date": "2000-01-14",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "672845"
+    },
+    "source_key": "hou201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 290700: Houston Astros signed free agent SS Yorbin Ceuta to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "hou201617:mlb-transactions-2016-17",
+   "organization": "HOU",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "C",
+   "player": {
+    "full_name": "José Alvarez",
+    "birth_date": "2000-06-04",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "672905"
+    },
+    "source_key": "hou201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 290769: Houston Astros signed free agent C Jose Alvarez to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "hou201617:mlb-transactions-2016-17",
+   "organization": "HOU",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "LHP",
+   "player": {
+    "full_name": "Jervic Chavez",
+    "birth_date": "1997-02-08",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "670902"
+    },
+    "source_key": "hou201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 19 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 313912: Houston Astros signed free agent LHP Jervic Chavez to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "hou201617:mlb-transactions-2016-17",
+   "organization": "HOU",
+   "signing_date": "2016-07-05",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Jose Bravo",
+    "birth_date": "1997-06-10",
+    "birth_country": "Mexico",
+    "external_ids": {
+     "MLBAM": "670986"
+    },
+    "source_key": "hou201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Mexico, age 19 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 279378: Houston Astros signed free agent RHP Jose Bravo to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "hou201617:mlb-transactions-2016-17",
+   "organization": "HOU",
+   "signing_date": "2016-07-11",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Yohan Ramírez",
+    "birth_date": "1995-05-06",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "670990"
+    },
+    "source_key": "hou201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 21 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 278235: Houston Astros signed free agent RHP Yohan Ramirez to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "hou201617:mlb-transactions-2016-17",
+   "organization": "HOU",
+   "signing_date": "2016-07-23",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "SS",
+   "player": {
+    "full_name": "Anibal Sierra",
+    "birth_date": "1994-02-15",
+    "birth_country": "Cuba",
+    "external_ids": {
+     "MLBAM": "671242"
+    },
+    "source_key": "hou201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Cuba, age 22 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 280255: Houston Astros signed free agent SS Anibal Sierra to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "hou201617:mlb-transactions-2016-17",
+   "organization": "HOU",
+   "signing_date": "2016-09-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Renny Ugarte",
+    "birth_date": "1997-02-27",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "672423"
+    },
+    "source_key": "hou201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 19 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 289681: Houston Astros signed free agent RHP Renny Ugarte to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "hou201617:mlb-transactions-2016-17",
+   "organization": "HOU",
+   "signing_date": "2016-09-26",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "LHP",
+   "player": {
+    "full_name": "Antonio Pujols",
+    "birth_date": "1998-01-27",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "672388"
+    },
+    "source_key": "hou201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 18 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 289635: Houston Astros signed free agent LHP Antonio Pujols to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "hou201617:mlb-transactions-2016-17",
+   "organization": "HOU",
+   "signing_date": "2016-10-19",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Jose Alberto Rivera",
+    "birth_date": "1997-02-14",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "673277"
+    },
+    "source_key": "hou201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 19 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 295332: Houston Astros signed free agent RHP Jose Rivera to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "hou201617:mlb-transactions-2016-17",
+   "organization": "HOU",
+   "signing_date": "2016-11-04",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Luis De Paula",
+    "birth_date": "1996-11-15",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "673243"
+    },
+    "source_key": "hou201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 19 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 295330: Houston Astros signed free agent RHP Luis De Paula to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "hou201617:mlb-transactions-2016-17",
+   "organization": "HOU",
+   "signing_date": "2016-11-17",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Wender Oberto",
+    "birth_date": "1999-12-09",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "673245"
+    },
+    "source_key": "hou201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 295409: Houston Astros signed free agent RHP Wender Oberto to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "hou201617:mlb-transactions-2016-17",
+   "organization": "HOU",
+   "signing_date": "2016-12-05",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "C",
+   "player": {
+    "full_name": "Freddy Chirino",
+    "birth_date": "1999-12-15",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "673242"
+    },
+    "source_key": "hou201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 295405: Houston Astros signed free agent C Freddy Chirino to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "hou201617:mlb-transactions-2016-17",
+   "organization": "HOU",
+   "signing_date": "2016-12-07",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Fredis Guerrero",
+    "birth_date": "1996-02-16",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "673244"
+    },
+    "source_key": "hou201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 20 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 295407: Houston Astros signed free agent RHP Fredis Guerrero to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "hou201617:mlb-transactions-2016-17",
+   "organization": "HOU",
+   "signing_date": "2016-12-09",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "LHP",
+   "player": {
+    "full_name": "Cionel Pérez",
+    "birth_date": "1996-04-21",
+    "birth_country": "Cuba",
+    "external_ids": {
+     "MLBAM": "672335"
+    },
+    "source_key": "hou201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Cuba, age 20 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 294716: Houston Astros signed free agent LHP Cionel Perez to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "hou201617:mlb-transactions-2016-17",
+   "organization": "HOU",
+   "signing_date": "2016-12-20",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Carlos Quintero",
+    "birth_date": "2000-01-11",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "673373"
+    },
+    "source_key": "hou201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 296421: Houston Astros signed free agent RHP Carlos Quintero to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "hou201617:mlb-transactions-2016-17",
+   "organization": "HOU",
+   "signing_date": "2017-01-09",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "C",
+   "player": {
+    "full_name": "Luis Barajas",
+    "birth_date": "1998-07-13",
+    "birth_country": "Mexico",
+    "external_ids": {
+     "MLBAM": "673355"
+    },
+    "source_key": "hou201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Mexico, age 18 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 296290: Houston Astros signed free agent C Luis Barajas to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "hou201617:mlb-transactions-2016-17",
+   "organization": "HOU",
+   "signing_date": "2017-02-13",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "LHP",
+   "player": {
+    "full_name": "Denilson Lugo",
+    "birth_date": "1997-12-22",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "673748"
+    },
+    "source_key": "hou201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 19 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 297960: Houston Astros signed free agent LHP Denilson Lugo to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "hou201617:mlb-transactions-2016-17",
+   "organization": "HOU",
+   "signing_date": "2017-02-13",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "LHP",
+   "player": {
+    "full_name": "Nathanael Ventura",
+    "birth_date": "1995-12-15",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "673750"
+    },
+    "source_key": "hou201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 21 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 297966: Houston Astros signed free agent LHP Nathanael Ventura to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "hou201617:mlb-transactions-2016-17",
+   "organization": "HOU",
+   "signing_date": "2017-03-08",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "3B",
+   "player": {
+    "full_name": "Marco Van Der Wijst",
+    "birth_date": "1998-02-23",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "674294"
+    },
+    "source_key": "hou201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 19 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 299897: Houston Astros signed free agent 3B Oliver Van Der Wijst to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "hou201617:mlb-transactions-2016-17",
+   "organization": "HOU",
+   "signing_date": "2017-03-22",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Fabricio Reina",
+    "birth_date": "2000-02-26",
+    "birth_country": "VEN",
+    "external_ids": {
+     "MLBAM": "674457"
+    },
+    "source_key": "hou201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born VEN, age 17 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 301181: Houston Astros signed free agent RHP Fabricio Reina to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "hou201617:mlb-transactions-2016-17",
+   "organization": "HOU",
+   "signing_date": "2017-03-30",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Bryan Solano",
+    "birth_date": "1998-01-25",
+    "birth_country": "Costa Rica",
+    "external_ids": {
+     "MLBAM": "674484"
+    },
+    "source_key": "hou201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Costa Rica, age 19 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 301840: Houston Astros signed free agent RHP Bryan Solano to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "hou201617:mlb-transactions-2016-17",
+   "organization": "HOU",
+   "signing_date": "2017-06-01",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Gustavo Almonte",
+    "birth_date": "1998-06-03",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "674165"
+    },
+    "source_key": "hou201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 18 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 313124: Houston Astros signed free agent RHP Gustavo Almonte to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "hou201617:mlb-transactions-2016-17",
+   "organization": "HOU",
+   "signing_date": "2017-06-01",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Jonger Ochoa",
+    "birth_date": "1997-01-16",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "671000"
+    },
+    "source_key": "hou201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 20 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 313292: Houston Astros signed free agent RHP Jonger Ochoa to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "hou201617:mlb-transactions-2016-17",
+   "organization": "HOU",
+   "signing_date": "2017-06-01",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Oscar Severino",
+    "birth_date": "1998-02-26",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "670920"
+    },
+    "source_key": "hou201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 19 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 313301: Houston Astros signed free agent RHP Oscar Severino to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "hou201617:mlb-transactions-2016-17",
+   "organization": "HOU",
+   "signing_date": "2017-06-12",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "OF",
+   "player": {
+    "full_name": "Fildex Perfecto",
+    "birth_date": "1998-08-19",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "677126"
+    },
+    "source_key": "hou201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 18 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 316590: Houston Astros signed free agent OF Fildex Perfecto to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "hou201617:mlb-transactions-2016-17",
+   "organization": "HOU",
+   "signing_date": "2017-06-15",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Elian Rodriguez",
+    "birth_date": "1997-03-10",
+    "birth_country": "Cuba",
+    "external_ids": {
+     "MLBAM": "677080"
+    },
+    "source_key": "hou201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Cuba, age 20 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 316136: Houston Astros signed free agent RHP Elian Rodriguez to a minor league contract."
+  }
+ ]
+}

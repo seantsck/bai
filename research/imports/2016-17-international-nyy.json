@@ -1,0 +1,1075 @@
+{
+ "format": "bai-research-import/1",
+ "batch_key": "2016-17-international-nyy",
+ "channel": "INTERNATIONAL",
+ "description": "NYY 2016-17 signing period: 37 candidate international amateur signings discovered on the MLB transaction wire (bonuses unknown).",
+ "coverage_claims": [
+  {
+   "domain": "INTERNATIONAL",
+   "scope_key": "2016-17",
+   "organization": "NYY",
+   "coverage_state": "PARTIAL_RECONSTRUCTION",
+   "gap_notes": "Discovered from the MLB transaction wire by a documented rule; no complete published class list consulted yet; bonuses unknown; 7 foreign-born signees outside the rule not imported."
+  }
+ ],
+ "sources": [
+  {
+   "source_key": "nyy201617:mlb-transactions-2016-17",
+   "source_type": "OFFICIAL_LEAGUE",
+   "authority_level": "OFFICIAL",
+   "title": "MLB transaction wire, team 147, 2016-17 signing period",
+   "publisher": "MLB Advanced Media",
+   "reference": "statsapi.mlb.com/api/v1/transactions?teamId=147&startDate=…&endDate=… (period window)",
+   "retrieved_date": "2026-10-20",
+   "notes": "366 transactions in the window; signing entries give the day but no bonus."
+  },
+  {
+   "source_key": "nyy201617:mlb-people-2016-17",
+   "source_type": "OFFICIAL_LEAGUE",
+   "authority_level": "OFFICIAL",
+   "title": "MLB Stats API people and milb_all seasons for 2016-17 signees",
+   "publisher": "MLB Advanced Media",
+   "reference": "statsapi.mlb.com/api/v1/people?personIds=…; people/{id}/stats?stats=yearByYear&leagueListId=milb_all",
+   "retrieved_date": "2026-10-20",
+   "notes": "Birth date, birth country, draft year; affiliated seasons used only to exclude players with earlier professional history."
+  }
+ ],
+ "records": [
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "nyy201617:mlb-transactions-2016-17",
+   "organization": "NYY",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "C",
+   "player": {
+    "full_name": "Saul Torres",
+    "birth_date": "1999-02-19",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "670922"
+    },
+    "source_key": "nyy201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 17 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 279540: New York Yankees signed C Saul Torres."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "nyy201617:mlb-transactions-2016-17",
+   "organization": "NYY",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Abel Estevez",
+    "birth_date": "2000-01-17",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "672665"
+    },
+    "source_key": "nyy201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 290466: New York Yankees signed free agent RHP Abel Estevez to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "nyy201617:mlb-transactions-2016-17",
+   "organization": "NYY",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "LHP",
+   "player": {
+    "full_name": "Albert Hernandez",
+    "birth_date": "1999-12-01",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "672669"
+    },
+    "source_key": "nyy201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 290470: New York Yankees signed free agent LHP Albert Hernandez to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "nyy201617:mlb-transactions-2016-17",
+   "organization": "NYY",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "SS",
+   "player": {
+    "full_name": "Asdrubal Alvarez",
+    "birth_date": "1999-10-10",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "672700"
+    },
+    "source_key": "nyy201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 290523: New York Yankees signed free agent SS Asdrubal Alvarez to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "nyy201617:mlb-transactions-2016-17",
+   "organization": "NYY",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "SS",
+   "player": {
+    "full_name": "José Devers",
+    "birth_date": "1999-12-07",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "672701"
+    },
+    "source_key": "nyy201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 290524: New York Yankees signed free agent SS Jose Devers to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "nyy201617:mlb-transactions-2016-17",
+   "organization": "NYY",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Roansy Contreras",
+    "birth_date": "1999-11-07",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "672710"
+    },
+    "source_key": "nyy201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 290533: New York Yankees signed free agent RHP Roansy Contreras to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "nyy201617:mlb-transactions-2016-17",
+   "organization": "NYY",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "SS",
+   "player": {
+    "full_name": "Oswald Peraza",
+    "birth_date": "2000-06-15",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "672724"
+    },
+    "source_key": "nyy201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 290547: New York Yankees signed free agent SS Oswald Peraza to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "nyy201617:mlb-transactions-2016-17",
+   "organization": "NYY",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "CF",
+   "player": {
+    "full_name": "Jesus Severino",
+    "birth_date": "2000-06-07",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "672748"
+    },
+    "source_key": "nyy201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 290571: New York Yankees signed free agent CF Jesus Severino to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "nyy201617:mlb-transactions-2016-17",
+   "organization": "NYY",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Carfred Espana",
+    "birth_date": "2000-01-03",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "672753"
+    },
+    "source_key": "nyy201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 290576: New York Yankees signed free agent RHP Carfred Espana to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "nyy201617:mlb-transactions-2016-17",
+   "organization": "NYY",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Yoendrys Gómez",
+    "birth_date": "1999-10-15",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "672782"
+    },
+    "source_key": "nyy201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 290608: New York Yankees signed free agent RHP Yoendrys Gomez to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "nyy201617:mlb-transactions-2016-17",
+   "organization": "NYY",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Diego Cordero",
+    "birth_date": "1999-10-21",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "672785"
+    },
+    "source_key": "nyy201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 290615: New York Yankees signed free agent RHP Diego Cordero to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "nyy201617:mlb-transactions-2016-17",
+   "organization": "NYY",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "CF",
+   "player": {
+    "full_name": "Victor Hernandez",
+    "birth_date": "1999-01-31",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "672852"
+    },
+    "source_key": "nyy201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 17 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 290709: New York Yankees signed free agent CF Victor Hernandez to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "nyy201617:mlb-transactions-2016-17",
+   "organization": "NYY",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "CF",
+   "player": {
+    "full_name": "Jonathan Capellan",
+    "birth_date": "1999-03-26",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "672864"
+    },
+    "source_key": "nyy201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 17 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 290721: New York Yankees signed free agent CF Jonathan Capellan to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "nyy201617:mlb-transactions-2016-17",
+   "organization": "NYY",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Anyelo Luna",
+    "birth_date": "1997-12-16",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "672875"
+    },
+    "source_key": "nyy201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 18 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 290735: New York Yankees signed free agent RHP Anyelo Luna to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "nyy201617:mlb-transactions-2016-17",
+   "organization": "NYY",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "C",
+   "player": {
+    "full_name": "Malvin Del Orbe",
+    "birth_date": "1997-03-02",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "672904"
+    },
+    "source_key": "nyy201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 19 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 290768: New York Yankees signed free agent C Malvin Del Orbe to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "nyy201617:mlb-transactions-2016-17",
+   "organization": "NYY",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "LHP",
+   "player": {
+    "full_name": "Marcos Arguello",
+    "birth_date": "1997-11-10",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "670898"
+    },
+    "source_key": "nyy201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 18 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 291062: New York Yankees signed free agent LHP Marcos Arguello to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "nyy201617:mlb-transactions-2016-17",
+   "organization": "NYY",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "CF",
+   "player": {
+    "full_name": "Christian Andrade",
+    "birth_date": "1999-04-14",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "673386"
+    },
+    "source_key": "nyy201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 17 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 296550: New York Yankees signed free agent CF Christian Andrade to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "nyy201617:mlb-transactions-2016-17",
+   "organization": "NYY",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Nelvin Correa",
+    "birth_date": "1997-01-25",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "673388"
+    },
+    "source_key": "nyy201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 19 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 296552: New York Yankees signed free agent RHP Nelvin Correa to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "nyy201617:mlb-transactions-2016-17",
+   "organization": "NYY",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "C",
+   "player": {
+    "full_name": "Eduardo Rodriguez",
+    "birth_date": "1997-10-02",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "670917"
+    },
+    "source_key": "nyy201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 18 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 313666: New York Yankees signed free agent C Eduardo Rodriguez to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "nyy201617:mlb-transactions-2016-17",
+   "organization": "NYY",
+   "signing_date": "2016-07-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Rodrigo Garcia",
+    "birth_date": "1999-03-13",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "672045"
+    },
+    "source_key": "nyy201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 17 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 367387: New York Yankees signed free agent RHP Rodrigo Garcia to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "nyy201617:mlb-transactions-2016-17",
+   "organization": "NYY",
+   "signing_date": "2016-07-04",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "C",
+   "player": {
+    "full_name": "Miguel Torres",
+    "birth_date": "2000-03-03",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "672621"
+    },
+    "source_key": "nyy201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 290336: New York Yankees signed free agent C Miguel Torres to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "nyy201617:mlb-transactions-2016-17",
+   "organization": "NYY",
+   "signing_date": "2016-07-05",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "SS",
+   "player": {
+    "full_name": "Eduardo Torrealba",
+    "birth_date": "1999-03-26",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "665908"
+    },
+    "source_key": "nyy201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 17 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 279449: New York Yankees signed free agent SS Eduardo Torrealba to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "nyy201617:mlb-transactions-2016-17",
+   "organization": "NYY",
+   "signing_date": "2016-07-07",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "OF",
+   "player": {
+    "full_name": "Alexander Santana",
+    "birth_date": "2000-07-07",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "672581"
+    },
+    "source_key": "nyy201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 290205: New York Yankees signed free agent OF Alexander Santana to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "nyy201617:mlb-transactions-2016-17",
+   "organization": "NYY",
+   "signing_date": "2016-07-07",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "3B",
+   "player": {
+    "full_name": "Jose Villa",
+    "birth_date": "1998-11-16",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "672588"
+    },
+    "source_key": "nyy201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 17 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 290212: New York Yankees signed free agent 3B Jose Villa to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "nyy201617:mlb-transactions-2016-17",
+   "organization": "NYY",
+   "signing_date": "2016-07-12",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "C",
+   "player": {
+    "full_name": "Gustavo Campero",
+    "birth_date": "1997-09-20",
+    "birth_country": "Colombia",
+    "external_ids": {
+     "MLBAM": "672569"
+    },
+    "source_key": "nyy201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Colombia, age 18 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 290193: New York Yankees signed free agent C Gustavo Campero to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "nyy201617:mlb-transactions-2016-17",
+   "organization": "NYY",
+   "signing_date": "2016-08-15",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Jean Luna",
+    "birth_date": "1997-02-22",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "672471"
+    },
+    "source_key": "nyy201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 19 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 289797: New York Yankees signed free agent RHP Jean Luna to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "nyy201617:mlb-transactions-2016-17",
+   "organization": "NYY",
+   "signing_date": "2016-08-15",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Jose Peguero",
+    "birth_date": "1998-08-08",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "672472"
+    },
+    "source_key": "nyy201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 18 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 289798: New York Yankees signed free agent RHP Jose Peguero to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "nyy201617:mlb-transactions-2016-17",
+   "organization": "NYY",
+   "signing_date": "2016-08-30",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Juan Carderon",
+    "birth_date": "1998-08-01",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "672431"
+    },
+    "source_key": "nyy201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 18 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 289695: New York Yankees signed free agent RHP Juan Carderon to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "nyy201617:mlb-transactions-2016-17",
+   "organization": "NYY",
+   "signing_date": "2016-09-01",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "C",
+   "player": {
+    "full_name": "Gabriel Mora",
+    "birth_date": "2000-06-01",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "672425"
+    },
+    "source_key": "nyy201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 16 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 289683: New York Yankees signed free agent C Gabriel Mora to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "nyy201617:mlb-transactions-2016-17",
+   "organization": "NYY",
+   "signing_date": "2016-09-15",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "LHP",
+   "player": {
+    "full_name": "Daniel Calderon",
+    "birth_date": "1997-10-13",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "672401"
+    },
+    "source_key": "nyy201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 18 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 289659: New York Yankees signed free agent LHP Daniel Calderon to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "nyy201617:mlb-transactions-2016-17",
+   "organization": "NYY",
+   "signing_date": "2017-03-07",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Joensy Abreu",
+    "birth_date": "1997-12-29",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "674286"
+    },
+    "source_key": "nyy201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 19 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 299881: New York Yankees signed free agent RHP Joensy Abreu to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "nyy201617:mlb-transactions-2016-17",
+   "organization": "NYY",
+   "signing_date": "2017-03-16",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Wellington Diaz",
+    "birth_date": "1997-04-25",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "670905"
+    },
+    "source_key": "nyy201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 19 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 320368: New York Yankees signed free agent RHP Wellington Diaz to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "nyy201617:mlb-transactions-2016-17",
+   "organization": "NYY",
+   "signing_date": "2017-03-17",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "OF",
+   "player": {
+    "full_name": "Robert Javier",
+    "birth_date": "1999-02-01",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "670907"
+    },
+    "source_key": "nyy201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 18 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 313511: New York Yankees signed free agent OF Robert Javier to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "nyy201617:mlb-transactions-2016-17",
+   "organization": "NYY",
+   "signing_date": "2017-05-02",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Wilser Barrios",
+    "birth_date": "1998-03-21",
+    "birth_country": "VEN",
+    "external_ids": {
+     "MLBAM": "675841"
+    },
+    "source_key": "nyy201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born VEN, age 19 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 310498: New York Yankees signed free agent RHP Wilser Barrios to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "nyy201617:mlb-transactions-2016-17",
+   "organization": "NYY",
+   "signing_date": "2017-05-05",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "RHP",
+   "player": {
+    "full_name": "Daison Manzano",
+    "birth_date": "1998-07-06",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "675847"
+    },
+    "source_key": "nyy201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Venezuela, age 18 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 310511: New York Yankees signed free agent RHP Daison Manzano to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "nyy201617:mlb-transactions-2016-17",
+   "organization": "NYY",
+   "signing_date": "2017-05-12",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "SS",
+   "player": {
+    "full_name": "Starlin Paulino",
+    "birth_date": "2000-02-24",
+    "birth_country": "Dominican Republic",
+    "external_ids": {
+     "MLBAM": "676013"
+    },
+    "source_key": "nyy201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Dominican Republic, age 17 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 312709: New York Yankees signed free agent SS Starlin Paulino to a minor league contract."
+  },
+  {
+   "type": "INTERNATIONAL_SIGNING",
+   "source_key": "nyy201617:mlb-transactions-2016-17",
+   "organization": "NYY",
+   "signing_date": "2017-05-25",
+   "signing_date_precision": "DAY",
+   "period_key": "2016-17",
+   "pathway": "INTERNATIONAL_AMATEUR",
+   "position": "SS",
+   "player": {
+    "full_name": "Luis Santos",
+    "birth_date": "2000-01-04",
+    "birth_country": "Mexico",
+    "external_ids": {
+     "MLBAM": "676021"
+    },
+    "source_key": "nyy201617:mlb-people-2016-17"
+   },
+   "costs": {},
+   "flags": [
+    {
+     "code": "PATHWAY_BY_RULE",
+     "severity": "WARNING",
+     "notes": "Amateur by rule (born Mexico, age 17 at signing, never drafted, no earlier affiliated season); verify against a published class list."
+    }
+   ],
+   "notes": "MLB transaction 312728: New York Yankees signed free agent SS Luis Santos to a minor league contract."
+  }
+ ]
+}

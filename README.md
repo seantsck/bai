@@ -6,10 +6,15 @@ A league-wide research platform on MLB amateur talent acquisition across two equ
 
 BAI is independent of DISI and Diamond IQ. It shares DISI's research discipline but not its database, data or deployment.
 
-**Status:** Wave 1 research (branch `feature/phase7-decision-history-and-attribution`).
-- **On hosted:** migrations 001–020, the 2015 pilot, and PR #6's research: LAD 2016 and 2017 drafts and the 2016-17 / 2017-18 international classes.
-- **This phase:** an append-only decision history with registered human reviewers and proposals (migration 021, [docs/decision-history.md](docs/decision-history.md)); organizational WAR attribution with season-by-team value and trade returns (migration 022); the LAD 2018 and 2019 drafts; the Smeltzer correction as a proposal; Wave 2 preparation.
-- Migrations 021–022 and this phase's research are local until the branch merges.
+**Status:** Wave 1 research complete through LAD 2019; Wave 2 begun (branch `feature/phase8-wave2-and-deploy`).
+- **On hosted:**
+  - migrations 001–023;
+  - the 2015 pilot;
+  - LAD 2016–2019 drafts, with per-acquisition dispositions and organizational value;
+  - LAD 2016-17 / 2017-18 international classes;
+  - the Wave 2 2016 classes, created and planned.
+- **Certification is disabled.** Reviewer identity is bound to authenticated database logins (migration 021), and the gate opens only once the automation no longer holds the owner credential ([docs/decision-history.md](docs/decision-history.md)). Open decisions for a human reviewer: [docs/evidence/phase8-reviewer-packages.md](docs/evidence/phase8-reviewer-packages.md).
+- **This branch:** the Wave 2 2016 drafts and 2016-17 international candidates (ATL, BAL, HOU, NYY, SD, TB); local until it merges.
 - Nothing is certified. See [docs/backfill-methodology.md](docs/backfill-methodology.md).
 
 ## Principles
