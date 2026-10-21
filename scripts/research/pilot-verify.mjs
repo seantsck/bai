@@ -106,7 +106,9 @@ const SCOPED = {
   fact_resolutions: (r, s) => s.subjectIn(r.subject_table, r.subject_id),
   quality_flags: (r, s) => s.subjectIn(r.subject_table, r.subject_id),
   coverage_assessments: (r, s) => s.cells.has(`${r.domain}|${r.scope_key}|${r.organization_id}`),
-  sources: (r) => /^(pilot2015:|cal:|bai-reference:)/.test(r.source_key)
+  sources: (r) => /^(pilot2015:|cal:|bai-reference:)/.test(r.source_key),
+  // The baseline's calendar is 015's (2015-2026); historical phases added later (024's importer) are outside the pilot.
+  drafts: (r) => r.draft_year >= 2015 && r.draft_year <= 2026
 }
 
 async function snapshot (db, scope) {
@@ -165,6 +167,13 @@ function compare (base, cur) {
   const norm = (t, list = []) => list.map((r) => comparable(t, r)).filter(Boolean)
   for (const t of Object.keys(base.tables)) base.tables[t] = norm(t, base.tables[t])
   for (const t of Object.keys(cur.tables)) cur.tables[t] = norm(t, cur.tables[t])
+  // Columns added by later, additive migrations (e.g. 024's organizations.first_season) are not in the baseline; compare
+  // the columns the baseline recorded. Every recorded value is still compared, and a dropped column still shows.
+  for (const t of Object.keys(cur.tables)) {
+    if (!base.tables[t]?.length) continue
+    const known = new Set(base.tables[t].flatMap((r) => Object.keys(JSON.parse(r))))
+    cur.tables[t] = cur.tables[t].map((r) => JSON.stringify(Object.fromEntries(Object.entries(JSON.parse(r)).filter(([k]) => known.has(k)))))
+  }
   const cmpList = (label, a = [], b = []) => {
     const A = new Set(a)
     const B = new Set(b)

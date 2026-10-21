@@ -13,7 +13,7 @@
 //
 // League-wide backfill (docs/backfill-methodology.md). Single-organization commands always need --org; nothing assumes a club.
 //   npm run research:orgs                                                   the 30 organizations, historical names, program waves
-//   npm run research:class    -- --org LAD --channel draft --year 2016 [--create]   (international: --period 2016-17)
+//   npm run research:class    -- --org LAD --channel draft --year 2016 [--kind JANUARY_REGULAR] [--create]   (international: --period 2016-17)
 //   npm run research:plan     -- --org LAD --channel draft --year 2016       create/close jobs from the data (idempotent)
 //   npm run research:next     -- --org LAD [--channel draft --year 2016 --period 2016-17 --stage financials --limit 10] | --league
 //   npm run research:progress [-- --org LAD]                                league-wide unless --org is given
@@ -43,8 +43,17 @@
 // Against the hosted BAI database (.env.hosted.local, `npm run hosted:research -- <command> ...`), every command that writes
 // anything, staging included, also needs --confirm-hosted <project ref>. Read-only commands (conflicts, queue, coverage,
 // batches, resolve without --write) do not.
+//
+// PUBLICATION GATE: the hosted database feeds the public site, so importing, validating or applying a batch there needs
+// publish_site for every source the batch cites that research/history/sources.json governs (scripts/history/lib/
+// permissions.mjs). A batch citing a source without that grant (MLB's draft feed for historical classes, archived
+// Baseball-Reference pages) is refused before anything is staged or written. Local databases are not gated.
+import fs from 'node:fs'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import pg from 'pg'
-import { ownerDatabaseUrl, reviewerDatabaseUrl, requireHostedWriteConfirmation } from '../db/lib/connection.mjs'
+import { ownerDatabaseUrl, reviewerDatabaseUrl, requireHostedWriteConfirmation, isLocalUrl } from '../db/lib/connection.mjs'
+import { loadCatalog, requireBatchUse } from '../history/lib/permissions.mjs'
 import * as P from './lib/pipeline.mjs'
 import * as B from './lib/backfill.mjs'
 
@@ -62,7 +71,7 @@ const print = (title, obj) => { if (json) console.log(JSON.stringify(obj, null, 
 const need = (k) => { if (!args[k] || args[k] === true) throw new P.PipelineError(`--${k} is required`); return args[k] }
 const operator = () => args.agent ? `agent:${args.agent}` : (args.operator ?? process.env.BAI_OPERATOR ?? process.env.USER ?? 'cli')
 const listArg = (k) => args[k] && args[k] !== true ? String(args[k]).split(',').map((e) => e.trim()).filter(Boolean) : []
-const scopeArgs = () => ({ org: args.org, channel: args.channel, year: args.year, period: args.period })
+const scopeArgs = () => ({ org: args.org, channel: args.channel, year: args.year, period: args.period, kind: args.kind })
 
 function summarize (report) {
   const { coverage, actions, ...rest } = report
@@ -346,6 +355,24 @@ const WRITES = { import: true, validate: true, apply: true, identity: true, reso
   accept: Boolean(args.write), ratify: Boolean(args.write), check: true, gate: Boolean(args.open || args.close) }
 // Human-only actions run on the reviewer's own login (BAI_REVIEWER_DATABASE_URL), so the database knows who acts (021).
 const REVIEWER = { reconsider: true, accept: true, ratify: true, certify: true, reviewer: Boolean(args.enroll), proposals: Boolean(args.reject), gate: Boolean(args.open) }
+const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
+const PUBLISHING = { import: true, validate: true, apply: true }
+/** Refuses to put a batch on the hosted database unless every governed source it cites permits publish_site. */
+async function requireSitePublication (db) {
+  const catalog = loadCatalog(repoRoot)
+  let doc
+  if (command === 'import') doc = JSON.parse(fs.readFileSync(need('file'), 'utf8'))
+  else {
+    const ref = need('batch')
+    const b = (await db.query('select id, batch_key from ingest.import_batches where batch_key = $1 or id::text = $1', [String(ref)])).rows[0]
+    if (!b) return
+    const sources = (await db.query('select source_key from ingest.staged_sources where batch_id = $1', [b.id])).rows
+    const claims = (await db.query('select payload from ingest.staged_records where batch_id = $1 limit 1', [b.id])).rows
+    doc = { batch_key: b.batch_key, sources, coverage_claims: claims.map((r) => ({ scope_key: `${r.payload.draft_key ?? ''}` })) }
+  }
+  requireBatchUse(catalog, doc, 'publish_site', {}, { root: repoRoot })
+}
+
 let db = null
 let code = 1
 try {
@@ -356,6 +383,7 @@ try {
   if (WRITES[command]) requireHostedWriteConfirmation(url)
   db = new pg.Client({ connectionString: url })
   await db.connect()
+  if (PUBLISHING[command] && !isLocalUrl(url)) await requireSitePublication(db)
   code = await main(db)
 } catch (err) {
   console.error(err instanceof P.PipelineError ? `error: ${err.message}` : `error: ${err.message.replace(/postgres(ql)?:\/\/\S+/g, '<redacted>')}`)
