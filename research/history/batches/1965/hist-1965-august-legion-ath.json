@@ -1,0 +1,74 @@
+{
+ "format": "bai-research-import/1",
+ "batch_key": "hist-1965-august-legion-ath",
+ "channel": "DRAFT",
+ "description": "ATH, 1965 August American Legion phase: 1 of 1 selections from MLB's draft feed (historical importer).",
+ "coverage_claims": [
+  {
+   "domain": "DRAFT",
+   "scope_key": "1965-AUGUST_LEGION",
+   "organization": "ATH",
+   "coverage_state": "PARTIAL_RECONSTRUCTION",
+   "source_key": "hist:mlb-statsapi-draft-1965-al",
+   "gap_notes": "MLB's draft feed lists 1 selection(s) for the club in the August American Legion phase. No independent per-club count yet: one feed's rows are not proof of the population. Signing status, bonuses and outcomes not researched."
+  }
+ ],
+ "sources": [
+  {
+   "source_key": "hist:mlb-statsapi-draft-1965-al",
+   "source_type": "OFFICIAL_LEAGUE",
+   "authority_level": "OFFICIAL",
+   "title": "MLB Stats API draft endpoint, 1965 August American Legion phase (draftType AL)",
+   "publisher": "MLB Advanced Media",
+   "url": "https://statsapi.mlb.com/api/v1/draft/1965?draftType=AL",
+   "retrieved_date": "2026-10-21",
+   "notes": "League-wide JSON, 13 selections; sha256 50673ed2c7fe64cfca080a95b481e7c3b31c66ac1fc3f2455512403c3e46a1e8. Supplies pick, round, franchise-stable team id, MLBAM person, school label. No signing data. Terms: individual, non-commercial, non-bulk use (research/history/sources.json)."
+  },
+  {
+   "source_key": "hist:chadwick-register-781c175",
+   "source_type": "REFERENCE_DATABASE",
+   "authority_level": "AGGREGATOR",
+   "title": "Chadwick Baseball Bureau Register, commit 781c175",
+   "publisher": "Chadwick Baseball Bureau",
+   "url": "https://github.com/chadwickbureau/register/tree/781c175e748b89e5730fd3f5de0086b9355b2f92",
+   "retrieved_date": "2026-10-21",
+   "notes": "MLBAM -> Baseball-Reference, Baseball-Reference minors, FanGraphs and Retrosheet ids. Open Data Commons Attribution License 1.0."
+  }
+ ],
+ "records": [
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-1965-al",
+   "draft_key": "1965-AUGUST_LEGION",
+   "round_code": "1",
+   "overall_pick": 2,
+   "round_pick": 2,
+   "organization": "ATH",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Raymond Deriggi",
+    "birth_date": "1948-01-01",
+    "birth_country": null,
+    "external_ids": {
+     "MLBAM": "473952",
+     "BBREF_MINORS": "derigg001ray"
+    },
+    "source_key": "hist:mlb-statsapi-draft-1965-al",
+    "external_id_sources": {
+     "BBREF_MINORS": "hist:chadwick-register-781c175"
+    }
+   },
+   "school": {
+    "name": "Vailsburg HS (Newark, NJ)",
+    "school_type": "HIGH_SCHOOL",
+    "city": "Newark",
+    "region": "NJ",
+    "source_key": "hist:mlb-statsapi-draft-1965-al"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type from explicit words in MLB's label."
+  }
+ ]
+}

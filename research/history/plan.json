@@ -1,0 +1,1120 @@
+{
+ "format": "bai-history-plan/1",
+ "generated_from": "manifest + cache + local coverage",
+ "totals": {
+  "years": 62,
+  "selections_known": 3673,
+  "selections_estimated": 74570,
+  "discovery_requests": 159
+ },
+ "rows": [
+  {
+   "year": 2026,
+   "wave": "H0 (calendar exists; LAD/Wave 2 research)",
+   "order": 0,
+   "phases": [
+    "JR"
+   ],
+   "discovery_requests": 1,
+   "discovered": false,
+   "selections": null,
+   "selections_estimate": 615,
+   "phases_found": [],
+   "imported": 0,
+   "clubs_with_census": 0,
+   "club_phases": 30
+  },
+  {
+   "year": 2025,
+   "wave": "H0 (calendar exists; LAD/Wave 2 research)",
+   "order": 0,
+   "phases": [
+    "JR"
+   ],
+   "discovery_requests": 1,
+   "discovered": false,
+   "selections": null,
+   "selections_estimate": 615,
+   "phases_found": [],
+   "imported": 0,
+   "clubs_with_census": 0,
+   "club_phases": 30
+  },
+  {
+   "year": 2024,
+   "wave": "H0 (calendar exists; LAD/Wave 2 research)",
+   "order": 0,
+   "phases": [
+    "JR"
+   ],
+   "discovery_requests": 1,
+   "discovered": false,
+   "selections": null,
+   "selections_estimate": 615,
+   "phases_found": [],
+   "imported": 0,
+   "clubs_with_census": 0,
+   "club_phases": 30
+  },
+  {
+   "year": 2023,
+   "wave": "H0 (calendar exists; LAD/Wave 2 research)",
+   "order": 0,
+   "phases": [
+    "JR"
+   ],
+   "discovery_requests": 1,
+   "discovered": false,
+   "selections": null,
+   "selections_estimate": 615,
+   "phases_found": [],
+   "imported": 0,
+   "clubs_with_census": 0,
+   "club_phases": 30
+  },
+  {
+   "year": 2022,
+   "wave": "H0 (calendar exists; LAD/Wave 2 research)",
+   "order": 0,
+   "phases": [
+    "JR"
+   ],
+   "discovery_requests": 1,
+   "discovered": false,
+   "selections": null,
+   "selections_estimate": 615,
+   "phases_found": [],
+   "imported": 0,
+   "clubs_with_census": 0,
+   "club_phases": 30
+  },
+  {
+   "year": 2021,
+   "wave": "H0 (calendar exists; LAD/Wave 2 research)",
+   "order": 0,
+   "phases": [
+    "JR"
+   ],
+   "discovery_requests": 1,
+   "discovered": false,
+   "selections": null,
+   "selections_estimate": 615,
+   "phases_found": [],
+   "imported": 0,
+   "clubs_with_census": 0,
+   "club_phases": 30
+  },
+  {
+   "year": 2020,
+   "wave": "H0 (calendar exists; LAD/Wave 2 research)",
+   "order": 0,
+   "phases": [
+    "JR"
+   ],
+   "discovery_requests": 1,
+   "discovered": false,
+   "selections": null,
+   "selections_estimate": 160,
+   "phases_found": [],
+   "imported": 0,
+   "clubs_with_census": 0,
+   "club_phases": 30
+  },
+  {
+   "year": 2019,
+   "wave": "H0 (calendar exists; LAD/Wave 2 research)",
+   "order": 0,
+   "phases": [
+    "JR"
+   ],
+   "discovery_requests": 1,
+   "discovered": false,
+   "selections": null,
+   "selections_estimate": 1215,
+   "phases_found": [],
+   "imported": 42,
+   "clubs_with_census": 1,
+   "club_phases": 30
+  },
+  {
+   "year": 2018,
+   "wave": "H0 (calendar exists; LAD/Wave 2 research)",
+   "order": 0,
+   "phases": [
+    "JR"
+   ],
+   "discovery_requests": 1,
+   "discovered": false,
+   "selections": null,
+   "selections_estimate": 1215,
+   "phases_found": [],
+   "imported": 41,
+   "clubs_with_census": 1,
+   "club_phases": 30
+  },
+  {
+   "year": 2017,
+   "wave": "H0 (calendar exists; LAD/Wave 2 research)",
+   "order": 0,
+   "phases": [
+    "JR"
+   ],
+   "discovery_requests": 1,
+   "discovered": false,
+   "selections": null,
+   "selections_estimate": 1215,
+   "phases_found": [],
+   "imported": 40,
+   "clubs_with_census": 1,
+   "club_phases": 30
+  },
+  {
+   "year": 2016,
+   "wave": "H0 (calendar exists; LAD/Wave 2 research)",
+   "order": 0,
+   "phases": [
+    "JR"
+   ],
+   "discovery_requests": 1,
+   "discovered": false,
+   "selections": null,
+   "selections_estimate": 1215,
+   "phases_found": [],
+   "imported": 291,
+   "clubs_with_census": 7,
+   "club_phases": 30
+  },
+  {
+   "year": 2015,
+   "wave": "H0 (calendar exists; LAD/Wave 2 research)",
+   "order": 0,
+   "phases": [
+    "JR"
+   ],
+   "discovery_requests": 1,
+   "discovered": false,
+   "selections": null,
+   "selections_estimate": 1215,
+   "phases_found": [],
+   "imported": 42,
+   "clubs_with_census": 0,
+   "club_phases": 30
+  },
+  {
+   "year": 2014,
+   "wave": "H1",
+   "order": 1,
+   "phases": [
+    "JR"
+   ],
+   "discovery_requests": 1,
+   "discovered": false,
+   "selections": null,
+   "selections_estimate": 1215,
+   "phases_found": [],
+   "imported": 0,
+   "clubs_with_census": 0,
+   "club_phases": 0
+  },
+  {
+   "year": 2013,
+   "wave": "H1",
+   "order": 1,
+   "phases": [
+    "JR"
+   ],
+   "discovery_requests": 1,
+   "discovered": false,
+   "selections": null,
+   "selections_estimate": 1215,
+   "phases_found": [],
+   "imported": 0,
+   "clubs_with_census": 0,
+   "club_phases": 0
+  },
+  {
+   "year": 2012,
+   "wave": "H1",
+   "order": 1,
+   "phases": [
+    "JR"
+   ],
+   "discovery_requests": 1,
+   "discovered": false,
+   "selections": null,
+   "selections_estimate": 1215,
+   "phases_found": [],
+   "imported": 0,
+   "clubs_with_census": 0,
+   "club_phases": 0
+  },
+  {
+   "year": 2011,
+   "wave": "H1",
+   "order": 1,
+   "phases": [
+    "JR"
+   ],
+   "discovery_requests": 1,
+   "discovered": false,
+   "selections": null,
+   "selections_estimate": 1500,
+   "phases_found": [],
+   "imported": 0,
+   "clubs_with_census": 0,
+   "club_phases": 0
+  },
+  {
+   "year": 2010,
+   "wave": "H1",
+   "order": 1,
+   "phases": [
+    "JR"
+   ],
+   "discovery_requests": 1,
+   "discovered": false,
+   "selections": null,
+   "selections_estimate": 1500,
+   "phases_found": [],
+   "imported": 0,
+   "clubs_with_census": 0,
+   "club_phases": 0
+  },
+  {
+   "year": 2009,
+   "wave": "H1",
+   "order": 1,
+   "phases": [
+    "JR"
+   ],
+   "discovery_requests": 1,
+   "discovered": false,
+   "selections": null,
+   "selections_estimate": 1500,
+   "phases_found": [],
+   "imported": 0,
+   "clubs_with_census": 0,
+   "club_phases": 0
+  },
+  {
+   "year": 2008,
+   "wave": "H1",
+   "order": 1,
+   "phases": [
+    "JR"
+   ],
+   "discovery_requests": 1,
+   "discovered": false,
+   "selections": null,
+   "selections_estimate": 1500,
+   "phases_found": [],
+   "imported": 0,
+   "clubs_with_census": 0,
+   "club_phases": 0
+  },
+  {
+   "year": 2007,
+   "wave": "H1",
+   "order": 1,
+   "phases": [
+    "JR"
+   ],
+   "discovery_requests": 1,
+   "discovered": false,
+   "selections": null,
+   "selections_estimate": 1500,
+   "phases_found": [],
+   "imported": 0,
+   "clubs_with_census": 0,
+   "club_phases": 0
+  },
+  {
+   "year": 2006,
+   "wave": "H1",
+   "order": 1,
+   "phases": [
+    "JR"
+   ],
+   "discovery_requests": 1,
+   "discovered": false,
+   "selections": null,
+   "selections_estimate": 1500,
+   "phases_found": [],
+   "imported": 0,
+   "clubs_with_census": 0,
+   "club_phases": 0
+  },
+  {
+   "year": 2005,
+   "wave": "H2",
+   "order": 2,
+   "phases": [
+    "JR"
+   ],
+   "discovery_requests": 1,
+   "discovered": true,
+   "selections": 1501,
+   "selections_estimate": null,
+   "phases_found": [
+    "JR 1501"
+   ],
+   "imported": 1501,
+   "clubs_with_census": 29,
+   "club_phases": 30
+  },
+  {
+   "year": 2004,
+   "wave": "H2",
+   "order": 2,
+   "phases": [
+    "JR"
+   ],
+   "discovery_requests": 1,
+   "discovered": false,
+   "selections": null,
+   "selections_estimate": 1500,
+   "phases_found": [],
+   "imported": 0,
+   "clubs_with_census": 0,
+   "club_phases": 0
+  },
+  {
+   "year": 2003,
+   "wave": "H2",
+   "order": 2,
+   "phases": [
+    "JR"
+   ],
+   "discovery_requests": 1,
+   "discovered": false,
+   "selections": null,
+   "selections_estimate": 1500,
+   "phases_found": [],
+   "imported": 0,
+   "clubs_with_census": 0,
+   "club_phases": 0
+  },
+  {
+   "year": 2002,
+   "wave": "H2",
+   "order": 2,
+   "phases": [
+    "JR"
+   ],
+   "discovery_requests": 1,
+   "discovered": false,
+   "selections": null,
+   "selections_estimate": 1500,
+   "phases_found": [],
+   "imported": 0,
+   "clubs_with_census": 0,
+   "club_phases": 0
+  },
+  {
+   "year": 2001,
+   "wave": "H2",
+   "order": 2,
+   "phases": [
+    "JR"
+   ],
+   "discovery_requests": 1,
+   "discovered": false,
+   "selections": null,
+   "selections_estimate": 1500,
+   "phases_found": [],
+   "imported": 0,
+   "clubs_with_census": 0,
+   "club_phases": 0
+  },
+  {
+   "year": 2000,
+   "wave": "H2",
+   "order": 2,
+   "phases": [
+    "JR"
+   ],
+   "discovery_requests": 1,
+   "discovered": false,
+   "selections": null,
+   "selections_estimate": 1500,
+   "phases_found": [],
+   "imported": 0,
+   "clubs_with_census": 0,
+   "club_phases": 0
+  },
+  {
+   "year": 1999,
+   "wave": "H2",
+   "order": 2,
+   "phases": [
+    "JR"
+   ],
+   "discovery_requests": 1,
+   "discovered": false,
+   "selections": null,
+   "selections_estimate": 1500,
+   "phases_found": [],
+   "imported": 0,
+   "clubs_with_census": 0,
+   "club_phases": 0
+  },
+  {
+   "year": 1998,
+   "wave": "H2",
+   "order": 2,
+   "phases": [
+    "JR"
+   ],
+   "discovery_requests": 1,
+   "discovered": false,
+   "selections": null,
+   "selections_estimate": 1500,
+   "phases_found": [],
+   "imported": 0,
+   "clubs_with_census": 0,
+   "club_phases": 0
+  },
+  {
+   "year": 1997,
+   "wave": "H2",
+   "order": 2,
+   "phases": [
+    "JR"
+   ],
+   "discovery_requests": 1,
+   "discovered": false,
+   "selections": null,
+   "selections_estimate": 1500,
+   "phases_found": [],
+   "imported": 0,
+   "clubs_with_census": 0,
+   "club_phases": 0
+  },
+  {
+   "year": 1996,
+   "wave": "H2",
+   "order": 2,
+   "phases": [
+    "JR"
+   ],
+   "discovery_requests": 1,
+   "discovered": false,
+   "selections": null,
+   "selections_estimate": 1500,
+   "phases_found": [],
+   "imported": 0,
+   "clubs_with_census": 0,
+   "club_phases": 0
+  },
+  {
+   "year": 1995,
+   "wave": "H2",
+   "order": 2,
+   "phases": [
+    "JR"
+   ],
+   "discovery_requests": 1,
+   "discovered": false,
+   "selections": null,
+   "selections_estimate": 1500,
+   "phases_found": [],
+   "imported": 0,
+   "clubs_with_census": 0,
+   "club_phases": 0
+  },
+  {
+   "year": 1994,
+   "wave": "H2",
+   "order": 2,
+   "phases": [
+    "JR"
+   ],
+   "discovery_requests": 1,
+   "discovered": false,
+   "selections": null,
+   "selections_estimate": 1500,
+   "phases_found": [],
+   "imported": 0,
+   "clubs_with_census": 0,
+   "club_phases": 0
+  },
+  {
+   "year": 1993,
+   "wave": "H2",
+   "order": 2,
+   "phases": [
+    "JR"
+   ],
+   "discovery_requests": 1,
+   "discovered": false,
+   "selections": null,
+   "selections_estimate": 1500,
+   "phases_found": [],
+   "imported": 0,
+   "clubs_with_census": 0,
+   "club_phases": 0
+  },
+  {
+   "year": 1992,
+   "wave": "H2",
+   "order": 2,
+   "phases": [
+    "JR"
+   ],
+   "discovery_requests": 1,
+   "discovered": false,
+   "selections": null,
+   "selections_estimate": 1500,
+   "phases_found": [],
+   "imported": 0,
+   "clubs_with_census": 0,
+   "club_phases": 0
+  },
+  {
+   "year": 1991,
+   "wave": "H2",
+   "order": 2,
+   "phases": [
+    "JR"
+   ],
+   "discovery_requests": 1,
+   "discovered": false,
+   "selections": null,
+   "selections_estimate": 1500,
+   "phases_found": [],
+   "imported": 0,
+   "clubs_with_census": 0,
+   "club_phases": 0
+  },
+  {
+   "year": 1990,
+   "wave": "H2",
+   "order": 2,
+   "phases": [
+    "JR"
+   ],
+   "discovery_requests": 1,
+   "discovered": false,
+   "selections": null,
+   "selections_estimate": 1500,
+   "phases_found": [],
+   "imported": 0,
+   "clubs_with_census": 0,
+   "club_phases": 0
+  },
+  {
+   "year": 1989,
+   "wave": "H2",
+   "order": 2,
+   "phases": [
+    "JR"
+   ],
+   "discovery_requests": 1,
+   "discovered": false,
+   "selections": null,
+   "selections_estimate": 1500,
+   "phases_found": [],
+   "imported": 0,
+   "clubs_with_census": 0,
+   "club_phases": 0
+  },
+  {
+   "year": 1988,
+   "wave": "H2",
+   "order": 2,
+   "phases": [
+    "JR"
+   ],
+   "discovery_requests": 1,
+   "discovered": false,
+   "selections": null,
+   "selections_estimate": 1500,
+   "phases_found": [],
+   "imported": 0,
+   "clubs_with_census": 0,
+   "club_phases": 0
+  },
+  {
+   "year": 1987,
+   "wave": "H2",
+   "order": 2,
+   "phases": [
+    "JR"
+   ],
+   "discovery_requests": 1,
+   "discovered": false,
+   "selections": null,
+   "selections_estimate": 1500,
+   "phases_found": [],
+   "imported": 0,
+   "clubs_with_census": 0,
+   "club_phases": 0
+  },
+  {
+   "year": 1986,
+   "wave": "H3",
+   "order": 3,
+   "phases": [
+    "NR",
+    "NS",
+    "JR",
+    "JS",
+    "JD",
+    "AL"
+   ],
+   "discovery_requests": 6,
+   "discovered": false,
+   "selections": null,
+   "selections_estimate": 1250,
+   "phases_found": [],
+   "imported": 0,
+   "clubs_with_census": 0,
+   "club_phases": 0
+  },
+  {
+   "year": 1985,
+   "wave": "H3",
+   "order": 3,
+   "phases": [
+    "NR",
+    "NS",
+    "JR",
+    "JS",
+    "JD",
+    "AL"
+   ],
+   "discovery_requests": 6,
+   "discovered": true,
+   "selections": 1335,
+   "selections_estimate": null,
+   "phases_found": [
+    "NR 330",
+    "NS 69",
+    "JR 832",
+    "JS 104"
+   ],
+   "imported": 202,
+   "clubs_with_census": 15,
+   "club_phases": 104
+  },
+  {
+   "year": 1984,
+   "wave": "H3",
+   "order": 3,
+   "phases": [
+    "NR",
+    "NS",
+    "JR",
+    "JS",
+    "JD",
+    "AL"
+   ],
+   "discovery_requests": 6,
+   "discovered": false,
+   "selections": null,
+   "selections_estimate": 1250,
+   "phases_found": [],
+   "imported": 0,
+   "clubs_with_census": 0,
+   "club_phases": 0
+  },
+  {
+   "year": 1983,
+   "wave": "H3",
+   "order": 3,
+   "phases": [
+    "NR",
+    "NS",
+    "JR",
+    "JS",
+    "JD",
+    "AL"
+   ],
+   "discovery_requests": 6,
+   "discovered": false,
+   "selections": null,
+   "selections_estimate": 1250,
+   "phases_found": [],
+   "imported": 0,
+   "clubs_with_census": 0,
+   "club_phases": 0
+  },
+  {
+   "year": 1982,
+   "wave": "H3",
+   "order": 3,
+   "phases": [
+    "NR",
+    "NS",
+    "JR",
+    "JS",
+    "JD",
+    "AL"
+   ],
+   "discovery_requests": 6,
+   "discovered": false,
+   "selections": null,
+   "selections_estimate": 1250,
+   "phases_found": [],
+   "imported": 0,
+   "clubs_with_census": 0,
+   "club_phases": 0
+  },
+  {
+   "year": 1981,
+   "wave": "H3",
+   "order": 3,
+   "phases": [
+    "NR",
+    "NS",
+    "JR",
+    "JS",
+    "JD",
+    "AL"
+   ],
+   "discovery_requests": 6,
+   "discovered": false,
+   "selections": null,
+   "selections_estimate": 1250,
+   "phases_found": [],
+   "imported": 0,
+   "clubs_with_census": 0,
+   "club_phases": 0
+  },
+  {
+   "year": 1980,
+   "wave": "H3",
+   "order": 3,
+   "phases": [
+    "NR",
+    "NS",
+    "JR",
+    "JS",
+    "JD",
+    "AL"
+   ],
+   "discovery_requests": 6,
+   "discovered": false,
+   "selections": null,
+   "selections_estimate": 1250,
+   "phases_found": [],
+   "imported": 0,
+   "clubs_with_census": 0,
+   "club_phases": 0
+  },
+  {
+   "year": 1979,
+   "wave": "H3",
+   "order": 3,
+   "phases": [
+    "NR",
+    "NS",
+    "JR",
+    "JS",
+    "JD",
+    "AL"
+   ],
+   "discovery_requests": 6,
+   "discovered": false,
+   "selections": null,
+   "selections_estimate": 1250,
+   "phases_found": [],
+   "imported": 0,
+   "clubs_with_census": 0,
+   "club_phases": 0
+  },
+  {
+   "year": 1978,
+   "wave": "H3",
+   "order": 3,
+   "phases": [
+    "NR",
+    "NS",
+    "JR",
+    "JS",
+    "JD",
+    "AL"
+   ],
+   "discovery_requests": 6,
+   "discovered": false,
+   "selections": null,
+   "selections_estimate": 1250,
+   "phases_found": [],
+   "imported": 0,
+   "clubs_with_census": 0,
+   "club_phases": 0
+  },
+  {
+   "year": 1977,
+   "wave": "H3",
+   "order": 3,
+   "phases": [
+    "NR",
+    "NS",
+    "JR",
+    "JS",
+    "JD",
+    "AL"
+   ],
+   "discovery_requests": 6,
+   "discovered": false,
+   "selections": null,
+   "selections_estimate": 1250,
+   "phases_found": [],
+   "imported": 0,
+   "clubs_with_census": 0,
+   "club_phases": 0
+  },
+  {
+   "year": 1976,
+   "wave": "H3",
+   "order": 3,
+   "phases": [
+    "NR",
+    "NS",
+    "JR",
+    "JS",
+    "JD",
+    "AL"
+   ],
+   "discovery_requests": 6,
+   "discovered": false,
+   "selections": null,
+   "selections_estimate": 1250,
+   "phases_found": [],
+   "imported": 0,
+   "clubs_with_census": 0,
+   "club_phases": 0
+  },
+  {
+   "year": 1975,
+   "wave": "H4",
+   "order": 4,
+   "phases": [
+    "NR",
+    "NS",
+    "JR",
+    "JS",
+    "JD",
+    "AL"
+   ],
+   "discovery_requests": 6,
+   "discovered": false,
+   "selections": null,
+   "selections_estimate": 1250,
+   "phases_found": [],
+   "imported": 0,
+   "clubs_with_census": 0,
+   "club_phases": 0
+  },
+  {
+   "year": 1974,
+   "wave": "H4",
+   "order": 4,
+   "phases": [
+    "NR",
+    "NS",
+    "JR",
+    "JS",
+    "JD",
+    "AL"
+   ],
+   "discovery_requests": 6,
+   "discovered": false,
+   "selections": null,
+   "selections_estimate": 1250,
+   "phases_found": [],
+   "imported": 0,
+   "clubs_with_census": 0,
+   "club_phases": 0
+  },
+  {
+   "year": 1973,
+   "wave": "H4",
+   "order": 4,
+   "phases": [
+    "NR",
+    "NS",
+    "JR",
+    "JS",
+    "JD",
+    "AL"
+   ],
+   "discovery_requests": 6,
+   "discovered": false,
+   "selections": null,
+   "selections_estimate": 1250,
+   "phases_found": [],
+   "imported": 0,
+   "clubs_with_census": 0,
+   "club_phases": 0
+  },
+  {
+   "year": 1972,
+   "wave": "H4",
+   "order": 4,
+   "phases": [
+    "NR",
+    "NS",
+    "JR",
+    "JS",
+    "JD",
+    "AL"
+   ],
+   "discovery_requests": 6,
+   "discovered": false,
+   "selections": null,
+   "selections_estimate": 1250,
+   "phases_found": [],
+   "imported": 0,
+   "clubs_with_census": 0,
+   "club_phases": 0
+  },
+  {
+   "year": 1971,
+   "wave": "H4",
+   "order": 4,
+   "phases": [
+    "NR",
+    "NS",
+    "JR",
+    "JS",
+    "JD",
+    "AL"
+   ],
+   "discovery_requests": 6,
+   "discovered": false,
+   "selections": null,
+   "selections_estimate": 1250,
+   "phases_found": [],
+   "imported": 0,
+   "clubs_with_census": 0,
+   "club_phases": 0
+  },
+  {
+   "year": 1970,
+   "wave": "H4",
+   "order": 4,
+   "phases": [
+    "NR",
+    "NS",
+    "JR",
+    "JS",
+    "JD",
+    "AL"
+   ],
+   "discovery_requests": 6,
+   "discovered": false,
+   "selections": null,
+   "selections_estimate": 1250,
+   "phases_found": [],
+   "imported": 0,
+   "clubs_with_census": 0,
+   "club_phases": 0
+  },
+  {
+   "year": 1969,
+   "wave": "H4",
+   "order": 4,
+   "phases": [
+    "NR",
+    "NS",
+    "JR",
+    "JS",
+    "JD",
+    "AL"
+   ],
+   "discovery_requests": 6,
+   "discovered": false,
+   "selections": null,
+   "selections_estimate": 1250,
+   "phases_found": [],
+   "imported": 0,
+   "clubs_with_census": 0,
+   "club_phases": 0
+  },
+  {
+   "year": 1968,
+   "wave": "H4",
+   "order": 4,
+   "phases": [
+    "NR",
+    "NS",
+    "JR",
+    "JS",
+    "JD",
+    "AL"
+   ],
+   "discovery_requests": 6,
+   "discovered": false,
+   "selections": null,
+   "selections_estimate": 1250,
+   "phases_found": [],
+   "imported": 0,
+   "clubs_with_census": 0,
+   "club_phases": 0
+  },
+  {
+   "year": 1967,
+   "wave": "H4",
+   "order": 4,
+   "phases": [
+    "NR",
+    "NS",
+    "JR",
+    "JS",
+    "JD",
+    "AL"
+   ],
+   "discovery_requests": 6,
+   "discovered": false,
+   "selections": null,
+   "selections_estimate": 1250,
+   "phases_found": [],
+   "imported": 0,
+   "clubs_with_census": 0,
+   "club_phases": 0
+  },
+  {
+   "year": 1966,
+   "wave": "H4",
+   "order": 4,
+   "phases": [
+    "NR",
+    "NS",
+    "JR",
+    "JS",
+    "JD",
+    "AL"
+   ],
+   "discovery_requests": 6,
+   "discovered": false,
+   "selections": null,
+   "selections_estimate": 1250,
+   "phases_found": [],
+   "imported": 0,
+   "clubs_with_census": 0,
+   "club_phases": 0
+  },
+  {
+   "year": 1965,
+   "wave": "H4",
+   "order": 4,
+   "phases": [
+    "JR",
+    "AL"
+   ],
+   "discovery_requests": 2,
+   "discovered": true,
+   "selections": 837,
+   "selections_estimate": null,
+   "phases_found": [
+    "JR 824",
+    "AL 13"
+   ],
+   "imported": 106,
+   "clubs_with_census": 2,
+   "club_phases": 40
+  }
+ ]
+}

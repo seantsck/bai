@@ -1,0 +1,210 @@
+{
+ "year": 1985,
+ "built_on": "deterministic (from the cached files listed in research/history/manifest.json)",
+ "phases": [
+  {
+   "code": "JR",
+   "draft_key": "1985-JUNE_AMATEUR",
+   "label": "June regular phase",
+   "selections": 832,
+   "raw_rows": 832,
+   "clubs": 26,
+   "batches_written": [
+    "hist-1985-june-amateur-ath",
+    "hist-1985-june-amateur-lad",
+    "hist-1985-june-amateur-tex",
+    "hist-1985-june-amateur-wsh"
+   ],
+   "held": [],
+   "findings": [],
+   "crosswalk": {
+    "matched": 796,
+    "bbref": 148,
+    "bbref_minors": 796,
+    "fangraphs": 147
+   },
+   "birth_date_known": 334,
+   "school_typed": 466,
+   "school_untyped": 366,
+   "evidence": {
+    "source": "archived Baseball-Reference franchise-year pages",
+    "clubs": 4,
+    "agree": 4,
+    "disagree": [],
+    "unknown_codes": [],
+    "name_variants": [
+     "LAD #38 MLB \"Dan Smith\" / \"Jeremy Smith\"",
+     "LAD #64 MLB \"Peter Geist\" / \"Pete Geist\"",
+     "LAD #142 MLB \"Walter McConnell\" / \"Walt McConnell\"",
+     "LAD #532 MLB \"Charles Hardwick\" / \"Anthony Hardwick\"",
+     "LAD #558 MLB \"Edwin Hart\" / \"Bubba Hart\"",
+     "LAD #662 MLB \"Douglas Ames\" / \"Doug Ames\"",
+     "LAD #754 MLB \"Andrew Anthony\" / \"Andy Anthony\"",
+     "ATH #143 MLB \"Steven Iannini\" / \"Steve Iannini\"",
+     "ATH #325 MLB \"Joseph Xavier\" / \"Joe Xavier\"",
+     "ATH #429 MLB \"Gilbert Villanueva\" / \"Gil Villanueva\"",
+     "TEX #317 MLB \"Michael Dotzler\" / \"Mike Dotzler\"",
+     "TEX #343 MLB \"Michael Ollom\" / \"Mike Ollom\"",
+     "TEX #499 MLB \"Steven Lankard\" / \"Steve Lankard\"",
+     "TEX #603 MLB \"Randall Snyder\" / \"Randy Snyder\"",
+     "TEX #629 MLB \"William Booker\" / \"Sam Booker\"",
+     "WSH #62 MLB \"Jeffrey Oller\" / \"Jeff Oller\"",
+     "WSH #88 MLB \"Anthony Candelino\" / \"Tony Candelino\"",
+     "WSH #322 MLB \"Michael Day\" / \"Mike Day\"",
+     "WSH #348 MLB \"Robert Jones\" / \"Bobby Jones\"",
+     "WSH #478 MLB \"Stu Stauffacher\" / \"Stuart Stauffacher\"",
+     "WSH #530 MLB \"David Dasch\" / \"Dave Dasch\"",
+     "WSH #608 MLB \"Rick Parker\" / \"Richard Parker\""
+    ],
+    "numbering_differences": 0
+   }
+  },
+  {
+   "code": "NR",
+   "draft_key": "1985-JANUARY_REGULAR",
+   "label": "January regular phase",
+   "selections": 330,
+   "raw_rows": 330,
+   "clubs": 26,
+   "batches_written": [
+    "hist-1985-january-regular-ath",
+    "hist-1985-january-regular-lad",
+    "hist-1985-january-regular-tex",
+    "hist-1985-january-regular-wsh"
+   ],
+   "held": [],
+   "findings": [],
+   "crosswalk": {
+    "matched": 242,
+    "bbref": 26,
+    "bbref_minors": 242,
+    "fangraphs": 26
+   },
+   "birth_date_known": 150,
+   "school_typed": 287,
+   "school_untyped": 34,
+   "evidence": {
+    "source": "archived Baseball-Reference franchise-year pages",
+    "clubs": 4,
+    "agree": 4,
+    "disagree": [],
+    "unknown_codes": [],
+    "name_variants": [
+     "LAD #187 MLB \"Michael Fowler\" / \"Mike Fowler\"",
+     "LAD #233 MLB \"Christopher Graves\" / \"Chris Graves\"",
+     "ATH #90 MLB \"Robert Chadwick\" / \"Bob Chadwick\"",
+     "ATH #166 MLB \"Phillip Price\" / \"Phil Price\"",
+     "ATH #190 MLB \"Joseph Kemp\" / \"Joe Kemp\"",
+     "ATH #213 MLB \"Robin DeYoung\" / \"Rob DeYoung\"",
+     "TEX #4 MLB \"David Rolland\" / \"Dave Rolland\"",
+     "TEX #134 MLB \"Anthony Clark\" / \"Tony Clark\"",
+     "TEX #230 MLB \"Melvin Sisney\" / \"Mel Sisney\"",
+     "WSH #7 MLB \"Maurice Bigden\" / \"Mo Bigden\"",
+     "WSH #59 MLB \"David Rose\" / \"Carl Rose\"",
+     "WSH #137 MLB \"Kenneth Fox\" / \"Ken Fox\"",
+     "WSH #295 MLB \"Donald Cohoon\" / \"Don Cohoon\"",
+     "WSH #304 MLB \"William DeBoever\" / \"Bill DeBoever\""
+    ],
+    "numbering_differences": 0
+   }
+  },
+  {
+   "code": "NS",
+   "draft_key": "1985-JANUARY_SECONDARY",
+   "label": "January secondary phase",
+   "selections": 69,
+   "raw_rows": 69,
+   "clubs": 26,
+   "batches_written": [
+    "hist-1985-january-secondary-ath",
+    "hist-1985-january-secondary-lad",
+    "hist-1985-january-secondary-tex",
+    "hist-1985-january-secondary-wsh"
+   ],
+   "held": [],
+   "findings": [],
+   "crosswalk": {
+    "matched": 54,
+    "bbref": 11,
+    "bbref_minors": 54,
+    "fangraphs": 11
+   },
+   "birth_date_known": 36,
+   "school_typed": 61,
+   "school_untyped": 8,
+   "evidence": {
+    "source": "archived Baseball-Reference franchise-year pages",
+    "clubs": 4,
+    "agree": 4,
+    "disagree": [],
+    "unknown_codes": [],
+    "name_variants": [
+     "TEX #10 MLB \"Ed Soto\" / \"Edwardo Soto\"",
+     "WSH #41 MLB \"Melvin Houston\" / \"Mel Houston\"",
+     "WSH #61 MLB \"Jeffrey Atha\" / \"Jeff Atha\""
+    ],
+    "numbering_differences": 0
+   }
+  },
+  {
+   "code": "JS",
+   "draft_key": "1985-JUNE_SECONDARY",
+   "label": "June secondary phase",
+   "selections": 104,
+   "raw_rows": 104,
+   "clubs": 26,
+   "batches_written": [
+    "hist-1985-june-secondary-ath",
+    "hist-1985-june-secondary-lad",
+    "hist-1985-june-secondary-tex",
+    "hist-1985-june-secondary-wsh"
+   ],
+   "held": [],
+   "findings": [],
+   "crosswalk": {
+    "matched": 54,
+    "bbref": 18,
+    "bbref_minors": 54,
+    "fangraphs": 18
+   },
+   "birth_date_known": 51,
+   "school_typed": 88,
+   "school_untyped": 16,
+   "evidence": {
+    "source": "archived Baseball-Reference franchise-year pages",
+    "clubs": 4,
+    "agree": 3,
+    "disagree": [
+     {
+      "club": "WSH",
+      "mlb": 4,
+      "bref": 6,
+      "unmatched": [
+       "58 Louis Calvert",
+       "77 Frank Taylor"
+      ],
+      "not_on_bref": []
+     }
+    ],
+    "unknown_codes": [],
+    "name_variants": [
+     "LAD #49 MLB \"Marvin Newton\" / \"Marty Newton\"",
+     "ATH #6 MLB \"Blainee Deabenderfer\" / \"Blaine Deabenderfer\"",
+     "ATH #55 MLB \"Russ Elsberry\" / \"Rusty Elsberry\"",
+     "ATH #75 MLB \"James Hitt\" / \"Jimmy Hitt\""
+    ],
+    "numbering_differences": 0
+   }
+  },
+  {
+   "code": "JD",
+   "draft_key": "1985-JUNE_SECONDARY_DELAYED",
+   "selections": 0
+  },
+  {
+   "code": "AL",
+   "draft_key": "1985-AUGUST_LEGION",
+   "selections": 0
+  }
+ ]
+}

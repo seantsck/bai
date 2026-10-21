@@ -1,0 +1,237 @@
+{
+ "format": "bai-research-import/1",
+ "batch_key": "hist-1985-june-secondary-ath",
+ "channel": "DRAFT",
+ "description": "ATH, 1985 June secondary phase: 6 of 6 selections from MLB's draft feed (historical importer).",
+ "coverage_claims": [
+  {
+   "domain": "DRAFT",
+   "scope_key": "1985-JUNE_SECONDARY",
+   "organization": "ATH",
+   "coverage_state": "COMPLETE_CENSUS",
+   "expected_count": 6,
+   "source_key": "hist:mlb-statsapi-draft-1985-js",
+   "gap_notes": "MLB's draft feed lists 6 selection(s) for the club in the June secondary phase. Independent count: 6 (Baseball-Reference franchise-year page, Internet Archive capture 20240925011603: 6 listed, 6 matched to MLB's picks by name (3 by surname in the same round: #6 MLB \"Blainee Deabenderfer\" / \"Blaine Deabenderfer\"; #55 MLB \"Russ Elsberry\" / \"Rusty Elsberry\"; #75 MLB \"James Hitt\" / \"Jimmy Hitt\")). Signing status, bonuses and outcomes not researched."
+  }
+ ],
+ "sources": [
+  {
+   "source_key": "hist:mlb-statsapi-draft-1985-js",
+   "source_type": "OFFICIAL_LEAGUE",
+   "authority_level": "OFFICIAL",
+   "title": "MLB Stats API draft endpoint, 1985 June secondary phase (draftType JS)",
+   "publisher": "MLB Advanced Media",
+   "url": "https://statsapi.mlb.com/api/v1/draft/1985?draftType=JS",
+   "retrieved_date": "2026-10-21",
+   "notes": "League-wide JSON, 104 selections; sha256 8d258e03c826dca5cadd4d330d79aa4a567ffb74bdbe29ccf050463bd94456d1. Supplies pick, round, franchise-stable team id, MLBAM person, school label. No signing data. Terms: individual, non-commercial, non-bulk use (research/history/sources.json)."
+  },
+  {
+   "source_key": "hist:chadwick-register-781c175",
+   "source_type": "REFERENCE_DATABASE",
+   "authority_level": "AGGREGATOR",
+   "title": "Chadwick Baseball Bureau Register, commit 781c175",
+   "publisher": "Chadwick Baseball Bureau",
+   "url": "https://github.com/chadwickbureau/register/tree/781c175e748b89e5730fd3f5de0086b9355b2f92",
+   "retrieved_date": "2026-10-21",
+   "notes": "MLBAM -> Baseball-Reference, Baseball-Reference minors, FanGraphs and Retrosheet ids. Open Data Commons Attribution License 1.0."
+  }
+ ],
+ "records": [
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-1985-js",
+   "draft_key": "1985-JUNE_SECONDARY",
+   "round_code": "1",
+   "overall_pick": 6,
+   "round_pick": 7,
+   "organization": "ATH",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Blainee Deabenderfer",
+    "birth_date": null,
+    "birth_country": null,
+    "external_ids": {
+     "MLBAM": "473787"
+    },
+    "source_key": "hist:mlb-statsapi-draft-1985-js"
+   },
+   "school": {
+    "name": "North Carolina",
+    "school_type": null,
+    "city": null,
+    "region": null,
+    "source_key": "hist:mlb-statsapi-draft-1985-js"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type not stated in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-1985-js",
+   "draft_key": "1985-JUNE_SECONDARY",
+   "round_code": "2",
+   "overall_pick": 32,
+   "round_pick": 7,
+   "organization": "ATH",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Ken Sebree",
+    "birth_date": "1965-12-22",
+    "birth_country": null,
+    "external_ids": {
+     "MLBAM": "466575",
+     "BBREF_MINORS": "sebree001ken"
+    },
+    "source_key": "hist:mlb-statsapi-draft-1985-js",
+    "external_id_sources": {
+     "BBREF_MINORS": "hist:chadwick-register-781c175"
+    }
+   },
+   "school": {
+    "name": "Brevard College",
+    "school_type": "COLLEGE",
+    "city": null,
+    "region": null,
+    "source_key": "hist:mlb-statsapi-draft-1985-js"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type from explicit words in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-1985-js",
+   "draft_key": "1985-JUNE_SECONDARY",
+   "round_code": "3",
+   "overall_pick": 55,
+   "round_pick": 5,
+   "organization": "ATH",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Russ Elsberry",
+    "birth_date": null,
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "558200"
+    },
+    "source_key": "hist:mlb-statsapi-draft-1985-js"
+   },
+   "school": {
+    "name": "San Diego State",
+    "school_type": "COLLEGE",
+    "city": null,
+    "region": null,
+    "source_key": "hist:mlb-statsapi-draft-1985-js"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type from explicit words in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-1985-js",
+   "draft_key": "1985-JUNE_SECONDARY",
+   "round_code": "4",
+   "overall_pick": 75,
+   "round_pick": 3,
+   "organization": "ATH",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "James Hitt",
+    "birth_date": "1965-10-31",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "442573",
+     "BBREF_MINORS": "hitt--002jam"
+    },
+    "source_key": "hist:mlb-statsapi-draft-1985-js",
+    "external_id_sources": {
+     "BBREF_MINORS": "hist:chadwick-register-781c175"
+    }
+   },
+   "school": {
+    "name": "Chipola Junior College",
+    "school_type": "JUNIOR_COLLEGE",
+    "city": null,
+    "region": null,
+    "source_key": "hist:mlb-statsapi-draft-1985-js"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type from explicit words in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-1985-js",
+   "draft_key": "1985-JUNE_SECONDARY",
+   "round_code": "5",
+   "overall_pick": 87,
+   "round_pick": 3,
+   "organization": "ATH",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Steve Wapnick",
+    "birth_date": "1965-09-25",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "123909",
+     "BBREF": "wapnist01",
+     "BBREF_MINORS": "wapnic001ste",
+     "FANGRAPHS": "1013601"
+    },
+    "source_key": "hist:mlb-statsapi-draft-1985-js",
+    "external_id_sources": {
+     "BBREF": "hist:chadwick-register-781c175",
+     "BBREF_MINORS": "hist:chadwick-register-781c175",
+     "FANGRAPHS": "hist:chadwick-register-781c175"
+    }
+   },
+   "school": {
+    "name": "Moorpark College",
+    "school_type": "COLLEGE",
+    "city": null,
+    "region": null,
+    "source_key": "hist:mlb-statsapi-draft-1985-js"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type from explicit words in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-1985-js",
+   "draft_key": "1985-JUNE_SECONDARY",
+   "round_code": "6",
+   "overall_pick": 97,
+   "round_pick": 2,
+   "organization": "ATH",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Mike Stanford",
+    "birth_date": null,
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "567614"
+    },
+    "source_key": "hist:mlb-statsapi-draft-1985-js"
+   },
+   "school": {
+    "name": "Citrus College",
+    "school_type": "COLLEGE",
+    "city": null,
+    "region": null,
+    "source_key": "hist:mlb-statsapi-draft-1985-js"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type from explicit words in MLB's label."
+  }
+ ]
+}

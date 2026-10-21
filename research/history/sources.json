@@ -1,0 +1,63 @@
+{
+ "format": "bai-history-sources/1",
+ "reviewed_on": "2026-10-21",
+ "note": "Permissions review for the historical importer. 'bulk_status' is a human decision: CLEARED means the terms allow league-wide automated use; NEEDS_DECISION means a person must decide (or obtain permission) before a mass import; PILOT_ONLY means limited research use only. The importer refuses to fetch from hosts not listed here.",
+ "sources": [
+  {
+   "id": "mlb-statsapi-draft",
+   "title": "MLB Stats API draft endpoint (all amateur phases, 1965-present)",
+   "publisher": "MLB Advanced Media",
+   "authority_level": "OFFICIAL",
+   "source_type": "OFFICIAL_LEAGUE",
+   "hosts": ["statsapi.mlb.com"],
+   "url_template": "https://statsapi.mlb.com/api/v1/draft/{year}?draftType={code}",
+   "supplies": ["selection universe per phase", "round code", "overall and round pick", "drafting club (franchise-stable team id)", "MLBAM person id", "name", "birth date (often missing before 2000)", "school label"],
+   "does_not_supply": ["signing status", "bonus", "slot value", "the club's name in that year (team names are current)"],
+   "terms": "Responses carry: 'Use of any content on this page acknowledges agreement to the terms posted here http://gdx.mlb.com/components/copyright.txt'. Those terms: 'Only individual, non-commercial, non-bulk use of the Materials is permitted and any other use of the Materials is prohibited without prior written authorization from MLBAM.'",
+   "bulk_status": "NEEDS_DECISION",
+   "permission_notes": "BAI has used this endpoint for every class so far (LAD 2015-2019, Wave 2 2016) at one request per class. The pilot (1965, 1985, 2005: 10 requests) stays within that pattern. A 1965-2026 league-wide backfill (about 200 requests, roughly 100,000 selections republished on a public site) is plausibly 'bulk use'. Draft facts themselves are facts, but the terms are contractual. Before any mass import a person should decide: request written authorization from MLBAM, or limit BAI's use. Recorded here, not decided."
+  },
+  {
+   "id": "chadwick-register",
+   "title": "Chadwick Baseball Bureau Register (people crosswalk)",
+   "publisher": "Chadwick Baseball Bureau",
+   "authority_level": "AGGREGATOR",
+   "source_type": "REFERENCE_DATABASE",
+   "hosts": ["raw.githubusercontent.com"],
+   "url_template": "https://raw.githubusercontent.com/chadwickbureau/register/{commit}/data/people-{shard}.csv",
+   "pinned_commit": "781c175e748b89e5730fd3f5de0086b9355b2f92",
+   "pinned_commit_date": "2026-10-02",
+   "supplies": ["MLBAM -> Baseball-Reference, Baseball-Reference minors, FanGraphs, Retrosheet ids", "professional and MLB first/last seasons"],
+   "does_not_supply": ["draft data", "signing status"],
+   "terms": "Open Data Commons Attribution License 1.0 (README, pinned commit).",
+   "bulk_status": "CLEARED",
+   "permission_notes": "Attribution required: cite the Chadwick Baseball Bureau on public pages that show ids from it. Pinned to one commit so replays are deterministic."
+  },
+  {
+   "id": "wikipedia-draft-articles",
+   "title": "Wikipedia: '<year> Major League Baseball draft' articles",
+   "publisher": "Wikimedia Foundation (contributors)",
+   "authority_level": "AGGREGATOR",
+   "source_type": "REFERENCE_DATABASE",
+   "hosts": ["en.wikipedia.org"],
+   "url_template": "https://en.wikipedia.org/w/api.php?action=query&prop=revisions&rvprop=ids|timestamp|content&rvslots=main&format=json&titles={year}_Major_League_Baseball_draft",
+   "supplies": ["draft dates", "stated totals (some years)", "first-round tables"],
+   "does_not_supply": ["complete selection lists"],
+   "terms": "Text under CC BY-SA 4.0; BAI records facts (dates, counts) with the revision id, not article text.",
+   "bulk_status": "CLEARED",
+   "permission_notes": "Independent of MLB's feed for counts and dates. A secondary source: a disagreement with MLB is recorded, never resolved by preferring either."
+  },
+  {
+   "id": "bref-draft-archive",
+   "title": "Baseball-Reference draft pages, read through Internet Archive captures",
+   "publisher": "Sports Reference LLC (via the Internet Archive)",
+   "authority_level": "AGGREGATOR",
+   "source_type": "REFERENCE_DATABASE",
+   "hosts": ["web.archive.org", "archive.org"],
+   "supplies": ["per-club selection counts and names (count corroboration)", "signing flag and bonus for later years"],
+   "terms": "Sports Reference restricts automated collection from its own site; BAI reads only archived captures, a handful of pages per draft, for corroboration.",
+   "bulk_status": "PILOT_ONLY",
+   "permission_notes": "Used for count corroboration in earlier phases (LAD, Wave 2). Not a bulk source: a league-wide crawl of archived pages is neither polite nor within the spirit of the terms. The Internet Archive also rate-limits (HTTP 429 seen 2026-10-21)."
+  }
+ ]
+}

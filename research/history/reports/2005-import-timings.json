@@ -1,0 +1,159 @@
+{
+ "year": 2005,
+ "batches": [
+  {
+   "batch": "hist-2005-june-amateur-ari",
+   "records": 52,
+   "ms": 2154
+  },
+  {
+   "batch": "hist-2005-june-amateur-ath",
+   "records": 40,
+   "ms": 1495
+  },
+  {
+   "batch": "hist-2005-june-amateur-atl",
+   "records": 52,
+   "ms": 1559
+  },
+  {
+   "batch": "hist-2005-june-amateur-bal",
+   "records": 51,
+   "ms": 1768
+  },
+  {
+   "batch": "hist-2005-june-amateur-bos",
+   "records": 53,
+   "ms": 1469
+  },
+  {
+   "batch": "hist-2005-june-amateur-chc",
+   "records": 51,
+   "ms": 1438
+  },
+  {
+   "batch": "hist-2005-june-amateur-cin",
+   "records": 50,
+   "ms": 1737
+  },
+  {
+   "batch": "hist-2005-june-amateur-cle",
+   "records": 52,
+   "ms": 1630
+  },
+  {
+   "batch": "hist-2005-june-amateur-col",
+   "records": 52,
+   "ms": 1582
+  },
+  {
+   "batch": "hist-2005-june-amateur-cws",
+   "records": 49,
+   "ms": 1641
+  },
+  {
+   "batch": "hist-2005-june-amateur-det",
+   "records": 49,
+   "ms": 1528
+  },
+  {
+   "batch": "hist-2005-june-amateur-hou",
+   "records": 48,
+   "ms": 1511
+  },
+  {
+   "batch": "hist-2005-june-amateur-kc",
+   "records": 50,
+   "ms": 1604
+  },
+  {
+   "batch": "hist-2005-june-amateur-laa",
+   "records": 51,
+   "ms": 1559
+  },
+  {
+   "batch": "hist-2005-june-amateur-lad",
+   "records": 51,
+   "ms": 1781
+  },
+  {
+   "batch": "hist-2005-june-amateur-mia",
+   "records": 55,
+   "ms": 1743
+  },
+  {
+   "batch": "hist-2005-june-amateur-mil",
+   "records": 49,
+   "ms": 1561
+  },
+  {
+   "batch": "hist-2005-june-amateur-min",
+   "records": 54,
+   "ms": 1680
+  },
+  {
+   "batch": "hist-2005-june-amateur-nym",
+   "records": 48,
+   "ms": 1624
+  },
+  {
+   "batch": "hist-2005-june-amateur-nyy",
+   "records": 50,
+   "ms": 1601
+  },
+  {
+   "batch": "hist-2005-june-amateur-phi",
+   "records": 49,
+   "ms": 1525
+  },
+  {
+   "batch": "hist-2005-june-amateur-pit",
+   "records": 50,
+   "ms": 1624
+  },
+  {
+   "batch": "hist-2005-june-amateur-sd",
+   "records": 52,
+   "ms": 1942
+  },
+  {
+   "batch": "hist-2005-june-amateur-sea",
+   "records": 48,
+   "ms": 1448
+  },
+  {
+   "batch": "hist-2005-june-amateur-sf",
+   "records": 47,
+   "ms": 1425
+  },
+  {
+   "batch": "hist-2005-june-amateur-stl",
+   "records": 51,
+   "ms": 1755
+  },
+  {
+   "batch": "hist-2005-june-amateur-tb",
+   "records": 50,
+   "ms": 1566
+  },
+  {
+   "batch": "hist-2005-june-amateur-tex",
+   "records": 50,
+   "ms": 1729
+  },
+  {
+   "batch": "hist-2005-june-amateur-tor",
+   "records": 49,
+   "ms": 1493
+  },
+  {
+   "batch": "hist-2005-june-amateur-wsh",
+   "records": 48,
+   "ms": 1531
+  }
+ ],
+ "total": {
+  "records": 1501,
+  "ms": 48703
+ }
+}

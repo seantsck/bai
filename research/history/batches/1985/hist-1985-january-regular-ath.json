@@ -1,0 +1,369 @@
+{
+ "format": "bai-research-import/1",
+ "batch_key": "hist-1985-january-regular-ath",
+ "channel": "DRAFT",
+ "description": "ATH, 1985 January regular phase: 10 of 10 selections from MLB's draft feed (historical importer).",
+ "coverage_claims": [
+  {
+   "domain": "DRAFT",
+   "scope_key": "1985-JANUARY_REGULAR",
+   "organization": "ATH",
+   "coverage_state": "COMPLETE_CENSUS",
+   "expected_count": 10,
+   "source_key": "hist:mlb-statsapi-draft-1985-nr",
+   "gap_notes": "MLB's draft feed lists 10 selection(s) for the club in the January regular phase. Independent count: 10 (Baseball-Reference franchise-year page, Internet Archive capture 20250215031546: 10 listed, 10 matched to MLB's picks by name (4 by surname in the same round: #90 MLB \"Robert Chadwick\" / \"Bob Chadwick\"; #166 MLB \"Phillip Price\" / \"Phil Price\"; #190 MLB \"Joseph Kemp\" / \"Joe Kemp\"; #213 MLB \"Robin DeYoung\" / \"Rob DeYoung\")). Signing status, bonuses and outcomes not researched."
+  }
+ ],
+ "sources": [
+  {
+   "source_key": "hist:mlb-statsapi-draft-1985-nr",
+   "source_type": "OFFICIAL_LEAGUE",
+   "authority_level": "OFFICIAL",
+   "title": "MLB Stats API draft endpoint, 1985 January regular phase (draftType NR)",
+   "publisher": "MLB Advanced Media",
+   "url": "https://statsapi.mlb.com/api/v1/draft/1985?draftType=NR",
+   "retrieved_date": "2026-10-21",
+   "notes": "League-wide JSON, 330 selections; sha256 6525b6743219989f2d586d547438e1ee6b0a6aa9c40deec740a1d67e1038b898. Supplies pick, round, franchise-stable team id, MLBAM person, school label. No signing data. Terms: individual, non-commercial, non-bulk use (research/history/sources.json)."
+  },
+  {
+   "source_key": "hist:chadwick-register-781c175",
+   "source_type": "REFERENCE_DATABASE",
+   "authority_level": "AGGREGATOR",
+   "title": "Chadwick Baseball Bureau Register, commit 781c175",
+   "publisher": "Chadwick Baseball Bureau",
+   "url": "https://github.com/chadwickbureau/register/tree/781c175e748b89e5730fd3f5de0086b9355b2f92",
+   "retrieved_date": "2026-10-21",
+   "notes": "MLBAM -> Baseball-Reference, Baseball-Reference minors, FanGraphs and Retrosheet ids. Open Data Commons Attribution License 1.0."
+  }
+ ],
+ "records": [
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-1985-nr",
+   "draft_key": "1985-JANUARY_REGULAR",
+   "round_code": "1",
+   "overall_pick": 12,
+   "round_pick": 12,
+   "organization": "ATH",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Allen Wisdom",
+    "birth_date": null,
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "569008"
+    },
+    "source_key": "hist:mlb-statsapi-draft-1985-nr"
+   },
+   "school": {
+    "name": "San Jacinto",
+    "school_type": null,
+    "city": null,
+    "region": null,
+    "source_key": "hist:mlb-statsapi-draft-1985-nr"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type not stated in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-1985-nr",
+   "draft_key": "1985-JANUARY_REGULAR",
+   "round_code": "2",
+   "overall_pick": 38,
+   "round_pick": 12,
+   "organization": "ATH",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "David Ray",
+    "birth_date": null,
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "565604"
+    },
+    "source_key": "hist:mlb-statsapi-draft-1985-nr"
+   },
+   "school": {
+    "name": "Georgia Perimeter College",
+    "school_type": "COLLEGE",
+    "city": null,
+    "region": null,
+    "source_key": "hist:mlb-statsapi-draft-1985-nr"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type from explicit words in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-1985-nr",
+   "draft_key": "1985-JANUARY_REGULAR",
+   "round_code": "3",
+   "overall_pick": 64,
+   "round_pick": 12,
+   "organization": "ATH",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Marty Newton",
+    "birth_date": "1964-12-01",
+    "birth_country": null,
+    "external_ids": {
+     "MLBAM": "695168",
+     "BBREF_MINORS": "newton001mar"
+    },
+    "source_key": "hist:mlb-statsapi-draft-1985-nr",
+    "external_id_sources": {
+     "BBREF_MINORS": "hist:chadwick-register-781c175"
+    }
+   },
+   "school": {
+    "name": "San Bernardino Valley College",
+    "school_type": "COLLEGE",
+    "city": null,
+    "region": null,
+    "source_key": "hist:mlb-statsapi-draft-1985-nr"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type from explicit words in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-1985-nr",
+   "draft_key": "1985-JANUARY_REGULAR",
+   "round_code": "4",
+   "overall_pick": 90,
+   "round_pick": 12,
+   "organization": "ATH",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Robert Chadwick",
+    "birth_date": "1966-08-17",
+    "birth_country": null,
+    "external_ids": {
+     "MLBAM": "442567",
+     "BBREF_MINORS": "chadwi001rob"
+    },
+    "source_key": "hist:mlb-statsapi-draft-1985-nr",
+    "external_id_sources": {
+     "BBREF_MINORS": "hist:chadwick-register-781c175"
+    }
+   },
+   "school": {
+    "name": "Oxnard College",
+    "school_type": "COLLEGE",
+    "city": null,
+    "region": null,
+    "source_key": "hist:mlb-statsapi-draft-1985-nr"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type from explicit words in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-1985-nr",
+   "draft_key": "1985-JANUARY_REGULAR",
+   "round_code": "5",
+   "overall_pick": 116,
+   "round_pick": 12,
+   "organization": "ATH",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Ralph Lusian",
+    "birth_date": null,
+    "birth_country": null,
+    "external_ids": {
+     "MLBAM": "695150",
+     "BBREF_MINORS": "lusian000ral"
+    },
+    "source_key": "hist:mlb-statsapi-draft-1985-nr",
+    "external_id_sources": {
+     "BBREF_MINORS": "hist:chadwick-register-781c175"
+    }
+   },
+   "school": {
+    "name": "Mira Costa College",
+    "school_type": "COLLEGE",
+    "city": null,
+    "region": null,
+    "source_key": "hist:mlb-statsapi-draft-1985-nr"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type from explicit words in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-1985-nr",
+   "draft_key": "1985-JANUARY_REGULAR",
+   "round_code": "6",
+   "overall_pick": 142,
+   "round_pick": 12,
+   "organization": "ATH",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Larry Oedewaldt",
+    "birth_date": "1966-03-06",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "464504",
+     "BBREF_MINORS": "oedewa001lar"
+    },
+    "source_key": "hist:mlb-statsapi-draft-1985-nr",
+    "external_id_sources": {
+     "BBREF_MINORS": "hist:chadwick-register-781c175"
+    }
+   },
+   "school": {
+    "name": "Grossmont College",
+    "school_type": "COLLEGE",
+    "city": null,
+    "region": null,
+    "source_key": "hist:mlb-statsapi-draft-1985-nr"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type from explicit words in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-1985-nr",
+   "draft_key": "1985-JANUARY_REGULAR",
+   "round_code": "7",
+   "overall_pick": 166,
+   "round_pick": 11,
+   "organization": "ATH",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Phillip Price",
+    "birth_date": "1965-03-20",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "581446",
+     "BBREF_MINORS": "price-001phi"
+    },
+    "source_key": "hist:mlb-statsapi-draft-1985-nr",
+    "external_id_sources": {
+     "BBREF_MINORS": "hist:chadwick-register-781c175"
+    }
+   },
+   "school": {
+    "name": "Los Angeles Harbor College",
+    "school_type": "COLLEGE",
+    "city": null,
+    "region": null,
+    "source_key": "hist:mlb-statsapi-draft-1985-nr"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type from explicit words in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-1985-nr",
+   "draft_key": "1985-JANUARY_REGULAR",
+   "round_code": "8",
+   "overall_pick": 190,
+   "round_pick": 11,
+   "organization": "ATH",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Joseph Kemp",
+    "birth_date": "1964-09-21",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "471393",
+     "BBREF_MINORS": "kemp--002jos"
+    },
+    "source_key": "hist:mlb-statsapi-draft-1985-nr",
+    "external_id_sources": {
+     "BBREF_MINORS": "hist:chadwick-register-781c175"
+    }
+   },
+   "school": {
+    "name": "Citrus College",
+    "school_type": "COLLEGE",
+    "city": null,
+    "region": null,
+    "source_key": "hist:mlb-statsapi-draft-1985-nr"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type from explicit words in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-1985-nr",
+   "draft_key": "1985-JANUARY_REGULAR",
+   "round_code": "9",
+   "overall_pick": 213,
+   "round_pick": 10,
+   "organization": "ATH",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Robin DeYoung",
+    "birth_date": "1966-10-25",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "474569"
+    },
+    "source_key": "hist:mlb-statsapi-draft-1985-nr"
+   },
+   "school": {
+    "name": "Fullerton College",
+    "school_type": "COLLEGE",
+    "city": null,
+    "region": null,
+    "source_key": "hist:mlb-statsapi-draft-1985-nr"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type from explicit words in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-1985-nr",
+   "draft_key": "1985-JANUARY_REGULAR",
+   "round_code": "10",
+   "overall_pick": 236,
+   "round_pick": 10,
+   "organization": "ATH",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Ron Dale",
+    "birth_date": null,
+    "birth_country": null,
+    "external_ids": {
+     "MLBAM": "695101",
+     "BBREF_MINORS": "dale--002ron"
+    },
+    "source_key": "hist:mlb-statsapi-draft-1985-nr",
+    "external_id_sources": {
+     "BBREF_MINORS": "hist:chadwick-register-781c175"
+    }
+   },
+   "school": {
+    "name": "Los Angeles Valley College",
+    "school_type": "COLLEGE",
+    "city": null,
+    "region": null,
+    "source_key": "hist:mlb-statsapi-draft-1985-nr"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type from explicit words in MLB's label."
+  }
+ ]
+}

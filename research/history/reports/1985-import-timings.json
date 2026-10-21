@@ -1,0 +1,89 @@
+{
+ "year": 1985,
+ "batches": [
+  {
+   "batch": "hist-1985-january-regular-ath",
+   "records": 10,
+   "ms": 611
+  },
+  {
+   "batch": "hist-1985-january-regular-lad",
+   "records": 13,
+   "ms": 614
+  },
+  {
+   "batch": "hist-1985-january-regular-tex",
+   "records": 11,
+   "ms": 560
+  },
+  {
+   "batch": "hist-1985-january-regular-wsh",
+   "records": 19,
+   "ms": 759
+  },
+  {
+   "batch": "hist-1985-january-secondary-ath",
+   "records": 2,
+   "ms": 174
+  },
+  {
+   "batch": "hist-1985-january-secondary-lad",
+   "records": 3,
+   "ms": 217
+  },
+  {
+   "batch": "hist-1985-january-secondary-tex",
+   "records": 2,
+   "ms": 174
+  },
+  {
+   "batch": "hist-1985-january-secondary-wsh",
+   "records": 3,
+   "ms": 133
+  },
+  {
+   "batch": "hist-1985-june-amateur-ath",
+   "records": 30,
+   "ms": 992
+  },
+  {
+   "batch": "hist-1985-june-amateur-lad",
+   "records": 34,
+   "ms": 1121
+  },
+  {
+   "batch": "hist-1985-june-amateur-tex",
+   "records": 30,
+   "ms": 1159
+  },
+  {
+   "batch": "hist-1985-june-amateur-wsh",
+   "records": 27,
+   "ms": 889
+  },
+  {
+   "batch": "hist-1985-june-secondary-ath",
+   "records": 6,
+   "ms": 286
+  },
+  {
+   "batch": "hist-1985-june-secondary-lad",
+   "records": 3,
+   "ms": 172
+  },
+  {
+   "batch": "hist-1985-june-secondary-tex",
+   "records": 5,
+   "ms": 212
+  },
+  {
+   "batch": "hist-1985-june-secondary-wsh",
+   "records": 4,
+   "ms": 256
+  }
+ ],
+ "total": {
+  "records": 202,
+  "ms": 8329
+ }
+}

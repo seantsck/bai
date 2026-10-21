@@ -1,0 +1,168 @@
+{
+ "format": "bai-research-import/1",
+ "batch_key": "hist-1985-june-secondary-wsh",
+ "channel": "DRAFT",
+ "description": "WSH, 1985 June secondary phase: 4 of 4 selections from MLB's draft feed (historical importer).",
+ "coverage_claims": [
+  {
+   "domain": "DRAFT",
+   "scope_key": "1985-JUNE_SECONDARY",
+   "organization": "WSH",
+   "coverage_state": "PARTIAL_RECONSTRUCTION",
+   "source_key": "hist:mlb-statsapi-draft-1985-js",
+   "gap_notes": "MLB's draft feed lists 4 selection(s) for the club in the June secondary phase. Independent count: 6 (Baseball-Reference franchise-year page, Internet Archive capture 20170404043823: 6 listed, 4 matched to MLB's picks by name; 2 unmatched there, 0 of MLB's not listed there). Signing status, bonuses and outcomes not researched."
+  }
+ ],
+ "sources": [
+  {
+   "source_key": "hist:mlb-statsapi-draft-1985-js",
+   "source_type": "OFFICIAL_LEAGUE",
+   "authority_level": "OFFICIAL",
+   "title": "MLB Stats API draft endpoint, 1985 June secondary phase (draftType JS)",
+   "publisher": "MLB Advanced Media",
+   "url": "https://statsapi.mlb.com/api/v1/draft/1985?draftType=JS",
+   "retrieved_date": "2026-10-21",
+   "notes": "League-wide JSON, 104 selections; sha256 8d258e03c826dca5cadd4d330d79aa4a567ffb74bdbe29ccf050463bd94456d1. Supplies pick, round, franchise-stable team id, MLBAM person, school label. No signing data. Terms: individual, non-commercial, non-bulk use (research/history/sources.json)."
+  },
+  {
+   "source_key": "hist:chadwick-register-781c175",
+   "source_type": "REFERENCE_DATABASE",
+   "authority_level": "AGGREGATOR",
+   "title": "Chadwick Baseball Bureau Register, commit 781c175",
+   "publisher": "Chadwick Baseball Bureau",
+   "url": "https://github.com/chadwickbureau/register/tree/781c175e748b89e5730fd3f5de0086b9355b2f92",
+   "retrieved_date": "2026-10-21",
+   "notes": "MLBAM -> Baseball-Reference, Baseball-Reference minors, FanGraphs and Retrosheet ids. Open Data Commons Attribution License 1.0."
+  }
+ ],
+ "records": [
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-1985-js",
+   "draft_key": "1985-JUNE_SECONDARY",
+   "round_code": "1",
+   "overall_pick": 9,
+   "round_pick": 10,
+   "organization": "WSH",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Jim Hunter",
+    "birth_date": "1964-06-22",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "116335",
+     "BBREF": "hunteji01",
+     "BBREF_MINORS": "hunter002jam",
+     "FANGRAPHS": "1006203"
+    },
+    "source_key": "hist:mlb-statsapi-draft-1985-js",
+    "external_id_sources": {
+     "BBREF": "hist:chadwick-register-781c175",
+     "BBREF_MINORS": "hist:chadwick-register-781c175",
+     "FANGRAPHS": "hist:chadwick-register-781c175"
+    }
+   },
+   "school": {
+    "name": "Georgia",
+    "school_type": null,
+    "city": null,
+    "region": null,
+    "source_key": "hist:mlb-statsapi-draft-1985-js"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type not stated in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-1985-js",
+   "draft_key": "1985-JUNE_SECONDARY",
+   "round_code": "2",
+   "overall_pick": 35,
+   "round_pick": 10,
+   "organization": "WSH",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Scott Ayers",
+    "birth_date": null,
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "554922"
+    },
+    "source_key": "hist:mlb-statsapi-draft-1985-js"
+   },
+   "school": {
+    "name": "New Orleans",
+    "school_type": null,
+    "city": null,
+    "region": null,
+    "source_key": "hist:mlb-statsapi-draft-1985-js"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type not stated in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-1985-js",
+   "draft_key": "1985-JUNE_SECONDARY",
+   "round_code": "3",
+   "overall_pick": 58,
+   "round_pick": 8,
+   "organization": "WSH",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Louis Calvert",
+    "birth_date": null,
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "556409"
+    },
+    "source_key": "hist:mlb-statsapi-draft-1985-js"
+   },
+   "school": {
+    "name": "Blinn College",
+    "school_type": "COLLEGE",
+    "city": null,
+    "region": null,
+    "source_key": "hist:mlb-statsapi-draft-1985-js"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type from explicit words in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-1985-js",
+   "draft_key": "1985-JUNE_SECONDARY",
+   "round_code": "4",
+   "overall_pick": 77,
+   "round_pick": 5,
+   "organization": "WSH",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Frank Taylor",
+    "birth_date": null,
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "564988"
+    },
+    "source_key": "hist:mlb-statsapi-draft-1985-js"
+   },
+   "school": {
+    "name": "DeKalb Junior College",
+    "school_type": "JUNIOR_COLLEGE",
+    "city": null,
+    "region": null,
+    "source_key": "hist:mlb-statsapi-draft-1985-js"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type from explicit words in MLB's label."
+  }
+ ]
+}

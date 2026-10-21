@@ -1,0 +1,1765 @@
+{
+ "format": "bai-research-import/1",
+ "batch_key": "hist-2005-june-amateur-tex",
+ "channel": "DRAFT",
+ "description": "TEX, 2005 June regular phase: 50 of 50 selections from MLB's draft feed (historical importer).",
+ "coverage_claims": [
+  {
+   "domain": "DRAFT",
+   "scope_key": "2005-JUNE_AMATEUR",
+   "organization": "TEX",
+   "coverage_state": "COMPLETE_CENSUS",
+   "expected_count": 50,
+   "source_key": "hist:mlb-statsapi-draft-2005-jr",
+   "gap_notes": "MLB's draft feed lists 50 selection(s) for the club in the June regular phase. Independent count: 50 (Baseball-Reference franchise-year page, Internet Archive capture 20241228114108: 50 listed, 50 matched to MLB's picks by name (9 by surname in the same round: #19 MLB \"John Mayberry Jr.\" / \"John Mayberry\"; #219 MLB \"Jacob Rasner\" / \"Jake Rasner\"; #279 MLB \"Ronnie Anderson\" / \"R.J. Anderson\"; #429 MLB \"Steven Murphy\" / \"Steve Murphy\"; #609 MLB \"Joseph Hooft\" / \"Joe Hooft\"; #669 MLB \"Jarrod Dumont\" / \"Jarod Dumont\"; #789 MLB \"Benjamin Crabtree\" / \"Ben Crabtree\"; #879 MLB \"Phillip Hawke\" / \"Phil Hawke\"; #1119 MLB \"Timothy Rodriguez\" / \"Tim Rodriguez\")). Signing status, bonuses and outcomes not researched."
+  }
+ ],
+ "sources": [
+  {
+   "source_key": "hist:mlb-statsapi-draft-2005-jr",
+   "source_type": "OFFICIAL_LEAGUE",
+   "authority_level": "OFFICIAL",
+   "title": "MLB Stats API draft endpoint, 2005 June regular phase (draftType JR)",
+   "publisher": "MLB Advanced Media",
+   "url": "https://statsapi.mlb.com/api/v1/draft/2005?draftType=JR",
+   "retrieved_date": "2026-10-21",
+   "notes": "League-wide JSON, 1501 selections; sha256 188465d02300b092f4d534c5779d02c80ecf4f94b98348687d1d7f322a26886e. Supplies pick, round, franchise-stable team id, MLBAM person, school label. No signing data. Terms: individual, non-commercial, non-bulk use (research/history/sources.json)."
+  },
+  {
+   "source_key": "hist:chadwick-register-781c175",
+   "source_type": "REFERENCE_DATABASE",
+   "authority_level": "AGGREGATOR",
+   "title": "Chadwick Baseball Bureau Register, commit 781c175",
+   "publisher": "Chadwick Baseball Bureau",
+   "url": "https://github.com/chadwickbureau/register/tree/781c175e748b89e5730fd3f5de0086b9355b2f92",
+   "retrieved_date": "2026-10-21",
+   "notes": "MLBAM -> Baseball-Reference, Baseball-Reference minors, FanGraphs and Retrosheet ids. Open Data Commons Attribution License 1.0."
+  }
+ ],
+ "records": [
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-2005-jr",
+   "draft_key": "2005-JUNE_AMATEUR",
+   "round_code": "1",
+   "overall_pick": 19,
+   "round_pick": 19,
+   "organization": "TEX",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "John Mayberry Jr.",
+    "birth_date": "1983-12-21",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "460055",
+     "BBREF": "maybejo02",
+     "BBREF_MINORS": "mayber002joh",
+     "FANGRAPHS": "3390"
+    },
+    "source_key": "hist:mlb-statsapi-draft-2005-jr",
+    "external_id_sources": {
+     "BBREF": "hist:chadwick-register-781c175",
+     "BBREF_MINORS": "hist:chadwick-register-781c175",
+     "FANGRAPHS": "hist:chadwick-register-781c175"
+    }
+   },
+   "school": {
+    "name": "Stanford",
+    "school_type": null,
+    "city": null,
+    "region": null,
+    "source_key": "hist:mlb-statsapi-draft-2005-jr"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type not stated in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-2005-jr",
+   "draft_key": "2005-JUNE_AMATEUR",
+   "round_code": "2",
+   "overall_pick": 67,
+   "round_pick": 19,
+   "organization": "TEX",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "John Whittleman",
+    "birth_date": "1987-02-11",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "457800",
+     "BBREF_MINORS": "whittl001joh"
+    },
+    "source_key": "hist:mlb-statsapi-draft-2005-jr",
+    "external_id_sources": {
+     "BBREF_MINORS": "hist:chadwick-register-781c175"
+    }
+   },
+   "school": {
+    "name": "Kingwood HS, TX",
+    "school_type": "HIGH_SCHOOL",
+    "city": null,
+    "region": "TX",
+    "source_key": "hist:mlb-statsapi-draft-2005-jr"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type from explicit words in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-2005-jr",
+   "draft_key": "2005-JUNE_AMATEUR",
+   "round_code": "3",
+   "overall_pick": 99,
+   "round_pick": 19,
+   "organization": "TEX",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Taylor Teagarden",
+    "birth_date": "1983-12-21",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "460003",
+     "BBREF": "teagata01",
+     "BBREF_MINORS": "teagar001tay",
+     "FANGRAPHS": "5199"
+    },
+    "source_key": "hist:mlb-statsapi-draft-2005-jr",
+    "external_id_sources": {
+     "BBREF": "hist:chadwick-register-781c175",
+     "BBREF_MINORS": "hist:chadwick-register-781c175",
+     "FANGRAPHS": "hist:chadwick-register-781c175"
+    }
+   },
+   "school": {
+    "name": "Texas",
+    "school_type": null,
+    "city": null,
+    "region": null,
+    "source_key": "hist:mlb-statsapi-draft-2005-jr"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type not stated in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-2005-jr",
+   "draft_key": "2005-JUNE_AMATEUR",
+   "round_code": "4",
+   "overall_pick": 129,
+   "round_pick": 19,
+   "organization": "TEX",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Shane Funk",
+    "birth_date": "1987-05-09",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "457743",
+     "BBREF_MINORS": "funk--001sha"
+    },
+    "source_key": "hist:mlb-statsapi-draft-2005-jr",
+    "external_id_sources": {
+     "BBREF_MINORS": "hist:chadwick-register-781c175"
+    }
+   },
+   "school": {
+    "name": "Arnold HS, FL",
+    "school_type": "HIGH_SCHOOL",
+    "city": null,
+    "region": "FL",
+    "source_key": "hist:mlb-statsapi-draft-2005-jr"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type from explicit words in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-2005-jr",
+   "draft_key": "2005-JUNE_AMATEUR",
+   "round_code": "5",
+   "overall_pick": 159,
+   "round_pick": 19,
+   "organization": "TEX",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Michael Kirkman",
+    "birth_date": "1986-09-18",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "457779",
+     "BBREF": "kirkmmi01",
+     "BBREF_MINORS": "kirkma001mic",
+     "FANGRAPHS": "9877"
+    },
+    "source_key": "hist:mlb-statsapi-draft-2005-jr",
+    "external_id_sources": {
+     "BBREF": "hist:chadwick-register-781c175",
+     "BBREF_MINORS": "hist:chadwick-register-781c175",
+     "FANGRAPHS": "hist:chadwick-register-781c175"
+    }
+   },
+   "school": {
+    "name": "Columbia HS, FL",
+    "school_type": "HIGH_SCHOOL",
+    "city": null,
+    "region": "FL",
+    "source_key": "hist:mlb-statsapi-draft-2005-jr"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type from explicit words in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-2005-jr",
+   "draft_key": "2005-JUNE_AMATEUR",
+   "round_code": "6",
+   "overall_pick": 189,
+   "round_pick": 19,
+   "organization": "TEX",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "German Duran",
+    "birth_date": "1984-08-03",
+    "birth_country": "Mexico",
+    "external_ids": {
+     "MLBAM": "458061",
+     "BBREF": "durange01",
+     "BBREF_MINORS": "duran-002ger",
+     "FANGRAPHS": "3919"
+    },
+    "source_key": "hist:mlb-statsapi-draft-2005-jr",
+    "external_id_sources": {
+     "BBREF": "hist:chadwick-register-781c175",
+     "BBREF_MINORS": "hist:chadwick-register-781c175",
+     "FANGRAPHS": "hist:chadwick-register-781c175"
+    }
+   },
+   "school": {
+    "name": "Weatherford College",
+    "school_type": "COLLEGE",
+    "city": null,
+    "region": null,
+    "source_key": "hist:mlb-statsapi-draft-2005-jr"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type from explicit words in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-2005-jr",
+   "draft_key": "2005-JUNE_AMATEUR",
+   "round_code": "7",
+   "overall_pick": 219,
+   "round_pick": 19,
+   "organization": "TEX",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Jacob Rasner",
+    "birth_date": "1986-12-04",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "489229",
+     "BBREF_MINORS": "rasner001jac"
+    },
+    "source_key": "hist:mlb-statsapi-draft-2005-jr",
+    "external_id_sources": {
+     "BBREF_MINORS": "hist:chadwick-register-781c175"
+    }
+   },
+   "school": {
+    "name": "Earl Wooster HS, NV",
+    "school_type": "HIGH_SCHOOL",
+    "city": null,
+    "region": "NV",
+    "source_key": "hist:mlb-statsapi-draft-2005-jr"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type from explicit words in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-2005-jr",
+   "draft_key": "2005-JUNE_AMATEUR",
+   "round_code": "8",
+   "overall_pick": 249,
+   "round_pick": 19,
+   "organization": "TEX",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Bradley Barragar",
+    "birth_date": "1985-11-05",
+    "birth_country": null,
+    "external_ids": {
+     "MLBAM": "453219",
+     "BBREF_MINORS": "barrag001bra"
+    },
+    "source_key": "hist:mlb-statsapi-draft-2005-jr",
+    "external_id_sources": {
+     "BBREF_MINORS": "hist:chadwick-register-781c175"
+    }
+   },
+   "school": {
+    "name": "Golden West College",
+    "school_type": "COLLEGE",
+    "city": null,
+    "region": null,
+    "source_key": "hist:mlb-statsapi-draft-2005-jr"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type from explicit words in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-2005-jr",
+   "draft_key": "2005-JUNE_AMATEUR",
+   "round_code": "9",
+   "overall_pick": 279,
+   "round_pick": 19,
+   "organization": "TEX",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Ronnie Anderson",
+    "birth_date": "1986-11-01",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "456164",
+     "BBREF_MINORS": "anders005ron"
+    },
+    "source_key": "hist:mlb-statsapi-draft-2005-jr",
+    "external_id_sources": {
+     "BBREF_MINORS": "hist:chadwick-register-781c175"
+    }
+   },
+   "school": {
+    "name": "Blanche Armwood HS, FL",
+    "school_type": "HIGH_SCHOOL",
+    "city": null,
+    "region": "FL",
+    "source_key": "hist:mlb-statsapi-draft-2005-jr"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type from explicit words in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-2005-jr",
+   "draft_key": "2005-JUNE_AMATEUR",
+   "round_code": "10",
+   "overall_pick": 309,
+   "round_pick": 19,
+   "organization": "TEX",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Matt Nevarez",
+    "birth_date": "1987-02-26",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "457764",
+     "BBREF_MINORS": "nevare001mat"
+    },
+    "source_key": "hist:mlb-statsapi-draft-2005-jr",
+    "external_id_sources": {
+     "BBREF_MINORS": "hist:chadwick-register-781c175"
+    }
+   },
+   "school": {
+    "name": "San Fernando HS, CA",
+    "school_type": "HIGH_SCHOOL",
+    "city": null,
+    "region": "CA",
+    "source_key": "hist:mlb-statsapi-draft-2005-jr"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type from explicit words in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-2005-jr",
+   "draft_key": "2005-JUNE_AMATEUR",
+   "round_code": "11",
+   "overall_pick": 339,
+   "round_pick": 19,
+   "organization": "TEX",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Nathan Fogle",
+    "birth_date": "1983-12-27",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "446167",
+     "BBREF_MINORS": "fogle-001nat"
+    },
+    "source_key": "hist:mlb-statsapi-draft-2005-jr",
+    "external_id_sources": {
+     "BBREF_MINORS": "hist:chadwick-register-781c175"
+    }
+   },
+   "school": {
+    "name": "Oregon State",
+    "school_type": "COLLEGE",
+    "city": null,
+    "region": null,
+    "source_key": "hist:mlb-statsapi-draft-2005-jr"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type from explicit words in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-2005-jr",
+   "draft_key": "2005-JUNE_AMATEUR",
+   "round_code": "12",
+   "overall_pick": 369,
+   "round_pick": 19,
+   "organization": "TEX",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Dexter Carter",
+    "birth_date": "1987-02-05",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "488767",
+     "BBREF_MINORS": "carter001dex"
+    },
+    "source_key": "hist:mlb-statsapi-draft-2005-jr",
+    "external_id_sources": {
+     "BBREF_MINORS": "hist:chadwick-register-781c175"
+    }
+   },
+   "school": {
+    "name": "Greenbrier Christian Acad, VA",
+    "school_type": null,
+    "city": null,
+    "region": "VA",
+    "source_key": "hist:mlb-statsapi-draft-2005-jr"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type not stated in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-2005-jr",
+   "draft_key": "2005-JUNE_AMATEUR",
+   "round_code": "13",
+   "overall_pick": 399,
+   "round_pick": 19,
+   "organization": "TEX",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Doug Mathis",
+    "birth_date": "1983-06-07",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "450545",
+     "BBREF": "mathido01",
+     "BBREF_MINORS": "mathis001dou",
+     "FANGRAPHS": "3944"
+    },
+    "source_key": "hist:mlb-statsapi-draft-2005-jr",
+    "external_id_sources": {
+     "BBREF": "hist:chadwick-register-781c175",
+     "BBREF_MINORS": "hist:chadwick-register-781c175",
+     "FANGRAPHS": "hist:chadwick-register-781c175"
+    }
+   },
+   "school": {
+    "name": "U Missouri Columbia, MO",
+    "school_type": null,
+    "city": null,
+    "region": "MO",
+    "source_key": "hist:mlb-statsapi-draft-2005-jr"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type not stated in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-2005-jr",
+   "draft_key": "2005-JUNE_AMATEUR",
+   "round_code": "14",
+   "overall_pick": 429,
+   "round_pick": 19,
+   "organization": "TEX",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Steven Murphy",
+    "birth_date": "1984-04-22",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "489156",
+     "BBREF_MINORS": "murphy002ste"
+    },
+    "source_key": "hist:mlb-statsapi-draft-2005-jr",
+    "external_id_sources": {
+     "BBREF_MINORS": "hist:chadwick-register-781c175"
+    }
+   },
+   "school": {
+    "name": "Kansas State",
+    "school_type": "COLLEGE",
+    "city": null,
+    "region": null,
+    "source_key": "hist:mlb-statsapi-draft-2005-jr"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type from explicit words in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-2005-jr",
+   "draft_key": "2005-JUNE_AMATEUR",
+   "round_code": "15",
+   "overall_pick": 459,
+   "round_pick": 19,
+   "organization": "TEX",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Kea Kometani",
+    "birth_date": "1982-12-24",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "489030",
+     "BBREF_MINORS": "kometa001pau"
+    },
+    "source_key": "hist:mlb-statsapi-draft-2005-jr",
+    "external_id_sources": {
+     "BBREF_MINORS": "hist:chadwick-register-781c175"
+    }
+   },
+   "school": {
+    "name": "Pepperdine",
+    "school_type": null,
+    "city": null,
+    "region": null,
+    "source_key": "hist:mlb-statsapi-draft-2005-jr"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type not stated in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-2005-jr",
+   "draft_key": "2005-JUNE_AMATEUR",
+   "round_code": "16",
+   "overall_pick": 489,
+   "round_pick": 19,
+   "organization": "TEX",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Jesse Hall",
+    "birth_date": "1985-09-24",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "488933",
+     "BBREF_MINORS": "hall--001jes"
+    },
+    "source_key": "hist:mlb-statsapi-draft-2005-jr",
+    "external_id_sources": {
+     "BBREF_MINORS": "hist:chadwick-register-781c175"
+    }
+   },
+   "school": {
+    "name": "Yavapai College",
+    "school_type": "COLLEGE",
+    "city": null,
+    "region": null,
+    "source_key": "hist:mlb-statsapi-draft-2005-jr"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type from explicit words in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-2005-jr",
+   "draft_key": "2005-JUNE_AMATEUR",
+   "round_code": "17",
+   "overall_pick": 519,
+   "round_pick": 19,
+   "organization": "TEX",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Chris Dominguez",
+    "birth_date": "1986-11-22",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "458689",
+     "BBREF": "dominch01",
+     "BBREF_MINORS": "doming001chr",
+     "FANGRAPHS": "9718"
+    },
+    "source_key": "hist:mlb-statsapi-draft-2005-jr",
+    "external_id_sources": {
+     "BBREF": "hist:chadwick-register-781c175",
+     "BBREF_MINORS": "hist:chadwick-register-781c175",
+     "FANGRAPHS": "hist:chadwick-register-781c175"
+    }
+   },
+   "school": {
+    "name": "Gulliver Preparatory, FL",
+    "school_type": null,
+    "city": null,
+    "region": "FL",
+    "source_key": "hist:mlb-statsapi-draft-2005-jr"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type not stated in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-2005-jr",
+   "draft_key": "2005-JUNE_AMATEUR",
+   "round_code": "18",
+   "overall_pick": 549,
+   "round_pick": 19,
+   "organization": "TEX",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Chase Fontaine",
+    "birth_date": "1985-10-22",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "446230",
+     "BBREF_MINORS": "fontai001rob"
+    },
+    "source_key": "hist:mlb-statsapi-draft-2005-jr",
+    "external_id_sources": {
+     "BBREF_MINORS": "hist:chadwick-register-781c175"
+    }
+   },
+   "school": {
+    "name": "Daytona Beach CC, FL",
+    "school_type": "JUNIOR_COLLEGE",
+    "city": null,
+    "region": "FL",
+    "source_key": "hist:mlb-statsapi-draft-2005-jr"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type from explicit words in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-2005-jr",
+   "draft_key": "2005-JUNE_AMATEUR",
+   "round_code": "19",
+   "overall_pick": 579,
+   "round_pick": 19,
+   "organization": "TEX",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Brian Valichka",
+    "birth_date": "1983-08-21",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "489389",
+     "BBREF_MINORS": "valich001bri"
+    },
+    "source_key": "hist:mlb-statsapi-draft-2005-jr",
+    "external_id_sources": {
+     "BBREF_MINORS": "hist:chadwick-register-781c175"
+    }
+   },
+   "school": {
+    "name": "Delaware",
+    "school_type": null,
+    "city": null,
+    "region": null,
+    "source_key": "hist:mlb-statsapi-draft-2005-jr"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type not stated in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-2005-jr",
+   "draft_key": "2005-JUNE_AMATEUR",
+   "round_code": "20",
+   "overall_pick": 609,
+   "round_pick": 19,
+   "organization": "TEX",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Joseph Hooft",
+    "birth_date": "1982-08-30",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "458610",
+     "BBREF_MINORS": "hooft-001jos"
+    },
+    "source_key": "hist:mlb-statsapi-draft-2005-jr",
+    "external_id_sources": {
+     "BBREF_MINORS": "hist:chadwick-register-781c175"
+    }
+   },
+   "school": {
+    "name": "Arizona State",
+    "school_type": "COLLEGE",
+    "city": null,
+    "region": null,
+    "source_key": "hist:mlb-statsapi-draft-2005-jr"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type from explicit words in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-2005-jr",
+   "draft_key": "2005-JUNE_AMATEUR",
+   "round_code": "21",
+   "overall_pick": 639,
+   "round_pick": 19,
+   "organization": "TEX",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Brandon James",
+    "birth_date": "1986-09-05",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "474483",
+     "BBREF_MINORS": "james-004bra"
+    },
+    "source_key": "hist:mlb-statsapi-draft-2005-jr",
+    "external_id_sources": {
+     "BBREF_MINORS": "hist:chadwick-register-781c175"
+    }
+   },
+   "school": {
+    "name": "Carlisle HS, PA",
+    "school_type": "HIGH_SCHOOL",
+    "city": null,
+    "region": "PA",
+    "source_key": "hist:mlb-statsapi-draft-2005-jr"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type from explicit words in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-2005-jr",
+   "draft_key": "2005-JUNE_AMATEUR",
+   "round_code": "22",
+   "overall_pick": 669,
+   "round_pick": 19,
+   "organization": "TEX",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Jarrod Dumont",
+    "birth_date": "1985-07-30",
+    "birth_country": null,
+    "external_ids": {
+     "MLBAM": "488848",
+     "BBREF_MINORS": "dumont001jar"
+    },
+    "source_key": "hist:mlb-statsapi-draft-2005-jr",
+    "external_id_sources": {
+     "BBREF_MINORS": "hist:chadwick-register-781c175"
+    }
+   },
+   "school": {
+    "name": "Riverside City College",
+    "school_type": "COLLEGE",
+    "city": null,
+    "region": null,
+    "source_key": "hist:mlb-statsapi-draft-2005-jr"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type from explicit words in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-2005-jr",
+   "draft_key": "2005-JUNE_AMATEUR",
+   "round_code": "23",
+   "overall_pick": 699,
+   "round_pick": 19,
+   "organization": "TEX",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Steven Marquardt",
+    "birth_date": "1986-06-11",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "455118",
+     "BBREF_MINORS": "marqua002ste"
+    },
+    "source_key": "hist:mlb-statsapi-draft-2005-jr",
+    "external_id_sources": {
+     "BBREF_MINORS": "hist:chadwick-register-781c175"
+    }
+   },
+   "school": {
+    "name": "Columbia Basin College",
+    "school_type": "COLLEGE",
+    "city": null,
+    "region": null,
+    "source_key": "hist:mlb-statsapi-draft-2005-jr"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type from explicit words in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-2005-jr",
+   "draft_key": "2005-JUNE_AMATEUR",
+   "round_code": "24",
+   "overall_pick": 729,
+   "round_pick": 19,
+   "organization": "TEX",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Zach Borba",
+    "birth_date": "1984-10-25",
+    "birth_country": null,
+    "external_ids": {
+     "MLBAM": "488719",
+     "BBREF_MINORS": "borba-001zac"
+    },
+    "source_key": "hist:mlb-statsapi-draft-2005-jr",
+    "external_id_sources": {
+     "BBREF_MINORS": "hist:chadwick-register-781c175"
+    }
+   },
+   "school": {
+    "name": "Columbia Basin College",
+    "school_type": "COLLEGE",
+    "city": null,
+    "region": null,
+    "source_key": "hist:mlb-statsapi-draft-2005-jr"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type from explicit words in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-2005-jr",
+   "draft_key": "2005-JUNE_AMATEUR",
+   "round_code": "25",
+   "overall_pick": 759,
+   "round_pick": 19,
+   "organization": "TEX",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Brian Spielmann",
+    "birth_date": "1982-10-10",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "489331",
+     "BBREF_MINORS": "spielm001bri"
+    },
+    "source_key": "hist:mlb-statsapi-draft-2005-jr",
+    "external_id_sources": {
+     "BBREF_MINORS": "hist:chadwick-register-781c175"
+    }
+   },
+   "school": {
+    "name": "Bradley",
+    "school_type": null,
+    "city": null,
+    "region": null,
+    "source_key": "hist:mlb-statsapi-draft-2005-jr"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type not stated in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-2005-jr",
+   "draft_key": "2005-JUNE_AMATEUR",
+   "round_code": "26",
+   "overall_pick": 789,
+   "round_pick": 19,
+   "organization": "TEX",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Benjamin Crabtree",
+    "birth_date": "1982-11-02",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "488804",
+     "BBREF_MINORS": "crabtr001ben"
+    },
+    "source_key": "hist:mlb-statsapi-draft-2005-jr",
+    "external_id_sources": {
+     "BBREF_MINORS": "hist:chadwick-register-781c175"
+    }
+   },
+   "school": {
+    "name": "Ohio",
+    "school_type": null,
+    "city": null,
+    "region": null,
+    "source_key": "hist:mlb-statsapi-draft-2005-jr"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type not stated in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-2005-jr",
+   "draft_key": "2005-JUNE_AMATEUR",
+   "round_code": "27",
+   "overall_pick": 819,
+   "round_pick": 19,
+   "organization": "TEX",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Jon Wilson",
+    "birth_date": "1983-04-28",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "489431",
+     "BBREF_MINORS": "wilson002jon"
+    },
+    "source_key": "hist:mlb-statsapi-draft-2005-jr",
+    "external_id_sources": {
+     "BBREF_MINORS": "hist:chadwick-register-781c175"
+    }
+   },
+   "school": {
+    "name": "Winthrop",
+    "school_type": null,
+    "city": null,
+    "region": null,
+    "source_key": "hist:mlb-statsapi-draft-2005-jr"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type not stated in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-2005-jr",
+   "draft_key": "2005-JUNE_AMATEUR",
+   "round_code": "28",
+   "overall_pick": 849,
+   "round_pick": 19,
+   "organization": "TEX",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Sergio Morales",
+    "birth_date": "1987-12-17",
+    "birth_country": "U.S. Virgin Islands",
+    "external_ids": {
+     "MLBAM": "489140",
+     "BBREF_MINORS": "morale001ser"
+    },
+    "source_key": "hist:mlb-statsapi-draft-2005-jr",
+    "external_id_sources": {
+     "BBREF_MINORS": "hist:chadwick-register-781c175"
+    }
+   },
+   "school": {
+    "name": "Hollywood Hills HS, FL",
+    "school_type": "HIGH_SCHOOL",
+    "city": null,
+    "region": "FL",
+    "source_key": "hist:mlb-statsapi-draft-2005-jr"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type from explicit words in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-2005-jr",
+   "draft_key": "2005-JUNE_AMATEUR",
+   "round_code": "29",
+   "overall_pick": 879,
+   "round_pick": 19,
+   "organization": "TEX",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Phillip Hawke",
+    "birth_date": "1983-08-22",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "488949",
+     "BBREF_MINORS": "hawke-001mat"
+    },
+    "source_key": "hist:mlb-statsapi-draft-2005-jr",
+    "external_id_sources": {
+     "BBREF_MINORS": "hist:chadwick-register-781c175"
+    }
+   },
+   "school": {
+    "name": "Louisiana - Lafayette",
+    "school_type": null,
+    "city": null,
+    "region": null,
+    "source_key": "hist:mlb-statsapi-draft-2005-jr"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type not stated in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-2005-jr",
+   "draft_key": "2005-JUNE_AMATEUR",
+   "round_code": "30",
+   "overall_pick": 909,
+   "round_pick": 19,
+   "organization": "TEX",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Truan Mehl",
+    "birth_date": "1983-03-20",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "457079",
+     "BBREF_MINORS": "mehl--001tru"
+    },
+    "source_key": "hist:mlb-statsapi-draft-2005-jr",
+    "external_id_sources": {
+     "BBREF_MINORS": "hist:chadwick-register-781c175"
+    }
+   },
+   "school": {
+    "name": "Maryland",
+    "school_type": null,
+    "city": null,
+    "region": null,
+    "source_key": "hist:mlb-statsapi-draft-2005-jr"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type not stated in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-2005-jr",
+   "draft_key": "2005-JUNE_AMATEUR",
+   "round_code": "31",
+   "overall_pick": 939,
+   "round_pick": 19,
+   "organization": "TEX",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Austin Faught",
+    "birth_date": "1982-04-09",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "446563",
+     "BBREF_MINORS": "faught001aus"
+    },
+    "source_key": "hist:mlb-statsapi-draft-2005-jr",
+    "external_id_sources": {
+     "BBREF_MINORS": "hist:chadwick-register-781c175"
+    }
+   },
+   "school": {
+    "name": "Louisiana - Lafayette",
+    "school_type": null,
+    "city": null,
+    "region": null,
+    "source_key": "hist:mlb-statsapi-draft-2005-jr"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type not stated in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-2005-jr",
+   "draft_key": "2005-JUNE_AMATEUR",
+   "round_code": "32",
+   "overall_pick": 969,
+   "round_pick": 19,
+   "organization": "TEX",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Renny Osuna",
+    "birth_date": "1985-04-24",
+    "birth_country": "Venezuela",
+    "external_ids": {
+     "MLBAM": "489186",
+     "BBREF_MINORS": "osuna-001ren"
+    },
+    "source_key": "hist:mlb-statsapi-draft-2005-jr",
+    "external_id_sources": {
+     "BBREF_MINORS": "hist:chadwick-register-781c175"
+    }
+   },
+   "school": {
+    "name": "New Mexico Junior College",
+    "school_type": "JUNIOR_COLLEGE",
+    "city": null,
+    "region": null,
+    "source_key": "hist:mlb-statsapi-draft-2005-jr"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type from explicit words in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-2005-jr",
+   "draft_key": "2005-JUNE_AMATEUR",
+   "round_code": "33",
+   "overall_pick": 999,
+   "round_pick": 19,
+   "organization": "TEX",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Kevin Gossage",
+    "birth_date": "1987-02-16",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "488913",
+     "BBREF_MINORS": "gossag001kev"
+    },
+    "source_key": "hist:mlb-statsapi-draft-2005-jr",
+    "external_id_sources": {
+     "BBREF_MINORS": "hist:chadwick-register-781c175"
+    }
+   },
+   "school": {
+    "name": "Coronado HS, CO",
+    "school_type": "HIGH_SCHOOL",
+    "city": null,
+    "region": "CO",
+    "source_key": "hist:mlb-statsapi-draft-2005-jr"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type from explicit words in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-2005-jr",
+   "draft_key": "2005-JUNE_AMATEUR",
+   "round_code": "34",
+   "overall_pick": 1029,
+   "round_pick": 19,
+   "organization": "TEX",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Shooter Hunt",
+    "birth_date": "1986-08-16",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "476002",
+     "BBREF_MINORS": "hunt--001sho"
+    },
+    "source_key": "hist:mlb-statsapi-draft-2005-jr",
+    "external_id_sources": {
+     "BBREF_MINORS": "hist:chadwick-register-781c175"
+    }
+   },
+   "school": {
+    "name": "Ramapo HS, NJ",
+    "school_type": "HIGH_SCHOOL",
+    "city": null,
+    "region": "NJ",
+    "source_key": "hist:mlb-statsapi-draft-2005-jr"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type from explicit words in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-2005-jr",
+   "draft_key": "2005-JUNE_AMATEUR",
+   "round_code": "35",
+   "overall_pick": 1059,
+   "round_pick": 19,
+   "organization": "TEX",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Chris Hicks",
+    "birth_date": "1987-02-17",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "488962",
+     "BBREF_MINORS": "hicks-002chr"
+    },
+    "source_key": "hist:mlb-statsapi-draft-2005-jr",
+    "external_id_sources": {
+     "BBREF_MINORS": "hist:chadwick-register-781c175"
+    }
+   },
+   "school": {
+    "name": "Milton HS, GA",
+    "school_type": "HIGH_SCHOOL",
+    "city": null,
+    "region": "GA",
+    "source_key": "hist:mlb-statsapi-draft-2005-jr"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type from explicit words in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-2005-jr",
+   "draft_key": "2005-JUNE_AMATEUR",
+   "round_code": "36",
+   "overall_pick": 1089,
+   "round_pick": 19,
+   "organization": "TEX",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Steven Farris",
+    "birth_date": "1986-09-10",
+    "birth_country": null,
+    "external_ids": {
+     "MLBAM": "458671",
+     "BBREF_MINORS": "farris001ste"
+    },
+    "source_key": "hist:mlb-statsapi-draft-2005-jr",
+    "external_id_sources": {
+     "BBREF_MINORS": "hist:chadwick-register-781c175"
+    }
+   },
+   "school": {
+    "name": "Langham Creek Senior HS, TX",
+    "school_type": "HIGH_SCHOOL",
+    "city": null,
+    "region": "TX",
+    "source_key": "hist:mlb-statsapi-draft-2005-jr"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type from explicit words in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-2005-jr",
+   "draft_key": "2005-JUNE_AMATEUR",
+   "round_code": "37",
+   "overall_pick": 1119,
+   "round_pick": 19,
+   "organization": "TEX",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Timothy Rodriguez",
+    "birth_date": "1987-01-24",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "489260",
+     "BBREF_MINORS": "rodrig001tim"
+    },
+    "source_key": "hist:mlb-statsapi-draft-2005-jr",
+    "external_id_sources": {
+     "BBREF_MINORS": "hist:chadwick-register-781c175"
+    }
+   },
+   "school": {
+    "name": "Centennial HS, OR",
+    "school_type": "HIGH_SCHOOL",
+    "city": null,
+    "region": "OR",
+    "source_key": "hist:mlb-statsapi-draft-2005-jr"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type from explicit words in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-2005-jr",
+   "draft_key": "2005-JUNE_AMATEUR",
+   "round_code": "38",
+   "overall_pick": 1149,
+   "round_pick": 19,
+   "organization": "TEX",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "J.R. Murphy",
+    "birth_date": "1986-02-23",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "489154",
+     "BBREF_MINORS": "murphy003jef"
+    },
+    "source_key": "hist:mlb-statsapi-draft-2005-jr",
+    "external_id_sources": {
+     "BBREF_MINORS": "hist:chadwick-register-781c175"
+    }
+   },
+   "school": {
+    "name": "Yavapai College",
+    "school_type": "COLLEGE",
+    "city": null,
+    "region": null,
+    "source_key": "hist:mlb-statsapi-draft-2005-jr"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type from explicit words in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-2005-jr",
+   "draft_key": "2005-JUNE_AMATEUR",
+   "round_code": "39",
+   "overall_pick": 1179,
+   "round_pick": 19,
+   "organization": "TEX",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "David Makin",
+    "birth_date": "1987-04-20",
+    "birth_country": null,
+    "external_ids": {
+     "MLBAM": "489079",
+     "BBREF_MINORS": "makin-001dav"
+    },
+    "source_key": "hist:mlb-statsapi-draft-2005-jr",
+    "external_id_sources": {
+     "BBREF_MINORS": "hist:chadwick-register-781c175"
+    }
+   },
+   "school": {
+    "name": "Monte Vista HS, CA",
+    "school_type": "HIGH_SCHOOL",
+    "city": null,
+    "region": "CA",
+    "source_key": "hist:mlb-statsapi-draft-2005-jr"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type from explicit words in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-2005-jr",
+   "draft_key": "2005-JUNE_AMATEUR",
+   "round_code": "40",
+   "overall_pick": 1208,
+   "round_pick": 19,
+   "organization": "TEX",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Thomas Van Buskirk",
+    "birth_date": "1983-08-15",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "489390",
+     "BBREF_MINORS": "vanbus001tho"
+    },
+    "source_key": "hist:mlb-statsapi-draft-2005-jr",
+    "external_id_sources": {
+     "BBREF_MINORS": "hist:chadwick-register-781c175"
+    }
+   },
+   "school": {
+    "name": "Santa Clara",
+    "school_type": null,
+    "city": null,
+    "region": null,
+    "source_key": "hist:mlb-statsapi-draft-2005-jr"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type not stated in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-2005-jr",
+   "draft_key": "2005-JUNE_AMATEUR",
+   "round_code": "41",
+   "overall_pick": 1237,
+   "round_pick": 19,
+   "organization": "TEX",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Warren Rosebrock",
+    "birth_date": "1982-10-22",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "489268",
+     "BBREF_MINORS": "rosebr001war"
+    },
+    "source_key": "hist:mlb-statsapi-draft-2005-jr",
+    "external_id_sources": {
+     "BBREF_MINORS": "hist:chadwick-register-781c175"
+    }
+   },
+   "school": {
+    "name": "Cal State Sacramento",
+    "school_type": "COLLEGE",
+    "city": null,
+    "region": null,
+    "source_key": "hist:mlb-statsapi-draft-2005-jr"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type from explicit words in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-2005-jr",
+   "draft_key": "2005-JUNE_AMATEUR",
+   "round_code": "42",
+   "overall_pick": 1266,
+   "round_pick": 19,
+   "organization": "TEX",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Travis Hill",
+    "birth_date": "1985-04-08",
+    "birth_country": null,
+    "external_ids": {
+     "MLBAM": "488966",
+     "BBREF_MINORS": "hill--001tra"
+    },
+    "source_key": "hist:mlb-statsapi-draft-2005-jr",
+    "external_id_sources": {
+     "BBREF_MINORS": "hist:chadwick-register-781c175"
+    }
+   },
+   "school": {
+    "name": "Seminole State College (OK)",
+    "school_type": "COLLEGE",
+    "city": null,
+    "region": null,
+    "source_key": "hist:mlb-statsapi-draft-2005-jr"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type from explicit words in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-2005-jr",
+   "draft_key": "2005-JUNE_AMATEUR",
+   "round_code": "43",
+   "overall_pick": 1295,
+   "round_pick": 19,
+   "organization": "TEX",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Shawn Keil",
+    "birth_date": "1986-09-26",
+    "birth_country": null,
+    "external_ids": {
+     "MLBAM": "489014",
+     "BBREF_MINORS": "keil--001sha"
+    },
+    "source_key": "hist:mlb-statsapi-draft-2005-jr",
+    "external_id_sources": {
+     "BBREF_MINORS": "hist:chadwick-register-781c175"
+    }
+   },
+   "school": {
+    "name": "Seminole HS, FL",
+    "school_type": "HIGH_SCHOOL",
+    "city": null,
+    "region": "FL",
+    "source_key": "hist:mlb-statsapi-draft-2005-jr"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type from explicit words in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-2005-jr",
+   "draft_key": "2005-JUNE_AMATEUR",
+   "round_code": "44",
+   "overall_pick": 1324,
+   "round_pick": 19,
+   "organization": "TEX",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Roberto Valiente",
+    "birth_date": "1983-03-04",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "458727",
+     "BBREF_MINORS": "valien001rob"
+    },
+    "source_key": "hist:mlb-statsapi-draft-2005-jr",
+    "external_id_sources": {
+     "BBREF_MINORS": "hist:chadwick-register-781c175"
+    }
+   },
+   "school": {
+    "name": "Tampa",
+    "school_type": null,
+    "city": null,
+    "region": null,
+    "source_key": "hist:mlb-statsapi-draft-2005-jr"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type not stated in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-2005-jr",
+   "draft_key": "2005-JUNE_AMATEUR",
+   "round_code": "45",
+   "overall_pick": 1353,
+   "round_pick": 19,
+   "organization": "TEX",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Frank Lonigro",
+    "birth_date": "1985-05-18",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "489069",
+     "BBREF_MINORS": "lonigr001fra"
+    },
+    "source_key": "hist:mlb-statsapi-draft-2005-jr",
+    "external_id_sources": {
+     "BBREF_MINORS": "hist:chadwick-register-781c175"
+    }
+   },
+   "school": {
+    "name": "Fullerton College JC",
+    "school_type": "JUNIOR_COLLEGE",
+    "city": null,
+    "region": null,
+    "source_key": "hist:mlb-statsapi-draft-2005-jr"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type from explicit words in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-2005-jr",
+   "draft_key": "2005-JUNE_AMATEUR",
+   "round_code": "46",
+   "overall_pick": 1382,
+   "round_pick": 19,
+   "organization": "TEX",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Thomas Berkery",
+    "birth_date": "1982-09-29",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "459759",
+     "BBREF_MINORS": "berker001tho"
+    },
+    "source_key": "hist:mlb-statsapi-draft-2005-jr",
+    "external_id_sources": {
+     "BBREF_MINORS": "hist:chadwick-register-781c175"
+    }
+   },
+   "school": {
+    "name": "Mississippi State",
+    "school_type": "COLLEGE",
+    "city": null,
+    "region": null,
+    "source_key": "hist:mlb-statsapi-draft-2005-jr"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type from explicit words in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-2005-jr",
+   "draft_key": "2005-JUNE_AMATEUR",
+   "round_code": "47",
+   "overall_pick": 1411,
+   "round_pick": 19,
+   "organization": "TEX",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Marc Nobriga",
+    "birth_date": "1986-08-17",
+    "birth_country": null,
+    "external_ids": {
+     "MLBAM": "489173",
+     "BBREF_MINORS": "nobrig001mar"
+    },
+    "source_key": "hist:mlb-statsapi-draft-2005-jr",
+    "external_id_sources": {
+     "BBREF_MINORS": "hist:chadwick-register-781c175"
+    }
+   },
+   "school": {
+    "name": "Hartnell College",
+    "school_type": "COLLEGE",
+    "city": null,
+    "region": null,
+    "source_key": "hist:mlb-statsapi-draft-2005-jr"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type from explicit words in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-2005-jr",
+   "draft_key": "2005-JUNE_AMATEUR",
+   "round_code": "48",
+   "overall_pick": 1439,
+   "round_pick": 19,
+   "organization": "TEX",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Broc Coffman",
+    "birth_date": "1985-03-28",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "446542",
+     "BBREF_MINORS": "coffma001bro"
+    },
+    "source_key": "hist:mlb-statsapi-draft-2005-jr",
+    "external_id_sources": {
+     "BBREF_MINORS": "hist:chadwick-register-781c175"
+    }
+   },
+   "school": {
+    "name": "Lower Columbia CC",
+    "school_type": "JUNIOR_COLLEGE",
+    "city": null,
+    "region": null,
+    "source_key": "hist:mlb-statsapi-draft-2005-jr"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type from explicit words in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-2005-jr",
+   "draft_key": "2005-JUNE_AMATEUR",
+   "round_code": "49",
+   "overall_pick": 1466,
+   "round_pick": 19,
+   "organization": "TEX",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Glenn Swanson",
+    "birth_date": "1983-05-15",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "450302",
+     "BBREF_MINORS": "swanso001gle"
+    },
+    "source_key": "hist:mlb-statsapi-draft-2005-jr",
+    "external_id_sources": {
+     "BBREF_MINORS": "hist:chadwick-register-781c175"
+    }
+   },
+   "school": {
+    "name": "UC Irvine",
+    "school_type": null,
+    "city": null,
+    "region": null,
+    "source_key": "hist:mlb-statsapi-draft-2005-jr"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type not stated in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-2005-jr",
+   "draft_key": "2005-JUNE_AMATEUR",
+   "round_code": "50",
+   "overall_pick": 1493,
+   "round_pick": 19,
+   "organization": "TEX",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Joe Napoli",
+    "birth_date": "1982-10-04",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "489162",
+     "BBREF_MINORS": "napoli001joe"
+    },
+    "source_key": "hist:mlb-statsapi-draft-2005-jr",
+    "external_id_sources": {
+     "BBREF_MINORS": "hist:chadwick-register-781c175"
+    }
+   },
+   "school": {
+    "name": "Bradley",
+    "school_type": null,
+    "city": null,
+    "region": null,
+    "source_key": "hist:mlb-statsapi-draft-2005-jr"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type not stated in MLB's label."
+  }
+ ]
+}

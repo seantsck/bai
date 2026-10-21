@@ -1,0 +1,91 @@
+{
+ "format": "bai-research-import/1",
+ "batch_key": "hist-1965-august-legion-lad",
+ "channel": "DRAFT",
+ "description": "LAD, 1965 August American Legion phase: 2 of 2 selections from MLB's draft feed (historical importer).",
+ "coverage_claims": [
+  {
+   "domain": "DRAFT",
+   "scope_key": "1965-AUGUST_LEGION",
+   "organization": "LAD",
+   "coverage_state": "COMPLETE_CENSUS",
+   "expected_count": 2,
+   "source_key": "hist:mlb-statsapi-draft-1965-al",
+   "gap_notes": "MLB's draft feed lists 2 selection(s) for the club in the August American Legion phase. Independent count: 2 (Baseball-Reference franchise-year page, Internet Archive capture 20250820180839: 2 listed, 2 matched to MLB's picks by name (1 by surname in the same round: #4 MLB \"Larry Snyder\" / \"Barry Snyder\"); 1 numbered differently). Signing status, bonuses and outcomes not researched."
+  }
+ ],
+ "sources": [
+  {
+   "source_key": "hist:mlb-statsapi-draft-1965-al",
+   "source_type": "OFFICIAL_LEAGUE",
+   "authority_level": "OFFICIAL",
+   "title": "MLB Stats API draft endpoint, 1965 August American Legion phase (draftType AL)",
+   "publisher": "MLB Advanced Media",
+   "url": "https://statsapi.mlb.com/api/v1/draft/1965?draftType=AL",
+   "retrieved_date": "2026-10-21",
+   "notes": "League-wide JSON, 13 selections; sha256 50673ed2c7fe64cfca080a95b481e7c3b31c66ac1fc3f2455512403c3e46a1e8. Supplies pick, round, franchise-stable team id, MLBAM person, school label. No signing data. Terms: individual, non-commercial, non-bulk use (research/history/sources.json)."
+  }
+ ],
+ "records": [
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-1965-al",
+   "draft_key": "1965-AUGUST_LEGION",
+   "round_code": "1",
+   "overall_pick": 4,
+   "round_pick": 4,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Larry Snyder",
+    "birth_date": "1945-01-01",
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "567430"
+    },
+    "source_key": "hist:mlb-statsapi-draft-1965-al"
+   },
+   "school": {
+    "name": "Arkansas - Little Rock",
+    "school_type": null,
+    "city": null,
+    "region": null,
+    "source_key": "hist:mlb-statsapi-draft-1965-al"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type not stated in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-1965-al",
+   "draft_key": "1965-AUGUST_LEGION",
+   "round_code": "2",
+   "overall_pick": 8,
+   "round_pick": 2,
+   "organization": "LAD",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Frank Stanek",
+    "birth_date": null,
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "567611"
+    },
+    "source_key": "hist:mlb-statsapi-draft-1965-al"
+   },
+   "school": {
+    "name": "Omaha, NE",
+    "school_type": null,
+    "city": null,
+    "region": "NE",
+    "source_key": "hist:mlb-statsapi-draft-1965-al"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type not stated in MLB's label."
+  }
+ ]
+}

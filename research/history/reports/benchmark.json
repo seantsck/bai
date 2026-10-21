@@ -1,0 +1,62 @@
+{
+ "generated_on": "2026-10-21",
+ "postgres": "17.9",
+ "picks_per_club": 50,
+ "timings_ms": {
+  "migrate_001_024": 465,
+  "load_synthetic": 9244,
+  "explorer_default_page": 35,
+  "explorer_default_page_rows": 51,
+  "explorer_name_prefix": 19,
+  "explorer_name_prefix_rows": 51,
+  "explorer_franchise_range": 20,
+  "explorer_franchise_range_rows": 51,
+  "explorer_year_round": 13,
+  "explorer_year_round_rows": 26,
+  "explorer_school_prefix": 30,
+  "explorer_school_prefix_rows": 51,
+  "explorer_signing_unknown_deep_page": 316,
+  "explorer_signing_unknown_deep_page_rows": 51,
+  "explorer_combined": 16,
+  "explorer_combined_rows": 0,
+  "year_coverage_all": 810,
+  "refresh_read_models": 3140,
+  "rm_research_coverage_read": 27,
+  "analytics_acquisition_value_count": 2359
+ },
+ "plans": {
+  "explorer_default_page": {
+   "execution_ms": 17.6,
+   "top": "Limit"
+  },
+  "explorer_name_prefix": {
+   "execution_ms": 6,
+   "top": "Limit"
+  },
+  "explorer_franchise_range": {
+   "execution_ms": 7.6,
+   "top": "Limit"
+  },
+  "explorer_year_round": {
+   "execution_ms": 0.9,
+   "top": "Limit"
+  },
+  "explorer_school_prefix": {
+   "execution_ms": 15.6,
+   "top": "Limit"
+  },
+  "explorer_signing_unknown_deep_page": {
+   "execution_ms": 364.9,
+   "top": "Limit"
+  },
+  "explorer_combined": {
+   "execution_ms": 5.8,
+   "top": "Limit"
+  }
+ },
+ "rows": {
+  "selections": 84900,
+  "players": 84900,
+  "drafts": 62
+ }
+}

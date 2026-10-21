@@ -1,0 +1,109 @@
+{
+ "format": "bai-research-import/1",
+ "batch_key": "hist-1985-january-secondary-tex",
+ "channel": "DRAFT",
+ "description": "TEX, 1985 January secondary phase: 2 of 2 selections from MLB's draft feed (historical importer).",
+ "coverage_claims": [
+  {
+   "domain": "DRAFT",
+   "scope_key": "1985-JANUARY_SECONDARY",
+   "organization": "TEX",
+   "coverage_state": "COMPLETE_CENSUS",
+   "expected_count": 2,
+   "source_key": "hist:mlb-statsapi-draft-1985-ns",
+   "gap_notes": "MLB's draft feed lists 2 selection(s) for the club in the January secondary phase. Independent count: 2 (Baseball-Reference franchise-year page, Internet Archive capture 20191120053216: 2 listed, 2 matched to MLB's picks by name (1 by surname in the same round: #10 MLB \"Ed Soto\" / \"Edwardo Soto\")). Signing status, bonuses and outcomes not researched."
+  }
+ ],
+ "sources": [
+  {
+   "source_key": "hist:mlb-statsapi-draft-1985-ns",
+   "source_type": "OFFICIAL_LEAGUE",
+   "authority_level": "OFFICIAL",
+   "title": "MLB Stats API draft endpoint, 1985 January secondary phase (draftType NS)",
+   "publisher": "MLB Advanced Media",
+   "url": "https://statsapi.mlb.com/api/v1/draft/1985?draftType=NS",
+   "retrieved_date": "2026-10-21",
+   "notes": "League-wide JSON, 69 selections; sha256 43f15c3d533209fc9a81fe3c3245a27e8822c9b0ca40ffbbe39a34efda9ae058. Supplies pick, round, franchise-stable team id, MLBAM person, school label. No signing data. Terms: individual, non-commercial, non-bulk use (research/history/sources.json)."
+  },
+  {
+   "source_key": "hist:chadwick-register-781c175",
+   "source_type": "REFERENCE_DATABASE",
+   "authority_level": "AGGREGATOR",
+   "title": "Chadwick Baseball Bureau Register, commit 781c175",
+   "publisher": "Chadwick Baseball Bureau",
+   "url": "https://github.com/chadwickbureau/register/tree/781c175e748b89e5730fd3f5de0086b9355b2f92",
+   "retrieved_date": "2026-10-21",
+   "notes": "MLBAM -> Baseball-Reference, Baseball-Reference minors, FanGraphs and Retrosheet ids. Open Data Commons Attribution License 1.0."
+  }
+ ],
+ "records": [
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-1985-ns",
+   "draft_key": "1985-JANUARY_SECONDARY",
+   "round_code": "1",
+   "overall_pick": 10,
+   "round_pick": 10,
+   "organization": "TEX",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Ed Soto",
+    "birth_date": null,
+    "birth_country": "USA",
+    "external_ids": {
+     "MLBAM": "567473",
+     "BBREF_MINORS": "soto--001edw"
+    },
+    "source_key": "hist:mlb-statsapi-draft-1985-ns",
+    "external_id_sources": {
+     "BBREF_MINORS": "hist:chadwick-register-781c175"
+    }
+   },
+   "school": {
+    "name": "Miama Dade CC",
+    "school_type": "JUNIOR_COLLEGE",
+    "city": null,
+    "region": null,
+    "source_key": "hist:mlb-statsapi-draft-1985-ns"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type from explicit words in MLB's label."
+  },
+  {
+   "type": "DRAFT_SELECTION",
+   "source_key": "hist:mlb-statsapi-draft-1985-ns",
+   "draft_key": "1985-JANUARY_SECONDARY",
+   "round_code": "2",
+   "overall_pick": 36,
+   "round_pick": 10,
+   "organization": "TEX",
+   "selection_type": "STANDARD",
+   "player": {
+    "full_name": "Gary Alexander",
+    "birth_date": "1964-11-24",
+    "birth_country": null,
+    "external_ids": {
+     "MLBAM": "441705",
+     "BBREF_MINORS": "alexan001gar"
+    },
+    "source_key": "hist:mlb-statsapi-draft-1985-ns",
+    "external_id_sources": {
+     "BBREF_MINORS": "hist:chadwick-register-781c175"
+    }
+   },
+   "school": {
+    "name": "Laney College",
+    "school_type": "COLLEGE",
+    "city": null,
+    "region": null,
+    "source_key": "hist:mlb-statsapi-draft-1985-ns"
+   },
+   "signing": {
+    "status": "UNKNOWN"
+   },
+   "notes": "Historical import from MLB's draft feed. Signing status not researched: unknown, not unsigned. School: type from explicit words in MLB's label."
+  }
+ ]
+}

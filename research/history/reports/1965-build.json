@@ -1,0 +1,169 @@
+{
+ "year": 1965,
+ "built_on": "deterministic (from the cached files listed in research/history/manifest.json)",
+ "phases": [
+  {
+   "code": "JR",
+   "draft_key": "1965-JUNE_AMATEUR",
+   "label": "June regular phase",
+   "selections": 824,
+   "raw_rows": 824,
+   "clubs": 20,
+   "batches_written": [
+    "hist-1965-june-amateur-ath",
+    "hist-1965-june-amateur-lad",
+    "hist-1965-june-amateur-tex"
+   ],
+   "held": [
+    {
+     "pick": 650,
+     "reason": "same MLBAM person as pick #554 in this phase"
+    },
+    {
+     "pick": 796,
+     "reason": "same MLBAM person as pick #695 in this phase"
+    },
+    {
+     "pick": 811,
+     "reason": "same MLBAM person as pick #658 in this phase"
+    }
+   ],
+   "findings": [
+    {
+     "kind": "SAME_PERSON_TWICE",
+     "pick": 650,
+     "detail": "MLBAM 474610 Steven Kokor: #554 (team 142) and #650 (team 116)"
+    },
+    {
+     "kind": "SAME_PERSON_TWICE",
+     "pick": 796,
+     "detail": "MLBAM 568302 Glenn Wallace: #695 (team 144) and #796 (team 110)"
+    },
+    {
+     "kind": "SAME_PERSON_TWICE",
+     "pick": 811,
+     "detail": "MLBAM 555736 Glen Borkhuis: #658 (team 134) and #811 (team 117)"
+    }
+   ],
+   "crosswalk": {
+    "matched": 685,
+    "bbref": 132,
+    "bbref_minors": 685,
+    "fangraphs": 129
+   },
+   "birth_date_known": 160,
+   "school_typed": 595,
+   "school_untyped": 228,
+   "evidence": {
+    "source": "archived Baseball-Reference franchise-year pages",
+    "clubs": 3,
+    "agree": 1,
+    "disagree": [
+     {
+      "club": "LAD",
+      "mlb": 30,
+      "bref": 30,
+      "unmatched": [
+       "183 Paul Dennebaum"
+      ],
+      "not_on_bref": [
+       "#170 Paul Dennenbaum"
+      ]
+     },
+     {
+      "club": "ATH",
+      "mlb": 48,
+      "bref": 48,
+      "unmatched": [
+       "540 Gary Shepard"
+      ],
+      "not_on_bref": [
+       "#644 Gary Shephard"
+      ]
+     }
+    ],
+    "unknown_codes": [
+     "WSN"
+    ],
+    "name_variants": [
+     "LAD #130 MLB \"Gary Griffith\" / \"Larry Griffith\"",
+     "LAD #150 MLB \"Jim Johnson\" / \"James Johnson\"",
+     "LAD #210 MLB \"Joe Austin\" / \"Joseph Austin\"",
+     "LAD #350 MLB \"Rod Austin\" / \"Frank Austin\"",
+     "LAD #482 MLB \"John Keirns\" / \"Jon Keirns\"",
+     "ATH #159 MLB \"Franklin Riggins\" / \"Frank Riggins\"",
+     "ATH #179 MLB \"Don Lando\" / \"Donald Lando\"",
+     "ATH #239 MLB \"Donald Weeks\" / \"Donnie Weeks\"",
+     "ATH #418 MLB \"James Buker\" / \"Jim Buker\"",
+     "ATH #436 MLB \"Mike Strode\" / \"George Strode\"",
+     "ATH #472 MLB \"Hugh Britton\" / \"Pete Britton\"",
+     "ATH #605 MLB \"Jackie Creel\" / \"Jack Creel\"",
+     "ATH #619 MLB \"Peter Middlekauff\" / \"Pete Middlekauff\"",
+     "ATH #741 MLB \"James Watts\" / \"Jimmy Watts\"",
+     "TEX #83 MLB \"Settle Pauls\" / \"Arthur Pauls\"",
+     "TEX #143 MLB \"Edward Lupton\" / \"Eddie Lupton\"",
+     "TEX #203 MLB \"Richard Hense\" / \"Rick Hense\"",
+     "TEX #223 MLB \"Richard Koslick\" / \"Rich Koslick\"",
+     "TEX #243 MLB \"Gil Torres\" / \"Gilberto Torres\"",
+     "TEX #263 MLB \"John Cashman\" / \"Jack Cashman\"",
+     "TEX #422 MLB \"Thomas Cook\" / \"Tom Cook\""
+    ],
+    "numbering_differences": 78
+   }
+  },
+  {
+   "code": "NR",
+   "draft_key": "1965-JANUARY_REGULAR",
+   "selections": 0
+  },
+  {
+   "code": "NS",
+   "draft_key": "1965-JANUARY_SECONDARY",
+   "selections": 0
+  },
+  {
+   "code": "JS",
+   "draft_key": "1965-JUNE_SECONDARY",
+   "selections": 0
+  },
+  {
+   "code": "JD",
+   "draft_key": "1965-JUNE_SECONDARY_DELAYED",
+   "selections": 0
+  },
+  {
+   "code": "AL",
+   "draft_key": "1965-AUGUST_LEGION",
+   "label": "August American Legion phase",
+   "selections": 13,
+   "raw_rows": 13,
+   "clubs": 8,
+   "batches_written": [
+    "hist-1965-august-legion-ath",
+    "hist-1965-august-legion-lad"
+   ],
+   "held": [],
+   "findings": [],
+   "crosswalk": {
+    "matched": 6,
+    "bbref": 1,
+    "bbref_minors": 6,
+    "fangraphs": 1
+   },
+   "birth_date_known": 8,
+   "school_typed": 10,
+   "school_untyped": 3,
+   "evidence": {
+    "source": "archived Baseball-Reference franchise-year pages",
+    "clubs": 1,
+    "agree": 1,
+    "disagree": [],
+    "unknown_codes": [],
+    "name_variants": [
+     "LAD #4 MLB \"Larry Snyder\" / \"Barry Snyder\""
+    ],
+    "numbering_differences": 1
+   }
+  }
+ ]
+}

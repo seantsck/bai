@@ -1,0 +1,34 @@
+{
+ "year": 1965,
+ "batches": [
+  {
+   "batch": "hist-1965-august-legion-ath",
+   "records": 1,
+   "ms": 215
+  },
+  {
+   "batch": "hist-1965-august-legion-lad",
+   "records": 2,
+   "ms": 121
+  },
+  {
+   "batch": "hist-1965-june-amateur-ath",
+   "records": 48,
+   "ms": 1930
+  },
+  {
+   "batch": "hist-1965-june-amateur-lad",
+   "records": 30,
+   "ms": 849
+  },
+  {
+   "batch": "hist-1965-june-amateur-tex",
+   "records": 25,
+   "ms": 763
+  }
+ ],
+ "total": {
+  "records": 106,
+  "ms": 3878
+ }
+}
