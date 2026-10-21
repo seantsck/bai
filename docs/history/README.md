@@ -225,8 +225,8 @@ npm run history:benchmark
 ## Publication guard for new records (025, hosted only)
 
 On a Supabase (hosted) database, a trigger on every table that cites a source refuses a **new** record that cites a
-source outside the openly licensed groups (Chadwick Register, Wikipedia, BAI research). That covers an insert, or a
-change of `source_id`. It applies to MLB, Baseball-Reference, other publications and test fixtures alike. A group opens
+source outside the openly licensed groups (Chadwick Register, Wikipedia, BAI research). That covers a row actually
+inserted, or a real change of `source_id`; since 026, a no-op upsert is not a new record. It applies to MLB, Baseball-Reference, other publications and test fixtures alike. A group opens
 only when a person records a row in `ingest.source_publication_grants`.
 
 - **Existing records are unaffected.** They stay readable on the public site and editable without changing their

@@ -330,7 +330,8 @@ Every fact table above, apart from identity and lookup tables, also references `
 - **Publication guard (hosted only).** `ingest.source_publication_grants`, with a `<table>_publication_guard` trigger on
   every table that cites a source (except `fact_resolutions`): on a Supabase database, a new record or a changed
   `source_id` citing a group other than Chadwick Register, Wikipedia or BAI research is refused unless that group has a
-  recorded basis. Existing records are untouched.
+  recorded basis. Existing records are untouched. 026 makes it fire AFTER INSERT (only for rows actually inserted, so a no-op upsert passes) and on
+  UPDATE only when `source_id` changes.
 - **Exception review.** `research.history_exceptions`, `_claims`, `_proposals`, `_decisions`, `_events` and
   `_conclusions`. All are private and append-only:
   - claims are immutable;
