@@ -80,7 +80,7 @@
 - **International:** identification questions closed as unknown after research; Yordan Alvarez, Núñez and Zuñiga documented with recommendations.
 - **Wave 2 (ATL, BAL, SD, TB, HOU, NYY):** 2016 classes prepared with verified leads; waves await a human decision.
 
-## In progress: Phase 8 (data integrity, certification security, expansion)
+## Done: Phase 8 (PR #7 merged `034b71e`, PR #8 Wave 2 merged `79aadae`; both replayed on hosted)
 
 - **Per-acquisition dispositions (022):** how each acquisition ended, separate from the player's career; the database refuses contradictions. Fixes McLain and Liput (2017 UNSIGNED, 2018 signed). LAD 2016/2017 dispositions now have exit dates.
 - **Certification boundary (021):**
@@ -93,6 +93,22 @@
 - **WAR attribution (023):** only signed acquisitions earn value, and only for their own tenure; a return to the club is reported separately; trade returns come from the trade that ended the acquisition and are counted once per class.
 - **Reviewer packages:** Smeltzer, Wong, Sheffield/Robinson Rule 5, Witt/Casey, McLain/Liput ([phase8-reviewer-packages.md](evidence/phase8-reviewer-packages.md)).
 - **Wave 2:** the six 2016 draft classes (MLB census, identities, B-Ref signing data) and 2016-17 international candidates from the wire ([wave2-discovery-plan.md](evidence/wave2-discovery-plan.md)).
+
+## In progress: historical expansion, 1965–2026 (`feature/historical-importer-hardened`)
+
+- **Migration 024:** every historical draft phase, franchises across seasons, and coverage only for clubs that existed.
+  It is additive: `main`'s test suite passes with it applied. It is not deployed.
+- **Importer:** bulk import through the research pipeline, with cache and checksums, request budgets, census claims only
+  with agreeing independent evidence, checkpoints and deterministic replay ([history/README.md](history/README.md)).
+- **Permission gates (Phase 9.1).** These are per-source, per-use grants: fetch, local processing, repository and site
+  publication. They are enforced in the fetcher, both CLIs and `npm run check`. Restricted outputs stay out of Git
+  ([history/publication-audit.md](history/publication-audit.md)).
+- **Pilot:** 1965, 1985 and 2005, local only. Its 24 exceptions are preserved unresolved
+  ([history/pilot-results.md](history/pilot-results.md)).
+- **Plan:** the full backfill and its gates. It is blocked on the MLB terms decision
+  ([history/backfill-plan.md](history/backfill-plan.md)).
+- **Hosted provenance review:** [history/hosted-provenance.md](history/hosted-provenance.md).
+- **Public explorer:** `/draft/explorer` and `/draft/years`.
 
 ## Next
 

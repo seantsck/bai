@@ -4,6 +4,7 @@
 !.env.example
 /.pgdata*
 /.vercel
+/.cache
 /research
 /tests
 /docs
@@ -13,3 +14,4 @@
 !/supabase/prod-ca-2021.crt
 *.log
 /tsconfig.tsbuildinfo
+/.restricted

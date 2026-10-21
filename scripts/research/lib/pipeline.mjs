@@ -12,6 +12,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import crypto from 'node:crypto'
 import { validateEnvelope, validateRecordShape, roundStructure, slugify, EVIDENCE_SUBJECTS, organizationScopeErrors } from './import-format.mjs'
+import { loadCatalog, requireHostedPublication } from '../../history/lib/permissions.mjs'
 
 const SAFE_STATES = new Set(['EXACT_EXTERNAL_ID', 'EXACT_COMPOSITE', 'NO_MATCH'])
 const ACTION_RANK = { HELD: 6, CONFLICT: 5, INSERT: 4, UPDATE_UNKNOWN: 3, CORROBORATE: 2, NO_CHANGE: 1 }
@@ -21,6 +22,18 @@ const fieldSource = (r, f) => r.field_sources?.[f] ?? r.source_key
 const sha256 = (buf) => crypto.createHash('sha256').update(buf).digest('hex')
 
 export class PipelineError extends Error {}
+
+// Hosted publication gate (research/history/sources.json, scripts/history/lib/permissions.mjs). Every path that stages or
+// applies a batch (both CLIs, runbooks, scripts) goes through stageFile/applyBatch, so the gate lives here: on any
+// database that is not local, a batch is refused before anything is written unless its sources permit publish_site for
+// its years, and historical years (before 2015) need every source catalogued. Unknown hosts count as hosted (fail closed).
+const REPO_ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '../../..')
+const LOCAL_DB_HOSTS = new Set(['localhost', '127.0.0.1', '::1', '[::1]'])
+export const isLocalClient = (db) => { const h = db?.host ?? db?.connectionParameters?.host; return typeof h === 'string' && (LOCAL_DB_HOSTS.has(h) || h.startsWith('/')) }
+export function requirePublishable (db, doc) {
+  if (isLocalClient(db)) return null
+  return requireHostedPublication(loadCatalog(REPO_ROOT), doc, {}, { root: REPO_ROOT })
+}
 
 // ---------------------------------------------------------------------------------------------------------------
 // Batches
@@ -49,6 +62,7 @@ export async function stageFile (db, file, { operator = 'cli', allowFixtures = f
   // say why they belong to another club, such as re-drafts).
   if (organization) errors.push(...organizationScopeErrors(doc, organization))
   if (errors.length) throw new PipelineError('invalid import file:\n  ' + errors.join('\n  '))
+  requirePublishable(db, doc)
   const clash = await db.query('select id from ingest.import_batches where batch_key = $1', [doc.batch_key])
   if (clash.rows[0]) throw new PipelineError(`batch_key ${doc.batch_key} is already used by a different file; batches are immutable, use a new key`)
 
@@ -299,11 +313,13 @@ class Applier {
   async attachIdentifiers (playerId, p, sourceKey) {
     const src = await this.sourceId(p.source_key ?? sourceKey)
     for (const [system, value] of Object.entries(p.external_ids ?? {})) {
+      // external_id_sources names the source of an id another source supplied (e.g. a crosswalk); default: the player's source.
+      const idSrc = p.external_id_sources?.[system] ? await this.sourceId(p.external_id_sources[system]) : src
       const owner = await this.one('select player_id from public.player_external_ids where id_system = $1 and external_id = $2', [system, value])
       if (owner) { if (String(owner.player_id) !== String(playerId)) throw new PipelineError(`${system} ${value} belongs to player ${owner.player_id}`); continue }
       const mine = await this.one('select external_id from public.player_external_ids where player_id = $1 and id_system = $2', [playerId, system])
       if (mine) continue // a different id in the same system was caught by identity resolution (CONFLICT); never replaced here
-      await this.q('insert into public.player_external_ids (player_id, id_system, external_id, source_id) values ($1, $2, $3, $4)', [playerId, system, value, src])
+      await this.q('insert into public.player_external_ids (player_id, id_system, external_id, source_id) values ($1, $2, $3, $4)', [playerId, system, value, idSrc])
     }
     for (const a of p.aliases ?? []) {
       await this.q(`insert into public.player_aliases (player_id, alias, alias_type, source_id) values ($1, $2, $3, $4)
@@ -361,7 +377,11 @@ class Applier {
     if (!school.school_type) return { id: null, note: `school unresolved: "${school.name}" has no type` }
     const slug = await (async () => {
       const base = slugify([school.name, school.region].filter(Boolean).join(' '))
-      for (const s of [base, `${base}-${slugify(school.city ?? '')}`, `${base}-2`, `${base}-3`]) if (!(await this.one('select 1 from public.schools where slug = $1', [s]))) return s
+      // A missing city must not yield "<base>-" (invalid slug); numbered fallbacks cover same-named schools.
+      const city = slugify(school.city ?? '')
+      for (const s of [base, city ? `${base}-${city}` : null, ...[2, 3, 4, 5, 6, 7, 8, 9].map((n) => `${base}-${n}`)].filter(Boolean)) {
+        if (!(await this.one('select 1 from public.schools where slug = $1', [s]))) return s
+      }
       throw new PipelineError(`no free slug for school ${school.name}`)
     })()
     const row = await this.one(`insert into public.schools (slug, name, school_type, city, region, country, source_id) values ($1, $2, $3, $4, $5, $6, $7) returning id`,
@@ -762,6 +782,11 @@ export async function applyBatch (db, ref, { write = false, allowPartial = false
   }
 
   const records = (await db.query("select * from ingest.staged_records where batch_id = $1 and validation_status = 'VALID' order by record_index", [batch.id])).rows
+  if (write && !isLocalClient(db)) {
+    const sources = (await db.query('select payload from ingest.staged_sources where batch_id = $1', [batch.id])).rows.map((r) => r.payload)
+    const claims = (await db.query('select coverage_claim from ingest.import_batches where id = $1', [batch.id])).rows[0]?.coverage_claim ?? []
+    requirePublishable(db, { sources, coverage_claims: claims, records: records.map((r) => r.payload) })
+  }
   const skippedInvalid = Number((await db.query("select count(*) n from ingest.staged_records where batch_id = $1 and validation_status <> 'VALID'", [batch.id])).rows[0].n)
   const a = new Applier(db, batch)
   const results = []

@@ -8,6 +8,8 @@
 // affiliated minor-league seasons (leagueListId=milb_all), and transactions. Per season: the affiliates' parent clubs.
 import fs from 'node:fs'
 import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { loadCatalog, requireUse } from '../../history/lib/permissions.mjs'
 
 const argv = process.argv.slice(2)
 const arg = (k) => { const i = argv.indexOf(`--${k}`); return i >= 0 ? argv[i + 1] : null }
@@ -16,6 +18,9 @@ const out = arg('out')
 const [s0, s1] = (arg('seasons') ?? '2016-2026').split('-').map(Number)
 if (!ids.length || !out) throw new Error('--ids <mlbam,...> and --out <dir> are required')
 if (ids.length > 60) throw new Error('at most 60 players per run (rate policy)')
+// Permission gate (research/history/sources.json): refused before any request unless mlb-statsapi-draft grants fetch_targeted.
+const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..')
+try { requireUse(loadCatalog(repoRoot), 'mlb-statsapi-draft', 'fetch_targeted', { requests: ids.length * 3 }, { root: repoRoot }) } catch (err) { console.error(`permission refused: ${err.message}`); process.exit(4) }
 fs.mkdirSync(out, { recursive: true })
 
 const BASE = 'https://statsapi.mlb.com/api/v1'

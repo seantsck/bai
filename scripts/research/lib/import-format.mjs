@@ -31,6 +31,8 @@ export function roundStructure (code) {
   if (m) return { order: Number(m[1]) * 10, phase: 'REGULAR' }
   const c = /^C-(\d+)$/.exec(code)
   if (c) return { order: Number(c[1]) * 10 + 3, phase: 'COMPENSATION' }
+  const sup = /^S-(\d+)$/.exec(code)
+  if (sup) return { order: Number(sup[1]) * 10 + 5, phase: 'SUPPLEMENTAL' }
   if (code === 'CB-A') return { order: 16, phase: 'COMPETITIVE_BALANCE_A' }
   if (code === 'CB-B') return { order: 26, phase: 'COMPETITIVE_BALANCE_B' }
   return null
@@ -104,6 +106,10 @@ export function validateRecordShape (r, channel, declared) {
   validatePlayer(r.player, errors)
   if (!r.organization) errors.push('organization (franchise key) required')
   for (const [f, k] of Object.entries(r.field_sources ?? {})) needSource(k, `field_sources.${f}`)
+  for (const [sys, k] of Object.entries(r.player?.external_id_sources ?? {})) {
+    if (!r.player?.external_ids?.[sys]) errors.push(`player.external_id_sources.${sys}: no ${sys} id in player.external_ids`)
+    needSource(k, `player.external_id_sources.${sys}`)
+  }
   for (const [i, ev] of (r.evidence ?? []).entries()) {
     needSource(ev.source_key, `evidence[${i}]`)
     if (!EVIDENCE_SUBJECTS[ev.subject]) errors.push(`evidence[${i}]: subject must be one of ${Object.keys(EVIDENCE_SUBJECTS).join('|')}`)
@@ -115,7 +121,7 @@ export function validateRecordShape (r, channel, declared) {
   if (channel === 'DRAFT') {
     if (r.type !== 'DRAFT_SELECTION') errors.push('DRAFT batches hold DRAFT_SELECTION records')
     if (!/^\d{4}-[A-Z_]+$/.test(r.draft_key ?? '')) errors.push('draft_key required, e.g. 2015-JUNE_AMATEUR')
-    if (!r.round_code || !roundStructure(r.round_code)) errors.push(`round_code ${r.round_code} not recognised (1..N, C-n, CB-A, CB-B)`)
+    if (!r.round_code || !roundStructure(r.round_code)) errors.push(`round_code ${r.round_code} not recognised (1..N, C-n, S-n, CB-A, CB-B)`)
     if (!Number.isInteger(r.overall_pick) || r.overall_pick < 1) errors.push('overall_pick must be a positive integer')
     if (r.round_pick != null && (!Number.isInteger(r.round_pick) || r.round_pick < 1)) errors.push('round_pick must be a positive integer')
     if (r.selection_type && !SELECTION_TYPES.includes(r.selection_type)) errors.push('selection_type invalid')

@@ -48,14 +48,19 @@ export function channelKey (c) {
 }
 
 /** {org, channel, year | period} -> the class scope (no writes). */
-export async function classScope (db, { org, channel, year, period }) {
+export const DRAFT_KINDS = ['JUNE_AMATEUR', 'JANUARY_REGULAR', 'JANUARY_SECONDARY', 'JUNE_SECONDARY', 'JUNE_SECONDARY_DELAYED', 'AUGUST_LEGION']
+
+export async function classScope (db, { org, channel, year, period, kind = 'JUNE_AMATEUR' }) {
   const ch = await one(db, 'select * from research.channels where channel_key = $1', [channelKey(channel)])
   if (!ch) throw new PipelineError(`unknown channel ${channel}`)
   let scope
   if (ch.scope_kind === 'DRAFT') {
     if (!year || year === true) throw new PipelineError('a draft class needs --year <YYYY>')
-    const d = await one(db, "select id, draft_key, draft_year from public.drafts where draft_year = $1 and draft_kind = 'JUNE_AMATEUR'", [Number(year)])
-    if (!d) throw new PipelineError(`no ${year} draft on the calendar`)
+    // Historical years hold several phases (024); June regular is the default, others are named with --kind.
+    const k = String(kind === true ? '' : kind || 'JUNE_AMATEUR').toUpperCase()
+    if (!DRAFT_KINDS.includes(k)) throw new PipelineError(`unknown draft phase ${kind} (${DRAFT_KINDS.join(', ')})`)
+    const d = await one(db, 'select id, draft_key, draft_year from public.drafts where draft_year = $1 and draft_kind = $2', [Number(year), k])
+    if (!d) throw new PipelineError(`no ${year} ${k} draft on the calendar`)
     scope = { draftId: d.id, scopeKey: d.draft_key, season: d.draft_year }
   } else if (ch.scope_kind === 'SIGNING_PERIOD') {
     if (!period || period === true) throw new PipelineError('an international class needs --period <key, e.g. 2016-17>')
@@ -64,6 +69,9 @@ export async function classScope (db, { org, channel, year, period }) {
     scope = { periodId: p.id, scopeKey: p.period_key, season: p.season }
   } else throw new PipelineError(`channel ${ch.channel_key} is not implemented yet`)
   const o = await resolveOrganization(db, org, scope.season)
+  if (scope.draftId && !(await one(db, 'select public.organization_exists_in_season($1, $2) as ok', [o.id, scope.season])).ok) {
+    throw new PipelineError(`${o.franchise_key} did not exist in ${scope.season}`)
+  }
   return { channel: ch, organization: o, ...scope, classKey: `${o.franchise_key}/${ch.channel_key}/${scope.scopeKey}` }
 }
 

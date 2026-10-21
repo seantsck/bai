@@ -80,3 +80,17 @@ test('coverage dashboard: one cell per calendar scope and organization, queue co
   assert.equal(queues.length, 10)
   assert.ok(queues.every((r) => Number.isInteger(r.open_items) && !('detail' in r)))
 })
+
+test('historical explorer and year coverage run as anon; name normalization matches the database', async () => {
+  const { parseExplorerParams, normalizeName } = await import('../../lib/search.ts')
+  const rows = await q.getDraftExplorer(parseExplorerParams({}))
+  assert.ok(Array.isArray(rows))
+  assert.ok(rows.length <= 51)
+  const cov = await q.getDraftYearCoverage()
+  assert.ok(cov.length > 0)
+  assert.ok(cov.every((r) => r.expected_selections === null || r.clubs_with_census === r.clubs))
+  for (const name of ['Gaby Sánchez', 'José Núñez-Ñañez', "D'Angelo O'Brien Jr.", '  B.J.  Surhoff ', 'Łukasz Đorđević', 'Zoë Ÿves']) {
+    const { n } = (await db.query('select normalize_name($1) as n', [name])).rows[0]
+    assert.equal(normalizeName(name), n, name)
+  }
+})

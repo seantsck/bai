@@ -1,0 +1,312 @@
+{
+ "format": "bai-history-sources/2",
+ "note": "Permission gates for the historical importer, enforced by scripts/history/lib/permissions.mjs. Each source has a separate grant per use (fetch_targeted, fetch_bulk, process_local, publish_repository, publish_site); a host on this list is not a permission. States: CLEARED (the license permits it), LIMITED (only inside its scope), AUTHORIZED (only with a documented authorization on file: reference, grantor, dates, scope, uses and the document with its SHA-256), PENDING (a person must decide; refused) and PROHIBITED (refused). Grants are human decisions recorded here after review; tooling never changes them. A source whose review_due date has passed is refused until it is reviewed again. historical_before: records of years before it are 'historical'; on hosted they need every source catalogued and granting publish_site (requireHostedPublication). Governance by URL (governs_hosts, governs_url_patterns) applies whatever source key a batch uses, so aliases cannot bypass a grant.",
+ "historical_before": 2015,
+ "authorization_template": {
+  "reference": "e.g. MLBAM letter or contract number",
+  "granted_by": "name and role at the rights holder",
+  "granted_on": "YYYY-MM-DD",
+  "expires_on": "YYYY-MM-DD or null",
+  "uses": [
+   "fetch_bulk",
+   "publish_site"
+  ],
+  "scope": {
+   "years": [
+    1965,
+    2026
+   ]
+  },
+  "document": "path in the repository or a private location, e.g. docs/authorizations/<file>",
+  "document_sha256": "sha256 of the document"
+ },
+ "sources": [
+  {
+   "id": "mlb-statsapi-draft",
+   "title": "MLB Stats API (draft endpoint for all amateur phases since 1965; also people, stats and transactions)",
+   "publisher": "MLB Advanced Media",
+   "authority_level": "OFFICIAL",
+   "source_type": "OFFICIAL_LEAGUE",
+   "hosts": [
+    "statsapi.mlb.com"
+   ],
+   "url_prefixes": [
+    "https://statsapi.mlb.com/api/v1/"
+   ],
+   "governs_hosts": [
+    "statsapi.mlb.com"
+   ],
+   "url_template": "https://statsapi.mlb.com/api/v1/draft/{year}?draftType={code}",
+   "source_key_prefixes": [
+    "hist:mlb-statsapi-draft-"
+   ],
+   "supplies": [
+    "selection universe per phase",
+    "round code",
+    "overall and round pick",
+    "drafting club (franchise-stable team id)",
+    "MLBAM person id",
+    "name",
+    "birth date (often missing before 2000)",
+    "school label"
+   ],
+   "does_not_supply": [
+    "signing status",
+    "bonus",
+    "slot value",
+    "the club's name in that year (team names are current)"
+   ],
+   "license": {
+    "name": "MLBAM terms of use (contractual; no open license)",
+    "url": "http://gdx.mlb.com/components/copyright.txt",
+    "attribution": "MLB Advanced Media"
+   },
+   "terms": "Responses carry: 'Use of any content on this page acknowledges agreement to the terms posted here http://gdx.mlb.com/components/copyright.txt'. Those terms: 'Only individual, non-commercial, non-bulk use of the Materials is permitted and any other use of the Materials is prohibited without prior written authorization from MLBAM.'",
+   "review": {
+    "reviewed_on": "2026-10-21",
+    "review_due": "2027-01-21",
+    "reviewed_by": "BAI maintainer review pending (prepared by the importer audit, Phase 9.1)"
+   },
+   "uses": {
+    "fetch_targeted": {
+     "state": "PENDING",
+     "basis": "The terms permit only individual, non-commercial, non-bulk use without written MLBAM authorization. No decision yet on whether BAI's per-class research requests qualify: every downloader that reaches statsapi.mlb.com (the history importer, scripts/research/sources/fetch-mlb-player-outcomes.mjs) is refused until a person records one."
+    },
+    "fetch_bulk": {
+     "state": "PENDING",
+     "basis": "League-wide, multi-year collection (about 200 requests, roughly 78,000 selections) is plausibly bulk use under the terms. Requires written MLBAM authorization recorded under authorization."
+    },
+    "process_local": {
+     "state": "LIMITED",
+     "basis": "Already-cached pilot files (10 requests made on 2026-10-21, before this gate existed) may be processed locally to preserve and review the pilot evidence. No other years.",
+     "scope": {
+      "years": [
+       1965,
+       1985,
+       2005
+      ]
+     }
+    },
+    "publish_repository": {
+     "state": "PROHIBITED",
+     "basis": "The public repository is redistribution. Selection lists, extracts and per-year counts derived from the feed stay out of Git (kept in .restricted/, backed up outside the repository)."
+    },
+    "publish_site": {
+     "state": "LIMITED",
+     "scope": {
+      "years_from": 2015
+     },
+     "basis": "Status quo, under review: the per-class research program (LAD 2015-2019, Wave 2 2016) already publishes MLB-sourced records for 2015 onward (docs/history/hosted-provenance.md). Historical years (before 2015) stay refused until written MLBAM authorization covers display. A maintainer may tighten this to PENDING, which stops new research-program publication too."
+    }
+   },
+   "authorization": null,
+   "permission_notes": "BAI has used this endpoint for every class so far (LAD 2015-2019, Wave 2 2016) at one request per class. The pilot (1965, 1985, 2005: 10 requests) stays within that pattern. A 1965-2026 league-wide backfill (about 200 requests, roughly 100,000 selections republished on a public site) is plausibly 'bulk use'. Draft facts themselves are facts, but the terms are contractual. Before any mass import a person should decide: request written authorization from MLBAM, or limit BAI's use. Recorded here, not decided.",
+   "prior_use": "Targeted per-class requests by the research pipeline (not this importer) for LAD 2015-2019, the six Wave 2 clubs in 2016 and international lists; those records are on hosted and in research/imports. See docs/history/hosted-provenance.md."
+  },
+  {
+   "id": "chadwick-register",
+   "title": "Chadwick Baseball Bureau Register (people crosswalk)",
+   "publisher": "Chadwick Baseball Bureau",
+   "authority_level": "AGGREGATOR",
+   "source_type": "REFERENCE_DATABASE",
+   "hosts": [
+    "raw.githubusercontent.com"
+   ],
+   "url_prefixes": [
+    "https://raw.githubusercontent.com/chadwickbureau/register/"
+   ],
+   "governs_url_patterns": [
+    "chadwickbureau/register"
+   ],
+   "url_template": "https://raw.githubusercontent.com/chadwickbureau/register/{commit}/data/people-{shard}.csv",
+   "pinned_commit": "781c175e748b89e5730fd3f5de0086b9355b2f92",
+   "pinned_commit_date": "2026-10-02",
+   "source_key_prefixes": [
+    "hist:chadwick-register-"
+   ],
+   "supplies": [
+    "MLBAM -> Baseball-Reference, Baseball-Reference minors, FanGraphs, Retrosheet ids",
+    "professional and MLB first/last seasons"
+   ],
+   "does_not_supply": [
+    "draft data",
+    "signing status"
+   ],
+   "license": {
+    "name": "Open Data Commons Attribution License 1.0",
+    "url": "https://opendatacommons.org/licenses/by/1-0/",
+    "attribution": "Chadwick Baseball Bureau (cite on public pages that show ids from the register)"
+   },
+   "terms": "Open Data Commons Attribution License 1.0 (README, pinned commit).",
+   "review": {
+    "reviewed_on": "2026-10-21",
+    "review_due": "2027-01-21",
+    "reviewed_by": "BAI maintainer review pending (prepared by the importer audit, Phase 9.1)"
+   },
+   "uses": {
+    "fetch_targeted": {
+     "state": "CLEARED",
+     "basis": "ODC-BY permits copying; the 16 shards of one pinned commit."
+    },
+    "fetch_bulk": {
+     "state": "CLEARED",
+     "basis": "ODC-BY permits copying the whole register; pinned to one commit, budgeted and rate-limited."
+    },
+    "process_local": {
+     "state": "CLEARED",
+     "basis": "ODC-BY."
+    },
+    "publish_repository": {
+     "state": "CLEARED",
+     "basis": "ODC-BY permits redistribution with attribution. BAI commits only ids attached to its own records, never the register files."
+    },
+    "publish_site": {
+     "state": "CLEARED",
+     "basis": "ODC-BY with attribution on pages that show the ids."
+    }
+   },
+   "authorization": null,
+   "permission_notes": "Attribution required: cite the Chadwick Baseball Bureau on public pages that show ids from it. Pinned to one commit so replays are deterministic."
+  },
+  {
+   "id": "wikipedia-draft-articles",
+   "title": "Wikipedia: '<year> Major League Baseball draft' articles",
+   "publisher": "Wikimedia Foundation (contributors)",
+   "authority_level": "AGGREGATOR",
+   "source_type": "REFERENCE_DATABASE",
+   "hosts": [
+    "en.wikipedia.org"
+   ],
+   "url_prefixes": [
+    "https://en.wikipedia.org/"
+   ],
+   "governs_hosts": [
+    "wikipedia.org"
+   ],
+   "url_template": "https://en.wikipedia.org/w/api.php?action=query&prop=revisions&rvprop=ids|timestamp|content&rvslots=main&format=json&titles={year}_Major_League_Baseball_draft",
+   "source_key_prefixes": [
+    "hist:wikipedia-"
+   ],
+   "supplies": [
+    "draft dates",
+    "stated totals (some years)",
+    "first-round tables"
+   ],
+   "does_not_supply": [
+    "complete selection lists"
+   ],
+   "license": {
+    "name": "CC BY-SA 4.0 (text); facts are not copyrightable",
+    "url": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "attribution": "Wikipedia contributors, with the revision id"
+   },
+   "terms": "Text under CC BY-SA 4.0; BAI records facts (dates, counts) with the revision id, not article text.",
+   "review": {
+    "reviewed_on": "2026-10-21",
+    "review_due": "2027-01-21",
+    "reviewed_by": "BAI maintainer review pending (prepared by the importer audit, Phase 9.1)"
+   },
+   "uses": {
+    "fetch_targeted": {
+     "state": "CLEARED",
+     "basis": "One article revision per draft year through the public API, with a descriptive User-Agent."
+    },
+    "fetch_bulk": {
+     "state": "LIMITED",
+     "basis": "At most one article per draft year (62 for 1965-2026) per run.",
+     "scope": {
+      "max_requests_per_run": 70
+     }
+    },
+    "process_local": {
+     "state": "CLEARED",
+     "basis": "Facts (dates, stated totals) with the revision id."
+    },
+    "publish_repository": {
+     "state": "CLEARED",
+     "basis": "Facts with the revision id; short attributed quotations only, never article text."
+    },
+    "publish_site": {
+     "state": "CLEARED",
+     "basis": "Facts with the revision id."
+    }
+   },
+   "authorization": null,
+   "permission_notes": "Independent of MLB's feed for counts and dates. A secondary source: a disagreement with MLB is recorded, never resolved by preferring either."
+  },
+  {
+   "id": "bref-draft-archive",
+   "title": "Baseball-Reference pages (live, and read through Internet Archive captures)",
+   "publisher": "Sports Reference LLC (via the Internet Archive)",
+   "authority_level": "AGGREGATOR",
+   "source_type": "REFERENCE_DATABASE",
+   "hosts": [
+    "web.archive.org",
+    "archive.org"
+   ],
+   "url_prefixes": [
+    "https://web.archive.org/cdx/search/cdx?url=baseball-reference.com/",
+    "https://web.archive.org/web/"
+   ],
+   "governs_hosts": [
+    "baseball-reference.com",
+    "sports-reference.com"
+   ],
+   "governs_url_patterns": [
+    "baseball-reference.com"
+   ],
+   "source_key_prefixes": [
+    "hist:bref-archive-"
+   ],
+   "supplies": [
+    "per-club selection counts and names (count corroboration)",
+    "signing flag and bonus for later years"
+   ],
+   "license": {
+    "name": "Sports Reference terms of use (no open license); Internet Archive terms for the captures",
+    "url": "https://www.sports-reference.com/termsofuse.html",
+    "attribution": "Baseball-Reference.com (Sports Reference LLC), via the Internet Archive"
+   },
+   "terms": "Sports Reference restricts automated collection from its own site; BAI reads only archived captures, a handful of pages per draft, for corroboration.",
+   "review": {
+    "reviewed_on": "2026-10-21",
+    "review_due": "2027-01-21",
+    "reviewed_by": "BAI maintainer review pending (prepared by the importer audit, Phase 9.1)"
+   },
+   "uses": {
+    "fetch_targeted": {
+     "state": "PENDING",
+     "basis": "Sports Reference restricts automated collection of its data; reading its pages through archive captures does not change whose data it is. Every downloader (the history importer, scripts/research/sources/fetch-bref-player-pages.mjs) is refused until a person decides."
+    },
+    "fetch_bulk": {
+     "state": "PROHIBITED",
+     "basis": "A league-wide crawl of archived Baseball-Reference pages is not permitted by its terms and is not polite to the Internet Archive (HTTP 429 seen 2026-10-21)."
+    },
+    "process_local": {
+     "state": "LIMITED",
+     "basis": "Already-cached pilot captures may be read locally to preserve the pilot's corroboration and its exception evidence. No other years.",
+     "scope": {
+      "years": [
+       1965,
+       1985,
+       2005
+      ]
+     }
+    },
+    "publish_repository": {
+     "state": "PROHIBITED",
+     "basis": "Names, counts or extracts from Baseball-Reference pages are not committed to the public repository."
+    },
+    "publish_site": {
+     "state": "LIMITED",
+     "scope": {
+      "years_from": 2015
+     },
+     "basis": "Status quo, under review: research-program batches for 2015 onward cite Baseball-Reference pages one at a time (docs/history/hosted-provenance.md). Historical years stay refused. A maintainer may tighten this to PROHIBITED."
+    }
+   },
+   "authorization": null,
+   "permission_notes": "Used for count corroboration in earlier phases (LAD, Wave 2). Not a bulk source: a league-wide crawl of archived pages is neither polite nor within the spirit of the terms. The Internet Archive also rate-limits (HTTP 429 seen 2026-10-21)."
+  }
+ ]
+}

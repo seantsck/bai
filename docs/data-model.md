@@ -301,3 +301,17 @@ Every fact table above, apart from identity and lookup tables, also references `
   - `acquisition_value`: per acquisition and provider. Only an acquisition that signed is `credited` (otherwise `NOT_SIGNED` / `SIGNING_UNKNOWN` and every value NULL). `original_org_war` counts the acquisition's own tenure (acquisition season to exit season); `returning_stint_war` (a later return to the club) is reported and never credited; `other_org_war`; the return of the trade that ended this acquisition (`trade_package_return_war`, the whole package, never split); cost, debut timeline and coverage;
   - `class_value`: known sums over credited acquisitions with coverage counts; a total only when every credited member is covered; each package counted once per class, with shared packages flagged.
 - Baseball-Reference and FanGraphs are never mixed or used to fill each other. A provider not observed is NULL, never zero.
+
+### Historical drafts (024)
+
+- `draft_kind` gains `JUNE_SECONDARY_DELAYED` and `AUGUST_LEGION`, so every historical phase is its own `drafts` row.
+  `drafts.start_date_precision` (`DAY` | `MONTH`; a MONTH date is the first of the month) and `drafts.mlb_draft_type` (MLB's code).
+- `organizations.first_season`: a selection by a club before it existed is refused (`draft_selections_organization_guard`), as is a research class.
+- `organization_names` covers every name used since 1965 with its seasons (relocations and renames), so a source's
+  wording resolves to the franchise for that season. `organization_league_seasons`: league and division by season from 1965.
+- Coverage cells (`analytics.research_coverage_cells`, `rm_research_coverage`) exist only for clubs that existed in a
+  draft's year, for every phase; `refresh_read_models()` validates the count by the same rule.
+- Explorer: `v_draft_explorer` (one row per selection with the club's name and league that year), prefix indexes on
+  normalized player and school names, `rm_draft_year_coverage` (per-phase counts, refreshed offline; the aggregate view
+  `v_draft_year_coverage` is internal). Public views call no functions.
+- Details: [history/README.md](history/README.md).

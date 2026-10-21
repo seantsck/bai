@@ -61,3 +61,9 @@ footer { color: var(--muted); font-size: .8rem; padding: 16px; text-align: cente
 .cell-NA, .cell-\? { background: #f0eeea; }
 .legend { display: flex; flex-wrap: wrap; gap: 8px; font-size: .85rem; }
 .legend-item { padding: 2px 8px; border-radius: 6px; border: 1px solid var(--border); }
+/* Historical explorer */
+.filters { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: flex-end; margin: 0 0 16px; padding: 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); }
+.filters label { display: flex; flex-direction: column; gap: 2px; font-size: .8rem; color: var(--muted); }
+.filters input, .filters select { font: inherit; color: var(--text); background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 4px 6px; min-width: 0; }
+.filters button { font: inherit; padding: 5px 14px; border-radius: 6px; border: 1px solid var(--accent); background: var(--accent); color: var(--surface); cursor: pointer; }
+.pager { display: flex; justify-content: space-between; align-items: center; margin: 12px 0; }

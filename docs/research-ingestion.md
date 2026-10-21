@@ -36,7 +36,7 @@ Format `bai-research-import/1`. Examples: `research/imports/2015-draft-lad.json`
 - **Pick:** `draft_key`, `round_code` (`1..N`, `C-n`, `CB-A`, `CB-B`), `overall_pick`, `round_pick`, `organization`, `selection_type`, `position`.
 - **Club wording (optional):** `organization_as_named` keeps the source's own name for the club (e.g. "Florida Marlins"); it must resolve to `organization` for that season (`resolve_organization`), and is kept on the organization observation.
 - **Other club (optional):** `cross_organization: "<reason>"` allows a record for a club other than the import's `--org` (e.g. a re-draft).
-- **Player:** `{ full_name, birth_date, birth_country, external_ids: { MLBAM, BBREF, BBREF_MINORS, FANGRAPHS }, aliases, source_key }`.
+- **Player:** `{ full_name, birth_date, birth_country, external_ids: { MLBAM, BBREF, BBREF_MINORS, FANGRAPHS, RETROSHEET }, external_id_sources, aliases, source_key }`. `external_id_sources` (optional) names the source of an id that came from somewhere other than the player's source, e.g. `{ "FANGRAPHS": "chadwick:register-<sha>" }` for a crosswalk; each id is then recorded with that source.
 - **School:** `{ name, school_type, city, region, country }`.
 - **Signing:** `{ status: SIGNED | DID_NOT_SIGN | UNKNOWN, bonus_usd, date, date_precision, source_key }`.
 - **Slot value:** `slot_value { usd, source_key }`.

@@ -90,6 +90,14 @@ Never create or alter tables through the Dashboard. A hosted database must alway
   - `hosted:verify` 11/11; pilot reconciliation OK.
   - A LAD-scoped record-by-record comparison with a fresh local rebuild found 0 differences: 205 picks, 105 international signings, 310 acquisition tenures, 166 audits, 354 WAR observations, 83 trade packages, class value, 11 resolutions, 4 proposals.
   - The certification gate is closed. No reviewer is enrolled, no class is certified, and no rate is published.
+- **Wave 2 on hosted (2026-10-21, after PR #8 merged at `79aadae`):** `wave2-2016-drafts.mjs` and
+  `wave2-2016-17-international.mjs` replayed with `--confirm-hosted`.
+  - **Interruption.** The drafts runbook was stopped after HOU by a wrapper timeout. The batch apply is one transaction,
+    so HOU was complete (40 selections, APPLIED). The rest resumed from a clean checkout of `main`.
+  - **Results:** parity OK, security OK, `hosted:verify` 11/11, pilot reconciliation OK, integrity 0 violations.
+  - **Comparison with a clean local replay:** 0 differences in 247 selections, 192 international signings, coverage,
+    classes, proposals, conflicts and observations. LAD's own records are unchanged.
+  - **Lesson:** hosted replays run from a clean `main` worktree, never from a working tree with other changes.
 - `hosted:verify-pilot` compares only the pilot's own rows, so it keeps working as hosted gains other classes.
 
 ### Hosted-only migrations

@@ -1,0 +1,781 @@
+{
+ "format": "bai-history-manifest/1",
+ "entries": {
+  "archive/bref/1965/al-lad-20250820180839.html": {
+   "url": "https://web.archive.org/web/20250820180839id_/https://www.baseball-reference.com/draft/index.fcgi?query_type=franch_year&team_ID=LAD&year_ID=1965&draft_type=augleg",
+   "source_key": "bref-draft-archive",
+   "bytes": 159355,
+   "sha256": "8001454be9732b4e1d9d18ade75f60c3e9932afe2f1c974217cb42e07803da49",
+   "retrieved_at": "2026-10-21T01:45:12.890Z",
+   "content_type": "text/html; charset=utf-8"
+  },
+  "archive/bref/1965/jr-lad-20250816074525.html": {
+   "url": "https://web.archive.org/web/20250816074525id_/https://www.baseball-reference.com/draft/index.fcgi?query_type=franch_year&team_ID=LAD&year_ID=1965&draft_type=junreg&",
+   "source_key": "bref-draft-archive",
+   "bytes": 194553,
+   "sha256": "80e7a8dc99a64f3afa691cde1b450b1b57196db5a626c2fe61a23ece7f8c695f",
+   "retrieved_at": "2026-10-21T01:45:16.071Z",
+   "content_type": "text/html; charset=utf-8"
+  },
+  "archive/bref/1965/jr-oak-20240913193238.html": {
+   "url": "https://web.archive.org/web/20240913193238id_/https://www.baseball-reference.com/draft/index.fcgi?team_ID=OAK&year_ID=1965&draft_type=junreg&query_type=franch_year",
+   "source_key": "bref-draft-archive",
+   "bytes": 222311,
+   "sha256": "2afcafea0bd54b9afd2943397c8d13815290d0c2b862fd0d7bfbe1625520cf0e",
+   "retrieved_at": "2026-10-21T01:45:25.471Z",
+   "content_type": "text/html; charset=utf-8"
+  },
+  "archive/bref/1965/jr-tex-20230716062850.html": {
+   "url": "https://web.archive.org/web/20230716062850id_/https://www.baseball-reference.com/draft/index.fcgi?team_ID=TEX&year_ID=1965&draft_type=junreg&query_type=franch_year",
+   "source_key": "bref-draft-archive",
+   "bytes": 187829,
+   "sha256": "11c9736c348e3ad1274b8946169aa8970207997dc9c5d5fb30d5b0efcafa9e7d",
+   "retrieved_at": "2026-10-21T01:45:37.039Z",
+   "content_type": "text/html; charset=utf-8"
+  },
+  "archive/bref/1965/jr-wsn-20210205104857.html": {
+   "url": "https://web.archive.org/web/20210205104857id_/https://www.baseball-reference.com/draft/?team_ID=WSN&year_ID=1965&draft_type=junreg&query_type=franch_year",
+   "source_key": "bref-draft-archive",
+   "bytes": 125247,
+   "sha256": "4e75b35b93fe15ace8982d28a310464c228b83cbcf3e47f062e5d6064f99fb42",
+   "retrieved_at": "2026-10-21T01:45:46.736Z",
+   "content_type": "text/html; charset=utf-8"
+  },
+  "archive/bref/1965/js-lad-20231104173013.html": {
+   "url": "https://web.archive.org/web/20231104173013id_/https://www.baseball-reference.com/draft/?team_ID=LAD&year_ID=1965&draft_type=junsec&query_type=franch_year",
+   "source_key": "bref-draft-archive",
+   "bytes": 131193,
+   "sha256": "228105cd7a5a9aed9be42a83c42faf12f94e6b2352eb55f6949848e588e99dac",
+   "retrieved_at": "2026-10-21T01:45:19.090Z",
+   "content_type": "text/html; charset=utf-8"
+  },
+  "archive/bref/1965/js-oak-20200807075821.html": {
+   "url": "https://web.archive.org/web/20200807075821id_/https://www.baseball-reference.com/draft/?team_ID=OAK&year_ID=1965&draft_type=junsec&query_type=franch_year",
+   "source_key": "bref-draft-archive",
+   "bytes": 119802,
+   "sha256": "afac38ec4b4cb43d218179ded349c31169e97c1084990036b6eb805f4e7514d4",
+   "retrieved_at": "2026-10-21T01:45:27.799Z",
+   "content_type": "text/html; charset=utf-8"
+  },
+  "archive/bref/1965/js-tex-20200807124326.html": {
+   "url": "https://web.archive.org/web/20200807124326id_/https://www.baseball-reference.com/draft/?team_ID=TEX&year_ID=1965&draft_type=junsec&query_type=franch_year",
+   "source_key": "bref-draft-archive",
+   "bytes": 119790,
+   "sha256": "1149854cfdf5c0dc38ecb4009087153f7e414740a3fb1147752a0ee6bbd477a3",
+   "retrieved_at": "2026-10-21T01:45:39.927Z",
+   "content_type": "text/html; charset=utf-8"
+  },
+  "archive/bref/1965/nr-lad-20200807013605.html": {
+   "url": "https://web.archive.org/web/20200807013605id_/https://www.baseball-reference.com/draft/?team_ID=LAD&year_ID=1965&draft_type=janreg&query_type=franch_year",
+   "source_key": "bref-draft-archive",
+   "bytes": 119798,
+   "sha256": "88370d2f6cd267331a8f81da0121341160e4121db4df8696209db2cbd9e1b1b4",
+   "retrieved_at": "2026-10-21T01:45:22.247Z",
+   "content_type": "text/html; charset=utf-8"
+  },
+  "archive/bref/1965/nr-oak-20160503100659.html": {
+   "url": "https://web.archive.org/web/20160503100659id_/http://www.baseball-reference.com/draft/index.cgi?team_ID=OAK&year_ID=1965&draft_type=janreg&query_type=franch_year",
+   "source_key": "bref-draft-archive",
+   "bytes": 36740,
+   "sha256": "2d8f99237a1ae580f2ce5fcb42b43d5be0d7d8e22094cb68ad548b9b57ace10c",
+   "retrieved_at": "2026-10-21T01:45:30.782Z",
+   "content_type": "text/html; charset=UTF-8"
+  },
+  "archive/bref/1965/nr-wsn-20210417064703.html": {
+   "url": "https://web.archive.org/web/20210417064703id_/https://www.baseball-reference.com/draft/?team_ID=WSN&year_ID=1965&draft_type=janreg&query_type=franch_year",
+   "source_key": "bref-draft-archive",
+   "bytes": 126263,
+   "sha256": "edea71b8d6b157d499b8202328d7fd149e6fa627e82bbb1f7b0b301261315347",
+   "retrieved_at": "2026-10-21T01:45:49.221Z",
+   "content_type": "text/html; charset=utf-8"
+  },
+  "archive/bref/1965/ns-oak-20210127135639.html": {
+   "url": "https://web.archive.org/web/20210127135639id_/https://www.baseball-reference.com/draft/?team_ID=OAK&year_ID=1965&draft_type=jansec&query_type=franch_year",
+   "source_key": "bref-draft-archive",
+   "bytes": 125199,
+   "sha256": "5f8d5fde8f204d25fd06753332c2ffcfa25247516810bd13a5834aa706e1b2ec",
+   "retrieved_at": "2026-10-21T01:45:34.282Z",
+   "content_type": "text/html; charset=utf-8"
+  },
+  "archive/bref/1965/ns-tex-20210127135815.html": {
+   "url": "https://web.archive.org/web/20210127135815id_/https://www.baseball-reference.com/draft/?team_ID=TEX&year_ID=1965&draft_type=jansec&query_type=franch_year",
+   "source_key": "bref-draft-archive",
+   "bytes": 125190,
+   "sha256": "50b3ae7f10b371a9b6517603c6f55afa776a402f2877269094c360a75b2458b6",
+   "retrieved_at": "2026-10-21T01:45:44.380Z",
+   "content_type": "text/html; charset=utf-8"
+  },
+  "archive/bref/1985/jr-lad-20240811211914.html": {
+   "url": "https://web.archive.org/web/20240811211914id_/https://www.baseball-reference.com/draft/index.fcgi?team_ID=LAD&year_ID=1985&draft_type=junreg&query_type=franch_year",
+   "source_key": "bref-draft-archive",
+   "bytes": 196435,
+   "sha256": "854b99f8a19d46d0a1156b67ecefa0320f27d391229250e4ffc2788b9cb5e52a",
+   "retrieved_at": "2026-10-21T01:46:37.730Z",
+   "content_type": "text/html; charset=utf-8"
+  },
+  "archive/bref/1985/jr-oak-20240725070131.html": {
+   "url": "https://web.archive.org/web/20240725070131id_/https://www.baseball-reference.com/draft/index.fcgi?team_ID=OAK&year_ID=1985&draft_type=junreg&query_type=franch_year",
+   "source_key": "bref-draft-archive",
+   "bytes": 188630,
+   "sha256": "0390e683637373f01aa38110910db4bc27670abb079d964d91f5f6d0689ac820",
+   "retrieved_at": "2026-10-21T01:46:49.705Z",
+   "content_type": "text/html; charset=utf-8"
+  },
+  "archive/bref/1985/jr-tex-20230716062839.html": {
+   "url": "https://web.archive.org/web/20230716062839id_/https://www.baseball-reference.com/draft/index.fcgi?team_ID=TEX&year_ID=1985&draft_type=junreg&query_type=franch_year",
+   "source_key": "bref-draft-archive",
+   "bytes": 197573,
+   "sha256": "de9abf7027595f34b0bda2335b38d282d460980adea6fc0b78da4fd0070e93b8",
+   "retrieved_at": "2026-10-21T01:47:01.458Z",
+   "content_type": "text/html; charset=utf-8"
+  },
+  "archive/bref/1985/jr-wsn-20181211205237.html": {
+   "url": "https://web.archive.org/web/20181211205237id_/https://www.baseball-reference.com/draft/index.fcgi?team_ID=WSN&year_ID=1985&draft_type=junreg&query_type=franch_year",
+   "source_key": "bref-draft-archive",
+   "bytes": 171608,
+   "sha256": "2d269c31f89361564fe4ea49d4490aed6e32724b43c7ec780892db34505cd8ef",
+   "retrieved_at": "2026-10-21T01:47:13.854Z",
+   "content_type": "text/html; charset=utf-8"
+  },
+  "archive/bref/1985/js-lad-20250121002429.html": {
+   "url": "https://web.archive.org/web/20250121002429id_/https://www.baseball-reference.com/draft/index.fcgi?query_type=franch_year&team_ID=LAD&year_ID=1985&draft_type=junsec&",
+   "source_key": "bref-draft-archive",
+   "bytes": 145161,
+   "sha256": "85264eb5eff31ce38c91908f15cf51aa9d754183f1a81d325e35d67f79f8d1d9",
+   "retrieved_at": "2026-10-21T01:46:41.509Z",
+   "content_type": "text/html; charset=utf-8"
+  },
+  "archive/bref/1985/js-oak-20240925011603.html": {
+   "url": "https://web.archive.org/web/20240925011603id_/https://www.baseball-reference.com/draft/index.fcgi?team_ID=OAK&year_ID=1985&draft_type=junsec&query_type=franch_year",
+   "source_key": "bref-draft-archive",
+   "bytes": 155895,
+   "sha256": "e796ebc726fafb359c8fff2b52e69a31c0352a4c9672892bd73e768a06fffc80",
+   "retrieved_at": "2026-10-21T01:46:52.873Z",
+   "content_type": "text/html; charset=utf-8"
+  },
+  "archive/bref/1985/js-tex-20170708163132.html": {
+   "url": "https://web.archive.org/web/20170708163132id_/http://www.baseball-reference.com/draft/?team_ID=TEX&year_ID=1985&draft_type=junsec&query_type=franch_year",
+   "source_key": "bref-draft-archive",
+   "bytes": 208040,
+   "sha256": "12fe5d8b1f4d23f9c4f371a1c40e1e5eefe0f569dff01efd81df3315d0d41e0c",
+   "retrieved_at": "2026-10-21T01:47:04.808Z",
+   "content_type": "text/html; charset=utf-8"
+  },
+  "archive/bref/1985/js-wsn-20170404043823.html": {
+   "url": "https://web.archive.org/web/20170404043823id_/http://www.baseball-reference.com/draft/?team_ID=WSN&year_ID=1985&draft_type=junsec&query_type=franch_year",
+   "source_key": "bref-draft-archive",
+   "bytes": 160344,
+   "sha256": "a20e8cce3308d00e25ce0cbebd226a06158fa7206b762ad4ed3936528a78d2d6",
+   "retrieved_at": "2026-10-21T01:47:17.688Z",
+   "content_type": "text/html; charset=utf-8"
+  },
+  "archive/bref/1985/nr-lad-20250120012757.html": {
+   "url": "https://web.archive.org/web/20250120012757id_/https://www.baseball-reference.com/draft/index.fcgi?query_type=franch_year&team_ID=LAD&year_ID=1985&draft_type=janreg",
+   "source_key": "bref-draft-archive",
+   "bytes": 164262,
+   "sha256": "62ca5eeeeac39087f8f4af16aa25f6557d44c03ae5d530873bbaf9b61bd45246",
+   "retrieved_at": "2026-10-21T01:46:43.648Z",
+   "content_type": "text/html; charset=utf-8"
+  },
+  "archive/bref/1985/nr-oak-20250215031546.html": {
+   "url": "https://web.archive.org/web/20250215031546id_/https://www.baseball-reference.com/draft/index.fcgi?team_ID=OAK&year_ID=1985&draft_type=janreg&query_type=franch_year",
+   "source_key": "bref-draft-archive",
+   "bytes": 164540,
+   "sha256": "14bd06c48fb21e249f26304395827a484ba0462255a99b53f8fc5c9d635fb84b",
+   "retrieved_at": "2026-10-21T01:46:56.805Z",
+   "content_type": "text/html; charset=utf-8"
+  },
+  "archive/bref/1985/nr-tex-20250218061227.html": {
+   "url": "https://web.archive.org/web/20250218061227id_/https://www.baseball-reference.com/draft/index.fcgi?team_ID=TEX&year_ID=1985&draft_type=janreg&query_type=franch_year",
+   "source_key": "bref-draft-archive",
+   "bytes": 162836,
+   "sha256": "3007b0db55a5443e276133f93946e4279cb2616324085105fd409fd16e9f6ad2",
+   "retrieved_at": "2026-10-21T01:47:07.845Z",
+   "content_type": "text/html; charset=utf-8"
+  },
+  "archive/bref/1985/nr-wsn-20250118232130.html": {
+   "url": "https://web.archive.org/web/20250118232130id_/https://www.baseball-reference.com/draft/index.fcgi?team_ID=WSN&year_ID=1985&draft_type=janreg&query_type=franch_year",
+   "source_key": "bref-draft-archive",
+   "bytes": 175179,
+   "sha256": "ba446ef375884d7d15877f9209224f9d5f880a178ce4eb44695c6b3fca2cf21c",
+   "retrieved_at": "2026-10-21T01:47:19.683Z",
+   "content_type": "text/html; charset=utf-8"
+  },
+  "archive/bref/1985/ns-lad-20241214161631.html": {
+   "url": "https://web.archive.org/web/20241214161631id_/https://www.baseball-reference.com/draft/index.fcgi?team_ID=LAD&year_ID=1985&draft_type=jansec&query_type=franch_year",
+   "source_key": "bref-draft-archive",
+   "bytes": 148278,
+   "sha256": "2dd4884be3fe3c201a76a90a86b851416364c2f5559b7c4b8e8b84d5a41b0e17",
+   "retrieved_at": "2026-10-21T01:46:47.232Z",
+   "content_type": "text/html; charset=utf-8"
+  },
+  "archive/bref/1985/ns-oak-20170711113057.html": {
+   "url": "https://web.archive.org/web/20170711113057id_/http://www.baseball-reference.com/draft/?team_ID=OAK&year_ID=1985&draft_type=jansec&query_type=franch_year",
+   "source_key": "bref-draft-archive",
+   "bytes": 191554,
+   "sha256": "a031cabc0d417dac7513b97fffe706c57574fd024e54390d2eabe3e5e95a4dc7",
+   "retrieved_at": "2026-10-21T01:46:58.646Z",
+   "content_type": "text/html; charset=utf-8"
+  },
+  "archive/bref/1985/ns-tex-20191120053216.html": {
+   "url": "https://web.archive.org/web/20191120053216id_/https://www.baseball-reference.com/draft/?team_ID=TEX&year_ID=1985&draft_type=jansec&query_type=franch_year",
+   "source_key": "bref-draft-archive",
+   "bytes": 133320,
+   "sha256": "3a1aa5f12de31f4bff6cbd5a9343490789c301e50bdd2cdebb9b386f723dcfa7",
+   "retrieved_at": "2026-10-21T01:47:10.397Z",
+   "content_type": "text/html; charset=utf-8"
+  },
+  "archive/bref/1985/ns-wsn-20241004095831.html": {
+   "url": "https://web.archive.org/web/20241004095831id_/https://www.baseball-reference.com/draft/index.fcgi?team_ID=WSN&year_ID=1985&draft_type=jansec&query_type=franch_year",
+   "source_key": "bref-draft-archive",
+   "bytes": 146025,
+   "sha256": "486b08b4df350ccbeb051919a8c8f17864eba12cfdc902bee58c0c2220dfc226",
+   "retrieved_at": "2026-10-21T01:47:23.563Z",
+   "content_type": "text/html; charset=utf-8"
+  },
+  "archive/bref/2005/jr-ana-20241130103848.html": {
+   "url": "https://web.archive.org/web/20241130103848id_/https://www.baseball-reference.com/draft/index.fcgi?query_type=franch_year&team_ID=ANA&year_ID=2005&draft_type=junreg&",
+   "source_key": "bref-draft-archive",
+   "bytes": 227003,
+   "sha256": "9d39bbe89ee46dba55a25850d483be618f98b65adeb15598dad21076697b2425",
+   "retrieved_at": "2026-10-21T01:43:04.892Z",
+   "content_type": "text/html; charset=utf-8"
+  },
+  "archive/bref/2005/jr-ari-20180423170657.html": {
+   "url": "https://web.archive.org/web/20180423170657id_/https://www.baseball-reference.com/draft/index.fcgi?team_ID=ARI&year_ID=2005&draft_type=junreg&query_type=franch_year",
+   "source_key": "bref-draft-archive",
+   "bytes": 224524,
+   "sha256": "a30a69cae27449d73d55ee8f625cfca7bfeeeb649ce959ed54f26d8804de9751",
+   "retrieved_at": "2026-10-21T01:43:07.419Z",
+   "content_type": "text/html; charset=utf-8"
+  },
+  "archive/bref/2005/jr-atl-20180423170725.html": {
+   "url": "https://web.archive.org/web/20180423170725id_/https://www.baseball-reference.com/draft/index.fcgi?team_ID=ATL&year_ID=2005&draft_type=junreg&query_type=franch_year",
+   "source_key": "bref-draft-archive",
+   "bytes": 250939,
+   "sha256": "6374e833f42d37290daa09829b746f46bb664b0dcead90b67e8f6f056e68de81",
+   "retrieved_at": "2026-10-21T01:43:10.901Z",
+   "content_type": "text/html; charset=utf-8"
+  },
+  "archive/bref/2005/jr-bal-20240804022146.html": {
+   "url": "https://web.archive.org/web/20240804022146id_/https://www.baseball-reference.com/draft/index.fcgi?team_ID=BAL&year_ID=2005&draft_type=junreg&query_type=franch_year",
+   "source_key": "bref-draft-archive",
+   "bytes": 224125,
+   "sha256": "7f068244872817c960af95b31d7fd7eb1b89a2db221ce1f3af78bf823c32b245",
+   "retrieved_at": "2026-10-21T01:43:14.102Z",
+   "content_type": "text/html; charset=utf-8"
+  },
+  "archive/bref/2005/jr-bos-20240721030943.html": {
+   "url": "https://web.archive.org/web/20240721030943id_/https://www.baseball-reference.com/draft/index.fcgi?team_ID=BOS&year_ID=2005&draft_type=junreg&query_type=franch_year",
+   "source_key": "bref-draft-archive",
+   "bytes": 234203,
+   "sha256": "b4a1a4253b3382dbd9fab2eb262138a19e2c62e43d685492da5bf0f9964eb665",
+   "retrieved_at": "2026-10-21T01:43:18.824Z",
+   "content_type": "text/html; charset=utf-8"
+  },
+  "archive/bref/2005/jr-chc-20180423170717.html": {
+   "url": "https://web.archive.org/web/20180423170717id_/https://www.baseball-reference.com/draft/index.fcgi?team_ID=CHC&year_ID=2005&draft_type=junreg&query_type=franch_year",
+   "source_key": "bref-draft-archive",
+   "bytes": 232408,
+   "sha256": "fcc49182b373308907c1ab99ffd9fd781c9dfca03beab30afaeb6cff2dd1e1c1",
+   "retrieved_at": "2026-10-21T01:43:19.510Z",
+   "content_type": "text/html; charset=utf-8"
+  },
+  "archive/bref/2005/jr-chw-20250121162128.html": {
+   "url": "https://web.archive.org/web/20250121162128id_/https://www.baseball-reference.com/draft/index.fcgi?query_type=franch_year&team_ID=CHW&year_ID=2005&draft_type=junreg&",
+   "source_key": "bref-draft-archive",
+   "bytes": 229487,
+   "sha256": "182e70e9d934357002041008641a46f1e02dfa454af6bdf5d618129b49b19a18",
+   "retrieved_at": "2026-10-21T01:43:23.168Z",
+   "content_type": "text/html; charset=utf-8"
+  },
+  "archive/bref/2005/jr-cin-20180423232854.html": {
+   "url": "https://web.archive.org/web/20180423232854id_/https://www.baseball-reference.com/draft/index.fcgi?team_ID=CIN&year_ID=2005&draft_type=junreg&query_type=franch_year",
+   "source_key": "bref-draft-archive",
+   "bytes": 537385,
+   "sha256": "d60f9b816dd883c8ab4d68412cee0b276d02a2c399175d9ef349a63c9d14d1f6",
+   "retrieved_at": "2026-10-21T01:43:26.063Z",
+   "content_type": "text/html; charset=utf-8"
+  },
+  "archive/bref/2005/jr-cle-20250121161657.html": {
+   "url": "https://web.archive.org/web/20250121161657id_/https://www.baseball-reference.com/draft/index.fcgi?query_type=franch_year&team_ID=CLE&year_ID=2005&draft_type=junreg&",
+   "source_key": "bref-draft-archive",
+   "bytes": 239736,
+   "sha256": "1538a8b0221572934f77cc65555bbb20718f38bc2666a34883f8ec7fffb3458b",
+   "retrieved_at": "2026-10-21T01:43:29.884Z",
+   "content_type": "text/html; charset=utf-8"
+  },
+  "archive/bref/2005/jr-col-20180423232429.html": {
+   "url": "https://web.archive.org/web/20180423232429id_/https://www.baseball-reference.com/draft/index.fcgi?team_ID=COL&year_ID=2005&draft_type=junreg&query_type=franch_year",
+   "source_key": "bref-draft-archive",
+   "bytes": 349897,
+   "sha256": "0e3b11727e0ebae5faebf343d5ce2c316357afc9a87e9ccf799da9b39074a0ac",
+   "retrieved_at": "2026-10-21T01:43:31.740Z",
+   "content_type": "text/html; charset=utf-8"
+  },
+  "archive/bref/2005/jr-det-20240719131950.html": {
+   "url": "https://web.archive.org/web/20240719131950id_/https://www.baseball-reference.com/draft/index.fcgi?team_ID=DET&year_ID=2005&draft_type=junreg&query_type=franch_year",
+   "source_key": "bref-draft-archive",
+   "bytes": 226705,
+   "sha256": "1e395c1da91b13189b3ecb9d10b22dbcebcfa12dafe7128fdf7ef1a312cee15e",
+   "retrieved_at": "2026-10-21T01:43:34.804Z",
+   "content_type": "text/html; charset=utf-8"
+  },
+  "archive/bref/2005/jr-fla-20240810141324.html": {
+   "url": "https://web.archive.org/web/20240810141324id_/https://www.baseball-reference.com/draft/index.fcgi?team_ID=FLA&year_ID=2005&draft_type=junreg&query_type=franch_year",
+   "source_key": "bref-draft-archive",
+   "bytes": 238653,
+   "sha256": "6d8cc13cdfbe5b8e1d81badee5de5ffa42043b72323eb153f1f09300c4d9f728",
+   "retrieved_at": "2026-10-21T01:43:37.599Z",
+   "content_type": "text/html; charset=utf-8"
+  },
+  "archive/bref/2005/jr-hou-20240916002340.html": {
+   "url": "https://web.archive.org/web/20240916002340id_/https://www.baseball-reference.com/draft/index.fcgi?team_ID=HOU&year_ID=2005&draft_type=junreg&query_type=franch_year",
+   "source_key": "bref-draft-archive",
+   "bytes": 228364,
+   "sha256": "bcb863f5d774d42d54241dba3adcca729b821905d20a83e362f853053b773d43",
+   "retrieved_at": "2026-10-21T01:43:40.588Z",
+   "content_type": "text/html; charset=utf-8"
+  },
+  "archive/bref/2005/jr-kcr-20240722091324.html": {
+   "url": "https://web.archive.org/web/20240722091324id_/https://www.baseball-reference.com/draft/index.fcgi?team_ID=KCR&year_ID=2005&draft_type=junreg&query_type=franch_year",
+   "source_key": "bref-draft-archive",
+   "bytes": 221546,
+   "sha256": "dea9bf9fce851f06b2377d86ed974012f033c2954271f07f9ec82745a5bff103",
+   "retrieved_at": "2026-10-21T01:43:43.783Z",
+   "content_type": "text/html; charset=utf-8"
+  },
+  "archive/bref/2005/jr-lad-20250120013900.html": {
+   "url": "https://web.archive.org/web/20250120013900id_/https://www.baseball-reference.com/draft/index.fcgi?query_type=franch_year&team_ID=LAD&year_ID=2005&draft_type=junreg&",
+   "source_key": "bref-draft-archive",
+   "bytes": 229775,
+   "sha256": "be4ff9ccf75155c9d9b32d9d546ee4fcdd9c1007a7ce7dd79f34d646d75b8483",
+   "retrieved_at": "2026-10-21T01:43:46.863Z",
+   "content_type": "text/html; charset=utf-8"
+  },
+  "archive/bref/2005/jr-mil-20241211180736.html": {
+   "url": "https://web.archive.org/web/20241211180736id_/https://www.baseball-reference.com/draft/index.fcgi?team_ID=MIL&year_ID=2005&draft_type=junreg&query_type=franch_year",
+   "source_key": "bref-draft-archive",
+   "bytes": 223000,
+   "sha256": "01a7fdadbcab5dd892fdd88d1572051328ffcf2041f767aa80b55b1f406186e0",
+   "retrieved_at": "2026-10-21T01:43:49.740Z",
+   "content_type": "text/html; charset=utf-8"
+  },
+  "archive/bref/2005/jr-min-20251013162254.html": {
+   "url": "https://web.archive.org/web/20251013162254id_/https://www.baseball-reference.com/draft/index.fcgi?query_type=franch_year&team_ID=MIN&year_ID=2005&draft_type=junreg&",
+   "source_key": "bref-draft-archive",
+   "bytes": 230014,
+   "sha256": "797ca3d7d0e3526cfd16791f027bbd94bab47b0af17b50a9c025d2f5d6e650fa",
+   "retrieved_at": "2026-10-21T01:43:52.809Z",
+   "content_type": "text/html; charset=utf-8"
+  },
+  "archive/bref/2005/jr-nym-20240809213255.html": {
+   "url": "https://web.archive.org/web/20240809213255id_/https://www.baseball-reference.com/draft/index.fcgi?team_ID=NYM&year_ID=2005&draft_type=junreg&query_type=franch_year",
+   "source_key": "bref-draft-archive",
+   "bytes": 222115,
+   "sha256": "83d90579a994f717061eca802ce882da456b896961978db5be74941fb189f6e5",
+   "retrieved_at": "2026-10-21T01:43:56.105Z",
+   "content_type": "text/html; charset=utf-8"
+  },
+  "archive/bref/2005/jr-nyy-20250707222509.html": {
+   "url": "https://web.archive.org/web/20250707222509id_/https://www.baseball-reference.com/draft/index.fcgi?team_ID=NYY&year_ID=2005&draft_type=junreg&query_type=franch_year",
+   "source_key": "bref-draft-archive",
+   "bytes": 225297,
+   "sha256": "26b12755472bc57bfd84b15e08607ce3bee3b52615d91b1cdf4ea9ca10e98526",
+   "retrieved_at": "2026-10-21T01:43:58.722Z",
+   "content_type": "text/html; charset=utf-8"
+  },
+  "archive/bref/2005/jr-oak-20241217134502.html": {
+   "url": "https://web.archive.org/web/20241217134502id_/https://www.baseball-reference.com/draft/index.fcgi?query_type=franch_year&team_ID=OAK&year_ID=2005&draft_type=junreg",
+   "source_key": "bref-draft-archive",
+   "bytes": 207639,
+   "sha256": "ccd031a490ac253b37ad7b8f1cd79eaf146fe6bb6f4368af771a875f89f353a6",
+   "retrieved_at": "2026-10-21T01:44:02.225Z",
+   "content_type": "text/html; charset=utf-8"
+  },
+  "archive/bref/2005/jr-phi-20240725013750.html": {
+   "url": "https://web.archive.org/web/20240725013750id_/https://www.baseball-reference.com/draft/index.fcgi?team_ID=PHI&year_ID=2005&draft_type=junreg&query_type=franch_year",
+   "source_key": "bref-draft-archive",
+   "bytes": 221719,
+   "sha256": "90be0047c570fc6b318eb437382c82dc54abfbcbe823dc79033d23cfbc11a7dd",
+   "retrieved_at": "2026-10-21T01:44:04.998Z",
+   "content_type": "text/html; charset=utf-8"
+  },
+  "archive/bref/2005/jr-pit-20240809084926.html": {
+   "url": "https://web.archive.org/web/20240809084926id_/https://www.baseball-reference.com/draft/index.fcgi?team_ID=PIT&year_ID=2005&draft_type=junreg&query_type=franch_year",
+   "source_key": "bref-draft-archive",
+   "bytes": 221881,
+   "sha256": "a81c25287651d2dc8f779e2aa2f01a6e23378e0aad588dc70b85f705018c706c",
+   "retrieved_at": "2026-10-21T01:44:08.262Z",
+   "content_type": "text/html; charset=utf-8"
+  },
+  "archive/bref/2005/jr-sdp-20250810200853.html": {
+   "url": "https://web.archive.org/web/20250810200853id_/https://www.baseball-reference.com/draft/index.fcgi?query_type=franch_year&team_ID=SDP&year_ID=2005&draft_type=junreg",
+   "source_key": "bref-draft-archive",
+   "bytes": 227560,
+   "sha256": "aa06361041da107f4f42fbeb92fc7857a6d980f88fcc62edb596de2ef9940365",
+   "retrieved_at": "2026-10-21T01:44:10.731Z",
+   "content_type": "text/html; charset=utf-8"
+  },
+  "archive/bref/2005/jr-sea-20241228091843.html": {
+   "url": "https://web.archive.org/web/20241228091843id_/https://www.baseball-reference.com/draft/index.fcgi?query_type=franch_year&team_ID=SEA&year_ID=2005&draft_type=junreg&",
+   "source_key": "bref-draft-archive",
+   "bytes": 222418,
+   "sha256": "1888a1852341326cd8df22f741f31d0695216ddf0d6d79a87b42df9ee2cc3b0a",
+   "retrieved_at": "2026-10-21T01:44:14.187Z",
+   "content_type": "text/html; charset=utf-8"
+  },
+  "archive/bref/2005/jr-sfg-20180423170135.html": {
+   "url": "https://web.archive.org/web/20180423170135id_/https://www.baseball-reference.com/draft/index.fcgi?team_ID=SFG&year_ID=2005&draft_type=junreg&query_type=franch_year",
+   "source_key": "bref-draft-archive",
+   "bytes": 217737,
+   "sha256": "d8d00bf371741e3f877044282fa8ccb36867891e88f434087cc15fdb4cb09856",
+   "retrieved_at": "2026-10-21T01:44:16.678Z",
+   "content_type": "text/html; charset=utf-8"
+  },
+  "archive/bref/2005/jr-stl-20241225070807.html": {
+   "url": "https://web.archive.org/web/20241225070807id_/https://www.baseball-reference.com/draft/index.fcgi?query_type=franch_year&team_ID=STL&year_ID=2005&draft_type=junreg&",
+   "source_key": "bref-draft-archive",
+   "bytes": 228995,
+   "sha256": "c88449fdb2e0e03f700f11b542f045916b6844f29d8a7c25eb8ce0a85520c25f",
+   "retrieved_at": "2026-10-21T01:44:19.618Z",
+   "content_type": "text/html; charset=utf-8"
+  },
+  "archive/bref/2005/jr-tbd-20240630112206.html": {
+   "url": "https://web.archive.org/web/20240630112206id_/https://www.baseball-reference.com/draft/index.fcgi?team_ID=TBD&year_ID=2005&draft_type=junreg&query_type=franch_year",
+   "source_key": "bref-draft-archive",
+   "bytes": 222376,
+   "sha256": "0b511bf5e30e061a901adb7451d769ebd590a90a631cdb958c384d75fd54e083",
+   "retrieved_at": "2026-10-21T01:44:25.014Z",
+   "content_type": "text/html; charset=utf-8"
+  },
+  "archive/bref/2005/jr-tex-20241228114108.html": {
+   "url": "https://web.archive.org/web/20241228114108id_/https://www.baseball-reference.com/draft/index.fcgi?query_type=franch_year&team_ID=TEX&year_ID=2005&draft_type=junreg&",
+   "source_key": "bref-draft-archive",
+   "bytes": 223494,
+   "sha256": "8e48bab3486d2a6877d2b9d6574da812e06963f89e6481d64540c5912b8b9a9d",
+   "retrieved_at": "2026-10-21T01:44:25.750Z",
+   "content_type": "text/html; charset=utf-8"
+  },
+  "archive/bref/2005/jr-tor-20250121155945.html": {
+   "url": "https://web.archive.org/web/20250121155945id_/https://www.baseball-reference.com/draft/index.fcgi?query_type=franch_year&team_ID=TOR&year_ID=2005&draft_type=junreg&",
+   "source_key": "bref-draft-archive",
+   "bytes": 230616,
+   "sha256": "bc2be7a0b039164de340a943d819fd53fd5281cc7dfeb902b6af79c4c3fa9e64",
+   "retrieved_at": "2026-10-21T01:44:28.778Z",
+   "content_type": "text/html; charset=utf-8"
+  },
+  "archive/bref/2005/jr-wsn-20250122014722.html": {
+   "url": "https://web.archive.org/web/20250122014722id_/https://www.baseball-reference.com/draft/index.fcgi?query_type=franch_year&team_ID=WSN&year_ID=2005&draft_type=junreg&",
+   "source_key": "bref-draft-archive",
+   "bytes": 221544,
+   "sha256": "7ec9044bb715ba8fcb1a5a25de59ce8182d4e09d4d12ac752c4f62228dec773d",
+   "retrieved_at": "2026-10-21T01:44:32.285Z",
+   "content_type": "text/html; charset=utf-8"
+  },
+  "archive/cdx/bref-draft-franch-year-1965.txt": {
+   "url": "https://web.archive.org/cdx/search/cdx?url=baseball-reference.com/draft/&matchType=prefix&filter=urlkey:.*franch_year.*&filter=urlkey:.*year_id=1965.*&filter=statuscode:200&fl=timestamp,original&collapse=urlkey&limit=2000",
+   "source_key": "bref-draft-archive",
+   "bytes": 15337,
+   "sha256": "c6c8d8c803b7c533c6d6133ba49f51121e1d4a99113ba5deeab8270e256f37d2",
+   "retrieved_at": "2026-10-21T01:45:12.237Z",
+   "content_type": "text/plain"
+  },
+  "archive/cdx/bref-draft-franch-year-1985.txt": {
+   "url": "https://web.archive.org/cdx/search/cdx?url=baseball-reference.com/draft/&matchType=prefix&filter=urlkey:.*franch_year.*&filter=urlkey:.*year_id=1985.*&filter=statuscode:200&fl=timestamp,original&collapse=urlkey&limit=2000",
+   "source_key": "bref-draft-archive",
+   "bytes": 38094,
+   "sha256": "743496bfb771e5ec1c3ec287b9540e5610d9fdbffa8a8b10f8275b53c052a348",
+   "retrieved_at": "2026-10-21T01:46:36.831Z",
+   "content_type": "text/plain"
+  },
+  "archive/cdx/bref-draft-franch-year-2005.txt": {
+   "url": "https://web.archive.org/cdx/search/cdx?url=baseball-reference.com/draft/&matchType=prefix&filter=urlkey:.*franch_year.*&filter=urlkey:.*year_id=2005.*&filter=statuscode:200&fl=timestamp,original&collapse=urlkey&limit=2000",
+   "source_key": "bref-draft-archive",
+   "bytes": 24790,
+   "sha256": "9072cdcf662f5912373b45c1dd3ff1032f3b8f7c7ccb363c2ff001f36165b26b",
+   "retrieved_at": "2026-10-21T01:42:49.471Z",
+   "content_type": "text/plain"
+  },
+  "chadwick/781c175/people-0.csv": {
+   "url": "https://raw.githubusercontent.com/chadwickbureau/register/781c175e748b89e5730fd3f5de0086b9355b2f92/data/people-0.csv",
+   "source_key": "chadwick-register",
+   "bytes": 4257746,
+   "sha256": "d825dc9ad301f8f9e6dc4338f0153dcb60d9953e80b92ab737d7020a68cbe1d2",
+   "retrieved_at": "2026-10-21T01:40:37.287Z",
+   "content_type": "text/plain; charset=utf-8"
+  },
+  "chadwick/781c175/people-1.csv": {
+   "url": "https://raw.githubusercontent.com/chadwickbureau/register/781c175e748b89e5730fd3f5de0086b9355b2f92/data/people-1.csv",
+   "source_key": "chadwick-register",
+   "bytes": 4264399,
+   "sha256": "1c55cbbbf8ef252af41687485525db0d52dcb50b6ffad83d2afabf34a590415d",
+   "retrieved_at": "2026-10-21T01:40:38.802Z",
+   "content_type": "text/plain; charset=utf-8"
+  },
+  "chadwick/781c175/people-2.csv": {
+   "url": "https://raw.githubusercontent.com/chadwickbureau/register/781c175e748b89e5730fd3f5de0086b9355b2f92/data/people-2.csv",
+   "source_key": "chadwick-register",
+   "bytes": 4228679,
+   "sha256": "8cd2cfc50090f4ccc16aaab591133841c783f5514d17e21704311a9b7c246e8c",
+   "retrieved_at": "2026-10-21T01:40:40.162Z",
+   "content_type": "text/plain; charset=utf-8"
+  },
+  "chadwick/781c175/people-3.csv": {
+   "url": "https://raw.githubusercontent.com/chadwickbureau/register/781c175e748b89e5730fd3f5de0086b9355b2f92/data/people-3.csv",
+   "source_key": "chadwick-register",
+   "bytes": 4260677,
+   "sha256": "4f04d2d720268c779826f1019307e8da57a41732e5eee75ee2fa6a2f758dc104",
+   "retrieved_at": "2026-10-21T01:40:41.634Z",
+   "content_type": "text/plain; charset=utf-8"
+  },
+  "chadwick/781c175/people-4.csv": {
+   "url": "https://raw.githubusercontent.com/chadwickbureau/register/781c175e748b89e5730fd3f5de0086b9355b2f92/data/people-4.csv",
+   "source_key": "chadwick-register",
+   "bytes": 4254461,
+   "sha256": "a7b1513083a196448fcc29f630f08bac0df840ecab016a6fe3f20798cb3bcefb",
+   "retrieved_at": "2026-10-21T01:40:43.115Z",
+   "content_type": "text/plain; charset=utf-8"
+  },
+  "chadwick/781c175/people-5.csv": {
+   "url": "https://raw.githubusercontent.com/chadwickbureau/register/781c175e748b89e5730fd3f5de0086b9355b2f92/data/people-5.csv",
+   "source_key": "chadwick-register",
+   "bytes": 4260872,
+   "sha256": "8c2a114c819f082c2ce2f00eb6e7d00747c18503603a1a194dbb6204070623a2",
+   "retrieved_at": "2026-10-21T01:40:44.673Z",
+   "content_type": "text/plain; charset=utf-8"
+  },
+  "chadwick/781c175/people-6.csv": {
+   "url": "https://raw.githubusercontent.com/chadwickbureau/register/781c175e748b89e5730fd3f5de0086b9355b2f92/data/people-6.csv",
+   "source_key": "chadwick-register",
+   "bytes": 4234752,
+   "sha256": "147e139cd39fb8532d3d4664f9a541d27e2a76cab5d700cd178d4c4c63ab577a",
+   "retrieved_at": "2026-10-21T01:40:46.130Z",
+   "content_type": "text/plain; charset=utf-8"
+  },
+  "chadwick/781c175/people-7.csv": {
+   "url": "https://raw.githubusercontent.com/chadwickbureau/register/781c175e748b89e5730fd3f5de0086b9355b2f92/data/people-7.csv",
+   "source_key": "chadwick-register",
+   "bytes": 4264989,
+   "sha256": "b627671de7f2185f06934de980085feb708987598baa8ba7539a1c34400779ce",
+   "retrieved_at": "2026-10-21T01:40:47.674Z",
+   "content_type": "text/plain; charset=utf-8"
+  },
+  "chadwick/781c175/people-8.csv": {
+   "url": "https://raw.githubusercontent.com/chadwickbureau/register/781c175e748b89e5730fd3f5de0086b9355b2f92/data/people-8.csv",
+   "source_key": "chadwick-register",
+   "bytes": 4220617,
+   "sha256": "5fc519b9f9152f83082b3ff086745df102af4df8c52f2525bdc21c9884e7d12d",
+   "retrieved_at": "2026-10-21T01:40:49.339Z",
+   "content_type": "text/plain; charset=utf-8"
+  },
+  "chadwick/781c175/people-9.csv": {
+   "url": "https://raw.githubusercontent.com/chadwickbureau/register/781c175e748b89e5730fd3f5de0086b9355b2f92/data/people-9.csv",
+   "source_key": "chadwick-register",
+   "bytes": 4242599,
+   "sha256": "0d7e872eaaada86393d55d8a71f9e22f710078165f3605c5025932da43066623",
+   "retrieved_at": "2026-10-21T01:40:50.641Z",
+   "content_type": "text/plain; charset=utf-8"
+  },
+  "chadwick/781c175/people-a.csv": {
+   "url": "https://raw.githubusercontent.com/chadwickbureau/register/781c175e748b89e5730fd3f5de0086b9355b2f92/data/people-a.csv",
+   "source_key": "chadwick-register",
+   "bytes": 4305511,
+   "sha256": "acf5f83a0c1224c482aec3e295a8e8815da7606a7eab1551db279af3d7916e7a",
+   "retrieved_at": "2026-10-21T01:40:52.186Z",
+   "content_type": "text/plain; charset=utf-8"
+  },
+  "chadwick/781c175/people-b.csv": {
+   "url": "https://raw.githubusercontent.com/chadwickbureau/register/781c175e748b89e5730fd3f5de0086b9355b2f92/data/people-b.csv",
+   "source_key": "chadwick-register",
+   "bytes": 4271053,
+   "sha256": "3865907858bb96a911b3de94d5885451ea57315b0159847d8365b1bacc69a3c3",
+   "retrieved_at": "2026-10-21T01:40:53.799Z",
+   "content_type": "text/plain; charset=utf-8"
+  },
+  "chadwick/781c175/people-c.csv": {
+   "url": "https://raw.githubusercontent.com/chadwickbureau/register/781c175e748b89e5730fd3f5de0086b9355b2f92/data/people-c.csv",
+   "source_key": "chadwick-register",
+   "bytes": 4252290,
+   "sha256": "7ba78a859d5bd57622eb16538f71c1d558aca34da2d41d6555df9801222bbd7f",
+   "retrieved_at": "2026-10-21T01:40:55.181Z",
+   "content_type": "text/plain; charset=utf-8"
+  },
+  "chadwick/781c175/people-d.csv": {
+   "url": "https://raw.githubusercontent.com/chadwickbureau/register/781c175e748b89e5730fd3f5de0086b9355b2f92/data/people-d.csv",
+   "source_key": "chadwick-register",
+   "bytes": 4280813,
+   "sha256": "eb2395d69c03c0b1850f17ad904f37a8c31440467d5929aa3e4f8ab4f65203ef",
+   "retrieved_at": "2026-10-21T01:40:56.671Z",
+   "content_type": "text/plain; charset=utf-8"
+  },
+  "chadwick/781c175/people-e.csv": {
+   "url": "https://raw.githubusercontent.com/chadwickbureau/register/781c175e748b89e5730fd3f5de0086b9355b2f92/data/people-e.csv",
+   "source_key": "chadwick-register",
+   "bytes": 4250065,
+   "sha256": "81926371966427488d066a724fbeec7903d56eff40112f84ee9f84cdbbc6a1ee",
+   "retrieved_at": "2026-10-21T01:40:58.260Z",
+   "content_type": "text/plain; charset=utf-8"
+  },
+  "chadwick/781c175/people-f.csv": {
+   "url": "https://raw.githubusercontent.com/chadwickbureau/register/781c175e748b89e5730fd3f5de0086b9355b2f92/data/people-f.csv",
+   "source_key": "chadwick-register",
+   "bytes": 4319123,
+   "sha256": "006a2acab5be8bdea08daa149cea1b12a9eddd5dfe0a66e6bf9c6a36b2cb5980",
+   "retrieved_at": "2026-10-21T01:40:59.800Z",
+   "content_type": "text/plain; charset=utf-8"
+  },
+  "mlb/draft-types.json": {
+   "url": "https://statsapi.mlb.com/api/v1/draftTypes",
+   "source_key": "mlb-statsapi-draft",
+   "bytes": 514,
+   "sha256": "542cc408cae407713c4c9deb7890870cfdb39cfeadbfb2ad79e5913bd12ecec3",
+   "retrieved_at": "2026-10-21T01:40:09.309Z",
+   "content_type": "application/json;charset=UTF-8"
+  },
+  "mlb/draft/1965-al.json": {
+   "url": "https://statsapi.mlb.com/api/v1/draft/1965?draftType=AL",
+   "source_key": "mlb-statsapi-draft",
+   "bytes": 18302,
+   "sha256": "50673ed2c7fe64cfca080a95b481e7c3b31c66ac1fc3f2455512403c3e46a1e8",
+   "retrieved_at": "2026-10-21T01:39:39.395Z",
+   "content_type": "application/json;charset=UTF-8"
+  },
+  "mlb/draft/1965-jd.json": {
+   "url": "https://statsapi.mlb.com/api/v1/draft/1965?draftType=JD",
+   "source_key": "mlb-statsapi-draft",
+   "bytes": 220,
+   "sha256": "7a13db90cd57a59448e134258ba526ae5c1a8a5b2ce9e4408b83c13170ed10f3",
+   "retrieved_at": "2026-10-21T01:39:37.721Z",
+   "content_type": "application/json;charset=UTF-8"
+  },
+  "mlb/draft/1965-jr.json": {
+   "url": "https://statsapi.mlb.com/api/v1/draft/1965?draftType=JR",
+   "source_key": "mlb-statsapi-draft",
+   "bytes": 1092983,
+   "sha256": "52990e2cb1764886efa61024de132b8876b862ac96c765abb98f4fdfd4019c44",
+   "retrieved_at": "2026-10-21T01:39:32.560Z",
+   "content_type": "application/json;charset=UTF-8"
+  },
+  "mlb/draft/1965-js.json": {
+   "url": "https://statsapi.mlb.com/api/v1/draft/1965?draftType=JS",
+   "source_key": "mlb-statsapi-draft",
+   "bytes": 220,
+   "sha256": "7a13db90cd57a59448e134258ba526ae5c1a8a5b2ce9e4408b83c13170ed10f3",
+   "retrieved_at": "2026-10-21T01:39:36.226Z",
+   "content_type": "application/json;charset=UTF-8"
+  },
+  "mlb/draft/1965-nr.json": {
+   "url": "https://statsapi.mlb.com/api/v1/draft/1965?draftType=NR",
+   "source_key": "mlb-statsapi-draft",
+   "bytes": 220,
+   "sha256": "7a13db90cd57a59448e134258ba526ae5c1a8a5b2ce9e4408b83c13170ed10f3",
+   "retrieved_at": "2026-10-21T01:39:33.222Z",
+   "content_type": "application/json;charset=UTF-8"
+  },
+  "mlb/draft/1965-ns.json": {
+   "url": "https://statsapi.mlb.com/api/v1/draft/1965?draftType=NS",
+   "source_key": "mlb-statsapi-draft",
+   "bytes": 220,
+   "sha256": "7a13db90cd57a59448e134258ba526ae5c1a8a5b2ce9e4408b83c13170ed10f3",
+   "retrieved_at": "2026-10-21T01:39:34.731Z",
+   "content_type": "application/json;charset=UTF-8"
+  },
+  "mlb/draft/1985-al.json": {
+   "url": "https://statsapi.mlb.com/api/v1/draft/1985?draftType=AL",
+   "source_key": "mlb-statsapi-draft",
+   "bytes": 220,
+   "sha256": "841ee8995fe83249f3ab432f68386c701d7cd132893f20b2c0ea3dca696674fd",
+   "retrieved_at": "2026-10-21T01:39:48.239Z",
+   "content_type": "application/json;charset=UTF-8"
+  },
+  "mlb/draft/1985-jd.json": {
+   "url": "https://statsapi.mlb.com/api/v1/draft/1985?draftType=JD",
+   "source_key": "mlb-statsapi-draft",
+   "bytes": 220,
+   "sha256": "841ee8995fe83249f3ab432f68386c701d7cd132893f20b2c0ea3dca696674fd",
+   "retrieved_at": "2026-10-21T01:39:46.728Z",
+   "content_type": "application/json;charset=UTF-8"
+  },
+  "mlb/draft/1985-jr.json": {
+   "url": "https://statsapi.mlb.com/api/v1/draft/1985?draftType=JR",
+   "source_key": "mlb-statsapi-draft",
+   "bytes": 1117959,
+   "sha256": "85f4797c7643f7f4b03023eb871d4deb5333a27ad01aeb840434affd791e80cf",
+   "retrieved_at": "2026-10-21T01:39:41.071Z",
+   "content_type": "application/json;charset=UTF-8"
+  },
+  "mlb/draft/1985-js.json": {
+   "url": "https://statsapi.mlb.com/api/v1/draft/1985?draftType=JS",
+   "source_key": "mlb-statsapi-draft",
+   "bytes": 140395,
+   "sha256": "8d258e03c826dca5cadd4d330d79aa4a567ffb74bdbe29ccf050463bd94456d1",
+   "retrieved_at": "2026-10-21T01:39:45.252Z",
+   "content_type": "application/json;charset=UTF-8"
+  },
+  "mlb/draft/1985-nr.json": {
+   "url": "https://statsapi.mlb.com/api/v1/draft/1985?draftType=NR",
+   "source_key": "mlb-statsapi-draft",
+   "bytes": 443822,
+   "sha256": "6525b6743219989f2d586d547438e1ee6b0a6aa9c40deec740a1d67e1038b898",
+   "retrieved_at": "2026-10-21T01:39:42.425Z",
+   "content_type": "application/json;charset=UTF-8"
+  },
+  "mlb/draft/1985-ns.json": {
+   "url": "https://statsapi.mlb.com/api/v1/draft/1985?draftType=NS",
+   "source_key": "mlb-statsapi-draft",
+   "bytes": 93075,
+   "sha256": "43f15c3d533209fc9a81fe3c3245a27e8822c9b0ca40ffbbe39a34efda9ae058",
+   "retrieved_at": "2026-10-21T01:39:43.825Z",
+   "content_type": "application/json;charset=UTF-8"
+  },
+  "mlb/draft/2005-al.json": {
+   "url": "https://statsapi.mlb.com/api/v1/draft/2005?draftType=AL",
+   "source_key": "mlb-statsapi-draft",
+   "bytes": 220,
+   "sha256": "63bcbc94163c43130abd47f4c333911303ea75abb7187fe0d4c54d655ee5f1b2",
+   "retrieved_at": "2026-10-21T01:39:57.236Z",
+   "content_type": "application/json;charset=UTF-8"
+  },
+  "mlb/draft/2005-jd.json": {
+   "url": "https://statsapi.mlb.com/api/v1/draft/2005?draftType=JD",
+   "source_key": "mlb-statsapi-draft",
+   "bytes": 220,
+   "sha256": "63bcbc94163c43130abd47f4c333911303ea75abb7187fe0d4c54d655ee5f1b2",
+   "retrieved_at": "2026-10-21T01:39:55.727Z",
+   "content_type": "application/json;charset=UTF-8"
+  },
+  "mlb/draft/2005-jr.json": {
+   "url": "https://statsapi.mlb.com/api/v1/draft/2005?draftType=JR",
+   "source_key": "mlb-statsapi-draft",
+   "bytes": 2297854,
+   "sha256": "188465d02300b092f4d534c5779d02c80ecf4f94b98348687d1d7f322a26886e",
+   "retrieved_at": "2026-10-21T01:39:50.548Z",
+   "content_type": "application/json;charset=UTF-8"
+  },
+  "mlb/draft/2005-js.json": {
+   "url": "https://statsapi.mlb.com/api/v1/draft/2005?draftType=JS",
+   "source_key": "mlb-statsapi-draft",
+   "bytes": 220,
+   "sha256": "63bcbc94163c43130abd47f4c333911303ea75abb7187fe0d4c54d655ee5f1b2",
+   "retrieved_at": "2026-10-21T01:39:54.231Z",
+   "content_type": "application/json;charset=UTF-8"
+  },
+  "mlb/draft/2005-nr.json": {
+   "url": "https://statsapi.mlb.com/api/v1/draft/2005?draftType=NR",
+   "source_key": "mlb-statsapi-draft",
+   "bytes": 220,
+   "sha256": "63bcbc94163c43130abd47f4c333911303ea75abb7187fe0d4c54d655ee5f1b2",
+   "retrieved_at": "2026-10-21T01:39:51.229Z",
+   "content_type": "application/json;charset=UTF-8"
+  },
+  "mlb/draft/2005-ns.json": {
+   "url": "https://statsapi.mlb.com/api/v1/draft/2005?draftType=NS",
+   "source_key": "mlb-statsapi-draft",
+   "bytes": 220,
+   "sha256": "63bcbc94163c43130abd47f4c333911303ea75abb7187fe0d4c54d655ee5f1b2",
+   "retrieved_at": "2026-10-21T01:39:52.728Z",
+   "content_type": "application/json;charset=UTF-8"
+  }
+ }
+}

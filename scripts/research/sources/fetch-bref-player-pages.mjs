@@ -5,6 +5,8 @@
 //   node scripts/research/sources/fetch-bref-player-pages.mjs --ids luxga01,smithwi05 --before 20260325 --out <dir>
 import fs from 'node:fs'
 import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { loadCatalog, requireUse } from '../../history/lib/permissions.mjs'
 
 const argv = process.argv.slice(2)
 const arg = (k) => { const i = argv.indexOf(`--${k}`); return i >= 0 ? argv[i + 1] : null }
@@ -13,6 +15,9 @@ const out = arg('out')
 const before = arg('before')
 if (!ids.length || !out || !/^\d{8,14}$/.test(before ?? '')) throw new Error('--ids, --before YYYYMMDD[hhmmss] and --out are required')
 if (ids.length > 60) throw new Error('at most 60 ids per run (rate policy)')
+// Permission gate (research/history/sources.json): refused before any request unless bref-draft-archive grants fetch_targeted.
+const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..')
+try { requireUse(loadCatalog(repoRoot), 'bref-draft-archive', 'fetch_targeted', { requests: ids.length * 2 }, { root: repoRoot }) } catch (err) { console.error(`permission refused: ${err.message}`); process.exit(4) }
 fs.mkdirSync(out, { recursive: true })
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
 const manifestFile = path.join(out, 'manifest.json')
