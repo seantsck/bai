@@ -123,7 +123,32 @@ Never create or alter tables through the Dashboard. A hosted database must alway
     - drafts, selections, players, signings, coverage assessments and coverage cells unchanged.
   - **Production:** the live Vercel site (the earlier app) keeps working on the new schema. No historical records were
     imported.
-- **025 (attribution, historical lock, publication guard, exception review) is pending.** It is rehearsed, not deployed.
+- **025 (attribution, historical lock, publication guard, exception review) is deployed** (2026-10-21, after PR #13
+  merged at `43320d5`, from a clean `main`).
+  - **Rehearsals:** `hosted:rehearse` OK, plus a 15-check rehearsal:
+    - attribution groups for all 166 sources;
+    - public views readable as anon;
+    - existing research records unchanged;
+    - the guard refuses new MLB and Baseball-Reference records and repointed sources;
+    - existing records stay editable;
+    - the release register rejects years after 2014;
+    - private tables are unreadable by anon;
+    - exception evidence is refused.
+  - **Push and record:** dry run (025 only), push, then `hosted:migrate` recorded it.
+  - **After:**
+    - `hosted:refresh`;
+    - parity 0 differences over 2,751 objects (migrations 25/25);
+    - security OK (64 functions, 19 SECURITY DEFINER; none executable by public roles);
+    - pilot reconciliation OK;
+    - integrity 0 violations;
+    - Supabase advisors report no issues.
+  - **Preserved:** organizations, names, sources (apart from the generated column), selections, signings, bonuses,
+    WAR, observations and international signings are unchanged.
+  - **Historical lock** refuses a 1999 selection; no exception evidence, release or grant rows exist; certification
+    remains closed.
+  - **`hosted:verify` 10/11.** Its calendar-idempotence check re-runs 015's seed upsert. 025's guard fired BEFORE INSERT,
+    which PostgreSQL runs even for a conflicting (no-op) upsert row, so the re-seed was refused as a new publication.
+    026 fixes the guard (rehearsed on hosted; pending approval). The production release waits for 11/11.
 - `hosted:verify-pilot` compares only the pilot's own rows, so it keeps working as hosted gains other classes.
 
 ### Hosted-only migrations

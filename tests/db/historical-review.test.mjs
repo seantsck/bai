@@ -110,6 +110,16 @@ test('publication guard (hosted only): existing records stay readable; new MLB a
     await db.query(`insert into ingest.source_publication_grants (attribution_category, basis_reference, scope_note) values ('MLB', 'FIXTURE-AUTH-MLB', 'fixture authorization')`)
     assert.ok((await newPick(10, 'fx:mlb-api')).rows[0].id)
     await h.asRole(db, 'anon', () => assert.rejects(db.query('select * from ingest.source_publication_grants'), /permission denied/))
+    await db.query(`delete from ingest.source_publication_grants`)
+    // 026: a no-op upsert of an existing restricted-source record (re-running a reference seed) is not a new publication,
+    // and setting a record's source to the same value is not a change; a real insert through an upsert still is.
+    const existing = await h.one(db, `select id, draft_id, round_id, overall_pick, round_pick, organization_id, player_id, source_id from draft_selections where id = $1`, [local])
+    const upsert = (pick, player) => db.query(`insert into draft_selections (draft_id, round_id, overall_pick, round_pick, organization_id, player_id, source_id) values ($1, $2, $3, $3, $4, $5, $6)
+      on conflict (draft_id, player_id) do update set source_id = excluded.source_id`, [existing.draft_id, existing.round_id, pick, existing.organization_id, player, existing.source_id])
+    await upsert(existing.overall_pick, existing.player_id)
+    await db.query(`update draft_selections set source_id = source_id where id = $1`, [local])
+    await db.query(`insert into players (slug, full_name, display_name) values ('fixture-guard-upsert', 'Fixture Guard Upsert', 'Fixture Guard Upsert')`)
+    await assert.rejects(upsert(11, (await h.one(db, `select id from players where slug = 'fixture-guard-upsert'`)).id), /new MLB record/)
   } finally {
     await db.query('drop role supabase_admin')
     await db.query(`delete from ingest.source_publication_grants`)
