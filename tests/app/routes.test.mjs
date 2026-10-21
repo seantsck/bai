@@ -40,3 +40,14 @@ test('active nav matching', () => {
   assert.ok(isActive('/draft/picks', '/draft'))
   assert.ok(!isActive('/drafts', '/draft'))
 })
+
+test('.vercelignore never excludes app code or the CA file', () => {
+  const lines = fs.readFileSync(path.join(root, '.vercelignore'), 'utf8').split('\n').map((l) => l.trim()).filter((l) => l && !l.startsWith('#') && !l.startsWith('!'))
+  for (const l of lines) {
+    if (/^[A-Za-z]/.test(l) && !l.includes('*')) assert.fail(`unanchored directory pattern "${l}" would also match inside app/ (use /${l})`)
+  }
+  for (const route of PLANNED_ROUTES) {
+    for (const seg of route.split('/').filter(Boolean)) assert.ok(!lines.includes(seg), `${seg} would exclude app${route}`)
+  }
+  assert.ok(fs.readFileSync(path.join(root, '.vercelignore'), 'utf8').includes('!/supabase/prod-ca-2021.crt'))
+})

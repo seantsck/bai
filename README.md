@@ -94,6 +94,7 @@ npm run hosted:security                          # grants, RLS, functions, priva
 npm run hosted:verify                            # DB verification suite on hosted, fully rolled back
 npm run hosted:verify-pilot                      # pilot facts + reconciliation with research/baselines/
 npm run hosted:start                             # app on 127.0.0.1:3000 reading hosted as bai_web -> anon
+npm run deploy:web-env -- --target preview --confirm-hosted <ref>   # Vercel: store the web URL (see docs/vercel.md)
 ```
 
 Procedure, secret handling and platform differences: [docs/supabase.md](docs/supabase.md).

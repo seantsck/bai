@@ -1,0 +1,8 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "nextjs",
+  "installCommand": "npm ci",
+  "buildCommand": "npm run build",
+  "regions": ["yul1"],
+  "ignoreCommand": "if [ \"$VERCEL_ENV\" = production ]; then echo 'production releases are manual: vercel deploy --prod after review'; exit 0; fi; exit 1"
+}
