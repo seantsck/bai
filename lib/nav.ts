@@ -14,7 +14,7 @@ export const NAV_ITEMS: NavItem[] = [
 export const PLANNED_ROUTES = [
   '/',
   '/international', '/international/signings', '/international/classes', '/international/markets', '/international/trainers',
-  '/draft', '/draft/picks', '/draft/years', '/draft/schools',
+  '/draft', '/draft/picks', '/draft/explorer', '/draft/years', '/draft/schools',
   '/organizations', '/organizations/[slug]',
   '/players', '/players/[slug]',
   '/compare', '/research'
@@ -33,6 +33,7 @@ export const INTERNATIONAL_NAV: NavItem[] = [
 
 export const DRAFT_NAV: NavItem[] = [
   { href: '/draft/picks', label: 'Picks' },
-  { href: '/draft/years', label: 'Draft years' },
+  { href: '/draft/explorer', label: 'Historical explorer' },
+  { href: '/draft/years', label: 'Draft years & coverage' },
   { href: '/draft/schools', label: 'Schools & programs' }
 ]

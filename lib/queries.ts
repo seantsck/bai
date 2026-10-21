@@ -3,6 +3,7 @@
 //   * facts are simple indexed lookups with explicit LIMITs.
 // Nothing here touches analytics.* (the public role cannot) or builds nested analytical graphs.
 import { publicQuery } from './db.ts'
+import { buildExplorerQuery, type ExplorerFilters } from './search.ts'
 
 export const LIST_LIMIT = 200
 
@@ -114,3 +115,18 @@ export const getResearchCoverage = () =>
 // Queue sizes only; the work items themselves are internal.
 export const getResearchQueueSummary = () =>
   publicQuery('select queue_key, priority, description, open_items from rm_research_queue_summary order by priority, queue_key limit 50')
+
+// Historical explorer (024): one bounded, parameterized page of v_draft_explorer (PAGE_SIZE + 1 rows, no count).
+export const getDraftExplorer = (f: ExplorerFilters) => {
+  const { sql, params } = buildExplorerQuery(f)
+  return publicQuery(sql, params)
+}
+
+// Per-phase coverage counts from the refreshed read model (no rates). expected_selections is null unless every club that existed has a sourced census.
+export const getDraftYearCoverage = () =>
+  publicQuery(`select draft_key, draft_year, draft_kind, start_date, start_date_precision, clubs, clubs_with_census, expected_selections,
+      imported_selections, identities_resolved, signing_known, bonus_known, outcomes_audited
+    from rm_draft_year_coverage order by draft_year desc, draft_kind limit 400`)
+
+export const getOrganizationKeys = () =>
+  publicQuery('select franchise_key, current_name from organizations where active order by current_name limit 30')

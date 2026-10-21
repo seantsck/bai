@@ -74,7 +74,9 @@
     "hosted:verify-pilot": "node --env-file=.env.hosted.local scripts/research/pilot-verify.mjs --compare research/baselines/pilot-2015-lad.local.json",
     "hosted:start": "node --env-file=.env.hosted.local scripts/db/web-preflight.mjs && node --env-file=.env.hosted.local node_modules/next/dist/bin/next start -H 127.0.0.1",
     "check": "npm run lint && npm run typecheck && npm test && npm run build && git diff --check && npm run scan:credentials",
-    "deploy:web-env": "node --env-file=.env.hosted.local scripts/deploy/vercel-web-env.mjs"
+    "deploy:web-env": "node --env-file=.env.hosted.local scripts/deploy/vercel-web-env.mjs",
+    "history": "node --env-file-if-exists=.env.local scripts/history/cli.mjs",
+    "history:benchmark": "node --import ./tests/support/register-ts.mjs scripts/history/benchmark.mjs"
   },
   "dependencies": {
     "next": "16.4.2",

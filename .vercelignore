@@ -4,6 +4,7 @@
 !.env.example
 /.pgdata*
 /.vercel
+/.cache
 /research
 /tests
 /docs

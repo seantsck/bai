@@ -44,6 +44,12 @@ export const COVERAGE_STATE_LABELS: Record<string, { label: string, supportsRate
   UNKNOWN: { label: 'Unknown', supportsRates: false, description: 'Coverage has not been assessed.' }
 }
 
+// Draft phases (024). Historical years held several; June regular is the modern Rule 4 draft.
+export const KIND_LABELS: Record<string, string> = {
+  JUNE_AMATEUR: 'June (regular)', JANUARY_REGULAR: 'January (regular)', JANUARY_SECONDARY: 'January (secondary)',
+  JUNE_SECONDARY: 'June (secondary)', JUNE_SECONDARY_DELAYED: 'June (secondary, delayed)', AUGUST_LEGION: 'August (American Legion)'
+}
+
 export const SIGNING_STATUS_LABELS: Record<string, string> = {
   SIGNED: 'Signed',
   DID_NOT_SIGN: 'Did not sign',
