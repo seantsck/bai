@@ -73,15 +73,18 @@ the sources behind the records already on hosted are in [hosted-provenance.md](h
 A source whose `review_due` date has passed is refused until it is reviewed again. Permission to download never implies
 permission to publish.
 
-**Current decisions (reviewed 2026-10-21, due 2027-01-21).** These are proposals prepared in the audit, for the
-maintainer to confirm.
+**Current decisions (reviewed 2026-10-21, due 2027-01-21).** Tightened in Phase 9.3 at the maintainer's direction:
+"under review" is not permission for new publication.
 
 | Source | fetch_targeted | fetch_bulk | process_local | publish_repository | publish_site |
 |---|---|---|---|---|---|
-| MLB Stats API (draft feed, people, transactions) | PENDING | PENDING | LIMITED: 1965, 1985, 2005 (already cached) | PROHIBITED | LIMITED: 2015 on (status quo of the research program, under review); historical years refused |
+| MLB (Stats API, transaction wire, MLB.com, MiLB.com) | PENDING | PENDING | LIMITED: 1965, 1985, 2005 (already cached) | PROHIBITED | PENDING: no new publication in any year; existing hosted records preserved for review |
 | Chadwick register (ODC-BY) | CLEARED | CLEARED | CLEARED | CLEARED (attribution) | CLEARED (attribution) |
 | Wikipedia (CC BY-SA, facts) | CLEARED | LIMITED: 70 per run | CLEARED | CLEARED | CLEARED |
-| Baseball-Reference (live or via Internet Archive) | PENDING | PROHIBITED | LIMITED: 1965, 1985, 2005 (already cached) | PROHIBITED | LIMITED: 2015 on (status quo, under review); historical years refused |
+| BAI reference (BAI's own compilations; `bai-reference:` keys, type BAI_REFERENCE) | — (not downloadable) | — | CLEARED | CLEARED | CLEARED (any URL it cites must also be permitted) |
+| Verification fixtures (`verify:` keys, type TEST_FIXTURE) | — | — | CLEARED | CLEARED | CLEARED for rolled-back `hosted:verify` only; the database guard refuses them otherwise |
+| Anything else (news, Baseball America, FanGraphs, clubs) | not catalogued: **refused on hosted** until a person catalogues it with a permission basis | | | | |
+| Baseball-Reference (live or via Internet Archive) | PENDING | PROHIBITED | LIMITED: 1965, 1985, 2005 (already cached) | PROHIBITED | PENDING: no new publication; existing hosted observations, bonuses and WAR preserved for review |
 
 **Where each gate is enforced**
 - **Fetcher.** Every call names its source and use, and the URL must match that source's hosts and URL prefixes. A
@@ -219,6 +222,22 @@ npm run history:benchmark
 - **Groups** (`sources.attribution_category`, generated): MLB, Baseball-Reference, Chadwick Register, Wikipedia, BAI
   research (independent researcher observations and compilations), and other publications.
 
+## Publication guard for new records (025, hosted only)
+
+On a Supabase (hosted) database, a trigger on every table that cites a source refuses a **new** record that cites a
+source outside the openly licensed groups (Chadwick Register, Wikipedia, BAI research). That covers an insert, or a
+change of `source_id`. It applies to MLB, Baseball-Reference, other publications and test fixtures alike. A group opens
+only when a person records a row in `ingest.source_publication_grants`.
+
+- **Existing records are unaffected.** They stay readable on the public site and editable without changing their
+  source. Nothing is deleted or hidden while the rights review runs.
+- **A grant is not verified.** A grant row (like a historical release row) records what a person asserted; the database
+  cannot verify that a license exists.
+- **Local research databases** are not guarded.
+- **Two layers.** Together with the pipeline's fail-closed gate, which requires every cited source to be catalogued and
+  every matching entry by key or URL to grant `publish_site`, neither a script, a runbook, an alias key nor ad hoc SQL
+  can publish new restricted records by accident.
+
 ## Historical lock (025)
 
 A selection in a draft year before 2015 is refused by the database unless that year has a row in
@@ -228,6 +247,7 @@ deliberately released.
 
 - **Locally,** `history import --write` records its use as `local-research`.
 - **On hosted,** a release row is a decision a person makes after `publish_site` is granted, citing the authorization.
+  The row records that assertion; it does not mean a license has been independently verified.
 
 ## Exception review (private, 025)
 

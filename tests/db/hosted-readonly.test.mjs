@@ -72,7 +72,14 @@ after(async () => {
 /** Runs fn inside an outer transaction that is always rolled back. */
 async function isolated (fn) {
   await raw.query('begin')
-  try { return await fn() } finally { await raw.query('rollback') }
+  try {
+    // 025's publication guard refuses new records citing restricted source groups on hosted; the fictional fixtures here
+    // get an explicit grant inside this transaction, which the rollback removes with everything else.
+    if ((await raw.query("select to_regclass('ingest.source_publication_grants') is not null as ok")).rows[0].ok) {
+      await raw.query("insert into ingest.source_publication_grants (attribution_category, basis_reference, scope_note) values ('TEST_FIXTURE', 'hosted-verify', 'fictional fixtures inside a rolled-back verification transaction')")
+    }
+    return await fn()
+  } finally { await raw.query('rollback') }
 }
 const one = async (sql, p) => (await raw.query(sql, p)).rows[0]
 const rows = async (sql, p) => (await raw.query(sql, p)).rows
@@ -147,7 +154,7 @@ test('research-ingestion schema: private staging area, lifecycle enums, identity
   const t = await rows("select table_name from information_schema.tables where table_schema = 'ingest' order by 1")
   // 025 adds the historical-year release table; this suite also runs against hosted before 025 is deployed.
   const with025 = (await one("select to_regclass('research.history_exceptions') is not null as ok")).ok
-  assert.deepEqual(t.map((r) => r.table_name), [...(with025 ? ['historical_releases'] : []), 'import_batches', 'staged_records', 'staged_sources'])
+  assert.deepEqual(t.map((r) => r.table_name), [...(with025 ? ['historical_releases'] : []), 'import_batches', ...(with025 ? ['source_publication_grants'] : []), 'staged_records', 'staged_sources'])
   assert.equal((await one("select enum_range(null::ingest.identity_match_state)::text r")).r, '{EXACT_EXTERNAL_ID,EXACT_COMPOSITE,PROBABLE_MATCH,AMBIGUOUS,NO_MATCH,CONFLICT}')
   assert.equal((await one("select enum_range(null::ingest.apply_action)::text r")).r, '{INSERT,UPDATE_UNKNOWN,CORROBORATE,NO_CHANGE,CONFLICT,HELD}')
   assert.equal((await one("select count(*)::int n from conflict_rules")).n, 8)

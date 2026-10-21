@@ -98,3 +98,14 @@ selection and signing. The report's categories map onto the public groups as fol
 
 **Attribution is not a license.** The page says so explicitly, and states that BAI is independent and not affiliated
 with or endorsed by MLB. The rights questions above remain open whatever the page shows.
+
+## Phase 9.3: existing records preserved, new publication blocked
+
+- **Existing records.** Every MLB- and Baseball-Reference-sourced record already on hosted is preserved unchanged and
+  stays publicly readable for the rights review. That includes source observations, signing bonuses and WAR.
+- **New records.** Publishing new records from these sources needs an approved permission basis, recorded in two places:
+  - `publish_site` in `research/history/sources.json`, enforced by the pipeline;
+  - a row in `ingest.source_publication_grants`, enforced by the database on hosted.
+
+  "Under review" grants nothing.
+- **Historical years.** 1965–2014 stay locked in addition (`ingest.historical_releases`).

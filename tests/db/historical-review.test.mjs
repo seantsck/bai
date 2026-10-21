@@ -78,6 +78,44 @@ test('historical lock: a selection in a year before 2015 needs that year release
   await h.asRole(db, 'anon', () => assert.rejects(db.query('select * from ingest.historical_releases'), /permission denied/))
 })
 
+test('publication guard (hosted only): existing records stay readable; new MLB and Baseball-Reference records are refused without a recorded basis', async () => {
+  // Players carry no source_id; each pick gets its own fictional player.
+  const newPick = async (pick, sourceKey) => {
+    await db.query(`insert into players (slug, full_name, display_name) values ($1, $2, $2) on conflict do nothing`, [`fixture-guard-${pick}`, `Fixture Guard ${pick}`])
+    return db.query(`insert into draft_selections (draft_id, round_id, overall_pick, round_pick, organization_id, player_id, source_id)
+      select d.id, r.id, $1, $1, (select id from organizations where franchise_key = 'KC'), (select id from players where slug = $3), (select id from sources where source_key = $2)
+      from drafts d join draft_rounds r on r.draft_id = d.id and r.round_code = '1' where d.draft_key = '2019-JUNE_AMATEUR' returning id`, [pick, sourceKey, `fixture-guard-${pick}`])
+  }
+  // A local research database is not guarded.
+  const local = (await newPick(3, 'fx:mlb-api')).rows[0].id
+  await db.query('create role supabase_admin nologin')   // what makes a database a Supabase (hosted) one
+  try {
+    // Existing MLB- and Baseball-Reference-sourced records: readable by the public site, and editable without changing their source.
+    await h.asRole(db, 'anon', async () => {
+      const r = await h.rows(db, `select a.selection_source_category, a.signing_source_category from v_selection_attribution a where a.selection_id in (select id from draft_selections where player_id in (select id from players where slug like 'fixture-%'))`)
+      assert.ok(r.some((x) => x.selection_source_category === 'MLB' && x.signing_source_category === 'BASEBALL_REFERENCE'))
+    })
+    await db.query(`update draft_selections set position = 'RHP' where id = $1`, [local])
+    // New records citing them are refused, by insert or by repointing a record's source.
+    await assert.rejects(newPick(4, 'fx:mlb-api'), /a new MLB record cannot be published on this database without a recorded permission basis/)
+    await assert.rejects(newPick(5, 'fx:mlbcom-archive'), /new MLB record/)
+    await assert.rejects(db.query(`insert into draft_signings (draft_selection_id, signing_status, signing_bonus_usd, source_id) values ($1, 'SIGNED', 1000, (select id from sources where source_key = 'fx:bref'))`, [local]), /new BASEBALL_REFERENCE record/)
+    await assert.rejects(db.query(`insert into source_observations (source_id, subject_table, subject_id, field_name, observed_value) values ((select id from sources where source_key = 'fx:bref'), 'draft_selections', $1, 'position', '"LHP"')`, [local]), /new BASEBALL_REFERENCE record/)
+    await assert.rejects(newPick(6, 'fx:news'), /new OTHER_PUBLICATION record/)
+    const wiki = (await newPick(7, 'fx:wiki')).rows[0].id
+    await assert.rejects(db.query(`update draft_selections set source_id = (select id from sources where source_key = 'fx:mlb-api') where id = $1`, [wiki]), /new MLB record/)
+    // Openly licensed and BAI's own sources need no grant; a recorded basis (a person's assertion, not verified) opens a group.
+    assert.ok((await newPick(8, 'fx:chadwick')).rows[0].id)
+    assert.ok((await newPick(9, 'fx:bai')).rows[0].id)
+    await db.query(`insert into ingest.source_publication_grants (attribution_category, basis_reference, scope_note) values ('MLB', 'FIXTURE-AUTH-MLB', 'fixture authorization')`)
+    assert.ok((await newPick(10, 'fx:mlb-api')).rows[0].id)
+    await h.asRole(db, 'anon', () => assert.rejects(db.query('select * from ingest.source_publication_grants'), /permission denied/))
+  } finally {
+    await db.query('drop role supabase_admin')
+    await db.query(`delete from ingest.source_publication_grants`)
+  }
+})
+
 async function loadFixtureException (key, kind) {
   const e = await h.one(db, `insert into research.history_exceptions (exception_key, draft_year, phase, franchise_key, kind, summary, effect, resolution_needs, register_sha256, loaded_by)
     values ($1, 1990, 'JR', 'KC', $2, 'Fixture: source A lists Fixture Able at #12, source B lists Fixture Baker', 'Class partial.', 'A third source.', $3, 'fixture-loader') returning id, status`, [key, kind, 'a'.repeat(64)])

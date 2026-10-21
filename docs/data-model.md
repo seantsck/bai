@@ -316,7 +316,7 @@ Every fact table above, apart from identity and lookup tables, also references `
   `v_draft_year_coverage` is internal). Public views call no functions.
 - Details: [history/README.md](history/README.md).
 
-### Attribution, historical lock and exception review (025)
+### Attribution, historical lock, publication guard and exception review (025)
 
 - **Attribution.**
   - `sources.attribution_category` is generated from each source's type, URL and publisher: MLB, BASEBALL_REFERENCE,
@@ -325,7 +325,12 @@ Every fact table above, apart from identity and lookup tables, also references `
   - `v_selection_attribution` (public) gives each selection's and signing's group.
   - Attribution is not a statement of redistribution rights.
 - **Historical lock.** `ingest.historical_releases`, with the `draft_selections_historical_guard` trigger: a selection in
-  a draft year before 2015 is refused unless that year is released on that database, with an authorization reference.
+  a draft year before 2015 is refused unless that year is released on that database, with an authorization reference. A
+  release records an asserted authorization; the database does not verify a license.
+- **Publication guard (hosted only).** `ingest.source_publication_grants`, with a `<table>_publication_guard` trigger on
+  every table that cites a source (except `fact_resolutions`): on a Supabase database, a new record or a changed
+  `source_id` citing a group other than Chadwick Register, Wikipedia or BAI research is refused unless that group has a
+  recorded basis. Existing records are untouched.
 - **Exception review.** `research.history_exceptions`, `_claims`, `_proposals`, `_decisions`, `_events` and
   `_conclusions`. All are private and append-only:
   - claims are immutable;

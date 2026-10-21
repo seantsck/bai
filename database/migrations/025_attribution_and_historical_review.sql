@@ -17,7 +17,13 @@
 --   4. ingest.historical_releases + a trigger on draft_selections: a selection in a historical draft year (before 2015) is
 --      refused unless that year has been released on this database with an authorization reference. Defense in depth
 --      under the importer's permission gates (scripts/history/lib/permissions.mjs): no import path, script or ad hoc SQL
---      can put historical selections on a database where the year was not deliberately released.
+--      can put historical selections on a database where the year was not deliberately released. A release row records
+--      that a person asserted an authorization; the database does not, and cannot, verify that a license exists.
+--   4b. ingest.source_publication_grants + a guard on every table that cites a source: on a Supabase (hosted) database a
+--      NEW record (insert, or a changed source_id) citing a source outside the openly licensed groups (Chadwick Register,
+--      Wikipedia, BAI research) is refused unless that group has a recorded permission basis. Existing records are
+--      untouched and stay readable: nothing is deleted or hidden, they wait for the rights review. Local research
+--      databases are not affected.
 --   5. research.history_exceptions and friends: the private exception-review workflow. Exceptions keep their source
 --      claims and evidence; anyone may propose a conclusion; only an enrolled human reviewer, in their own authenticated
 --      session (research.require_reviewer, 021), records a decision. Everything is append-only and logged. A decision
@@ -110,7 +116,7 @@ create table ingest.historical_releases (
   released_by name not null default session_user,
   released_at timestamptz not null default now()
 );
-comment on table ingest.historical_releases is 'Draft years before 2015 released on THIS database (025). On hosted, a row is a deliberate, recorded decision citing the authorization that permits publishing that year (research/history/sources.json); locally, the importer records its local research use.';
+comment on table ingest.historical_releases is 'Draft years before 2015 released on THIS database (025). On hosted, a row is a deliberate, recorded decision citing the authorization a person asserts permits publishing that year (research/history/sources.json); the database does not verify that a license exists. Locally, the importer records its local research use.';
 
 create function public.draft_selection_historical_guard() returns trigger
 language plpgsql
@@ -128,6 +134,48 @@ begin
 end $$;
 create trigger draft_selections_historical_guard before insert or update of draft_id on public.draft_selections
   for each row execute function public.draft_selection_historical_guard();
+
+-- ---------------------------------------------------------------------------------------------------------------
+-- 4b. Publication guard for new source-derived records (hosted only)
+-- ---------------------------------------------------------------------------------------------------------------
+
+create table ingest.source_publication_grants (
+  attribution_category text primary key check (attribution_category in ('MLB', 'BASEBALL_REFERENCE', 'OTHER_PUBLICATION', 'TEST_FIXTURE')),
+  basis_reference text not null check (btrim(basis_reference) <> ''),
+  scope_note text not null check (btrim(scope_note) <> ''),
+  granted_by name not null default session_user,
+  granted_at timestamptz not null default now()
+);
+comment on table ingest.source_publication_grants is 'A recorded permission basis for publishing NEW records of a source group on this database (025). A row records what a person asserted (an authorization, a legal review); the database does not verify it. Chadwick Register, Wikipedia and BAI research need none.';
+
+create function public.source_publication_guard() returns trigger
+language plpgsql
+set search_path = pg_catalog, public, ingest
+as $$
+declare
+  cat text;
+begin
+  if not exists (select 1 from pg_roles where rolname = 'supabase_admin') then return new; end if;   -- hosted (Supabase) only
+  if new.source_id is null then return new; end if;
+  select attribution_category into cat from public.sources where id = new.source_id;
+  if cat in ('CHADWICK_REGISTER', 'WIKIPEDIA', 'BAI_RESEARCH') then return new; end if;
+  if not exists (select 1 from ingest.source_publication_grants g where g.attribution_category = cat) then
+    raise exception 'a new % record cannot be published on this database without a recorded permission basis (ingest.source_publication_grants); existing records are unaffected', coalesce(cat, 'uncategorized')
+      using errcode = 'insufficient_privilege';
+  end if;
+  return new;
+end $$;
+
+do $$
+declare
+  t text;
+begin
+  for t in select c.table_name from information_schema.columns c join information_schema.tables x using (table_schema, table_name)
+           where c.table_schema = 'public' and c.column_name = 'source_id' and x.table_type = 'BASE TABLE' and c.table_name <> 'fact_resolutions' order by 1
+  loop
+    execute format('create trigger %I before insert or update of source_id on public.%I for each row execute function public.source_publication_guard()', t || '_publication_guard', t);
+  end loop;
+end $$;
 
 -- ---------------------------------------------------------------------------------------------------------------
 -- 5. Historical exception review (private)
@@ -437,9 +485,10 @@ alter table research.history_exception_proposals enable row level security;
 alter table research.history_exception_decisions enable row level security;
 alter table research.history_exception_events enable row level security;
 alter table ingest.historical_releases enable row level security;
+alter table ingest.source_publication_grants enable row level security;
 select public.apply_public_boundary();
 revoke all on all tables in schema research from public, anon, authenticated, service_role;
 revoke all on all sequences in schema research from public, anon, authenticated, service_role;
 revoke all on all functions in schema research from public, anon, authenticated, service_role;
-revoke all on ingest.historical_releases from public, anon, authenticated, service_role;
+revoke all on ingest.historical_releases, ingest.source_publication_grants from public, anon, authenticated, service_role;
 grant execute on function research.decide_history_exception(text, research.history_exception_decision, text, text, bigint, jsonb) to bai_reviewer;

@@ -123,7 +123,7 @@ Never create or alter tables through the Dashboard. A hosted database must alway
     - drafts, selections, players, signings, coverage assessments and coverage cells unchanged.
   - **Production:** the live Vercel site (the earlier app) keeps working on the new schema. No historical records were
     imported.
-- **025 (attribution, historical lock, exception review) is pending.** It is rehearsed, not deployed.
+- **025 (attribution, historical lock, publication guard, exception review) is pending.** It is rehearsed, not deployed.
 - `hosted:verify-pilot` compares only the pilot's own rows, so it keeps working as hosted gains other classes.
 
 ### Hosted-only migrations
