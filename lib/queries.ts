@@ -130,3 +130,11 @@ export const getDraftYearCoverage = () =>
 
 export const getOrganizationKeys = () =>
   publicQuery('select franchise_key, current_name from organizations where active order by current_name limit 30')
+
+// Public attribution (025): records and field observations per source group and domain. Counts only.
+export const getSourceAttribution = () =>
+  publicQuery('select attribution_category, domain, records, sources from v_source_attribution order by attribution_category, domain limit 200')
+
+// Attribution groups of the selections on one explorer page (025). Bounded by the page size; ids are integers.
+export const getSelectionAttribution = (ids: number[]) =>
+  ids.length ? publicQuery('select selection_id, selection_source_category, signing_source_category from v_selection_attribution where selection_id = any ($1::bigint[]) limit 100', [ids.filter((n) => Number.isInteger(n)).slice(0, 100)]) : Promise.resolve([])

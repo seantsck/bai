@@ -14,7 +14,10 @@ export default function RootLayout ({ children }: { children: ReactNode }) {
       <body>
         <Nav />
         <main>{children}</main>
-        <footer>Public data only · missing is not zero · unaudited is not failed · tracked is not the complete population</footer>
+        <footer>
+          <p>Public data only · missing is not zero · unaudited is not failed · tracked is not the complete population</p>
+          <p>BAI is an independent research project, not affiliated with or endorsed by Major League Baseball, MLB Advanced Media or any club. Sources are credited on <a href='/sources'>Sources &amp; methodology</a>.</p>
+        </footer>
       </body>
     </html>
   )

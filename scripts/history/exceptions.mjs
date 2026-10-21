@@ -9,6 +9,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { loadCatalog, requireUse } from './lib/permissions.mjs'
+import { BREF_TEAM_CODES } from './lib/evidence.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 const OUT = path.resolve(root, process.env.BAI_HISTORY_OUT || '.restricted/history')
@@ -65,8 +66,40 @@ for (const year of years) {
   }
 }
 for (const m of MANUAL) if (years.includes(m.year)) register.push(m)
-const entries = register.map((e) => ({ ...e, status: 'UNRESOLVED', decided_by: null, decided_on: null, decision: null }))
+// Review kind (research.history_exception_kind, 025) and evidence locators (cached files with their checksums, so a
+// reviewer can re-read exactly what each source said).
+const manifest = JSON.parse(fs.readFileSync(path.join(root, 'research/history/manifest.json'), 'utf8')).entries
+const surname = (s) => String(s).replace(/^\d+\s+|^#\d+\s+/, '').trim().split(/\s+/).at(-1).toLowerCase().normalize('NFD').replace(/[^a-z]/g, '')
+const editDistance = (a, b) => { const d = Array.from({ length: a.length + 1 }, (_, i) => [i, ...Array(b.length).fill(0)]); for (let j = 1; j <= b.length; j++) d[0][j] = j
+  for (let i = 1; i <= a.length; i++) for (let j = 1; j <= b.length; j++) d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)); return d[a.length][b.length] }
+function reviewKind (e) {
+  switch (e.kind) {
+    case 'SAME_PERSON_TWICE': return 'SAME_PERSON_MULTIPLE_SELECTIONS'
+    case 'LISTS_DIFFER_COUNT': return 'MISSING_SELECTION'
+    case 'LISTS_DIFFER_SAME_COUNT': {
+      // Same count, one unmatched name each side: a spelling if the surnames are within two edits, otherwise a different player.
+      const a = (e.claims[0].says.match(/not on the other list: (.*)$/) ?? [])[1] ?? ''
+      const b = (e.claims[1]?.says.match(/not matched to the feed: (.*)$/) ?? [])[1] ?? ''
+      return editDistance(surname(a), surname(b)) <= 2 ? 'ALTERNATE_NAME' : 'DIFFERENT_PLAYER_SAME_PICK'
+    }
+    case 'NAME_VARIANTS': return 'ALTERNATE_NAME'
+    case 'PICK_NUMBERING_DIFFERS': return 'NUMBERING_DISAGREEMENT'
+    case 'CROSSWALK_UNMATCHED': return 'CROSSWALK_UNMATCHED'
+    case 'CENSUS_TOTAL_DISAGREES': return 'CENSUS_TOTAL_DISAGREEMENT'
+    default: return 'CONFLICTING_IDENTITY'
+  }
+}
+const teamCodes = (fk) => Object.entries(BREF_TEAM_CODES).filter(([, v]) => v === fk).map(([k]) => k.toLowerCase())
+function evidenceFor (e) {
+  const out = []
+  const add = (prefix, source) => { for (const [k, v] of Object.entries(manifest)) if (k.startsWith(prefix)) out.push({ source, cache_key: k, sha256: v.sha256, url: v.url }) }
+  if (e.phase) add(`mlb/draft/${e.year}-${e.phase.toLowerCase()}.json`, 'mlb-statsapi-draft')
+  if (/LIST|NAMES|NUMBERING/.test(e.id)) for (const t of e.club ? teamCodes(e.club) : ['']) add(`archive/bref/${e.year}/${(e.phase ?? '').toLowerCase()}-${t}`, 'bref-draft-archive')
+  if (/CROSSWALK/.test(e.id)) add('chadwick/', 'chadwick-register')
+  return out
+}
+const entries = register.map((e) => ({ ...e, review_kind: reviewKind(e), evidence: evidenceFor(e), status: 'UNRESOLVED', decided_by: null, decided_on: null, decision: null }))
 fs.writeFileSync(path.join(OUT, 'exceptions.json'), JSON.stringify({ format: 'bai-history-exceptions/1', note: 'Restricted: quotes source-derived names. Never resolved automatically.', years, entries }, null, 1) + '\n')
 const byKind = entries.reduce((a, e) => ({ ...a, [e.kind]: (a[e.kind] ?? 0) + 1 }), {})
 console.log(`${entries.length} unresolved exception(s) for ${years.join(', ')}:`, byKind)
-for (const e of entries) console.log(`  ${e.id}  ${e.kind}${e.count ? ` (${e.count})` : ''}`)
+for (const e of entries) console.log(`  ${e.id}  ${e.review_kind}${e.count ? ` (${e.count})` : ''}, ${e.evidence.length} evidence file(s)`)

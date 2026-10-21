@@ -204,6 +204,83 @@ npm run history:benchmark
 - **Security.** It runs on the same read-only path as every page: `bai_web` → `anon`, a read-only transaction and a
   3-second statement timeout.
 
+## Attribution and methodology (025)
+
+- **`/sources` (public)** carries:
+  - the independence statement (BAI is not affiliated with or endorsed by MLB, MLB Advanced Media, any club or any
+    source);
+  - the sourcing rules;
+  - each source group, with what BAI takes from it, its credit line, and the records and observations citing it
+    (`v_source_attribution`);
+  - a rights note: crediting a source is not a license to redistribute it.
+- **Every page footer** repeats the independence statement.
+- **The explorer** shows each row's source group, for the selection and its signing (`v_selection_attribution`). Before
+  025 is deployed the column shows a dash, and the explorer itself is unaffected.
+- **Groups** (`sources.attribution_category`, generated): MLB, Baseball-Reference, Chadwick Register, Wikipedia, BAI
+  research (independent researcher observations and compilations), and other publications.
+
+## Historical lock (025)
+
+A selection in a draft year before 2015 is refused by the database unless that year has a row in
+`ingest.historical_releases` (`authorization_reference`, `scope_note`, `released_by`). This is defense in depth under the
+permission gates: no script, runbook or ad hoc SQL can put historical selections on a database where the year was not
+deliberately released.
+
+- **Locally,** `history import --write` records its use as `local-research`.
+- **On hosted,** a release row is a decision a person makes after `publish_site` is granted, citing the authorization.
+
+## Exception review (private, 025)
+
+The importer's disagreements are reviewed in a local research database, never in Git or on hosted.
+
+```bash
+node scripts/history/exceptions.mjs                       # rebuild the restricted register from the build reports
+npm run history:review -- load --propose-rules            # load into the local database (refuses non-local)
+npm run history:review -- list [--status OPEN] [--kind ALTERNATE_NAME]
+npm run history:review -- show --key EX-2005-JR-PHI-LIST  # claims, evidence (cache key + SHA-256), proposals, decisions, events
+npm run history:review -- conclusions --kind MISSING_SELECTION
+npm run history:review -- propose --key <EX-...> --conclusion <C> --rationale "<why>" --by <name>   # or --agent <name>
+npm run history:review -- decide --key <EX-...> --decision ACCEPT_PROPOSAL --proposal <id> --rationale "<why>"   # reviewer login
+```
+
+**Kinds:**
+- conflicting identities;
+- missing selections;
+- different players at the same pick;
+- one person selected more than once;
+- alternate names;
+- numbering disagreements;
+- unmatched crosswalk ids;
+- census-total disagreements.
+
+Each kind has its own list of allowed conclusions.
+
+**Who does what**
+- **Anyone, including an agent, may propose.** `--agent` records `agent:<name>`, and rule-based proposals are
+  `agent:history-review-rules`.
+- **Only an enrolled human reviewer, on their own login** (`BAI_REVIEWER_DATABASE_URL`), decides:
+  - accept or reject a proposal;
+  - decide directly;
+  - ask for more evidence;
+  - reopen a decided exception.
+- **Owner and automation sessions are refused** by the database.
+
+**History is append-only:** claims, proposals, decisions and events.
+
+**A decision is a judgment, not a correction.** A fix it calls for goes through the research pipeline as a sourced
+batch. Decisions have nothing to do with certification, which stays behind its own gate.
+
+**Status on 2026-10-21:**
+- all 24 pilot exception groups are loaded locally, each with its source claims, evidence locators and a proposed
+  conclusion (agent rules, deliberately cautious: `UNDETERMINED` where the evidence in hand cannot settle a case);
+- none is decided.
+
+## Preflight
+
+`npm run history -- preflight --years 2006-2010 [--target local|hosted]` lists every grant a batch needs, year by year,
+without any request or write. It exits with code 4 while any is refused. The first expansion batch is planned in
+[batch-h1a-2006-2010.md](batch-h1a-2006-2010.md).
+
 ## Tests
 
 - **`tests/db/historical-drafts.test.mjs`:**
@@ -226,5 +303,13 @@ npm run history:benchmark
   - restricted batches refused for `publish_site`;
   - the publication check on fixtures and on the real repository;
   - the CLI exiting with code 4 on restricted downloads.
+- **`tests/db/historical-review.test.mjs`** (025, fictional data):
+  - attribution groups, and the public summary and per-selection views as anon;
+  - the historical lock;
+  - immutable claims, proposals by anyone, decisions only in a reviewer session (owner, automation and direct inserts
+    refused);
+  - conclusions per kind, status transitions, append-only history and withdrawal;
+  - privacy from anon, refusal on a Supabase database;
+  - no canonical change, and certification untouched.
 - **`tests/app/search.test.mjs` and `public-queries.test.mjs`:** filter whitelisting, parameterization, pagination, and
   explorer and coverage queries as anon. The name normalizer is checked against the database.

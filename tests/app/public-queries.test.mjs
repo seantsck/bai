@@ -94,3 +94,12 @@ test('historical explorer and year coverage run as anon; name normalization matc
     assert.equal(normalizeName(name), n, name)
   }
 })
+
+test('source attribution runs as anon: groups only, no test fixtures, per-selection lookup bounded', async () => {
+  const groups = await q.getSourceAttribution()
+  const known = new Set(['MLB', 'BASEBALL_REFERENCE', 'CHADWICK_REGISTER', 'WIKIPEDIA', 'BAI_RESEARCH', 'OTHER_PUBLICATION'])
+  assert.ok(groups.every((r) => known.has(r.attribution_category)), JSON.stringify(groups))
+  assert.deepEqual(await q.getSelectionAttribution([]), [])
+  const rows = await q.getSelectionAttribution([1, 2, 3, 1.5])
+  assert.ok(Array.isArray(rows) && rows.length <= 3)
+})

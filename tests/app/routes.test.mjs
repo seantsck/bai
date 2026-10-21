@@ -7,8 +7,8 @@ import { NAV_ITEMS, PLANNED_ROUTES, isActive } from '../../lib/nav.ts'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 
-test('navigation is Overview, International, Draft, Organizations, Players, Compare, Research', () => {
-  assert.deepEqual(NAV_ITEMS.map((n) => n.label), ['Overview', 'International', 'Draft', 'Organizations', 'Players', 'Compare', 'Research'])
+test('navigation is Overview, International, Draft, Organizations, Players, Compare, Research, Sources', () => {
+  assert.deepEqual(NAV_ITEMS.map((n) => n.label), ['Overview', 'International', 'Draft', 'Organizations', 'Players', 'Compare', 'Research', 'Sources'])
 })
 
 test('every planned route has an App Router page', () => {

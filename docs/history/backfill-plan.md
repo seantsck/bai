@@ -186,4 +186,7 @@ record-by-record hosted backfill would take weeks (the Wave 2 replay ran at abou
 - `fetch_bulk` and `process_local` for MLB's feed for 2006–2010, which needs written MLBAM authorization;
 - an independent per-club source for census claims. Without one, every class stays a partial reconstruction.
 
-Work that needs no new source permission is listed in [README.md](README.md#what-can-proceed-without-new-permissions).
+The batch is fully prepared, with expected records, storage, permissions, costs, compute, reconciliation workload,
+deployment steps and stop conditions, in [batch-h1a-2006-2010.md](batch-h1a-2006-2010.md). `npm run history -- preflight
+--years 2006-2010` lists every grant it still needs. Work that needs no new source permission is listed in
+[README.md](README.md#what-can-proceed-without-new-permissions).

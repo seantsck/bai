@@ -315,3 +315,24 @@ Every fact table above, apart from identity and lookup tables, also references `
   normalized player and school names, `rm_draft_year_coverage` (per-phase counts, refreshed offline; the aggregate view
   `v_draft_year_coverage` is internal). Public views call no functions.
 - Details: [history/README.md](history/README.md).
+
+### Attribution, historical lock and exception review (025)
+
+- **Attribution.**
+  - `sources.attribution_category` is generated from each source's type, URL and publisher: MLB, BASEBALL_REFERENCE,
+    CHADWICK_REGISTER, WIKIPEDIA, BAI_RESEARCH, OTHER_PUBLICATION (or TEST_FIXTURE).
+  - `v_source_attribution` (public) counts the records and field observations citing each group, by domain.
+  - `v_selection_attribution` (public) gives each selection's and signing's group.
+  - Attribution is not a statement of redistribution rights.
+- **Historical lock.** `ingest.historical_releases`, with the `draft_selections_historical_guard` trigger: a selection in
+  a draft year before 2015 is refused unless that year is released on that database, with an authorization reference.
+- **Exception review.** `research.history_exceptions`, `_claims`, `_proposals`, `_decisions`, `_events` and
+  `_conclusions`. All are private and append-only:
+  - claims are immutable;
+  - anyone proposes;
+  - only `research.decide_history_exception` decides, in an enrolled reviewer's own session;
+  - status moves only through proposals and decisions;
+  - on a Supabase database the evidence tables refuse rows.
+
+  A decision changes no canonical fact and has no bearing on certification.
+- Details: [history/README.md](history/README.md).
