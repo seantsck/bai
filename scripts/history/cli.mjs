@@ -10,6 +10,7 @@
 //   build           --year 1985 [--orgs LAD,WSH] [--phases JR]                            write batches + report (deterministic, offline)
 //   import          --year 1985 [--orgs LAD,WSH] [--phases JR] [--write] [--no-plan]      stage, validate, dry-run / apply; resumable
 //   status          [--from 1965 --to 2026]                                               per-phase coverage (counts only)
+//   preflight       --years 2006-2010 [--target local|hosted]                            every permission a batch needs (no network, no writes)
 //   (scripts/history/benchmark.mjs: synthetic 1965-2026 scale benchmark in a disposable database)
 //
 // Safety:
@@ -29,7 +30,7 @@ import { ownerDatabaseUrl, isLocalUrl } from '../db/lib/connection.mjs'
 import * as P from '../research/lib/pipeline.mjs'
 import * as B from '../research/lib/backfill.mjs'
 import { createFetcher, BudgetExhausted } from './lib/fetch.mjs'
-import { loadCatalog, requireUse, requireBatchUse, requireHostedPublication, PermissionDenied } from './lib/permissions.mjs'
+import { loadCatalog, checkUse, requireUse, requireBatchUse, requireHostedPublication, PermissionDenied } from './lib/permissions.mjs'
 import { PHASES, normalizePhase, draftKey } from './lib/mlb.mjs'
 import { SHARDS, indexShard } from './lib/chadwick.mjs'
 import { buildPhaseBatches } from './lib/build.mjs'
@@ -233,6 +234,9 @@ const COMMANDS = {
         // Checkpoint: an APPLIED batch with the same file checksum is skipped (stageFile recognises it).
         const { batch, already } = await P.stageFile(db, path.join(dir, file), { operator: OPERATOR, organization: org })
         if (already && batch.status === 'APPLIED') { log(`${doc.batch_key}: already applied (checkpoint)`); continue }
+        // Historical years are locked per database (025). withDb allows writes only to local databases, where the importer
+        // records its local research use; a hosted release is a separate, deliberate decision (docs/history/README.md).
+        if (write && year < 2015) await db.query(`insert into ingest.historical_releases (draft_year, authorization_reference, scope_note) values ($1, 'local-research', 'local research database: restricted, not for publication') on conflict (draft_year) do nothing`, [year])
         const { cls } = await B.createClass(db, { org, channel: 'draft', year, kind }, { actor: OPERATOR })
         await B.linkImport(db, cls.class_key, batch.id, { actor: OPERATOR })
         const v = await P.validateBatch(db, batch.id)
@@ -258,6 +262,34 @@ const COMMANDS = {
       fs.mkdirSync(path.join(OUT, 'reports'), { recursive: true })
       fs.writeFileSync(path.join(OUT, 'reports', `${year}-import-timings.json`), JSON.stringify({ year, batches: timings, total }, null, 1) + '\n')
     }
+  },
+
+  // Every grant a batch for these years needs, checked without any request or write. Exit 4 if anything is refused.
+  async preflight () {
+    const spec = opt('years', opt('year', ''))
+    const [a, b] = spec.includes('-') ? spec.split('-').map(Number) : [Number(spec), Number(spec)]
+    if (!(a >= 1965 && b >= a && b <= 2100)) throw new Error('--years 2006-2010 (or --year 2006) is required')
+    const target = opt('target', 'hosted')
+    const steps = [
+      ['mlb-statsapi-draft', 'fetch_bulk', 'discover each phase (fetch-draft)'],
+      ['mlb-statsapi-draft', 'process_local', 'build and import locally'],
+      ['chadwick-register', 'process_local', 'identity crosswalk'],
+      ['wikipedia-draft-articles', 'fetch_bulk', 'calendar dates and totals'],
+      ['bref-draft-archive', 'fetch_targeted', 'independent per-club lists (census claims)'],
+      ['bref-draft-archive', 'process_local', 'compare lists'],
+      ...(target === 'hosted' ? [['mlb-statsapi-draft', 'publish_site', 'publish to hosted'], ['chadwick-register', 'publish_site', 'publish ids to hosted'], ['bref-draft-archive', 'publish_site', 'publish census corroboration to hosted']] : [])
+    ]
+    const rows = []
+    for (let y = a; y <= b; y++) {
+      for (const [src, use, why] of steps) {
+        const r = checkUse(catalog, src, use, { year: y, requests: 1 }, { root })
+        rows.push({ year: y, source: src, use, for: why, allowed: r.ok ? 'yes' : 'NO', state: r.state, reason: r.ok ? '' : r.reason.replace(/^[^:]+: [a-z_]+ refused: /, '').slice(0, 90) })
+      }
+    }
+    const refused = rows.filter((r) => r.allowed === 'NO')
+    console.table(rows.map(({ year, source, use, allowed, state, reason }) => ({ year, source, use, allowed, state, reason })))
+    console.log(`${target === 'hosted' ? 'hosted also needs: ingest.historical_releases rows for each year (025), citing the authorization; a runner in ca-central-1.\n' : ''}${refused.length} of ${rows.length} grants refused for ${a}-${b} (${target}).`)
+    if (refused.length) process.exitCode = 4
   },
 
   async status () {
@@ -306,7 +338,7 @@ async function evidenceFor (year, code, picks, organizations) {
 }
 
 if (!COMMANDS[command]) {
-  console.error('usage: scripts/history/cli.mjs <fetch-draft|fetch-crosswalk|fetch-evidence|calendar|build|import|status> [options]')
+  console.error('usage: scripts/history/cli.mjs <fetch-draft|fetch-crosswalk|fetch-evidence|calendar|build|import|status|preflight> [options]')
   process.exit(1)
 }
 try {

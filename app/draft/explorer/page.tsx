@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { PageHeader, SubNav, DataTable, Notice, load, Unavailable } from '../../../components/ui.tsx'
-import { getDraftExplorer, getOrganizationKeys } from '../../../lib/queries.ts'
-import { formatUsd, label, KIND_LABELS, SIGNING_STATUS_LABELS } from '../../../lib/format.ts'
+import { getDraftExplorer, getOrganizationKeys, getSelectionAttribution } from '../../../lib/queries.ts'
+import { formatUsd, label, KIND_LABELS, SIGNING_STATUS_LABELS, SOURCE_GROUP_SHORT } from '../../../lib/format.ts'
 import { DRAFT_NAV } from '../../../lib/nav.ts'
 import { parseExplorerParams, explorerHref, PAGE_SIZE, DRAFT_KINDS } from '../../../lib/search.ts'
 
@@ -18,6 +18,16 @@ export default async function ExplorerPage ({ searchParams }: { searchParams: Pr
   const [res, orgs] = await Promise.all([load(() => getDraftExplorer(f)), load(getOrganizationKeys)])
   const rows = res.ok ? res.data.slice(0, PAGE_SIZE) : []
   const hasNext = res.ok && res.data.length > PAGE_SIZE
+  // Source groups for this page's rows (025). Optional: without them the column shows a dash.
+  const attr = await load(() => getSelectionAttribution(rows.map((r) => Number(r.selection_id))))
+  const sourceOf = new Map(attr.ok ? attr.data.map((a) => [Number(a.selection_id), a]) : [])
+  const sourceCell = (r: Record<string, any>) => {
+    const a = sourceOf.get(Number(r.selection_id))
+    if (!a) return '—'
+    const sel = label(SOURCE_GROUP_SHORT, a.selection_source_category)
+    const sign = a.signing_source_category ? label(SOURCE_GROUP_SHORT, a.signing_source_category) : null
+    return sign && sign !== sel ? `${sel}; signing: ${sign}` : sel
+  }
   return (
     <>
       <PageHeader title='Historical draft explorer'
@@ -65,8 +75,10 @@ export default async function ExplorerPage ({ searchParams }: { searchParams: Pr
             { key: 'league_then', header: 'League', render: (r) => [r.league_then, r.division_then].filter(Boolean).join(' ') || '—' },
             { key: 'school_name', header: 'School / program' },
             { key: 'signing_status', header: 'Signing', render: (r) => label(SIGNING_STATUS_LABELS, r.signing_status) },
-            { key: 'signing_bonus_usd', header: 'Bonus', numeric: true, render: (r) => r.signing_status === 'SIGNED' ? formatUsd(r.signing_bonus_usd) : '—' }
+            { key: 'signing_bonus_usd', header: 'Bonus', numeric: true, render: (r) => r.signing_status === 'SIGNED' ? formatUsd(r.signing_bonus_usd) : '—' },
+            { key: 'source', header: 'Source', render: sourceCell }
           ]} />
+          <p className='note'>Source is the primary citation of the selection (and of its signing when different). See <Link href='/sources'>sources &amp; methodology</Link>.</p>
           <nav className='pager' aria-label='Pages'>
             {f.page > 1 ? <Link href={explorerHref(f, f.page - 1, { q: rawQ, school: rawSchool })}>← Previous</Link> : <span />}
             <span>Page {f.page}</span>

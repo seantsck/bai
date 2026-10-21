@@ -94,10 +94,12 @@
 - **Reviewer packages:** Smeltzer, Wong, Sheffield/Robinson Rule 5, Witt/Casey, McLain/Liput ([phase8-reviewer-packages.md](evidence/phase8-reviewer-packages.md)).
 - **Wave 2:** the six 2016 draft classes (MLB census, identities, B-Ref signing data) and 2016-17 international candidates from the wire ([wave2-discovery-plan.md](evidence/wave2-discovery-plan.md)).
 
-## In progress: historical expansion, 1965–2026 (`feature/historical-importer-hardened`)
+## In progress: historical expansion, 1965–2026 (PR #12 merged `c29564f`; 024 deployed on hosted)
 
 - **Migration 024:** every historical draft phase, franchises across seasons, and coverage only for clubs that existed.
-  It is additive: `main`'s test suite passes with it applied. It is not deployed.
+  It is additive: `main`'s test suite passes with it applied. It is deployed on hosted (Phase 9.2).
+- **Migration 025 (Phase 9.2):** public source attribution (`/sources`, explorer source column), a database lock on
+  historical years, and the private exception-review workflow. It is rehearsed, not deployed.
 - **Importer:** bulk import through the research pipeline, with cache and checksums, request budgets, census claims only
   with agreeing independent evidence, checkpoints and deterministic replay ([history/README.md](history/README.md)).
 - **Permission gates (Phase 9.1).** These are per-source, per-use grants: fetch, local processing, repository and site
@@ -108,6 +110,7 @@
 - **Plan:** the full backfill and its gates. It is blocked on the MLB terms decision
   ([history/backfill-plan.md](history/backfill-plan.md)).
 - **Hosted provenance review:** [history/hosted-provenance.md](history/hosted-provenance.md).
+- **Next batch (2006–2010):** prepared and blocked on permissions ([history/batch-h1a-2006-2010.md](history/batch-h1a-2006-2010.md)).
 - **Public explorer:** `/draft/explorer` and `/draft/years`.
 
 ## Next

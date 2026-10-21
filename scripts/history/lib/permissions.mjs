@@ -77,17 +77,22 @@ export function sourceForUrl (catalog, url) {
   return catalog.sources.find((s) => (s.governs_hosts ?? []).some(matchHost) || (s.governs_url_patterns ?? []).some((p) => u.includes(p))) ?? null
 }
 /**
- * The source governing a cited source ({ source_key, url }), by key first and then by URL, so a renamed key or an alias
- * pointing at a governed host is still governed. A hist: key the catalog does not know is reported as `unknownHist`.
+ * Every catalog source governing a cited source ({ source_key, url, source_type }): by key (case-insensitive prefix, and
+ * the declared source_type when the entry requires one) AND by URL. All of them must permit a use, so an alias key or a
+ * borrowed label cannot carry a governed source's data. A hist: key the catalog does not know is reported as `unknownHist`.
  */
-export function governingSource (catalog, cited) {
+export function governingSources (catalog, cited) {
+  const out = []
   const byKey = sourceForKey(catalog, cited.source_key)
-  if (byKey) return { source: byKey }
+  if (byKey && (!byKey.required_source_type || byKey.required_source_type === cited.source_type)) out.push(byKey)
   const byUrl = sourceForUrl(catalog, cited.url)
-  if (byUrl) return { source: byUrl }
-  return { source: null, unknownHist: /^hist:/i.test(String(cited.source_key ?? '').trim()) }
+  if (byUrl && !out.includes(byUrl)) out.push(byUrl)
+  return { sources: out, unknownHist: !out.length && /^hist:/i.test(String(cited.source_key ?? '').trim()) }
 }
-export const sourceForHost = (catalog, host) => catalog.sources.find((s) => (s.hosts ?? []).includes(host)) ?? null
+export function governingSource (catalog, cited) {
+  const { sources, unknownHist } = governingSources(catalog, cited)
+  return { source: sources[0] ?? null, unknownHist }
+}
 
 function scopeProblem (scope, ctx) {
   if (!scope) return null
@@ -189,26 +194,22 @@ export function batchYears (doc) {
 }
 
 /**
- * Hosted publication gate: the hosted database feeds the public site, so a batch may be staged or applied there only if
- *   * every source it cites that the catalog governs (by key or by URL) grants publish_site for every year it touches;
- *   * no source carries a hist: key the catalog does not know;
- *   * for historical years (before catalog.historical_before, 2015) every source is catalogued: an unknown source cannot
- *     carry historical records to the public site. A batch whose years cannot be determined counts as historical.
- * Fails closed: throws PermissionDenied on the first refusal.
+ * Hosted publication gate. The hosted database feeds the public site, so a batch may be staged or applied there only if
+ * every source it cites is catalogued (fail closed: an uncatalogued, aliased or unknown source has no approved permission
+ * basis) and every catalog entry governing it, by key or by URL, grants publish_site for every year the batch touches.
+ * Historical years (before catalog.historical_before) are also locked per database (025). A batch whose years cannot be
+ * determined counts as historical; a batch with no sources is refused. Throws PermissionDenied on the first refusal.
  */
 export function requireHostedPublication (catalog, doc, ctx = {}, opts = {}) {
   const before = catalog.historical_before ?? 2015
   const years = batchYears(doc)
   const historical = !years.length || years.some((y) => y < before)
-  for (const cited of doc.sources ?? []) {
-    const { source, unknownHist } = governingSource(catalog, cited)
+  if (!(doc.sources ?? []).length) throw new PermissionDenied('a batch with no declared sources cannot reach hosted', { use: 'publish_site' })
+  for (const cited of doc.sources) {
+    const { sources, unknownHist } = governingSources(catalog, cited)
     if (unknownHist) throw new PermissionDenied(`${cited.source_key}: a hist: source key the catalog does not govern`, { source: cited.source_key, use: 'publish_site' })
-    if (!source) {
-      if (historical) throw new PermissionDenied(`${cited.source_key}: historical records (${years.join(', ') || 'year unknown'}) may reach hosted only from catalogued sources`, { source: cited.source_key, use: 'publish_site' })
-      continue
-    }
-    for (const year of years.length ? years : [null]) requireUse(catalog, source, 'publish_site', { ...ctx, year }, opts)
+    if (!sources.length) throw new PermissionDenied(`${cited.source_key}: not in the source catalog, so there is no approved basis to publish it on hosted (research/history/sources.json)`, { source: cited.source_key, use: 'publish_site' })
+    for (const source of sources) for (const year of years.length ? years : [null]) requireUse(catalog, source, 'publish_site', { ...ctx, year }, opts)
   }
-  if (!(doc.sources ?? []).length && historical) throw new PermissionDenied('a historical batch with no declared sources cannot reach hosted', { use: 'publish_site' })
   return { years, historical }
 }

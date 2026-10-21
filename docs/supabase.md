@@ -98,6 +98,32 @@ Never create or alter tables through the Dashboard. A hosted database must alway
   - **Comparison with a clean local replay:** 0 differences in 247 selections, 192 international signings, coverage,
     classes, proposals, conflicts and observations. LAD's own records are unchanged.
   - **Lesson:** hosted replays run from a clean `main` worktree, never from a working tree with other changes.
+- **024 (historical drafts) is deployed** (2026-10-21, after PR #12 merged at `c29564f`, from a clean `main`).
+  - **Rehearsals:**
+    - `hosted:rehearse` passed (+13 relations, rolled back).
+    - A deeper in-transaction rehearsal passed all 32 checks, then rolled back:
+      - organization identities unchanged;
+      - every franchise dated;
+      - 15 historical name resolutions (for example TEX 1965 Washington Senators, MIL 1969 Seattle Pilots);
+      - no overlapping names;
+      - league alignment;
+      - every existing selection by a club that existed;
+      - coverage cells unchanged (720);
+      - read-model refresh;
+      - anon reads and refusals;
+      - RLS and read-only policies on the new tables.
+  - **Push and record:** dry run (024 only), push, then `hosted:migrate` recorded it.
+  - **After:** `hosted:refresh`, parity 0 differences, security OK (54 functions), `hosted:verify` 11/11, pilot
+    reconciliation OK, integrity 0 violations, and Supabase advisors report no issues.
+  - **Comparison with a pre-release snapshot:**
+    - organizations unchanged;
+    - 21 existing name rows gained their first season, and 9 historical names were added;
+    - aliases 47 → 59;
+    - the new tables `organization_league_seasons` (66 rows) and `rm_draft_year_coverage` (12 phases);
+    - drafts, selections, players, signings, coverage assessments and coverage cells unchanged.
+  - **Production:** the live Vercel site (the earlier app) keeps working on the new schema. No historical records were
+    imported.
+- **025 (attribution, historical lock, publication guard, exception review) is pending.** It is rehearsed, not deployed.
 - `hosted:verify-pilot` compares only the pilot's own rows, so it keeps working as hosted gains other classes.
 
 ### Hosted-only migrations

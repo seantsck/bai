@@ -19,6 +19,8 @@ const PRIVATE_SCHEMAS = ['ingest', 'analytics', 'research', 'bai_meta']
 const REVIEWER_FUNCTIONS = ['research.enroll_reviewer(text, text)', 'research.set_certification_gate(boolean, text)',
   'research.reconsider_resolution(text, bigint, text, bigint, text, jsonb, bigint)', 'research.accept_proposal(bigint, text, jsonb)',
   'research.reject_proposal(bigint, text)', 'research.ratify_resolution(bigint, text, jsonb)', 'research.certify_class(bigint)']
+// Migration 025: the reviewer's decision on a historical exception (same rules; checked once 025 is present).
+const REVIEWER_FUNCTIONS_025 = ['research.decide_history_exception(text, research.history_exception_decision, text, text, bigint, jsonb)']
 const json = process.argv.includes('--json')
 const failures = []
 const notes = []
@@ -103,7 +105,7 @@ try {
     if (f.public_execute || f.anon_execute || f.authenticated_execute) fail(`${f.function} is executable by ${['PUBLIC', 'anon', 'authenticated'].filter((_, i) => [f.public_execute, f.anon_execute, f.authenticated_execute][i]).join(', ')}`)
     if (f.search_path === 'NOT SET') fail(`${f.function} does not pin search_path`)
     // A trigger function cannot be called directly; 021 runs the guards with the owner's rights so every writer is guarded.
-    if (f.security === 'DEFINER' && !f.trigger && !REVIEWER_FUNCTIONS.map((x) => x.replace(/ /g, '')).includes(f.sig)) fail(`${f.function} is SECURITY DEFINER; BAI declares only the reviewer functions and trigger guards of 021 (review before allowing)`)
+    if (f.security === 'DEFINER' && !f.trigger && ![...REVIEWER_FUNCTIONS, ...REVIEWER_FUNCTIONS_025].map((x) => x.replace(/ /g, '')).includes(f.sig)) fail(`${f.function} is SECURITY DEFINER; BAI declares only the reviewer functions (021, 025) and trigger guards (review before allowing)`)
   }
 
   // ---- Human certification boundary (021): the reviewer functions are the only SECURITY DEFINER functions, and only
@@ -113,7 +115,8 @@ try {
   if (research021) {
     if (grp.length !== 2) fail('roles bai_reviewer and bai_automation (021) are missing')
     for (const g of grp) if (g.rolcanlogin || g.rolsuper || g.rolcreaterole || g.rolbypassrls) fail(`${g.rolname} must be a NOLOGIN group with no attributes`)
-    for (const f of REVIEWER_FUNCTIONS) {
+    const research025 = (await q(db, "select to_regclass('research.history_exceptions') is not null ok"))[0].ok
+    for (const f of [...REVIEWER_FUNCTIONS, ...(research025 ? REVIEWER_FUNCTIONS_025 : [])]) {
       const r = (await q(db, `select p.prosecdef d, array(select coalesce(r.rolname::text, 'PUBLIC') from aclexplode(coalesce(p.proacl, acldefault('f', p.proowner))) a
           left join pg_roles r on r.oid = a.grantee where a.privilege_type = 'EXECUTE' and a.grantee <> p.proowner order by 1) grantees
         from pg_proc p where p.oid = to_regprocedure($1)`, [f]))[0]

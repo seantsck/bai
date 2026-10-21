@@ -50,6 +50,8 @@ try {
       select 'bench-' || n, (array['James','John','Michael','David','Robert','Carlos','Luis','Kevin','Brian','Jose'])[1 + n % 10] || ' ' ||
              (array['Smith','Johnson','Williams','Brown','Jones','Garcia','Miller','Davis','Rodriguez','Martinez','Hernandez','Lopez','Wilson','Anderson','Thomas'])[1 + (n / 10) % 15] || ' ' || n,
              'Bench Player ' || n, make_date(1940 + (n % 60)::int, 1 + (n % 12)::int, 1 + (n % 28)::int), 'DAY' from bench_sel`)
+    // Historical years are locked until released on a database (025); this disposable database releases them for the benchmark.
+    await db.query(`insert into ingest.historical_releases (draft_year, authorization_reference, scope_note) select y, 'benchmark', 'synthetic data in a disposable database' from generate_series(1965, 2014) y`)
     await db.query(`insert into draft_selections (draft_id, round_id, overall_pick, round_pick, organization_id, player_id, school_id, source_id)
       select s.draft_id, s.round_id, row_number() over (partition by s.draft_id order by s.round_no, s.round_pick), s.round_pick, s.organization_id,
              (select id from players where slug = 'bench-' || s.n), 1 + s.n % 6000, (select id from sources where source_key = 'bench:synthetic') from bench_sel s`)

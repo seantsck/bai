@@ -1,6 +1,6 @@
 {
  "format": "bai-history-sources/2",
- "note": "Permission gates for the historical importer, enforced by scripts/history/lib/permissions.mjs. Each source has a separate grant per use (fetch_targeted, fetch_bulk, process_local, publish_repository, publish_site); a host on this list is not a permission. States: CLEARED (the license permits it), LIMITED (only inside its scope), AUTHORIZED (only with a documented authorization on file: reference, grantor, dates, scope, uses and the document with its SHA-256), PENDING (a person must decide; refused) and PROHIBITED (refused). Grants are human decisions recorded here after review; tooling never changes them. A source whose review_due date has passed is refused until it is reviewed again. historical_before: records of years before it are 'historical'; on hosted they need every source catalogued and granting publish_site (requireHostedPublication). Governance by URL (governs_hosts, governs_url_patterns) applies whatever source key a batch uses, so aliases cannot bypass a grant.",
+ "note": "Permission gates for the historical importer, enforced by scripts/history/lib/permissions.mjs. Each source has a separate grant per use (fetch_targeted, fetch_bulk, process_local, publish_repository, publish_site); a host on this list is not a permission. States: CLEARED (the license permits it), LIMITED (only inside its scope), AUTHORIZED (only with a documented authorization on file: reference, grantor, dates, scope, uses and the document with its SHA-256), PENDING (a person must decide; refused) and PROHIBITED (refused). Grants are human decisions recorded here after review; tooling never changes them. A source whose review_due date has passed is refused until it is reviewed again. historical_before: records of years before it are 'historical'; on hosted they need every source catalogued and granting publish_site (requireHostedPublication). Governance by URL (governs_hosts, governs_url_patterns) applies whatever source key a batch uses, so aliases cannot bypass a grant. On hosted every cited source must be catalogued (fail closed) and every catalog entry matching it by key or URL must grant publish_site; required_source_type restricts a key-prefix match to sources declaring that type.",
  "historical_before": 2015,
  "authorization_template": {
   "reference": "e.g. MLBAM letter or contract number",
@@ -34,7 +34,9 @@
     "https://statsapi.mlb.com/api/v1/"
    ],
    "governs_hosts": [
-    "statsapi.mlb.com"
+    "statsapi.mlb.com",
+    "mlb.com",
+    "milb.com"
    ],
    "url_template": "https://statsapi.mlb.com/api/v1/draft/{year}?draftType={code}",
    "source_key_prefixes": [
@@ -65,7 +67,7 @@
    "review": {
     "reviewed_on": "2026-10-21",
     "review_due": "2027-01-21",
-    "reviewed_by": "BAI maintainer review pending (prepared by the importer audit, Phase 9.1)"
+    "reviewed_by": "BAI maintainer (Phase 9.3 authorization to tighten pending permissions)"
    },
    "uses": {
     "fetch_targeted": {
@@ -92,11 +94,8 @@
      "basis": "The public repository is redistribution. Selection lists, extracts and per-year counts derived from the feed stay out of Git (kept in .restricted/, backed up outside the repository)."
     },
     "publish_site": {
-     "state": "LIMITED",
-     "scope": {
-      "years_from": 2015
-     },
-     "basis": "Status quo, under review: the per-class research program (LAD 2015-2019, Wave 2 2016) already publishes MLB-sourced records for 2015 onward (docs/history/hosted-provenance.md). Historical years (before 2015) stay refused until written MLBAM authorization covers display. A maintainer may tighten this to PENDING, which stops new research-program publication too."
+     "state": "PENDING",
+     "basis": "No approved basis for publishing new MLB-sourced records (MLBAM terms: individual, non-commercial, non-bulk use without written authorization). Records already on hosted are preserved, unchanged, for the rights review (docs/history/hosted-provenance.md); \"under review\" is not permission for new publication. Covers the Stats API, transaction wire and MLB.com/MiLB.com pages."
     }
    },
    "authorization": null,
@@ -141,7 +140,7 @@
    "review": {
     "reviewed_on": "2026-10-21",
     "review_due": "2027-01-21",
-    "reviewed_by": "BAI maintainer review pending (prepared by the importer audit, Phase 9.1)"
+    "reviewed_by": "BAI maintainer (Phase 9.3 authorization to tighten pending permissions)"
    },
    "uses": {
     "fetch_targeted": {
@@ -204,7 +203,7 @@
    "review": {
     "reviewed_on": "2026-10-21",
     "review_due": "2027-01-21",
-    "reviewed_by": "BAI maintainer review pending (prepared by the importer audit, Phase 9.1)"
+    "reviewed_by": "BAI maintainer (Phase 9.3 authorization to tighten pending permissions)"
    },
    "uses": {
     "fetch_targeted": {
@@ -271,7 +270,7 @@
    "review": {
     "reviewed_on": "2026-10-21",
     "review_due": "2027-01-21",
-    "reviewed_by": "BAI maintainer review pending (prepared by the importer audit, Phase 9.1)"
+    "reviewed_by": "BAI maintainer (Phase 9.3 authorization to tighten pending permissions)"
    },
    "uses": {
     "fetch_targeted": {
@@ -298,15 +297,103 @@
      "basis": "Names, counts or extracts from Baseball-Reference pages are not committed to the public repository."
     },
     "publish_site": {
-     "state": "LIMITED",
-     "scope": {
-      "years_from": 2015
-     },
-     "basis": "Status quo, under review: research-program batches for 2015 onward cite Baseball-Reference pages one at a time (docs/history/hosted-provenance.md). Historical years stay refused. A maintainer may tighten this to PROHIBITED."
+     "state": "PENDING",
+     "basis": "No approved basis for publishing new Baseball-Reference-sourced records (Sports Reference restricts reuse). Existing hosted observations, signing bonuses and WAR are preserved, unchanged, for the rights review; nothing new is published."
     }
    },
    "authorization": null,
    "permission_notes": "Used for count corroboration in earlier phases (LAD, Wave 2). Not a bulk source: a league-wide crawl of archived pages is neither polite nor within the spirit of the terms. The Internet Archive also rate-limits (HTTP 429 seen 2026-10-21)."
+  },
+  {
+   "id": "bai-reference",
+   "title": "BAI reference compilations and researcher determinations (franchise histories, calendars, classifications)",
+   "publisher": "BAI",
+   "authority_level": "AGGREGATOR",
+   "source_type": "BAI_REFERENCE",
+   "hosts": [],
+   "url_prefixes": [],
+   "source_key_prefixes": [
+    "bai-reference:"
+   ],
+   "required_source_type": "BAI_REFERENCE",
+   "license": {
+    "name": "BAI original work (facts compiled from cited public sources)",
+    "attribution": "BAI research"
+   },
+   "terms": "BAI's own compilation. Its URL, if any, is still governed by the source it points at (an mlb.com page is governed by the MLB entry), so a BAI label cannot carry another source's data.",
+   "review": {
+    "reviewed_on": "2026-10-21",
+    "review_due": "2027-01-21",
+    "reviewed_by": "BAI maintainer (Phase 9.3 authorization to tighten pending permissions)"
+   },
+   "uses": {
+    "fetch_targeted": {
+     "state": "PROHIBITED",
+     "basis": "Not a downloadable source."
+    },
+    "fetch_bulk": {
+     "state": "PROHIBITED",
+     "basis": "Not a downloadable source."
+    },
+    "process_local": {
+     "state": "CLEARED",
+     "basis": "BAI original work."
+    },
+    "publish_repository": {
+     "state": "CLEARED",
+     "basis": "BAI original work."
+    },
+    "publish_site": {
+     "state": "CLEARED",
+     "basis": "BAI original work; any cited URL must also be permitted."
+    }
+   },
+   "authorization": null
+  },
+  {
+   "id": "verification-fixtures",
+   "title": "Fictional verification fixtures (hosted:verify, inside rolled-back transactions)",
+   "publisher": "BAI tests",
+   "authority_level": "OTHER",
+   "source_type": "TEST_FIXTURE",
+   "hosts": [],
+   "url_prefixes": [],
+   "source_key_prefixes": [
+    "verify:"
+   ],
+   "required_source_type": "TEST_FIXTURE",
+   "license": {
+    "name": "BAI test data (fictional)"
+   },
+   "terms": "Fictional records that exist only inside the hosted verification suite's rolled-back transactions. On hosted, the database guard (025) refuses them unless the same transaction records an explicit publication grant, which the suite does and rolls back.",
+   "review": {
+    "reviewed_on": "2026-10-21",
+    "review_due": "2027-01-21",
+    "reviewed_by": "BAI maintainer (Phase 9.3 authorization to tighten pending permissions)"
+   },
+   "uses": {
+    "fetch_targeted": {
+     "state": "PROHIBITED",
+     "basis": "Not a downloadable source."
+    },
+    "fetch_bulk": {
+     "state": "PROHIBITED",
+     "basis": "Not a downloadable source."
+    },
+    "process_local": {
+     "state": "CLEARED",
+     "basis": "Fictional."
+    },
+    "publish_repository": {
+     "state": "CLEARED",
+     "basis": "Fictional test data in tests/."
+    },
+    "publish_site": {
+     "state": "CLEARED",
+     "basis": "Rolled-back verification only; refused by the database guard outside an explicit grant."
+    }
+   },
+   "authorization": null
   }
  ]
 }

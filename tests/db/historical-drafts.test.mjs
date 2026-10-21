@@ -19,6 +19,8 @@ before(async () => {
   await h.startServer()
   db = await h.freshDatabase()
   await db.query(`insert into sources (source_key, source_type, authority_level, title) values ('x:cal', 'TEST_FIXTURE', 'OFFICIAL', 'Historical calendar fixture')`)
+  // Historical years are locked until released on a database (025); the fixture database releases the two it uses.
+  await db.query(`insert into ingest.historical_releases (draft_year, authorization_reference, scope_note) values (1965, 'test', 'fixture'), (1985, 'test', 'fixture')`)
   for (const [key, year, kind, date, prec, rounds] of [['1965-JUNE_AMATEUR', 1965, 'JUNE_AMATEUR', '1965-06-08', 'DAY', 72], ['1985-JANUARY_REGULAR', 1985, 'JANUARY_REGULAR', '1985-01-01', 'MONTH', 21],
     ['1985-JUNE_AMATEUR', 1985, 'JUNE_AMATEUR', '1985-06-01', 'MONTH', 39], ['1985-JUNE_SECONDARY', 1985, 'JUNE_SECONDARY', '1985-06-01', 'MONTH', 7]]) {
     await db.query(`insert into drafts (draft_key, draft_year, draft_kind, start_date, start_date_precision, total_rounds, source_id) values ($1, $2, $3, $4, $5, $6, (select id from sources where source_key = 'x:cal'))`, [key, year, kind, date, prec, rounds])

@@ -73,15 +73,18 @@ the sources behind the records already on hosted are in [hosted-provenance.md](h
 A source whose `review_due` date has passed is refused until it is reviewed again. Permission to download never implies
 permission to publish.
 
-**Current decisions (reviewed 2026-10-21, due 2027-01-21).** These are proposals prepared in the audit, for the
-maintainer to confirm.
+**Current decisions (reviewed 2026-10-21, due 2027-01-21).** Tightened in Phase 9.3 at the maintainer's direction:
+"under review" is not permission for new publication.
 
 | Source | fetch_targeted | fetch_bulk | process_local | publish_repository | publish_site |
 |---|---|---|---|---|---|
-| MLB Stats API (draft feed, people, transactions) | PENDING | PENDING | LIMITED: 1965, 1985, 2005 (already cached) | PROHIBITED | LIMITED: 2015 on (status quo of the research program, under review); historical years refused |
+| MLB (Stats API, transaction wire, MLB.com, MiLB.com) | PENDING | PENDING | LIMITED: 1965, 1985, 2005 (already cached) | PROHIBITED | PENDING: no new publication in any year; existing hosted records preserved for review |
 | Chadwick register (ODC-BY) | CLEARED | CLEARED | CLEARED | CLEARED (attribution) | CLEARED (attribution) |
 | Wikipedia (CC BY-SA, facts) | CLEARED | LIMITED: 70 per run | CLEARED | CLEARED | CLEARED |
-| Baseball-Reference (live or via Internet Archive) | PENDING | PROHIBITED | LIMITED: 1965, 1985, 2005 (already cached) | PROHIBITED | LIMITED: 2015 on (status quo, under review); historical years refused |
+| BAI reference (BAI's own compilations; `bai-reference:` keys, type BAI_REFERENCE) | — (not downloadable) | — | CLEARED | CLEARED | CLEARED (any URL it cites must also be permitted) |
+| Verification fixtures (`verify:` keys, type TEST_FIXTURE) | — | — | CLEARED | CLEARED | CLEARED for rolled-back `hosted:verify` only; the database guard refuses them otherwise |
+| Anything else (news, Baseball America, FanGraphs, clubs) | not catalogued: **refused on hosted** until a person catalogues it with a permission basis | | | | |
+| Baseball-Reference (live or via Internet Archive) | PENDING | PROHIBITED | LIMITED: 1965, 1985, 2005 (already cached) | PROHIBITED | PENDING: no new publication; existing hosted observations, bonuses and WAR preserved for review |
 
 **Where each gate is enforced**
 - **Fetcher.** Every call names its source and use, and the URL must match that source's hosts and URL prefixes. A
@@ -204,6 +207,100 @@ npm run history:benchmark
 - **Security.** It runs on the same read-only path as every page: `bai_web` → `anon`, a read-only transaction and a
   3-second statement timeout.
 
+## Attribution and methodology (025)
+
+- **`/sources` (public)** carries:
+  - the independence statement (BAI is not affiliated with or endorsed by MLB, MLB Advanced Media, any club or any
+    source);
+  - the sourcing rules;
+  - each source group, with what BAI takes from it, its credit line, and the records and observations citing it
+    (`v_source_attribution`);
+  - a rights note: crediting a source is not a license to redistribute it.
+- **Every page footer** repeats the independence statement.
+- **The explorer** shows each row's source group, for the selection and its signing (`v_selection_attribution`). Before
+  025 is deployed the column shows a dash, and the explorer itself is unaffected.
+- **Groups** (`sources.attribution_category`, generated): MLB, Baseball-Reference, Chadwick Register, Wikipedia, BAI
+  research (independent researcher observations and compilations), and other publications.
+
+## Publication guard for new records (025, hosted only)
+
+On a Supabase (hosted) database, a trigger on every table that cites a source refuses a **new** record that cites a
+source outside the openly licensed groups (Chadwick Register, Wikipedia, BAI research). That covers an insert, or a
+change of `source_id`. It applies to MLB, Baseball-Reference, other publications and test fixtures alike. A group opens
+only when a person records a row in `ingest.source_publication_grants`.
+
+- **Existing records are unaffected.** They stay readable on the public site and editable without changing their
+  source. Nothing is deleted or hidden while the rights review runs.
+- **A grant is not verified.** A grant row (like a historical release row) records what a person asserted; the database
+  cannot verify that a license exists.
+- **Local research databases** are not guarded.
+- **Two layers.** Together with the pipeline's fail-closed gate, which requires every cited source to be catalogued and
+  every matching entry by key or URL to grant `publish_site`, neither a script, a runbook, an alias key nor ad hoc SQL
+  can publish new restricted records by accident.
+
+## Historical lock (025)
+
+A selection in a draft year before 2015 is refused by the database unless that year has a row in
+`ingest.historical_releases` (`authorization_reference`, `scope_note`, `released_by`). This is defense in depth under the
+permission gates: no script, runbook or ad hoc SQL can put historical selections on a database where the year was not
+deliberately released.
+
+- **Locally,** `history import --write` records its use as `local-research`.
+- **On hosted,** a release row is a decision a person makes after `publish_site` is granted, citing the authorization.
+  The row records that assertion; it does not mean a license has been independently verified.
+
+## Exception review (private, 025)
+
+The importer's disagreements are reviewed in a local research database, never in Git or on hosted.
+
+```bash
+node scripts/history/exceptions.mjs                       # rebuild the restricted register from the build reports
+npm run history:review -- load --propose-rules            # load into the local database (refuses non-local)
+npm run history:review -- list [--status OPEN] [--kind ALTERNATE_NAME]
+npm run history:review -- show --key EX-2005-JR-PHI-LIST  # claims, evidence (cache key + SHA-256), proposals, decisions, events
+npm run history:review -- conclusions --kind MISSING_SELECTION
+npm run history:review -- propose --key <EX-...> --conclusion <C> --rationale "<why>" --by <name>   # or --agent <name>
+npm run history:review -- decide --key <EX-...> --decision ACCEPT_PROPOSAL --proposal <id> --rationale "<why>"   # reviewer login
+```
+
+**Kinds:**
+- conflicting identities;
+- missing selections;
+- different players at the same pick;
+- one person selected more than once;
+- alternate names;
+- numbering disagreements;
+- unmatched crosswalk ids;
+- census-total disagreements.
+
+Each kind has its own list of allowed conclusions.
+
+**Who does what**
+- **Anyone, including an agent, may propose.** `--agent` records `agent:<name>`, and rule-based proposals are
+  `agent:history-review-rules`.
+- **Only an enrolled human reviewer, on their own login** (`BAI_REVIEWER_DATABASE_URL`), decides:
+  - accept or reject a proposal;
+  - decide directly;
+  - ask for more evidence;
+  - reopen a decided exception.
+- **Owner and automation sessions are refused** by the database.
+
+**History is append-only:** claims, proposals, decisions and events.
+
+**A decision is a judgment, not a correction.** A fix it calls for goes through the research pipeline as a sourced
+batch. Decisions have nothing to do with certification, which stays behind its own gate.
+
+**Status on 2026-10-21:**
+- all 24 pilot exception groups are loaded locally, each with its source claims, evidence locators and a proposed
+  conclusion (agent rules, deliberately cautious: `UNDETERMINED` where the evidence in hand cannot settle a case);
+- none is decided.
+
+## Preflight
+
+`npm run history -- preflight --years 2006-2010 [--target local|hosted]` lists every grant a batch needs, year by year,
+without any request or write. It exits with code 4 while any is refused. The first expansion batch is planned in
+[batch-h1a-2006-2010.md](batch-h1a-2006-2010.md).
+
 ## Tests
 
 - **`tests/db/historical-drafts.test.mjs`:**
@@ -226,5 +323,13 @@ npm run history:benchmark
   - restricted batches refused for `publish_site`;
   - the publication check on fixtures and on the real repository;
   - the CLI exiting with code 4 on restricted downloads.
+- **`tests/db/historical-review.test.mjs`** (025, fictional data):
+  - attribution groups, and the public summary and per-selection views as anon;
+  - the historical lock;
+  - immutable claims, proposals by anyone, decisions only in a reviewer session (owner, automation and direct inserts
+    refused);
+  - conclusions per kind, status transitions, append-only history and withdrawal;
+  - privacy from anon, refusal on a Supabase database;
+  - no canonical change, and certification untouched.
 - **`tests/app/search.test.mjs` and `public-queries.test.mjs`:** filter whitelisting, parameterization, pagination, and
   explorer and coverage queries as anon. The name normalizer is checked against the database.

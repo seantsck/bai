@@ -151,29 +151,35 @@ test('batches: restricted sources cannot be published to the site; evidence used
   }
 })
 
-test('hosted publication: aliases, unknown keys and historical years cannot bypass the gate', () => {
+test('hosted publication: no new MLB or Baseball-Reference records; aliases, unknown keys and borrowed labels cannot bypass the gate', () => {
   const pub = (doc) => () => requireHostedPublication(catalog, doc, { now: NOW }, { root })
   const rec = (draftKey) => ({ type: 'DRAFT_SELECTION', draft_key: draftKey, source_key: 'x' })
   const doc = (sources, draftKey = '2006-JUNE_AMATEUR', claims = []) => ({ sources, coverage_claims: claims, records: [rec(draftKey)] })
-  // Governed by URL whatever the key: an alias for MLB's feed or an archive capture of Baseball-Reference.
-  assert.throws(pub(doc([{ source_key: 'mlb-feed-2006', url: 'https://statsapi.mlb.com/api/v1/draft/2006?draftType=JR' }])), /mlb-statsapi-draft: publish_site refused: year 2006 is before the scope/)
-  assert.throws(pub(doc([{ source_key: 'bref:2006', url: 'https://web.archive.org/web/2019id_/https://www.baseball-reference.com/draft/x' }])), /bref-draft-archive: publish_site refused/)
+  // MLB and Baseball-Reference: no new publication in any year (existing hosted records are preserved, not republished).
+  for (const y of ['2006', '2016', '2026']) {
+    assert.throws(pub(doc([{ source_key: 'mlb-feed', url: `https://statsapi.mlb.com/api/v1/draft/${y}` }], `${y}-JUNE_AMATEUR`)), /mlb-statsapi-draft: publish_site refused: a decision is pending/, y)
+  }
+  // Governed by URL whatever the key: aliases, MLB.com editorial pages and archive captures of Baseball-Reference.
+  assert.throws(pub(doc([{ source_key: 'lad2016:slots', url: 'https://www.mlb.com/news/2016-draft-pick-values' }], '2016-JUNE_AMATEUR')), /mlb-statsapi-draft/)
+  assert.throws(pub(doc([{ source_key: 'bref:2016', url: 'https://web.archive.org/web/2019id_/https://www.baseball-reference.com/draft/x' }], '2016-JUNE_AMATEUR')), /bref-draft-archive: publish_site refused/)
   // Case and whitespace variants of a governed key resolve to the same source.
   assert.throws(pub(doc([{ source_key: ' HIST:MLB-STATSAPI-DRAFT-2006-JR ' }])), /mlb-statsapi-draft/)
-  // An invented hist: key is refused outright; an uncatalogued source cannot carry historical records.
+  // Unknown keys fail closed: an invented hist: key, and any uncatalogued source in any year.
   assert.throws(pub(doc([{ source_key: 'hist:new-source-2006' }])), /hist: source key the catalog does not govern/)
-  assert.throws(pub(doc([{ source_key: 'news:2006', url: 'https://example.test/2006' }])), /only from catalogued sources/)
-  // A batch's years come from its records as well as its claims; unknown years count as historical; no sources refuses.
-  const mixed = doc([{ source_key: 'news:x', url: 'https://example.test/' }], '2016-JUNE_AMATEUR', [{ scope_key: '2016-JUNE_AMATEUR' }])
-  mixed.records.push(rec('2006-JUNE_AMATEUR'))
-  assert.throws(pub(mixed), /\(2006, 2016\) may reach hosted only from catalogued sources/)
-  assert.throws(pub({ sources: [{ source_key: 'news:x' }], records: [] }), /year unknown/)
-  assert.throws(pub({ sources: [], records: [rec('1985-JUNE_AMATEUR')] }), /no declared sources/)
-  // Openly licensed sources pass for historical years; the research program (2015 on) keeps its status quo.
+  assert.throws(pub(doc([{ source_key: 'news:2016', url: 'https://example.test/2016' }], '2016-JUNE_AMATEUR')), /not in the source catalog/)
+  assert.throws(pub({ sources: [], records: [rec('2016-JUNE_AMATEUR')] }), /no declared sources/)
+  // A borrowed label cannot carry another source's data: every catalog entry matching by key OR by URL must permit it.
+  assert.throws(pub(doc([{ source_key: 'bai-reference:x', source_type: 'BAI_REFERENCE', url: 'https://statsapi.mlb.com/api/v1/teams' }], '2016-JUNE_AMATEUR')), /mlb-statsapi-draft/)
+  assert.throws(pub(doc([{ source_key: 'verify:x', source_type: 'OFFICIAL_LEAGUE' }], '2016-JUNE_AMATEUR')), /not in the source catalog/, 'verify: keys only for declared test fixtures')
+  assert.throws(pub(doc([{ source_key: 'verify:x', source_type: 'TEST_FIXTURE', url: 'https://statsapi.mlb.com/api/v1/draft/2016' }], '2016-JUNE_AMATEUR')), /mlb-statsapi-draft/)
+  // Openly licensed and BAI's own sources pass under their documented scope (historical years are still locked per
+  // database by 025); fictional verification fixtures pass for hosted:verify's rolled-back transactions.
   assert.deepEqual(pub(doc([{ source_key: 'hist:chadwick-register-781c175' }, { source_key: 'hist:wikipedia-2006-rev1' }]))(), { years: [2006], historical: true })
-  assert.equal(pub(doc([{ source_key: 'lad2016:mlb', url: 'https://statsapi.mlb.com/api/v1/draft/2016?teamId=119' }], '2016-JUNE_AMATEUR'))().historical, false)
+  assert.equal(pub(doc([{ source_key: 'bai-reference:calendar-2027', source_type: 'BAI_REFERENCE' }], '2027-JUNE_AMATEUR'))().historical, false)
+  assert.equal(pub(doc([{ source_key: 'verify:official', source_type: 'TEST_FIXTURE' }], '2017-JUNE_AMATEUR'))().historical, false)
+  // Every batch already in the repository (whose records are on hosted) would be refused as a NEW publication today.
   for (const f of fs.readdirSync(path.join(root, 'research/imports')).filter((x) => x.endsWith('.json'))) {
-    assert.doesNotThrow(pub(JSON.parse(fs.readFileSync(path.join(root, 'research/imports', f), 'utf8'))), f)
+    assert.throws(pub(JSON.parse(fs.readFileSync(path.join(root, 'research/imports', f), 'utf8'))), PermissionDenied, f)
   }
 })
 

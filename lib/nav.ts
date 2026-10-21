@@ -7,7 +7,8 @@ export const NAV_ITEMS: NavItem[] = [
   { href: '/organizations', label: 'Organizations' },
   { href: '/players', label: 'Players' },
   { href: '/compare', label: 'Compare' },
-  { href: '/research', label: 'Research' }
+  { href: '/research', label: 'Research' },
+  { href: '/sources', label: 'Sources' }
 ]
 
 // Every planned public route. tests/app asserts each has a page.
@@ -17,7 +18,7 @@ export const PLANNED_ROUTES = [
   '/draft', '/draft/picks', '/draft/explorer', '/draft/years', '/draft/schools',
   '/organizations', '/organizations/[slug]',
   '/players', '/players/[slug]',
-  '/compare', '/research'
+  '/compare', '/research', '/sources'
 ]
 
 export function isActive (pathname: string, href: string): boolean {

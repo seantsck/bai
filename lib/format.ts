@@ -50,6 +50,20 @@ export const KIND_LABELS: Record<string, string> = {
   JUNE_SECONDARY: 'June (secondary)', JUNE_SECONDARY_DELAYED: 'June (secondary, delayed)', AUGUST_LEGION: 'August (American Legion)'
 }
 
+// Public attribution groups (migration 025, sources.attribution_category). Attribution says where a record came from; it is
+// not a statement that BAI holds redistribution rights.
+export const SOURCE_GROUP_LABELS: Record<string, string> = {
+  MLB: 'MLB (Stats API, transaction wire, MLB.com)',
+  BASEBALL_REFERENCE: 'Baseball-Reference',
+  CHADWICK_REGISTER: 'Chadwick Register',
+  WIKIPEDIA: 'Wikipedia',
+  BAI_RESEARCH: 'BAI research',
+  OTHER_PUBLICATION: 'Other publications'
+}
+export const SOURCE_GROUP_SHORT: Record<string, string> = {
+  MLB: 'MLB', BASEBALL_REFERENCE: 'B-Ref', CHADWICK_REGISTER: 'Chadwick', WIKIPEDIA: 'Wikipedia', BAI_RESEARCH: 'BAI research', OTHER_PUBLICATION: 'Publication'
+}
+
 export const SIGNING_STATUS_LABELS: Record<string, string> = {
   SIGNED: 'Signed',
   DID_NOT_SIGN: 'Did not sign',

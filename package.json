@@ -81,6 +81,7 @@
     "history": "node --env-file-if-exists=.env.local scripts/history/cli.mjs",
     "history:publication-check": "node scripts/history/publication-check.mjs",
     "history:plan": "node --env-file-if-exists=.env.local scripts/history/plan.mjs",
+    "history:review": "node --env-file-if-exists=.env.local scripts/history/review.mjs",
     "history:benchmark": "node --import ./tests/support/register-ts.mjs scripts/history/benchmark.mjs"
   },
   "dependencies": {
