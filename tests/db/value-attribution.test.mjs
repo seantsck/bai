@@ -87,7 +87,7 @@ test('value for the acquiring club, value elsewhere, and trade returns are kept 
   assert.deepEqual([t2.war_coverage, t2.orig, t2.other, t2.ret], ['NO_MLB', 0, 0, 1.5])
   // Unsigned: the pick earns nothing at all (another club's production is never value delivered to LAD), and
   // the player's career is not shown on an acquisition that never happened.
-  assert.deepEqual(await value('unsigned').then((v) => [v.war_coverage, v.credited, v.career, v.orig, v.other, v.cost, v.seasons_to_debut]), ['NOT_SIGNED', false, null, null, null, null, null])
+  assert.deepEqual(await value('unsigned').then((v) => [v.war_coverage, v.credited, v.career, v.orig, v.other, v.ret, v.back, v.cost, v.seasons_to_debut]), ['NOT_SIGNED', false, null, null, null, null, null, null, null])
   // Audited without MLB time: zero is a fact. Not audited: unknown, never zero.
   assert.deepEqual(await value('nomlb').then((v) => [v.war_coverage, v.orig, v.other]), ['NO_MLB', 0, 0])
   assert.deepEqual(await value('notaudited').then((v) => [v.war_coverage, v.orig, v.other]), ['NOT_OBSERVED', null, null])

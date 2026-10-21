@@ -299,11 +299,13 @@ class Applier {
   async attachIdentifiers (playerId, p, sourceKey) {
     const src = await this.sourceId(p.source_key ?? sourceKey)
     for (const [system, value] of Object.entries(p.external_ids ?? {})) {
+      // external_id_sources names the source of an id another source supplied (e.g. a crosswalk); default: the player's source.
+      const idSrc = p.external_id_sources?.[system] ? await this.sourceId(p.external_id_sources[system]) : src
       const owner = await this.one('select player_id from public.player_external_ids where id_system = $1 and external_id = $2', [system, value])
       if (owner) { if (String(owner.player_id) !== String(playerId)) throw new PipelineError(`${system} ${value} belongs to player ${owner.player_id}`); continue }
       const mine = await this.one('select external_id from public.player_external_ids where player_id = $1 and id_system = $2', [playerId, system])
       if (mine) continue // a different id in the same system was caught by identity resolution (CONFLICT); never replaced here
-      await this.q('insert into public.player_external_ids (player_id, id_system, external_id, source_id) values ($1, $2, $3, $4)', [playerId, system, value, src])
+      await this.q('insert into public.player_external_ids (player_id, id_system, external_id, source_id) values ($1, $2, $3, $4)', [playerId, system, value, idSrc])
     }
     for (const a of p.aliases ?? []) {
       await this.q(`insert into public.player_aliases (player_id, alias, alias_type, source_id) values ($1, $2, $3, $4)
@@ -361,7 +363,11 @@ class Applier {
     if (!school.school_type) return { id: null, note: `school unresolved: "${school.name}" has no type` }
     const slug = await (async () => {
       const base = slugify([school.name, school.region].filter(Boolean).join(' '))
-      for (const s of [base, `${base}-${slugify(school.city ?? '')}`, `${base}-2`, `${base}-3`]) if (!(await this.one('select 1 from public.schools where slug = $1', [s]))) return s
+      // A missing city must not yield "<base>-" (invalid slug); numbered fallbacks cover same-named schools.
+      const city = slugify(school.city ?? '')
+      for (const s of [base, city ? `${base}-${city}` : null, ...[2, 3, 4, 5, 6, 7, 8, 9].map((n) => `${base}-${n}`)].filter(Boolean)) {
+        if (!(await this.one('select 1 from public.schools where slug = $1', [s]))) return s
+      }
       throw new PipelineError(`no free slug for school ${school.name}`)
     })()
     const row = await this.one(`insert into public.schools (slug, name, school_type, city, region, country, source_id) values ($1, $2, $3, $4, $5, $6, $7) returning id`,

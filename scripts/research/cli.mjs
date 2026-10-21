@@ -13,7 +13,7 @@
 //
 // League-wide backfill (docs/backfill-methodology.md). Single-organization commands always need --org; nothing assumes a club.
 //   npm run research:orgs                                                   the 30 organizations, historical names, program waves
-//   npm run research:class    -- --org LAD --channel draft --year 2016 [--create]   (international: --period 2016-17)
+//   npm run research:class    -- --org LAD --channel draft --year 2016 [--kind JANUARY_REGULAR] [--create]   (international: --period 2016-17)
 //   npm run research:plan     -- --org LAD --channel draft --year 2016       create/close jobs from the data (idempotent)
 //   npm run research:next     -- --org LAD [--channel draft --year 2016 --period 2016-17 --stage financials --limit 10] | --league
 //   npm run research:progress [-- --org LAD]                                league-wide unless --org is given
@@ -62,7 +62,7 @@ const print = (title, obj) => { if (json) console.log(JSON.stringify(obj, null, 
 const need = (k) => { if (!args[k] || args[k] === true) throw new P.PipelineError(`--${k} is required`); return args[k] }
 const operator = () => args.agent ? `agent:${args.agent}` : (args.operator ?? process.env.BAI_OPERATOR ?? process.env.USER ?? 'cli')
 const listArg = (k) => args[k] && args[k] !== true ? String(args[k]).split(',').map((e) => e.trim()).filter(Boolean) : []
-const scopeArgs = () => ({ org: args.org, channel: args.channel, year: args.year, period: args.period })
+const scopeArgs = () => ({ org: args.org, channel: args.channel, year: args.year, period: args.period, kind: args.kind })
 
 function summarize (report) {
   const { coverage, actions, ...rest } = report

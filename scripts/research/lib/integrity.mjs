@@ -51,8 +51,11 @@ export const INTEGRITY_CHECKS = [
   {
     key: 'UNSIGNED_ACQUISITION_CREDITED',
     description: 'an acquisition that did not sign (or whose signing is unknown) earns no value',
+    // trade_package_return_war is left out on purpose: referencing it forces the view's trade_returns join for every
+    // acquisition (552 s on a 2,265-selection database, against 0.6 s without it). The view joins trade returns only for
+    // credited acquisitions, and tests/db/value-attribution.test.mjs pins that an unsigned pick gets no trade credit.
     sql: `select channel::text, organization_id, scope_key, player_id, war_system::text from analytics.acquisition_value
-      where not credited and (career_war is not null or original_org_war is not null or other_org_war is not null or returning_stint_war is not null or trade_package_return_war is not null)`
+      where not credited and (career_war is not null or original_org_war is not null or other_org_war is not null or returning_stint_war is not null)`
   },
   {
     key: 'OVERLAPPING_SIGNED_ACQUISITIONS',
