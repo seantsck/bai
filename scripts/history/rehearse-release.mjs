@@ -113,7 +113,7 @@ try {
     const supplement = Boolean(rel.manifest.supplement_of)
     const snapshot = async () => { const o = {}; for (const t of tl) o[t] = new Set((await q(db, `select to_jsonb(x)::text j from ${t} x`)).map((x) => x.j)); return o }
     const snap0 = supplement ? await snapshot() : null
-    const wd0 = supplement ? (await q(db, `select count(*)::int n from public.source_observations o join public.sources s on s.id = o.source_id where s.attribution_category = 'WIKIDATA'`))[0].n : 0
+    const wd0 = (await q(db, `select count(*)::int n from public.source_observations o join public.sources s on s.id = o.source_id where s.attribution_category = 'WIKIDATA'`))[0].n
     const want = supplement ? Object.fromEntries(await Promise.all(rel.batches.flatMap((b) => b.doc.records).map(async (rec) => [rec.overall_pick, (await q(db, `select player_id from public.player_external_ids where id_system = 'MLBAM' and external_id = $1`, [rec.player.external_ids.MLBAM]))[0]?.player_id ?? null]))) : null
     const priorSel = supplement ? await q(db, `select id, player_id, draft_id, overall_pick, organization_id from public.draft_selections where player_id = any($1)`, [Object.values(want)]) : null
     const pv = run('preview'); rstep('preview on the disposable database is SAFE', pv.status === 0, (pv.stdout.trim().split('\n').pop() ?? '') + (pv.stderr ? ` ${pv.stderr.trim().slice(0, 200)}` : ''))
@@ -133,14 +133,14 @@ try {
     rstep('migrations, organizations, drafts, reviewers and certifications untouched', !untouched.length, untouched.join(', '))
     const audit = (await q(db, 'select counts, jsonb_array_length(entries) n from ingest.release_audits where manifest_sha256 = $1', [rel.manifest.manifest_sha256]))[0]
     rstep('release audit written with every record', audit && audit.n === rel.manifest.totals.selections, JSON.stringify(audit?.counts))
-    const cats = await q(db, `select s.attribution_category c, count(*)::int n from public.draft_selections ds join public.drafts d on d.id = ds.draft_id join public.sources s on s.id = ds.source_id where d.draft_year = 2020 group by 1`)
-    rstep('every 2020 selection cites Wikipedia only', cats.length === 1 && cats[0].c === 'WIKIPEDIA', JSON.stringify(cats))
+    const cats = await q(db, `select s.attribution_category c, count(*)::int n from public.draft_selections ds join public.drafts d on d.id = ds.draft_id join public.sources s on s.id = ds.source_id where d.draft_year = ${rel.manifest.authorization_scope.draft_year} group by 1`)
+    rstep(`every ${rel.manifest.authorization_scope.draft_year} selection cites Wikipedia only`, cats.length === 1 && cats[0].c === 'WIKIPEDIA', JSON.stringify(cats))
     const wd = await q(db, `select count(*)::int n from public.source_observations o join public.sources s on s.id = o.source_id where s.attribution_category = 'WIKIDATA'`)
     rstep('Wikidata corroboration recorded as observations citing the WIKIDATA source', wd[0].n - wd0 === 2 * rel.manifest.totals.identity_tiers.VERIFIED, `${wd[0].n - wd0} new observations`)
     if (supplement) {
       const approved = rel.manifest.human_approvals.map((a) => a.pick).sort().join()
       rstep('picks are exactly the human-approved links', approved === rel.batches.flatMap((b) => b.picks).sort().join(), approved)
-      const linked = await q(db, `select s.overall_pick, s.player_id from public.draft_selections s join public.drafts d on d.id = s.draft_id where d.draft_year = 2020 and s.overall_pick = any($1)`, [Object.keys(want).map(Number)])
+      const linked = await q(db, `select s.overall_pick, s.player_id from public.draft_selections s join public.drafts d on d.id = s.draft_id where d.draft_year = ${rel.manifest.authorization_scope.draft_year} and s.overall_pick = any($1)`, [Object.keys(want).map(Number)])
       rstep('each new selection links to the intended existing player', linked.length === Object.keys(want).length && linked.every((x) => String(want[x.overall_pick]) === String(x.player_id)), JSON.stringify(linked))
       const dupNow = (await q(db, `select count(*)::int n from (select name_normalized, birth_date from public.players group by 1, 2 having count(*) > 1) x`))[0].n
       const dupBefore = new Set([...snap0['public.players']].map((j) => { const o = JSON.parse(j); return `${o.name_normalized}|${o.birth_date}` })).size - snap0['public.players'].size
@@ -168,9 +168,9 @@ try {
     const { integrityViolations } = await import('../research/lib/integrity.mjs')
     const viol = await integrityViolations(db)
     rstep('integrity violations: 0', viol.length === 0, JSON.stringify(viol).slice(0, 200))
-    const cov = await q(db, `select coverage_state::text s, count(*)::int n from public.rm_research_coverage rc where rc.scope_key = '2020-JUNE_AMATEUR' group by 1`).catch(() => [])
+    const cov = await q(db, `select coverage_state::text s, count(*)::int n from public.rm_research_coverage rc where rc.scope_key = $1 group by 1`, [rel.manifest.authorization_scope.draft_key]).catch(() => [])
     r.coverage_states = cov
-    rstep('every 2020 club coverage cell is partial', cov.length > 0 && cov.every((x) => x.s === 'PARTIAL_RECONSTRUCTION'), JSON.stringify(cov))
+    rstep(`every ${rel.manifest.authorization_scope.draft_year} club coverage cell is partial`, cov.length > 0 && cov.every((x) => x.s === 'PARTIAL_RECONSTRUCTION'), JSON.stringify(cov))
     const sec = spawnSync(process.execPath, [path.join(root, 'scripts/db/security.mjs')], { cwd: root, env: { ...env, BAI_DATABASE_URL: url(name) }, encoding: 'utf8' })
     rstep('security check passes', sec.status === 0, sec.stdout.trim().split('\n').slice(-2).join(' | ').slice(0, 200))
     await db.end()
