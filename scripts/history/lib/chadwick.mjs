@@ -23,7 +23,7 @@ export function parseCsv (text) {
 }
 
 // Ids are kept only when well formed; anything else is dropped, never repaired.
-const PATTERNS = {
+export const PATTERNS = {
   BBREF: /^[a-z][a-z.'-]*\d{2}$/,
   BBREF_MINORS: /^[a-z-]+\d{3}[a-z-]{3}$/,
   FANGRAPHS: /^(sa)?\d+$/,

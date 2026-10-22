@@ -14,3 +14,6 @@ next-env.d.ts
 
 # Restricted historical research output (source-derived; see research/history/sources.json). Never committed.
 .restricted/
+
+# Local-only research output that is not source-restricted but is not for the repository either (reports, identity files).
+.local/

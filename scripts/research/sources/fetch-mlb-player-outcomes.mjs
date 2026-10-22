@@ -6,6 +6,7 @@
 //
 // Per player: people (debut date, active flag, current team, MLB career and season stats, hitting and pitching),
 // affiliated minor-league seasons (leagueListId=milb_all), and transactions. Per season: the affiliates' parent clubs.
+import { publicRequestHeaders } from '../../history/lib/outbound.mjs'
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -29,7 +30,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
 const manifest = { retrieved_date: new Date().toISOString().slice(0, 10), requests: [] }
 async function get (url) {
   await sleep(PAUSE_MS)
-  const res = await fetch(url, { headers: { 'User-Agent': 'BAI research (public data; rate-limited)' } })
+  const res = await fetch(url, { headers: publicRequestHeaders('player outcomes research') })
   manifest.requests.push({ url, status: res.status })
   if (!res.ok) throw new Error(`${res.status} for ${url}`)
   return res.json()

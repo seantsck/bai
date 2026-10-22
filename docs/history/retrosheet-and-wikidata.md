@@ -1,0 +1,22 @@
+# Retrosheet and Wikidata as reference sources (Phase 10.1)
+
+Both are catalogued in `research/history/sources.json` (`retrosheet-transactions`, `wikidata`). Neither is a draft census.
+
+## Retrosheet transactions
+- **Terms** (https://www.retrosheet.org/notice.txt, read 2026-10-21; checksummed with the data as `retrosheet/notice.txt`): any use, including selling it, provided this statement appears prominently:
+  > The information used here was obtained free of charge from and is copyrighted by Retrosheet. Interested parties may contact Retrosheet at "www.retrosheet.org".
+
+  The statement is on `/sources` (verbatim, tested) and in the catalog (`license.attribution`). Retrosheet gives no accuracy guarantee.
+- **What it holds** (measured on the file of 2022-05-09, sha256 `c5cd539f…d450fd932`): 10,085 draft records (`Da` drafted and signed, `Dn` drafted and did not sign, `Dv` voided), 1965–2021, about 140–250 a year, nearly all for people who reached the majors (about 10–17% of selections), almost none after 2018, and three for 2020. Pick numbers only for first-round picks. Draft types: regular, S secondary, A active, L American Legion, D Dominican.
+- **What it is not:** the draft population. A record is evidence that a person was drafted, with a club, round and (for `Da`) a signing date. A missing record is not evidence of anything. `lib/retrosheet.mjs` labels its index that way and `coverage` prints counts so it cannot be mistaken for a census.
+- **Commands** (`npm run history:retrosheet -- <command>`): `fetch` (the notice, the readme and the 1.2 MB zip; cached under `.cache/history/`, recorded in `research/history/manifest.json` with checksums; a cached file whose checksum differs is an error, a re-run downloads nothing), `index` (draft index rebuilt only when the zip's checksum changes), `coverage --years`, `crosscheck`.
+- **Cross-check against the exception register:** `crosscheck` reads `.restricted/history/exceptions.json` (restricted: it quotes MLB and Baseball-Reference names, so the same `process_local` gates as `exceptions.mjs` apply) and writes `.restricted/history/retrosheet-crosscheck.json`: one PROPOSED_FINDING per exception group (`NO_RETROSHEET_RECORD`, `RETROSHEET_FAVORS_ONE_VARIANT`, `RETROSHEET_RECORD_NO_DISCRIMINATION`, `NOT_COMPARABLE`). Findings carry no conclusion; a reviewer decides through `history:review`. On 2026-10-22: 24 groups, 13 with no Retrosheet record, 10 not comparable (numbering, crosswalk and census-total groups), 1 where Retrosheet's record for six 2005 players names one spelling of a variant pair. Names for Retrosheet ids come from the Chadwick register.
+- **Hosted:** `publish_site` is PENDING. Hosted has no Retrosheet attribution category (migration 025's guard would refuse the records) and the credit surface is not yet tied to shown data. A person grants it together with a migration that adds the category.
+
+## Wikidata
+- CC0 (https://www.wikidata.org/wiki/Wikidata:Licensing). Used as a secondary identity and biographical reference: Q-id, MLB.com player id (P3541), Baseball Reference id (P1825), Retrosheet id (P6976), birth date, and "drafted by" (P647, pick P1836) for the few people who have it (well under 1% of selections).
+- Requests: `lib/wikidata.mjs` builds one SPARQL query per 40 names, cached by query hash, 1.5 s apart, budgeted (80 per run), sent only through the fetcher with the project user agent.
+- A match supports an identity; it never decides one alone and never shows that someone belongs to a draft.
+
+## Outbound identity (privacy)
+Every research request identifies the project by URL only (`BAI-research/0.1 (<component>; +https://github.com/seantsck/bai)`, Wikimedia's user-agent policy accepts a URL). `lib/outbound.mjs` refuses headers carrying an email address, credentials, token-like strings or any value from a private environment variable; the fetcher checks before every request; tests also scan the code for hand-built `User-Agent` headers and the repository for committed email addresses. Authenticated calls to Supabase and Vercel APIs are separate and never go to public sources.

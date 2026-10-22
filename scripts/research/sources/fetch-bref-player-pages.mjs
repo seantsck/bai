@@ -3,6 +3,7 @@
 // complete). One request at a time with a pause, at most 60 ids per run, backoff on 429. Writes <id>.html and a manifest
 // of capture URLs and timestamps; nothing is written to a database.
 //   node scripts/research/sources/fetch-bref-player-pages.mjs --ids luxga01,smithwi05 --before 20260325 --out <dir>
+import { publicRequestHeaders } from '../../history/lib/outbound.mjs'
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -26,7 +27,7 @@ async function get (url, tries = 4) {
   for (let i = 0; i < tries; i++) {
     await sleep(4000 + i * 30000)
     let res
-    try { res = await fetch(url, { headers: { 'User-Agent': 'BAI research (public data; rate-limited)' } }) } catch { continue }   // refused or reset: back off and retry
+    try { res = await fetch(url, { headers: publicRequestHeaders('player outcomes research') }) } catch { continue }   // refused or reset: back off and retry
     if (res.status === 429 || res.status >= 500) continue
     return res
   }

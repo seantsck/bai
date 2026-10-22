@@ -7,6 +7,9 @@ export const metadata = { title: 'Sources & methodology' }
 
 // What each source group is, what BAI takes from it, and how it is credited. Crediting a source is not a claim of a right
 // to redistribute its data (docs/history/hosted-provenance.md).
+// Retrosheet's required statement (https://www.retrosheet.org/notice.txt), verbatim.
+const RETROSHEET_CREDIT = 'The information used here was obtained free of charge from and is copyrighted by Retrosheet. Interested parties may contact Retrosheet at "www.retrosheet.org".'
+
 const GROUPS: { key: string, uses: string, credit: string }[] = [
   {
     key: 'MLB',
@@ -76,6 +79,16 @@ export default async function SourcesPage () {
         { key: 'records', header: 'Records citing it', numeric: true, render: (g) => res.ok ? (totals.get(g.key)?.records ?? 0).toLocaleString('en-US') : '—' },
         { key: 'observations', header: 'Field observations', numeric: true, render: (g) => res.ok ? (totals.get(g.key)?.observations ?? 0).toLocaleString('en-US') : '—' }
       ]} />
+
+      <h2>Reference data used in research</h2>
+      <p>
+        BAI’s research tooling also reads two openly licensed reference datasets. Neither is shown on this site yet; they are credited here because
+        Retrosheet’s notice requires its statement to appear prominently wherever its data is used.
+      </p>
+      <ul>
+        <li>{RETROSHEET_CREDIT}</li>
+        <li>Wikidata, structured data released under CC0 1.0. Credited as a courtesy.</li>
+      </ul>
 
       <h2>Rights</h2>
       <p>
