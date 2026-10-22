@@ -148,7 +148,38 @@ Never create or alter tables through the Dashboard. A hosted database must alway
     remains closed.
   - **`hosted:verify` 10/11.** Its calendar-idempotence check re-runs 015's seed upsert. 025's guard fired BEFORE INSERT,
     which PostgreSQL runs even for a conflicting (no-op) upsert row, so the re-seed was refused as a new publication.
-    026 fixes the guard (rehearsed on hosted; pending approval). The production release waits for 11/11.
+    026 fixed this (below).
+- **026 (publication guard ignores no-op upserts) is deployed** (2026-10-21, after PR #14 merged at `a151e6c`, from a
+  clean `main`).
+  - **Rehearsals:** `hosted:rehearse` OK, plus a rolled-back rehearsal:
+    - the 015 re-seed is refused without 026 and succeeds with it;
+    - new MLB-sourced records and repointed sources are still refused;
+    - 32 insert and 32 update guards replace 025's triggers.
+  - **Push and record:** dry run (026 only), push, then `hosted:migrate` recorded it.
+  - **After:**
+    - `hosted:refresh`;
+    - migration history 26/26;
+    - parity 0 differences over 2,784 objects;
+    - security OK (64 functions; none executable by public roles);
+    - **`hosted:verify` 11/11**;
+    - pilot reconciliation OK;
+    - integrity 0 violations;
+    - Supabase advisors report no issues.
+  - **Preserved:** compared with the snapshots taken before 025 and before 026, these are unchanged:
+    - players (779), selections (456), draft signings (456), international signings (297);
+    - WAR observations (354), source observations (7,429), external ids (1,372);
+    - organizations, names, drafts, coverage and sources.
+
+    Only the read models' refresh generation changed. There are no historical drafts or selections, no exception
+    evidence, no release or publication-grant rows, and certification remains closed.
+- **Production release (2026-10-21):** `main` at `a151e6c` was deployed manually to Vercel Production as
+  `dpl_4MkRhWprvwbL6vL2Yby8aWNNUzwb`, aliased to `bai-iota.vercel.app`.
+  - **Build:** from a `git archive` of the commit (57 KB, 39 files); functions in `yul1`; the read-only `bai_web`
+    connection unchanged. The Git-triggered production build was skipped by `ignoreCommand`, as designed.
+  - **Smoke test, unauthenticated:** every public page returned 200, and unknown routes, `/api` and `/admin` returned
+    404. Source counts and labels, the independence footer and the partial-coverage notices were all shown.
+  - **Runtime logs:** no errors, warnings or 5xx responses.
+  - **Rollback:** the previous production deployment, `bai-9alfbilek`, is available.
 - `hosted:verify-pilot` compares only the pilot's own rows, so it keeps working as hosted gains other classes.
 
 ### Hosted-only migrations
