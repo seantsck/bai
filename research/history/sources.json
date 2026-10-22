@@ -165,7 +165,18 @@
     }
    },
    "authorization": null,
-   "permission_notes": "Attribution required: cite the Chadwick Baseball Bureau on public pages that show ids from it. Pinned to one commit so replays are deterministic."
+   "permission_notes": "Attribution required: cite the Chadwick Baseball Bureau on public pages that show ids from it. Pinned to one commit so replays are deterministic.",
+   "identity": {
+    "url_prefixes": [
+     "https://github.com/chadwickbureau/register"
+    ],
+    "publishers": [
+     "Chadwick Baseball Bureau",
+     "Chadwick Baseball Bureau (GitHub)"
+    ],
+    "source_type": "REFERENCE_DATABASE",
+    "key_pattern": "^hist:chadwick-register-[0-9a-f]{7,40}$"
+   }
   },
   {
    "id": "wikipedia-draft-articles",
@@ -231,7 +242,18 @@
     }
    },
    "authorization": null,
-   "permission_notes": "Independent of MLB's feed for counts and dates. A secondary source: a disagreement with MLB is recorded, never resolved by preferring either."
+   "permission_notes": "Independent of MLB's feed for counts and dates. A secondary source: a disagreement with MLB is recorded, never resolved by preferring either.",
+   "identity": {
+    "hosts": [
+     "en.wikipedia.org"
+    ],
+    "publishers": [
+     "Wikimedia Foundation (contributors)",
+     "Wikipedia"
+    ],
+    "source_type": "REFERENCE_DATABASE",
+    "key_pattern": "^hist:wikipedia-[a-z0-9._:-]+$"
+   }
   },
   {
    "id": "bref-draft-archive",

@@ -24,13 +24,13 @@ test('the catalog reviews Wikidata as CC0 and declares its identity', () => {
 
 test('a catalog identity must be complete', () => {
   const broken = { ...catalog, sources: catalog.sources.map((s) => (s.id === 'wikidata' ? { ...s, identity: { hosts: ['www.wikidata.org'] } } : s)) }
-  assert.match(validateCatalog(broken).join(';'), /identity needs hosts, publisher, source_type and key_pattern/)
+  assert.match(validateCatalog(broken).join(';'), /identity needs hosts or url_prefixes, a publisher, source_type and key_pattern/)
 })
 
 test('identity needs host, publisher, type and key together', () => {
   assert.equal(matchesIdentity(wd.identity, GOOD), true)
   assert.equal(matchesIdentity(wd.identity, { ...GOOD, url: 'https://query.wikidata.org/sparql?query=x' }), true)
-  for (const bad of [{ url: 'https://www.wikidata.org.evil.example/' }, { url: 'https://www.wikidata.org@evil.example/' }, { url: 'http://www.wikidata.org/' }, { url: 'https://evil.example/www.wikidata.org/' },
+  for (const bad of [{ url: 'https://www.wikidata.org.evil.example/' }, { url: `https://www.wikidata.org${'@'}evil.example/` }, { url: 'http://www.wikidata.org/' }, { url: 'https://evil.example/www.wikidata.org/' },
     { url: 'https://www.wikidata.orgx/' }, { url: 'https://www.wikidata.org/ x' }, { url: null }, { publisher: 'Someone Else' }, { publisher: undefined }, { source_type: 'NEWS_REPORT' },
     { source_key: 'hist:wikidata-' }, { source_key: 'hist:wikidata-UPPER' }, { source_key: 'wikidata:2020' }, { source_key: 'hist:wikipedia-2020' }]) {
     assert.equal(matchesIdentity(wd.identity, { ...GOOD, ...bad }), false, JSON.stringify(bad))
@@ -55,7 +55,7 @@ test('restricted sources stay refused, with or without Wikidata beside them', ()
   refused([GOOD, mlb], /mlb-statsapi-draft|publish_site refused/)
   refused([GOOD, bref], /publish_site refused|not in the source catalog/)
   // A label borrowed from a free source, pointing at a restricted host, is governed by the host.
-  refused([{ ...mlb, source_key: 'hist:chadwick-register-fake' }], /publish_site refused|mlb-statsapi-draft/)
+  refused([{ ...mlb, source_key: 'hist:chadwick-register-fake' }], /publish_site refused|mlb-statsapi-draft|claims to be/)
 })
 
 test('missing citations: a batch with no sources, or an unknown hist: key, cannot reach hosted', () => {
@@ -72,4 +72,26 @@ test('local processing applies the same identity check, and the historical lock 
   assert.equal(requireHostedPublication(catalog, historical, {}, { root }).historical, true)
   const { misidentified } = governingSources(catalog, { ...GOOD, url: 'https://evil.example/' })
   assert.deepEqual(misidentified, ['wikidata'])
+})
+
+test('the pipeline refuses forged Chadwick and Wikipedia identities independently of the database', () => {
+  const CW = { source_key: 'hist:chadwick-register-781c175', source_type: 'REFERENCE_DATABASE', publisher: 'Chadwick Baseball Bureau', url: 'https://github.com/chadwickbureau/register/tree/781c175e748b89e5730fd3f5de0086b9355b2f92' }
+  const WP = { source_key: 'hist:wikipedia-2020-june-amateur-r1', source_type: 'REFERENCE_DATABASE', publisher: 'Wikimedia Foundation (contributors)', url: 'https://en.wikipedia.org/w/index.php?title=2020_Major_League_Baseball_draft&oldid=1' }
+  assert.deepEqual(requireHostedPublication(catalog, doc([CW, WP]), {}, { root }).years, [2020])
+  const forgeries = [
+    [{ ...CW, url: 'https://github.com/someone-else/register' }, /does not carry its identity|claims to be/],
+    [{ ...CW, url: 'https://github.com.evil.example/chadwickbureau/register' }, /does not carry its identity|claims to be/],
+    [{ ...CW, publisher: 'Someone Else' }, /does not carry its identity/],
+    [{ ...CW, source_type: 'NEWS_REPORT' }, /does not carry its identity|claims to be/],
+    [{ ...CW, source_key: 'hist:chadwick-register-ZZZ' }, /does not carry its identity|does not govern/],
+    [{ ...CW, url: 'https://statsapi.mlb.com/api/v1/draft/2020' }, /does not carry its identity|mlb-statsapi-draft/],
+    [{ ...WP, url: 'https://de.wikipedia.org/wiki/X' }, /does not carry its identity/],
+    [{ ...WP, url: 'https://en.wikipedia.org.evil.example/x' }, /does not carry its identity|claims to be/],
+    [{ ...WP, publisher: 'MLB Advanced Media' }, /does not carry its identity/],
+    [{ ...WP, source_type: 'NEWS_REPORT' }, /does not carry its identity/],
+    [{ ...WP, url: 'https://www.mlb.com/news/x' }, /does not carry its identity|mlb-statsapi-draft/]
+  ]
+  for (const [bad, re] of forgeries) refused([bad], re)
+  // The same forgeries are refused for local processing of a batch (identity is checked before any use).
+  assert.throws(() => requireBatchUse(catalog, doc([{ ...CW, publisher: 'Someone Else' }]), 'process_local', {}, { root }), /does not carry its identity/)
 })

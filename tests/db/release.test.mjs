@@ -18,7 +18,7 @@ before(async () => { await h.startServer(); db = await h.freshDatabase() }, { ti
 after(async () => { await h.stopServer(); fs.rmSync(tmp, { recursive: true, force: true }) })
 
 const WIKI = 'hist:wikipedia-2020-fixture-r1'
-const CW = 'hist:chadwick-register-fixture'
+const CW = 'hist:chadwick-register-abc1234'
 const WD = 'hist:wikidata-2020-fixture'
 const sources = (verified) => [
   { source_key: WIKI, source_type: 'REFERENCE_DATABASE', authority_level: 'AGGREGATOR', title: 'Wikipedia: fixture draft, revision 1', publisher: 'Wikimedia Foundation (contributors)', url: 'https://en.wikipedia.org/w/index.php?title=Fixture&oldid=1', retrieved_date: '2026-10-22' },
@@ -84,7 +84,7 @@ test('scope and content: another draft, a complete-census claim, signing data, i
   bad((d) => { d.records[0].signing = { status: 'UNKNOWN', bonus_usd: 5 } }, /carry a signing status, date or bonus/)
   bad((d) => { d.records[0].player.external_ids = { MLBAM: '999001' } }, /ids with no provenance/)
   bad((d) => { d.records[0].player.external_ids = { MLBAM: '999001' }; d.records[0].player.external_id_sources = { MLBAM: WIKI } }, /without the recorded Wikidata corroboration/)
-  bad((d) => { d.sources[0].url = 'https://statsapi.mlb.com/api/v1/draft/2020' }, /mlb-statsapi-draft|publish_site/)
+  bad((d) => { d.sources[0].url = 'https://statsapi.mlb.com/api/v1/draft/2020' }, /mlb-statsapi-draft|publish_site|claims to be/)
   bad((d) => { d.sources = [] }, /no declared sources/)
   const two = writeRelease('dup', [batch('KC', [record(1, 'KC', 'Fixture Dup A')], false), batch('LAD', [record(1, 'LAD', 'Fixture Dup B')], false)])
   assert.ok(verifyReleaseContent(loadRelease(two), { root }).some((p) => /more than one batch/.test(p)))

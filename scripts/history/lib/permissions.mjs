@@ -47,7 +47,7 @@ export function validateCatalog (catalog) {
     ids.add(s.id)
     if (!s.review?.reviewed_on || !s.review?.review_due) out.push(`${at}: review.reviewed_on and review.review_due are required`)
     if (!s.license?.name) out.push(`${at}: license.name is required`)
-    if (s.identity && (!Array.isArray(s.identity.hosts) || !s.identity.hosts.length || !s.identity.publisher || !s.identity.source_type || !s.identity.key_pattern)) out.push(`${at}: identity needs hosts, publisher, source_type and key_pattern`)
+    if (s.identity && (!((s.identity.hosts ?? []).length || (s.identity.url_prefixes ?? []).length) || !(s.identity.publisher || (s.identity.publishers ?? []).length) || !s.identity.source_type || !s.identity.key_pattern)) out.push(`${at}: identity needs hosts or url_prefixes, a publisher, source_type and key_pattern`)
     for (const use of USES) {
       const g = s.uses?.[use]
       if (!g) { out.push(`${at}: no grant for ${use}`); continue }
@@ -94,18 +94,20 @@ export function governingSources (catalog, cited) {
   return { sources: out, misidentified, unknownHist: !out.length && /^hist:/i.test(String(cited.source_key ?? '').trim()) }
 }
 
-/** Whether a cited source carries the identity an entry requires (https URL on exactly one of its hosts, publisher, type, key). */
+/**
+ * Whether a cited source carries the identity an entry requires: an https URL on one of its hosts (or under one of its URL
+ * prefixes, ending at a path, query or the end), a publisher from its list, its source type and its key pattern. All of
+ * them, never one label.
+ */
 export function matchesIdentity (identity, cited) {
   const url = String(cited.url ?? '')
-  const hostOk = (identity.hosts ?? []).some((h) => url.startsWith(`https://${h}`) && ['/', '?', ''].includes(url.charAt(`https://${h}`.length)) && !/\s/.test(url))
-  return hostOk &&
-    (!identity.publisher || cited.publisher === identity.publisher) &&
+  const under = (prefix) => url.startsWith(prefix) && ['/', '?', ''].includes(url.charAt(prefix.length))
+  const urlOk = !/\s/.test(url) && ((identity.hosts ?? []).some((h) => under(`https://${h}`)) || (identity.url_prefixes ?? []).some(under))
+  const publishers = identity.publishers ?? (identity.publisher ? [identity.publisher] : [])
+  return urlOk &&
+    (!publishers.length || publishers.includes(cited.publisher)) &&
     (!identity.source_type || cited.source_type === identity.source_type) &&
     (!identity.key_pattern || new RegExp(identity.key_pattern).test(String(cited.source_key ?? '')))
-}
-export function governingSource (catalog, cited) {
-  const { sources, unknownHist } = governingSources(catalog, cited)
-  return { source: sources[0] ?? null, unknownHist }
 }
 
 function scopeProblem (scope, ctx) {

@@ -174,7 +174,7 @@ test('hosted publication: no new MLB or Baseball-Reference records; aliases, unk
   assert.throws(pub(doc([{ source_key: 'verify:x', source_type: 'TEST_FIXTURE', url: 'https://statsapi.mlb.com/api/v1/draft/2016' }], '2016-JUNE_AMATEUR')), /mlb-statsapi-draft/)
   // Openly licensed and BAI's own sources pass under their documented scope (historical years are still locked per
   // database by 025); fictional verification fixtures pass for hosted:verify's rolled-back transactions.
-  assert.deepEqual(pub(doc([{ source_key: 'hist:chadwick-register-781c175' }, { source_key: 'hist:wikipedia-2006-rev1' }]))(), { years: [2006], historical: true })
+  assert.deepEqual(pub(doc([{ source_key: 'hist:chadwick-register-781c175', source_type: 'REFERENCE_DATABASE', publisher: 'Chadwick Baseball Bureau', url: 'https://github.com/chadwickbureau/register/tree/781c175e748b89e5730fd3f5de0086b9355b2f92' }, { source_key: 'hist:wikipedia-2006-rev1', source_type: 'REFERENCE_DATABASE', publisher: 'Wikimedia Foundation (contributors)', url: 'https://en.wikipedia.org/w/index.php?title=2006_Major_League_Baseball_draft&oldid=1' }]))(), { years: [2006], historical: true })
   assert.equal(pub(doc([{ source_key: 'bai-reference:calendar-2027', source_type: 'BAI_REFERENCE' }], '2027-JUNE_AMATEUR'))().historical, false)
   assert.equal(pub(doc([{ source_key: 'verify:official', source_type: 'TEST_FIXTURE' }], '2017-JUNE_AMATEUR'))().historical, false)
   // Every batch already in the repository (whose records are on hosted) would be refused as a NEW publication today.

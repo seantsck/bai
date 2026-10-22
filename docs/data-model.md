@@ -330,8 +330,9 @@ Every fact table above, apart from identity and lookup tables, also references `
 - **Publication guard (hosted only).** `ingest.source_publication_grants`, with a `<table>_publication_guard` trigger on
   every table that cites a source (except `fact_resolutions`): on a Supabase database, a new record or a changed
   `source_id` citing a group other than Chadwick Register, Wikipedia, Wikidata (027) or BAI research is refused unless that group has a
-  recorded basis. WIKIDATA is assigned only to a source whose URL, publisher, type and key all identify Wikidata
-  (`public.source_attribution_category`), and a source's category cannot change once it exists (027). Existing records are untouched. 026 makes it fire AFTER INSERT (only for rows actually inserted, so a no-op upsert passes) and on
+  recorded basis. The guard recomputes the strict category from the source itself (`public.source_attribution_category`, 027): restricted
+  groups are judged first, and Wikidata, Chadwick, Wikipedia and BAI research need their full URL, publisher, type (and key)
+  identity. A legacy source's stored category is not permission for new records, and a source's category cannot change once it exists. Existing records are untouched. 026 makes it fire AFTER INSERT (only for rows actually inserted, so a no-op upsert passes) and on
   UPDATE only when `source_id` changes.
 - **Exception review.** `research.history_exceptions`, `_claims`, `_proposals`, `_decisions`, `_events` and
   `_conclusions`. All are private and append-only:
