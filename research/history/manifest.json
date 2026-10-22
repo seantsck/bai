@@ -801,12 +801,36 @@
    "retrieved_at": "2026-10-22T01:10:07.872Z",
    "content_type": "application/zip"
   },
+  "wikidata/sparql-043135d3f7e6c0de.json": {
+   "url": "https://query.wikidata.org/sparql?format=json&query=SELECT%20%3Fp%20%3Flabel%20%3Fmlb%20%3Fbirth%20%3Fbbref%20%3Fretro%20%3FschoolLabel%20%3FdteamLabel%20%3Fdpick%20%3Fdtime%20WHERE%20%7B%0A%20%20VALUES%20%3Fp%20%7B%20wd%3AQ64699662%20wd%3AQ7972077%20wd%3AQ7707931%20wd%3AQ7414042%20wd%3AQ5916383%20wd%3AQ5148904%20wd%3AQ22582721%20wd%3AQ7589587%20wd%3AQ17379512%20wd%3AQ5095837%20wd%3AQ54861366%20wd%3AQ85216205%20wd%3AQ85232651%20wd%3AQ93783024%20wd%3AQ90959508%20wd%3AQ90958701%20wd%3AQ95971513%20wd%3AQ129652233%20wd%3AQ133866416%20wd%3AQ126005548%20wd%3AQ113144510%20wd%3AQ106782873%20wd%3AQ113566539%20wd%3AQ112208131%20wd%3AQ108109413%20wd%3AQ112238099%20wd%3AQ122723726%20wd%3AQ125019208%20wd%3AQ117360252%20wd%3AQ123230307%20wd%3AQ134823180%20wd%3AQ108869250%20wd%3AQ121354617%20wd%3AQ137356528%20wd%3AQ138782491%20wd%3AQ139736973%20wd%3AQ121392700%20wd%3AQ139736462%20wd%3AQ115529492%20wd%3AQ129790517%20wd%3AQ122442172%20wd%3AQ121355127%20wd%3AQ139736719%20wd%3AQ136350489%20wd%3AQ139736986%20wd%3AQ116937241%20wd%3AQ136290248%20wd%3AQ139736435%20wd%3AQ138939985%20wd%3AQ34156629%20%7D%0A%20%20%3Fp%20rdfs%3Alabel%20%3Flabel%20.%20FILTER(LANG(%3Flabel)%20%3D%20%22en%22)%0A%20%20OPTIONAL%20%7B%20%3Fp%20wdt%3AP3541%20%3Fmlb%20%7D%0A%20%20OPTIONAL%20%7B%20%3Fp%20wdt%3AP569%20%3Fbirth%20%7D%0A%20%20OPTIONAL%20%7B%20%3Fp%20wdt%3AP1825%20%3Fbbref%20%7D%0A%20%20OPTIONAL%20%7B%20%3Fp%20wdt%3AP6976%20%3Fretro%20%7D%0A%20%20OPTIONAL%20%7B%20%3Fp%20wdt%3AP69%20%3Fschool%20.%20%3Fschool%20rdfs%3Alabel%20%3FschoolLabel%20.%20FILTER(LANG(%3FschoolLabel)%20%3D%20%22en%22)%20%7D%0A%20%20OPTIONAL%20%7B%20%3Fp%20p%3AP647%20%3Fd%20.%20%3Fd%20ps%3AP647%20%3Fdteam%20.%20OPTIONAL%20%7B%20%3Fd%20pq%3AP1836%20%3Fdpick%20%7D%20OPTIONAL%20%7B%20%3Fd%20pq%3AP585%20%3Fdtime%20%7D%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%3Fdteam%20rdfs%3Alabel%20%3FdteamLabel%20.%20FILTER(LANG(%3FdteamLabel)%20%3D%20%22en%22)%20%7D%0A%7D",
+   "source_key": "wikidata",
+   "bytes": 31498,
+   "sha256": "dbd50a2977ad2d9b4c1556ae05c6a9071f6e84a6837ab61cf4260d311670d744",
+   "retrieved_at": "2026-10-22T01:42:37.797Z",
+   "content_type": "application/sparql-results+json;charset=utf-8"
+  },
+  "wikidata/sparql-4f1e6a6a8bc26b5b.json": {
+   "url": "https://query.wikidata.org/sparql?format=json&query=SELECT%20%3Fp%20%3Flabel%20%3Fmlb%20%3Fbirth%20%3Fbbref%20%3Fretro%20WHERE%20%7B%0A%20%20VALUES%20%3Fmlb%20%7B%20%22694379%22%20%22675966%22%20%22680671%22%20%22669386%22%20%22691949%22%20%22811717%22%20%22669398%22%20%22691723%22%20%22671109%22%20%22685125%22%20%22693308%22%20%22671157%22%20%22689713%22%20%22687723%22%20%22695406%22%20%22690956%22%20%22686978%22%20%22694679%22%20%22681924%22%20%22694395%22%20%22685068%22%20%22681432%22%20%22695026%22%20%22691021%22%20%22686546%22%20%22686894%22%20%22678016%22%20%22686251%22%20%22675455%22%20%22695020%22%20%22675911%22%20%22686769%22%20%22694397%22%20%22694360%22%20%22694930%22%20%22671113%22%20%22690993%22%20%22691945%22%20%22669165%22%20%22694361%22%20%22676309%22%20%22693440%22%20%22671987%22%20%22695247%22%20%22685076%22%20%22694372%22%20%22690544%22%20%22671212%22%20%22694885%22%20%22801997%22%20%7D%0A%20%20%3Fp%20wdt%3AP3541%20%3Fmlb%20.%20%3Fp%20rdfs%3Alabel%20%3Flabel%20.%20FILTER(LANG(%3Flabel)%20%3D%20%22en%22)%0A%20%20OPTIONAL%20%7B%20%3Fp%20wdt%3AP569%20%3Fbirth%20%7D%0A%20%20OPTIONAL%20%7B%20%3Fp%20wdt%3AP1825%20%3Fbbref%20%7D%0A%20%20OPTIONAL%20%7B%20%3Fp%20wdt%3AP6976%20%3Fretro%20%7D%0A%7D",
+   "source_key": "wikidata",
+   "bytes": 8064,
+   "sha256": "b8332e3d6aff8772e29165a339c095b60d2b590692a98994dbbcb4dd9b5b2c95",
+   "retrieved_at": "2026-10-22T01:49:51.975Z",
+   "content_type": "application/sparql-results+json;charset=utf-8"
+  },
   "wikidata/sparql-8d4e3f4cbc7f3998.json": {
    "url": "https://query.wikidata.org/sparql?format=json&query=SELECT%20%3Fp%20%3Flabel%20%3Fmlb%20%3Fbirth%20%3Fbbref%20%3Fretro%20%3FdteamLabel%20%3Fdpick%20%3Fdtime%20WHERE%20%7B%0A%20%20VALUES%20%3Flabel%20%7B%20%22Sam%20Weatherly%22%40en%20%22David%20Calabrese%22%40en%20%22Adisyn%20Coffey%22%40en%20%22Bryce%20Bonnin%22%40en%20%22Kyle%20Harrison%22%40en%20%22Tekoah%20Roby%22%40en%20%22Casey%20Martin%22%40en%20%22Jordan%20Nwogu%22%40en%20%22Blaze%20Jordan%22%40en%20%22Liam%20Norris%22%40en%20%22Anthony%20Walters%22%40en%20%22Zavier%20Warren%22%40en%20%22Levi%20Prater%22%40en%20%22Holden%20Powell%22%40en%20%22Petey%20Halpin%22%40en%20%22Hunter%20Barnhart%22%40en%20%22Jesse%20Franklin%20V%22%40en%20%22Michael%20Guldberg%22%40en%20%22Trevor%20Hauver%22%40en%20%22Jake%20Vogel%22%40en%20%22Tyler%20Brown%22%40en%20%22Gage%20Workman%22%40en%20%22Coby%20Mayo%22%40en%20%22Jake%20Eder%22%40en%20%22Christian%20Chamberlain%22%40en%20%22Nick%20Frasso%22%40en%20%22Tyler%20Keenan%22%40en%20%22Jack%20Hartman%22%40en%20%22Levi%20Thomas%22%40en%20%22Case%20Williams%22%40en%20%22Werner%20Blakely%22%40en%20%22Kade%20Mechals%22%40en%20%22Mac%20Wainwright%22%40en%20%22R.%20J.%20Dabovich%22%40en%20%22Dylan%20MacLean%22%40en%20%22Carson%20Ragsdale%22%40en%20%22Luke%20Little%22%40en%20%22Jeremy%20Wu-Yelland%22%40en%20%22A.%20J.%20Vukovich%22%40en%20%22Matthew%20Dyer%22%40en%20%7D%0A%20%20%3Fp%20rdfs%3Alabel%20%3Flabel%20%3B%20wdt%3AP106%20wd%3AQ10871364%20.%0A%20%20OPTIONAL%20%7B%20%3Fp%20wdt%3AP3541%20%3Fmlb%20%7D%0A%20%20OPTIONAL%20%7B%20%3Fp%20wdt%3AP569%20%3Fbirth%20%7D%0A%20%20OPTIONAL%20%7B%20%3Fp%20wdt%3AP1825%20%3Fbbref%20%7D%0A%20%20OPTIONAL%20%7B%20%3Fp%20wdt%3AP6976%20%3Fretro%20%7D%0A%20%20OPTIONAL%20%7B%20%3Fp%20p%3AP647%20%3Fd%20.%20%3Fd%20ps%3AP647%20%3Fdteam%20.%20OPTIONAL%20%7B%20%3Fd%20pq%3AP1836%20%3Fdpick%20%7D%20OPTIONAL%20%7B%20%3Fd%20pq%3AP585%20%3Fdtime%20%7D%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%3Fdteam%20rdfs%3Alabel%20%3FdteamLabel%20.%20FILTER(LANG(%3FdteamLabel)%20%3D%20%22en%22)%20%7D%0A%7D",
    "source_key": "wikidata",
    "bytes": 6540,
    "sha256": "f6b676c18b8c30972c066acbdb19e860ec70309145da8606eb47d9da9972eac0",
    "retrieved_at": "2026-10-22T01:16:32.914Z",
+   "content_type": "application/sparql-results+json;charset=utf-8"
+  },
+  "wikidata/sparql-9003f21ade6c7933.json": {
+   "url": "https://query.wikidata.org/sparql?format=json&query=SELECT%20%3Fp%20%3Flabel%20%3Fmlb%20%3Fbirth%20%3Fbbref%20%3Fretro%20WHERE%20%7B%0A%20%20VALUES%20%3Fmlb%20%7B%20%22685005%22%20%22669477%22%20%22694497%22%20%22693310%22%20%22669372%22%20%22668965%22%20%22691026%22%20%22669371%22%20%22673726%22%20%22671106%22%20%22693855%22%20%22676105%22%20%22669442%22%20%22689017%22%20%22693312%22%20%22668667%22%20%22693311%22%20%22683175%22%20%22690998%22%20%22690925%22%20%22676464%22%20%22694368%22%20%22693309%22%20%22676475%22%20%22692221%22%20%22691012%22%20%22669360%22%20%22676545%22%20%22685112%22%20%22694355%22%20%22694382%22%20%22687659%22%20%22694356%22%20%22811328%22%20%22677961%22%20%22676333%22%20%22683341%22%20%22676249%22%20%22675655%22%20%22690986%22%20%22694358%22%20%22676045%22%20%22685087%22%20%22691458%22%20%22691005%22%20%22695024%22%20%22680518%22%20%22686246%22%20%22676026%22%20%22690984%22%20%7D%0A%20%20%3Fp%20wdt%3AP3541%20%3Fmlb%20.%20%3Fp%20rdfs%3Alabel%20%3Flabel%20.%20FILTER(LANG(%3Flabel)%20%3D%20%22en%22)%0A%20%20OPTIONAL%20%7B%20%3Fp%20wdt%3AP569%20%3Fbirth%20%7D%0A%20%20OPTIONAL%20%7B%20%3Fp%20wdt%3AP1825%20%3Fbbref%20%7D%0A%20%20OPTIONAL%20%7B%20%3Fp%20wdt%3AP6976%20%3Fretro%20%7D%0A%7D",
+   "source_key": "wikidata",
+   "bytes": 8128,
+   "sha256": "bbeed0a76eccad0771e033f65476ec9eec94b166dc898474683bb5e150ec7f26",
+   "retrieved_at": "2026-10-22T01:45:32.520Z",
    "content_type": "application/sparql-results+json;charset=utf-8"
   },
   "wikidata/sparql-970b558bf11dd19c.json": {
@@ -825,6 +849,22 @@
    "retrieved_at": "2026-10-22T01:16:34.904Z",
    "content_type": "application/sparql-results+json;charset=utf-8"
   },
+  "wikidata/sparql-bf59e01882b13934.json": {
+   "url": "https://query.wikidata.org/sparql?format=json&query=SELECT%20%3Fp%20%3Flabel%20%3Fmlb%20%3Fbirth%20%3Fbbref%20%3Fretro%20WHERE%20%7B%0A%20%20VALUES%20%3Fmlb%20%7B%20%22676288%22%20%22691103%22%20%22675660%22%20%22694297%22%20%22679358%22%20%22676463%22%20%22680730%22%20%22668971%22%20%22695377%22%20%22693821%22%20%22669434%22%20%22693850%22%20%22694813%22%20%22694376%22%20%7D%0A%20%20%3Fp%20wdt%3AP3541%20%3Fmlb%20.%20%3Fp%20rdfs%3Alabel%20%3Flabel%20.%20FILTER(LANG(%3Flabel)%20%3D%20%22en%22)%0A%20%20OPTIONAL%20%7B%20%3Fp%20wdt%3AP569%20%3Fbirth%20%7D%0A%20%20OPTIONAL%20%7B%20%3Fp%20wdt%3AP1825%20%3Fbbref%20%7D%0A%20%20OPTIONAL%20%7B%20%3Fp%20wdt%3AP6976%20%3Fretro%20%7D%0A%7D",
+   "source_key": "wikidata",
+   "bytes": 3348,
+   "sha256": "0af0f91a5e38c0881ec6a6d365b5604d56b72c0a9d06b0572a4c1ac24c06f6a0",
+   "retrieved_at": "2026-10-22T01:45:35.254Z",
+   "content_type": "application/sparql-results+json;charset=utf-8"
+  },
+  "wikidata/sparql-c1478637c9b4cf44.json": {
+   "url": "https://query.wikidata.org/sparql?format=json&query=SELECT%20%3Fp%20%3Flabel%20%3Fmlb%20%3Fbirth%20%3Fbbref%20%3Fretro%20WHERE%20%7B%0A%20%20VALUES%20%3Fmlb%20%7B%20%22694379%22%20%22680671%22%20%22669386%22%20%22691949%22%20%22811717%22%20%22669398%22%20%22691723%22%20%22671109%22%20%22685125%22%20%22693308%22%20%22671157%22%20%22689713%22%20%22687723%22%20%22695406%22%20%22690956%22%20%22686978%22%20%22694679%22%20%22681924%22%20%22694395%22%20%22685068%22%20%22681432%22%20%22695026%22%20%22691021%22%20%22686546%22%20%22686894%22%20%22678016%22%20%22686251%22%20%22675455%22%20%22695020%22%20%22675911%22%20%22686769%22%20%22694397%22%20%22694360%22%20%22694930%22%20%22671113%22%20%22690993%22%20%22691945%22%20%22669165%22%20%22694361%22%20%22676309%22%20%22693440%22%20%22671987%22%20%22695247%22%20%22685076%22%20%22694372%22%20%22690544%22%20%22671212%22%20%22694885%22%20%22801997%22%20%22695336%22%20%7D%0A%20%20%3Fp%20wdt%3AP3541%20%3Fmlb%20.%20%3Fp%20rdfs%3Alabel%20%3Flabel%20.%20FILTER(LANG(%3Flabel)%20%3D%20%22en%22)%0A%20%20OPTIONAL%20%7B%20%3Fp%20wdt%3AP569%20%3Fbirth%20%7D%0A%20%20OPTIONAL%20%7B%20%3Fp%20wdt%3AP1825%20%3Fbbref%20%7D%0A%20%20OPTIONAL%20%7B%20%3Fp%20wdt%3AP6976%20%3Fretro%20%7D%0A%7D",
+   "source_key": "wikidata",
+   "bytes": 8711,
+   "sha256": "9be0d1f2ad740503a645f6d07837eb37e69af98cbe8734aa53d570344e4b7b5d",
+   "retrieved_at": "2026-10-22T01:45:33.629Z",
+   "content_type": "application/sparql-results+json;charset=utf-8"
+  },
   "wikidata/sparql-de0da57a034f5df2.json": {
    "url": "https://query.wikidata.org/sparql?format=json&query=SELECT%20%3Fp%20%3Flabel%20%3Fmlb%20%3Fbirth%20%3Fbbref%20%3Fretro%20%3FdteamLabel%20%3Fdpick%20%3Fdtime%20WHERE%20%7B%0A%20%20VALUES%20%3Flabel%20%7B%20%22Ben%20Hernandez%22%40en%20%22CJ%20Van%20Eyk%22%40en%20%22Zach%20DeLoach%22%40en%20%22Jared%20Jones%22%40en%20%22Owen%20Caissie%22%40en%20%22Chris%20McMahon%22%40en%20%22Jared%20Kelley%22%40en%20%22Christian%20Roa%22%40en%20%22Casey%20Schmitt%22%40en%20%22Evan%20Carter%22%40en%20%22Burl%20Carraway%22%40en%20%22J.%20T.%20Ginn%22%40en%20%22Freddy%20Zamora%22%40en%20%22Masyn%20Winn%22%40en%20%22Cole%20Henry%22%40en%20%22Logan%20Allen%22%40en%20%22Ian%20Seymour%22%40en%20%22Jeff%20Criswell%22%40en%20%22Alerick%20Soularie%22%40en%20%22Landon%20Knack%22%40en%20%22Kyle%20Nicolas%22%40en%20%22Daniel%20Cabrera%22%40en%20%22Tink%20Hence%22%40en%20%22Connor%20Phillips%22%40en%20%22Jackson%20Miller%22%40en%20%22Clayton%20Beeter%22%40en%20%22Nick%20Swiney%22%40en%20%22Jimmy%20Glowenke%22%40en%20%22Isaiah%20Greene%22%40en%20%22Alec%20Burleson%22%40en%20%22Sammy%20Infante%22%40en%20%22Alex%20Santos%22%40en%20%22Trei%20Cruz%22%40en%20%22Anthony%20Servideo%22%40en%20%22Zach%20McCambley%22%40en%20%22Tyler%20Gentry%22%40en%20%22Trent%20Palmer%22%40en%20%22Kaden%20Polcovich%22%40en%20%22Nick%20Garcia%22%40en%20%22Cole%20Wilcox%22%40en%20%7D%0A%20%20%3Fp%20rdfs%3Alabel%20%3Flabel%20%3B%20wdt%3AP106%20wd%3AQ10871364%20.%0A%20%20OPTIONAL%20%7B%20%3Fp%20wdt%3AP3541%20%3Fmlb%20%7D%0A%20%20OPTIONAL%20%7B%20%3Fp%20wdt%3AP569%20%3Fbirth%20%7D%0A%20%20OPTIONAL%20%7B%20%3Fp%20wdt%3AP1825%20%3Fbbref%20%7D%0A%20%20OPTIONAL%20%7B%20%3Fp%20wdt%3AP6976%20%3Fretro%20%7D%0A%20%20OPTIONAL%20%7B%20%3Fp%20p%3AP647%20%3Fd%20.%20%3Fd%20ps%3AP647%20%3Fdteam%20.%20OPTIONAL%20%7B%20%3Fd%20pq%3AP1836%20%3Fdpick%20%7D%20OPTIONAL%20%7B%20%3Fd%20pq%3AP585%20%3Fdtime%20%7D%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%3Fdteam%20rdfs%3Alabel%20%3FdteamLabel%20.%20FILTER(LANG(%3FdteamLabel)%20%3D%20%22en%22)%20%7D%0A%7D",
    "source_key": "wikidata",
@@ -833,12 +873,68 @@
    "retrieved_at": "2026-10-22T01:16:31.347Z",
    "content_type": "application/sparql-results+json;charset=utf-8"
   },
+  "wikidata/sparql-e9ab63c7e1c70dc9.json": {
+   "url": "https://query.wikidata.org/sparql?format=json&query=SELECT%20%3Fp%20%3Flabel%20%3Fmlb%20%3Fbirth%20%3Fbbref%20%3Fretro%20%3FschoolLabel%20%3FdteamLabel%20%3Fdpick%20%3Fdtime%20WHERE%20%7B%0A%20%20VALUES%20%3Fp%20%7B%20wd%3AQ41207552%20wd%3AQ7413703%20wd%3AQ111594731%20wd%3AQ127277829%20wd%3AQ116264945%20wd%3AQ114498034%20wd%3AQ125704980%20wd%3AQ125766408%20wd%3AQ113567387%20wd%3AQ122723172%20wd%3AQ130611957%20wd%3AQ130280207%20wd%3AQ138168093%20wd%3AQ126942708%20%7D%0A%20%20%3Fp%20rdfs%3Alabel%20%3Flabel%20.%20FILTER(LANG(%3Flabel)%20%3D%20%22en%22)%0A%20%20OPTIONAL%20%7B%20%3Fp%20wdt%3AP3541%20%3Fmlb%20%7D%0A%20%20OPTIONAL%20%7B%20%3Fp%20wdt%3AP569%20%3Fbirth%20%7D%0A%20%20OPTIONAL%20%7B%20%3Fp%20wdt%3AP1825%20%3Fbbref%20%7D%0A%20%20OPTIONAL%20%7B%20%3Fp%20wdt%3AP6976%20%3Fretro%20%7D%0A%20%20OPTIONAL%20%7B%20%3Fp%20wdt%3AP69%20%3Fschool%20.%20%3Fschool%20rdfs%3Alabel%20%3FschoolLabel%20.%20FILTER(LANG(%3FschoolLabel)%20%3D%20%22en%22)%20%7D%0A%20%20OPTIONAL%20%7B%20%3Fp%20p%3AP647%20%3Fd%20.%20%3Fd%20ps%3AP647%20%3Fdteam%20.%20OPTIONAL%20%7B%20%3Fd%20pq%3AP1836%20%3Fdpick%20%7D%20OPTIONAL%20%7B%20%3Fd%20pq%3AP585%20%3Fdtime%20%7D%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%3Fdteam%20rdfs%3Alabel%20%3FdteamLabel%20.%20FILTER(LANG(%3FdteamLabel)%20%3D%20%22en%22)%20%7D%0A%7D",
+   "source_key": "wikidata",
+   "bytes": 9220,
+   "sha256": "fc2bec2c76f84b2d6b232c03b2d534021d20c784252fec6ef3d75bffea1f0c49",
+   "retrieved_at": "2026-10-22T01:42:39.348Z",
+   "content_type": "application/sparql-results+json;charset=utf-8"
+  },
+  "wikidata/sparql-ef0f79cb8b262ecd.json": {
+   "url": "https://query.wikidata.org/sparql?format=json&query=SELECT%20%3Fp%20%3Flabel%20%3Fmlb%20%3Fbirth%20%3Fbbref%20%3Fretro%20WHERE%20%7B%0A%20%20VALUES%20%3Fmlb%20%7B%20%22679529%22%20%22677008%22%20%22801361%22%20%22676974%22%20%22669370%22%20%22687491%22%20%22668885%22%20%22676106%22%20%22693304%22%20%22690987%22%20%22691728%22%20%22672282%22%20%22676979%22%20%22690988%22%20%22672275%22%20%22679822%22%20%22690953%22%20%22690992%22%20%22694377%22%20%22686826%22%20%22691718%22%20%22669003%22%20%22691023%22%20%22676917%22%20%22691020%22%20%22691767%22%20%22694363%22%20%22691016%22%20%22693306%22%20%22669224%22%20%22676272%22%20%22676059%22%20%22669387%22%20%22679845%22%20%22677944%22%20%22694367%22%20%22691011%22%20%22669142%22%20%22675961%22%20%22693307%22%20%22681370%22%20%22690978%22%20%22690989%22%20%22669310%22%20%22676113%22%20%22702262%22%20%22683003%22%20%22683357%22%20%22675657%22%20%22691721%22%20%7D%0A%20%20%3Fp%20wdt%3AP3541%20%3Fmlb%20.%20%3Fp%20rdfs%3Alabel%20%3Flabel%20.%20FILTER(LANG(%3Flabel)%20%3D%20%22en%22)%0A%20%20OPTIONAL%20%7B%20%3Fp%20wdt%3AP569%20%3Fbirth%20%7D%0A%20%20OPTIONAL%20%7B%20%3Fp%20wdt%3AP1825%20%3Fbbref%20%7D%0A%20%20OPTIONAL%20%7B%20%3Fp%20wdt%3AP6976%20%3Fretro%20%7D%0A%7D",
+   "source_key": "wikidata",
+   "bytes": 19898,
+   "sha256": "0070a28edd4b4667f5711e1d5a449fcf15d489b78a49b80a6915d130dcb57c3b",
+   "retrieved_at": "2026-10-22T01:45:31.189Z",
+   "content_type": "application/sparql-results+json;charset=utf-8"
+  },
+  "wikidata/sparql-f837d8bac99c694e.json": {
+   "url": "https://query.wikidata.org/sparql?format=json&query=SELECT%20%3Fp%20%3Flabel%20%3Fmlb%20%3Fbirth%20%3Fbbref%20%3Fretro%20WHERE%20%7B%0A%20%20VALUES%20%3Fmlb%20%7B%20%22695336%22%20%22676288%22%20%22691103%22%20%22675660%22%20%22694297%22%20%22679358%22%20%22676463%22%20%22680730%22%20%22668971%22%20%22695377%22%20%22693821%22%20%22669434%22%20%22693850%22%20%22694813%22%20%22694376%22%20%7D%0A%20%20%3Fp%20wdt%3AP3541%20%3Fmlb%20.%20%3Fp%20rdfs%3Alabel%20%3Flabel%20.%20FILTER(LANG(%3Flabel)%20%3D%20%22en%22)%0A%20%20OPTIONAL%20%7B%20%3Fp%20wdt%3AP569%20%3Fbirth%20%7D%0A%20%20OPTIONAL%20%7B%20%3Fp%20wdt%3AP1825%20%3Fbbref%20%7D%0A%20%20OPTIONAL%20%7B%20%3Fp%20wdt%3AP6976%20%3Fretro%20%7D%0A%7D",
+   "source_key": "wikidata",
+   "bytes": 3995,
+   "sha256": "1ccfb4529ed6a35d244d07b77ffa865b905a43dd8ca153d6880370793b8e5c74",
+   "retrieved_at": "2026-10-22T01:49:53.616Z",
+   "content_type": "application/sparql-results+json;charset=utf-8"
+  },
+  "wikidata/sparql-fc5c3819c3288e88.json": {
+   "url": "https://query.wikidata.org/sparql?format=json&query=SELECT%20%3Fp%20%3Flabel%20%3Fmlb%20%3Fbirth%20%3Fbbref%20%3Fretro%20%3FschoolLabel%20%3FdteamLabel%20%3Fdpick%20%3Fdtime%20WHERE%20%7B%0A%20%20VALUES%20%3Fp%20%7B%20wd%3AQ90575116%20wd%3AQ64010395%20wd%3AQ64740429%20wd%3AQ79053450%20wd%3AQ84959379%20wd%3AQ84962029%20wd%3AQ85199601%20wd%3AQ85199714%20wd%3AQ85261723%20wd%3AQ85215973%20wd%3AQ85209734%20wd%3AQ85209585%20wd%3AQ85232823%20wd%3AQ85784416%20wd%3AQ85678951%20wd%3AQ86010113%20wd%3AQ86410935%20wd%3AQ86411059%20wd%3AQ90444141%20wd%3AQ88999909%20wd%3AQ90468341%20wd%3AQ95691952%20wd%3AQ95691975%20wd%3AQ91389745%20wd%3AQ91394712%20wd%3AQ91393913%20wd%3AQ91471366%20wd%3AQ93130094%20wd%3AQ93172135%20wd%3AQ94002370%20wd%3AQ95970456%20wd%3AQ95971503%20wd%3AQ95986053%20wd%3AQ96130538%20wd%3AQ96181800%20wd%3AQ96202444%20wd%3AQ96384729%20wd%3AQ96202417%20wd%3AQ96203241%20wd%3AQ96203234%20wd%3AQ96202409%20wd%3AQ136139699%20wd%3AQ113567550%20wd%3AQ123240922%20wd%3AQ112238091%20wd%3AQ111177093%20wd%3AQ121643156%20wd%3AQ118247254%20wd%3AQ137973094%20wd%3AQ137473450%20%7D%0A%20%20%3Fp%20rdfs%3Alabel%20%3Flabel%20.%20FILTER(LANG(%3Flabel)%20%3D%20%22en%22)%0A%20%20OPTIONAL%20%7B%20%3Fp%20wdt%3AP3541%20%3Fmlb%20%7D%0A%20%20OPTIONAL%20%7B%20%3Fp%20wdt%3AP569%20%3Fbirth%20%7D%0A%20%20OPTIONAL%20%7B%20%3Fp%20wdt%3AP1825%20%3Fbbref%20%7D%0A%20%20OPTIONAL%20%7B%20%3Fp%20wdt%3AP6976%20%3Fretro%20%7D%0A%20%20OPTIONAL%20%7B%20%3Fp%20wdt%3AP69%20%3Fschool%20.%20%3Fschool%20rdfs%3Alabel%20%3FschoolLabel%20.%20FILTER(LANG(%3FschoolLabel)%20%3D%20%22en%22)%20%7D%0A%20%20OPTIONAL%20%7B%20%3Fp%20p%3AP647%20%3Fd%20.%20%3Fd%20ps%3AP647%20%3Fdteam%20.%20OPTIONAL%20%7B%20%3Fd%20pq%3AP1836%20%3Fdpick%20%7D%20OPTIONAL%20%7B%20%3Fd%20pq%3AP585%20%3Fdtime%20%7D%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%3Fdteam%20rdfs%3Alabel%20%3FdteamLabel%20.%20FILTER(LANG(%3FdteamLabel)%20%3D%20%22en%22)%20%7D%0A%7D",
+   "source_key": "wikidata",
+   "bytes": 50217,
+   "sha256": "d03ade5877bd1376cf493fa0c0617adc3d9dddc9e2a8bcb6891a360ac3f79b48",
+   "retrieved_at": "2026-10-22T01:42:36.765Z",
+   "content_type": "application/sparql-results+json;charset=utf-8"
+  },
   "wikipedia/2020-major-league-baseball-draft.json": {
    "url": "https://en.wikipedia.org/w/api.php?action=query&prop=revisions&rvprop=ids|timestamp|content&rvslots=main&format=json&formatversion=2&titles=2020_Major_League_Baseball_draft",
    "source_key": "wikipedia-draft-articles",
    "bytes": 50102,
    "sha256": "e6c539de1e3b0c6e012b535b4d93f54daa62dba88286980bc2294b84e92f1ee5",
    "retrieved_at": "2026-10-22T01:11:03.833Z",
+   "content_type": "application/json; charset=utf-8"
+  },
+  "wikipedia/pageprops-7c5805ff832106c6.json": {
+   "url": "https://en.wikipedia.org/w/api.php?action=query&prop=pageprops&ppprop=wikibase_item&redirects=1&format=json&formatversion=2&titles=Spencer%20Torkelson%7CHeston%20Kjerstad%7CMax%20Meyer%20(baseball)%7CAsa%20Lacy%7CAustin%20Martin%7CEmerson%20Hancock%7CNick%20Gonzales%7CRobert%20Hassell%20(baseball)%7CZac%20Veen%7CReid%20Detmers%7CGarrett%20Crochet%7CAustin%20Hendrick%7CPatrick%20Bailey%7CJustin%20Foscue%7CMick%20Abel%7CEd%20Howard%20(baseball)%7CNick%20Yorke%7CBryce%20Jarvis%7CPete%20Crow-Armstrong%7CGarrett%20Mitchell%20(baseball)%7CJordan%20Walker%20(baseball)%7CCade%20Cavalli%7CCarson%20Tucker%7CNick%20Bitsko%7CJared%20Shuster%7CTyler%20Soderstrom%7CAaron%20Sabato%7CAustin%20Wells%7CBobby%20Miller%20(baseball)%7CJordan%20Westburg%7CCarmen%20Mlodzinski%7CNick%20Loftin%7CSlade%20Cecconi%7CJustin%20Lange%7CDrew%20Romo%7CTanner%20Burns%7CAlika%20Williams%7CDillon%20Dingler%7CHudson%20Haskin%7CDax%20Fulton%7CCJ%20Van%20Eyk%7CZach%20DeLoach%7CJared%20Jones%7COwen%20Caissie%7CChris%20McMahon%7CJared%20Kelley%7CChristian%20Roa%7CCasey%20Schmitt%7CEvan%20Carter%7CBurl%20Carraway",
+   "source_key": "wikipedia-draft-articles",
+   "bytes": 4817,
+   "sha256": "3a987d84eaeb74994ab055a7f8e7f87f8ec1138e27bced3c7dcf8d6a55c46019",
+   "retrieved_at": "2026-10-22T01:42:33.174Z",
+   "content_type": "application/json; charset=utf-8"
+  },
+  "wikipedia/pageprops-ad3f352ad3ec0feb.json": {
+   "url": "https://en.wikipedia.org/w/api.php?action=query&prop=pageprops&ppprop=wikibase_item&redirects=1&format=json&formatversion=2&titles=J.%20T.%20Ginn%7CFreddy%20Zamora%7CMasyn%20Winn%7CCole%20Henry%7CLogan%20Allen%20(baseball%2C%20born%201998)%7CIan%20Seymour%7CJeff%20Criswell%20(baseball)%7CLandon%20Knack%7CKyle%20Nicolas%7CDaniel%20Cabrera%20(outfielder)%7CTink%20Hence%7CConnor%20Phillips%7CClayton%20Beeter%7CNick%20Swiney%7CIsaiah%20Greene%7CAlec%20Burleson%7CAlex%20Santos%20(baseball)%7CTrei%20Cruz%7CZach%20McCambley%7CTyler%20Gentry%7CKaden%20Polcovich%7CCole%20Wilcox%7CSam%20Weatherly%7CAdisyn%20Coffey%7CKyle%20Harrison%20(baseball)%7CTekoah%20Roby%7CCasey%20Martin%20(baseball)%7CBlaze%20Jordan%7CHolden%20Powell%7CPetey%20Halpin%7CJesse%20Franklin%20V%7CTrevor%20Hauver%7CGage%20Workman%7CCoby%20Mayo%7CJake%20Eder%7CNick%20Frasso%7CR.%20J.%20Dabovich%7CCarson%20Ragsdale%7CLuke%20Little%7CA.%20J.%20Vukovich%7CJoey%20Wiemer%7CIan%20Bedell%7CTanner%20Murray%7CSpencer%20Strider%7CDane%20Acker%7CMarco%20Raya%7CBeck%20Way%7CColt%20Keith%7CCarter%20Baumler%7CKyle%20Hurt",
+   "source_key": "wikipedia-draft-articles",
+   "bytes": 6004,
+   "sha256": "c6484d2c4bddf7003591d23201173ae860ba07629d0a1747ca0abe05ec9dc10f",
+   "retrieved_at": "2026-10-22T01:42:34.531Z",
+   "content_type": "application/json; charset=utf-8"
+  },
+  "wikipedia/pageprops-e0f4e5c426588161.json": {
+   "url": "https://en.wikipedia.org/w/api.php?action=query&prop=pageprops&ppprop=wikibase_item&redirects=1&format=json&formatversion=2&titles=Will%20Klein%20(baseball)%7CTaylor%20Dollard%7CJagger%20Haynes%7CAdam%20Seminaris%7CBailey%20Horn%7CJoe%20Boyle%20(baseball)%7CRyan%20Murphy%20(baseball)%7CThomas%20Saggese%7CShane%20Drohan%7CBrandon%20Pfaadt%7CEric%20Orze%7CMitchell%20Parker%7CBryce%20Elder%7CKala'i%20Rosario%7CGavin%20Stone%7CShay%20Whitcomb",
+   "source_key": "wikipedia-draft-articles",
+   "bytes": 2070,
+   "sha256": "034f7f438a3fa100228b31201889866dce1554904a8a5b3eef498c4a1fd2c072",
+   "retrieved_at": "2026-10-22T01:42:36.012Z",
    "content_type": "application/json; charset=utf-8"
   }
  }

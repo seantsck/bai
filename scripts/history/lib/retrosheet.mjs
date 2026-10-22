@@ -114,7 +114,7 @@ export function coverageByYear (records) {
 
 const fold = (s) => String(s ?? '').normalize('NFD').replace(/\p{M}/gu, '').toLowerCase().replace(/[^a-z' -]/g, ' ').replace(/\s+/g, ' ').trim()
 export const splitName = (full) => {
-  const parts = fold(full).replace(/\b(jr|sr|ii|iii|iv)\b\.?/g, '').trim().split(' ')
+  const parts = fold(full).replace(/\b(jr|sr|ii|iii|iv|v)\b\.?$/g, '').trim().split(' ')
   return { first: parts[0] ?? '', last: parts.slice(1).join(' ') }
 }
 // Common given-name short forms; anything else must match exactly.

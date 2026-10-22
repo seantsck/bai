@@ -90,3 +90,15 @@ test('publicRequestHeaders always yields a project user agent', () => {
   assert.equal(h.Accept, 'text/csv')
   assert.ok(h['User-Agent'].includes(PROJECT_URL))
 })
+
+test('the standing agent brief forbids custom HTTP code, personal identifiers and workarounds', async () => {
+  const { AGENT_REQUEST_RULES, agentRequestRulesBlock } = await import('../../scripts/history/lib/agent-brief.mjs')
+  const block = agentRequestRulesBlock()
+  assert.match(block, /WebSearch and WebFetch/)
+  assert.match(block, /no HTTP code/i)
+  assert.ok(block.includes(PROJECT_URL))
+  assert.match(block, /personal information or credentials/)
+  assert.match(block, /never work around it/)
+  assert.doesNotMatch(block, /[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+\.[a-z]{2,}/, 'the brief contains no email address')
+  assert.equal(AGENT_REQUEST_RULES.length, 6)
+})
