@@ -37,13 +37,13 @@ const batch = (org, records, verified) => ({
   coverage_claims: [{ domain: 'DRAFT', scope_key: '2020-JUNE_AMATEUR', organization: org, coverage_state: 'PARTIAL_RECONSTRUCTION', source_key: WIKI, gap_notes: 'fixture: one list' }],
   sources: sources(verified), records
 })
-const writeRelease = (name, docs, { approvals = [], mutate = null } = {}) => {
+const writeRelease = (name, docs, { approvals = [], mutate = null, supplementOf = null } = {}) => {
   const dir = path.join(tmp, name)
   fs.rmSync(dir, { recursive: true, force: true })
   fs.mkdirSync(path.join(dir, 'batches'), { recursive: true })
   const batches = docs.map((doc, i) => { const file = `${String(i).padStart(2, '0')}-${doc.batch_key}.json`; fs.writeFileSync(path.join(dir, 'batches', file), JSON.stringify(doc, null, 1) + '\n'); return { file, sha256: fileSha256(path.join(dir, 'batches', file)), doc } })
   let manifest = buildManifest({ releaseKey: `fixture-${name}`, year: 2020, draftKey: '2020-JUNE_AMATEUR', batches, identity: { picks: [] }, article: { revision: 1, response_sha256: 'a'.repeat(64) }, chadwickCommit: 'f'.repeat(40),
-    identityFileSha256: 'b'.repeat(64), brownVariant: 'HELD', heldPicks: [], humanApprovals: approvals, catalog, maxSelections: docs.reduce((n, d) => n + d.records.length, 0), createdOn: '2026-10-22' })
+    identityFileSha256: 'b'.repeat(64), brownVariant: 'HELD', heldPicks: [], humanApprovals: approvals, supplementOf, catalog, maxSelections: docs.reduce((n, d) => n + d.records.length, 0), createdOn: '2026-10-22' })
   if (mutate) { manifest = mutate(manifest); manifest.manifest_sha256 = manifestChecksum(manifest) }
   fs.writeFileSync(path.join(dir, 'release-manifest.json'), JSON.stringify(manifest, null, 1) + '\n')
   return dir
@@ -185,4 +185,57 @@ test('the target must have exactly the committed migrations, and an agent cannot
     await assert.rejects(applyRelease(db, rel, { operator: 'Fixture Owner' }), /differs from the committed file/)
     assert.ok((await collisionReport(db, rel)).target.migrations[0].includes('differs'))
   } finally { await db.query('update bai_meta.schema_migrations set checksum = $1 where version = $2', [original.checksum, '026']) }
+})
+
+// A supplemental release (Phase 10.6): picks an earlier release held for a human decision, linked to EXISTING players only.
+const PARENT = 'c'.repeat(64)
+const approval = (pick) => ({ pick, code: 'WOULD_LINK_EXISTING_PLAYER', approved_by: 'Fixture Owner', approved_on: '2026-10-22', note: 'fixture: owner approved this link' })
+const snapshot = async (table) => new Set((await db.query(`select to_jsonb(x)::text j from ${table} x`)).rows.map((r) => r.j))
+
+test('a supplemental release links two approved picks to existing players: no new player, no signing, existing rows untouched, replay idempotent', async () => {
+  await db.query(`insert into players (slug, full_name, display_name, birth_date) values ('fixture-supp-a', 'Fixture Supp Alpha', 'Fixture Supp Alpha', null), ('fixture-supp-b', 'Fixture Supp Beta', 'Fixture Supp Beta', null)`)
+  await db.query(`insert into player_external_ids (player_id, id_system, external_id) values ((select id from players where slug = 'fixture-supp-a'), 'MLBAM', '930001'), ((select id from players where slug = 'fixture-supp-b'), 'MLBAM', '930002')`)
+  const docs = () => [batch('KC', [record(61, 'KC', 'Fixture Supp Alpha', { ids: { MLBAM: '930001' } })], true), batch('LAD', [record(62, 'LAD', 'Fixture Supp Beta', { ids: { MLBAM: '930002' } })], true)]
+  const supplementOf = { manifest_sha256: PARENT, note: 'fixture parent' }
+  // Without the owner's approval the collision report holds both picks and apply refuses.
+  const unapproved = loadRelease(writeRelease('supp-unapproved', docs(), { supplementOf }))
+  assert.equal((await collisionReport(db, unapproved)).overall, 'HUMAN_REVIEW')
+  await assert.rejects(applyRelease(db, unapproved, { operator: 'Fixture Owner' }), /collision report is HUMAN_REVIEW/)
+  assert.equal(await count('select count(*) n from draft_selections where overall_pick in (61, 62)'), 0)
+  const rel = loadRelease(writeRelease('supp', docs(), { approvals: [approval(61), approval(62)], supplementOf }))
+  assert.equal(rel.manifest.supplement_of.manifest_sha256, PARENT)
+  assert.equal(rel.manifest.expected_database_changes.players_created_max, 0)
+  assert.equal(rel.manifest.expected_database_changes.draft_signings_inserted, 0)
+  assert.deepEqual(verifyReleaseContent(rel, { root }), [])
+  assert.equal((await collisionReport(db, rel)).overall, 'SAFE')
+  const players = await snapshot('players'); const sels = await snapshot('draft_selections'); const signings = await count('select count(*) n from draft_signings')
+  const out = await applyRelease(db, rel, { operator: 'Fixture Owner' })
+  assert.deepEqual(out.counts, { selections: 2, imported: 2, skipped: 0, held: 0, held_in_manifest: 0 })
+  const linked = (await db.query(`select s.overall_pick, p.slug from draft_selections s join players p on p.id = s.player_id where s.overall_pick in (61, 62) order by 1`)).rows
+  assert.deepEqual(linked.map((r) => r.slug), ['fixture-supp-a', 'fixture-supp-b'])
+  const playersAfter = await snapshot('players'); const selsAfter = await snapshot('draft_selections')
+  assert.equal(playersAfter.size, players.size, 'no player row was created')
+  assert.ok([...players].every((j) => playersAfter.has(j)), 'no existing player row changed')
+  assert.ok([...sels].every((j) => selsAfter.has(j)), 'no existing selection changed')
+  assert.equal(selsAfter.size, sels.size + 2)
+  assert.equal(await count('select count(*) n from draft_signings'), signings, 'no signing row')
+  assert.equal(await count(`select count(*) n from players where slug like 'fixture-supp-%'`), 2, 'no duplicate player')
+  // Replay is idempotent.
+  const after = await count('select count(*) n from draft_selections')
+  assert.equal((await applyRelease(db, rel, { operator: 'Fixture Owner' })).already, true)
+  assert.equal(await count('select count(*) n from draft_selections'), after)
+  assert.equal((await collisionReport(db, rel)).overall, 'SAFE')
+})
+
+test('a supplemental release that would create a player is refused and rolls back completely', async () => {
+  const supplementOf = { manifest_sha256: PARENT, note: 'fixture parent' }
+  const rel = loadRelease(writeRelease('supp-new-player', [batch('KC', [record(71, 'KC', 'Fixture Supp Brand New')], false)], { supplementOf }))
+  assert.equal(rel.manifest.expected_database_changes.players_created_max, 0)
+  assert.equal((await collisionReport(db, rel)).overall, 'SAFE')   // nothing collides; only the zero-new-players promise is broken
+  const players = await count('select count(*) n from players'); const staged = await count('select count(*) n from ingest.import_batches')
+  await assert.rejects(applyRelease(db, rel, { operator: 'Fixture Owner' }), /player\(s\) created; the manifest allows 0/)
+  assert.equal(await count('select count(*) n from players'), players)
+  assert.equal(await count('select count(*) n from draft_selections where overall_pick = 71'), 0)
+  assert.equal(await count('select count(*) n from ingest.import_batches'), staged, 'staging rolled back too')
+  assert.equal(await count(`select count(*) n from ingest.release_audits where release_key = 'fixture-supp-new-player'`), 0)
 })

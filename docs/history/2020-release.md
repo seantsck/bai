@@ -38,3 +38,14 @@ npm run hosted:refresh
 npm run hosted:verify && npm run hosted:parity && npm run hosted:security
 ```
 The rollback plan is in the manifest. Production Vercel needs no release for the data; the `/sources` credit for Wikidata ships with the next ordinary production release.
+
+## Supplemental releases (picks a parent release held for a human decision)
+A parent release can hold picks (for example a pick whose identifier already belongs to an existing player). Once a person has decided, the picks go out in a SEPARATE, immutable manifest; the parent manifest and its audit are never edited.
+```
+npm run history:release -- build --year 2020 --release-dir <new dir> --only-picks 52,106 --suffix supp1 \
+  --parent-manifest-sha256 <parent checksum> --approvals <approvals.json>
+```
+- `--only-picks` builds exactly those picks; `--suffix` gives their batches new keys (an applied batch is immutable); `--parent-manifest-sha256` is recorded as `supplement_of`.
+- The approvals file holds one entry per pick and code (`WOULD_LINK_EXISTING_PLAYER`), each with a human `approved_by`, `approved_on` and `note`. Nothing is approved on a person's behalf; without the entry the collision report holds the pick and apply refuses.
+- A supplement promises **zero new players** (`players_created_max: 0`). `apply` counts players inside the transaction and rolls everything back if one was created, so a link cannot silently turn into a duplicate.
+- `node --env-file=.env.hosted.local scripts/history/rehearse-release.mjs --release-dir <dir>` (embedded PostgreSQL 17, hosted copied read-only) also checks, for a supplement: the picks are exactly the approved ones; each links to its intended player; no player or signing row is added; no existing row is deleted or changed (modified rows, such as the club's coverage tally, are listed); added identifiers belong only to the linked players; the replay is idempotent. Applying to hosted still needs a separate approval naming the checksum.

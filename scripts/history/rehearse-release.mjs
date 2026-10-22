@@ -41,8 +41,12 @@ try {
   await server.initialise(); await server.start()
   await server.createDatabase('bai_hosted_copy')
   const copy = new pg.Client({ connectionString: url('bai_hosted_copy') }); await copy.connect()
-  await applyMigrations(copy, { through: '026' })
-  step('disposable database built from migrations 001-026', true)
+  // Hosted before 027: build 001-026 and rehearse 027 too. Hosted after 027 (the first release is applied): build 001-027 as it is.
+  const probe = new pg.Client({ connectionString: hostedUrl }); await probe.connect()
+  const has027 = (await q(probe, "select count(*)::int n from bai_meta.schema_migrations where version = '027'"))[0].n === 1
+  await probe.end()
+  await applyMigrations(copy, { through: has027 ? '027' : '026' })
+  step(`disposable database built from migrations 001-${has027 ? '027' : '026'}`, true)
 
   // --- copy hosted data through a read-only transaction -----------------------------------------------------------
   const hosted = new pg.Client({ connectionString: hostedUrl }); await hosted.connect()
@@ -81,7 +85,7 @@ try {
 
   // --- migration 027 ------------------------------------------------------------------------------------------------
   const before = await q(copy, 'select source_key, attribution_category from public.sources order by source_key')
-  await applyMigrations(copy)
+  if (!has027) await applyMigrations(copy)
   const after = await q(copy, 'select source_key, attribution_category from public.sources order by source_key')
   const changed = before.filter((b, i) => after[i].source_key !== b.source_key || after[i].attribution_category !== b.attribution_category)
   step('027 applied; no existing source changed category', !changed.length && before.length === after.length, `${after.length} sources; ${JSON.stringify(Object.fromEntries(after.reduce((m, r) => m.set(r.attribution_category, (m.get(r.attribution_category) ?? 0) + 1), new Map())))}`)
@@ -106,17 +110,24 @@ try {
     const rstep = (nm, ok, detail) => { r.steps.push({ name: nm, ok, detail }); log(`${ok ? 'ok  ' : 'FAIL'} [${rel.manifest.totals.selections}] ${nm}${detail ? `: ${detail}` : ''}`) }
     const tl = await tables(db)
     const c0 = await counts(db, tl)
+    const supplement = Boolean(rel.manifest.supplement_of)
+    const snapshot = async () => { const o = {}; for (const t of tl) o[t] = new Set((await q(db, `select to_jsonb(x)::text j from ${t} x`)).map((x) => x.j)); return o }
+    const snap0 = supplement ? await snapshot() : null
+    const wd0 = supplement ? (await q(db, `select count(*)::int n from public.source_observations o join public.sources s on s.id = o.source_id where s.attribution_category = 'WIKIDATA'`))[0].n : 0
+    const want = supplement ? Object.fromEntries(await Promise.all(rel.batches.flatMap((b) => b.doc.records).map(async (rec) => [rec.overall_pick, (await q(db, `select player_id from public.player_external_ids where id_system = 'MLBAM' and external_id = $1`, [rec.player.external_ids.MLBAM]))[0]?.player_id ?? null]))) : null
+    const priorSel = supplement ? await q(db, `select id, player_id, draft_id, overall_pick, organization_id from public.draft_selections where player_id = any($1)`, [Object.values(want)]) : null
     const pv = run('preview'); rstep('preview on the disposable database is SAFE', pv.status === 0, (pv.stdout.trim().split('\n').pop() ?? '') + (pv.stderr ? ` ${pv.stderr.trim().slice(0, 200)}` : ''))
     const bad = run('apply', ['--manifest-sha256', '0'.repeat(64), '--operator', 'rehearsal operator']); rstep('apply refuses a wrong checksum', bad.status !== 0 && /must name this exact manifest/.test(bad.stderr))
     const agent = run('apply', ['--manifest-sha256', rel.manifest.manifest_sha256, '--operator', 'agent:rehearsal']); rstep('apply refuses an agent operator', agent.status !== 0 && /not agent/.test(agent.stderr))
     const ap = run('apply', ['--manifest-sha256', rel.manifest.manifest_sha256, '--operator', 'rehearsal operator']); rstep('apply commits', ap.status === 0, ap.stdout.trim().split('\n').find((l) => l.startsWith('committed')) ?? ap.stderr.trim().slice(0, 300))
     const c1 = await counts(db, tl)
+    const snap1 = supplement ? await snapshot() : null
     const delta = Object.fromEntries(tl.filter((t) => c1[t] !== c0[t]).map((t) => [t, c1[t] - c0[t]]))
     r.table_deltas = delta
     const e = rel.manifest.expected_database_changes
     rstep('draft selections +' + e.draft_selections_inserted, delta['public.draft_selections'] === e.draft_selections_inserted, String(delta['public.draft_selections']))
     rstep('signing rows added: 0', !delta['public.draft_signings'], String(delta['public.draft_signings'] ?? 0))
-    rstep('players created within the expected maximum', (delta['public.players'] ?? 0) <= e.players_created_max, `${delta['public.players']} (max ${e.players_created_max})`)
+    rstep('players created within the expected maximum', (delta['public.players'] ?? 0) <= e.players_created_max, `${delta['public.players'] ?? 0} (max ${e.players_created_max})`)
     rstep('external ids within the expected maximum', (delta['public.player_external_ids'] ?? 0) <= e.external_ids_inserted_max, `${delta['public.player_external_ids']} (max ${e.external_ids_inserted_max})`)
     const untouched = ['public.drafts', 'public.organizations', 'bai_meta.schema_migrations', 'research.reviewers', 'research.certifications'].filter((t) => tl.includes(t) && delta[t])
     rstep('migrations, organizations, drafts, reviewers and certifications untouched', !untouched.length, untouched.join(', '))
@@ -125,7 +136,30 @@ try {
     const cats = await q(db, `select s.attribution_category c, count(*)::int n from public.draft_selections ds join public.drafts d on d.id = ds.draft_id join public.sources s on s.id = ds.source_id where d.draft_year = 2020 group by 1`)
     rstep('every 2020 selection cites Wikipedia only', cats.length === 1 && cats[0].c === 'WIKIPEDIA', JSON.stringify(cats))
     const wd = await q(db, `select count(*)::int n from public.source_observations o join public.sources s on s.id = o.source_id where s.attribution_category = 'WIKIDATA'`)
-    rstep('Wikidata corroboration recorded as observations citing the WIKIDATA source', wd[0].n === 2 * rel.manifest.totals.identity_tiers.VERIFIED, `${wd[0].n} observations`)
+    rstep('Wikidata corroboration recorded as observations citing the WIKIDATA source', wd[0].n - wd0 === 2 * rel.manifest.totals.identity_tiers.VERIFIED, `${wd[0].n - wd0} new observations`)
+    if (supplement) {
+      const approved = rel.manifest.human_approvals.map((a) => a.pick).sort().join()
+      rstep('picks are exactly the human-approved links', approved === rel.batches.flatMap((b) => b.picks).sort().join(), approved)
+      const linked = await q(db, `select s.overall_pick, s.player_id from public.draft_selections s join public.drafts d on d.id = s.draft_id where d.draft_year = 2020 and s.overall_pick = any($1)`, [Object.keys(want).map(Number)])
+      rstep('each new selection links to the intended existing player', linked.length === Object.keys(want).length && linked.every((x) => String(want[x.overall_pick]) === String(x.player_id)), JSON.stringify(linked))
+      const dupNow = (await q(db, `select count(*)::int n from (select name_normalized, birth_date from public.players group by 1, 2 having count(*) > 1) x`))[0].n
+      const dupBefore = new Set([...snap0['public.players']].map((j) => { const o = JSON.parse(j); return `${o.name_normalized}|${o.birth_date}` })).size - snap0['public.players'].size
+      rstep('zero players created, no duplicate player', !delta['public.players'] && dupNow === 0 && dupBefore === 0, `players +${delta['public.players'] ?? 0}; duplicate name+birth-date groups ${dupNow}`)
+      const still = await q(db, `select count(*)::int n from public.draft_selections where id = any($1)`, [priorSel.map((x) => x.id)])
+      rstep('the players\' earlier selections are unchanged (same rows)', still[0].n === priorSel.length && [...snap0['public.draft_selections']].every((j) => snap1['public.draft_selections'].has(j)), priorSel.map((x) => `#${x.overall_pick} (draft ${x.draft_id})`).join(', '))
+      const changed = {}
+      for (const t of tl) { const lost = [...snap0[t]].filter((j) => !snap1[t].has(j)); if (lost.length) changed[t] = lost.map((j) => { const o = JSON.parse(j); const now = [...snap1[t]].map((x) => JSON.parse(x)).find((n) => n.id !== undefined && n.id === o.id); return { id: o.id, changed_fields: now ? Object.keys(now).filter((k) => JSON.stringify(now[k]) !== JSON.stringify(o[k])) : 'DELETED' } }) }
+      r.existing_rows_modified = changed
+      rstep('existing rows unchanged (nothing deleted; modified rows listed)', !Object.values(changed).flat().some((x) => x.changed_fields === 'DELETED'), JSON.stringify(changed).slice(0, 500))
+      const addedRows = (t) => [...snap1[t]].filter((j) => !snap0[t].has(j)).map((j) => JSON.parse(j))
+      r.new_external_ids = addedRows('public.player_external_ids').map((x) => ({ player_id: x.player_id, id_system: x.id_system }))
+      const srcKey = Object.fromEntries((await q(db, 'select id, source_key from public.sources')).map((x) => [x.id, x.source_key]))
+      r.new_observations = addedRows('public.source_observations').map((x) => ({ subject: x.subject_table ?? x.subject_type ?? null, field: x.field_name ?? x.field ?? null, source: srcKey[x.source_id] }))
+      r.coverage_changes = changed['public.coverage_assessments']?.map((c) => { const b = addedRows('public.coverage_assessments').length; return c })
+      rstep('observations within the expected maximum', (delta['public.source_observations'] ?? 0) <= e.source_observations_inserted_max, `${delta['public.source_observations'] ?? 0} (max ${e.source_observations_inserted_max})`)
+      rstep('new external ids belong to the two linked players only', r.new_external_ids.every((x) => ['679', '636'].includes(String(x.player_id))), JSON.stringify(r.new_external_ids))
+      r.new_rows = Object.fromEntries(tl.map((t) => [t, [...snap1[t]].filter((j) => !snap0[t].has(j)).length]).filter(([, n]) => n))
+    }
     const ap2 = run('apply', ['--manifest-sha256', rel.manifest.manifest_sha256, '--operator', 'rehearsal operator']); const c2 = await counts(db, tl)
     rstep('replay is idempotent (already applied, no change)', ap2.status === 0 && /already applied/.test(ap2.stdout) && tl.every((t) => c2[t] === c1[t]))
     const pv2 = run('preview'); rstep('preview after the apply reports the replay as SAFE', pv2.status === 0, (pv2.stdout.trim().split('\n').pop() ?? '').slice(0, 160))
