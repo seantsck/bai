@@ -58,7 +58,10 @@ export function linkTitle (rawCell) {
 const cellValue = (line) => {
   const body = line.replace(/^[|!]/, '')
   const m = body.match(/^((?:[a-z-]+\s*=\s*(?:"[^"]*"|'[^']*'|[^\s|]+)\s*)+)\|(?!\|)([\s\S]*)$/i)
-  return m ? m[2] : body
+  if (m) return m[2]
+  // Wiki markup typed with a curly quote (style="...;”|value) breaks the attribute pattern; strip a leading attribute run anyway.
+  const loose = body.match(/^(?:scope|style|class|colspan|rowspan)\s*=[^|{]*\|(?!\|)([\s\S]*)$/i)
+  return loose ? loose[1] : body
 }
 
 const ROUND_TITLES = [
@@ -89,8 +92,11 @@ export function parseDraftArticle (wikitext, { year }) {
   const parts = body.split(/^===\s*(.+?)\s*===\s*$/m)
   for (let i = 1; i < parts.length; i += 2) {
     const title = parts[i]
-    const code = roundFor(title)
-    if (!code) { findings.push({ kind: 'UNKNOWN_SECTION', detail: title }); continue }
+    // "Other notable selections" (later rounds, only some picks): a table with the round in the first column. These rows are
+    // real selections, but the table is a selection of the article's editors, not a list of the round: never a census.
+    const notable = /^other notable selections$/i.test(title.trim())
+    const code = notable ? null : roundFor(title)
+    if (!code && !notable) { findings.push({ kind: 'UNKNOWN_SECTION', detail: title }); continue }
     const rows = parts[i + 1].split(/^\|-\s*$/m).slice(1)
     let n = 0
     for (const row of rows) {
@@ -102,19 +108,24 @@ export function parseDraftArticle (wikitext, { year }) {
         if (/^[|!]/.test(l)) cells.push(l); else if (cells.length) cells[cells.length - 1] += ` ${l}`
       }
       void lines
-      if (cells.length < 5) { if (cells.length) findings.push({ kind: 'SHORT_ROW', detail: `${title}: ${cells.length} cells` }); continue }
-      const [pickC, playerC, teamC, posC, schoolC] = cells.map((c) => plain(cellValue(c)))
+      if (cells.length < (notable ? 6 : 5)) { if (cells.length) findings.push({ kind: 'SHORT_ROW', detail: `${title}: ${cells.length} cells` }); continue }
+      const vals = cells.map((c) => plain(cellValue(c)))
+      const [pickC, playerRaw, teamC, posC, schoolC] = notable ? vals.slice(1) : vals
+      const playerC = playerRaw.replace(/\s*\*+\s*$/, '')   // "*" is the article's "player did not sign" marker; it is not part of the name
+      const rowCode = notable ? roundCode(vals[0]) : code
+      const nameCell = notable ? cells[2] : cells[1]
+      if (notable && !rowCode) { findings.push({ kind: 'UNKNOWN_ROUND', detail: `${title}: ${vals[0]}` }); continue }
       const overall = Number(pickC.match(/^\d+/)?.[0])
       const team = teamC.replace(/\s*\(baseball\)$/, '').trim()
       const school = schoolC.replace(/\s*\(([A-Z]{2}|[A-Z][a-z]+)\)$/, (m, st) => `, ${st}`)
       n++
       picks.push({
-        year, overall_pick: Number.isInteger(overall) ? overall : null, round_title: title, round_code: code, selection_type: selectionType(code),
-        name: playerC, link_title: linkTitle(cells[1]), team_label: team, franchise: WIKI_TEAMS[team] ?? null, position: posC || null, school_label: school || null, school: schoolFromLabel(school),
-        did_not_sign_marker: /\*\s*$/.test(playerC) || /\*/.test(cells[1])
+        year, overall_pick: Number.isInteger(overall) ? overall : null, round_title: title, round_code: rowCode, selection_type: selectionType(rowCode), ...(notable ? { notable_only: true } : {}),
+        name: playerC, link_title: linkTitle(nameCell), team_label: team, franchise: WIKI_TEAMS[team] ?? null, position: posC || null, school_label: school || null, school: schoolFromLabel(school),
+        did_not_sign_marker: /\*\s*$/.test(playerRaw) || /\*/.test(nameCell)
       })
     }
-    sections.push({ title, round_code: code, rows: n })
+    sections.push({ title, round_code: notable ? 'NOTABLE' : code, rows: n })
   }
   // Integrity findings: reported, never repaired.
   const seen = new Map()

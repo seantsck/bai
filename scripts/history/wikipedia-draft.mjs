@@ -227,6 +227,7 @@ const COMMANDS = {
         gap_notes: [
           `Wikipedia's article (revision ${a.revid}) lists ${mine.length} selection(s) for the club in the ${year} June draft; the article states ${a.stated.overall} in all.`,
           'One aggregator list and no independent per-club list: the rows are not proof of the population.',
+          mine.some((p) => p.notable_only) ? `${mine.filter((p) => p.notable_only).length} of the club's rows come from the article's "Other notable selections" table (later rounds, rows chosen by the article's editors): those rounds are NOT a list of the club's selections.` : null,
           held.length ? `Held, not imported: ${held.map((h) => `#${h.pick} (${h.reason})`).join('; ')}.` : null,
           'Signing status, bonuses and outcomes not researched.'
         ].filter(Boolean).join(' ')

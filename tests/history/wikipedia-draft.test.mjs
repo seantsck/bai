@@ -94,3 +94,67 @@ test('verified needs both sources to agree on the same person; anything less sta
   assert.equal(decideIdentity([c, { ...c, key_person: 'p5', qid: null, ids: {}, birth: ['1999', '9', '9'] }], []).status, 'AMBIGUOUS')
   assert.equal(decideIdentity([c], [wd({ qid: 'Q1' }), wd({ qid: 'Q7' })]).status, 'VERIFIED', 'the Q-id in the register picks the right person')
 })
+
+// 2021 article layout: later rounds only as an "Other notable selections" table (round first), a "*" did-not-sign marker, and a
+// cell typed with a curly quote. FICTIONAL players.
+const ARTICLE_2021 = `{{Infobox sports draft
+| overall     = 612
+| rounds      = 20
+}}
+==Draft selections==
+===First round===
+{| class="wikitable"
+|-
+|1
+!scope="row" style="text-align:center"|{{sortname|Ann|Able}}
+|[[Detroit Tigers]]
+|[[Pitcher]]
+|[[Arizona State Sun Devils baseball|Arizona State]]
+|-
+|2
+!scope="row" style="text-align:center; background:#bfb;”|{{sortname|Bo|Baker}}*
+|[[Texas Rangers (baseball)|Texas Rangers]]
+|[[Outfielder]]
+|[[Jesuit High School (Beaverton, Oregon)|Jesuit High School]] ([[Oregon|OR]])
+|}
+===Other notable selections===
+{| class="wikitable"
+|-
+! scope="col" | Round
+! scope="col" | Pick
+|-
+|3
+|72
+!scope="row" style="text-align:center"|{{sortname|Cy|Carter}}
+|[[Oakland Athletics]]
+|[[Shortstop]]
+|[[Dallas Baptist Patriots baseball|Dallas Baptist]]
+|-
+|20
+|610
+!scope="row" style="text-align:center"|Di Dunn*
+|[[Detroit Tigers]]
+|[[Pitcher]]
+|[[Alabama Crimson Tide baseball|Alabama]]
+|}
+==Summary==
+`
+
+test('"Other notable selections" rows are real selections flagged notable_only, with the round from their own column', () => {
+  const r = parseDraftArticle(ARTICLE_2021, { year: 2021 })
+  const n = r.picks.filter((p) => p.notable_only)
+  assert.deepEqual(n.map((p) => [p.overall_pick, p.round_code, p.name, p.franchise]), [[72, '3', 'Cy Carter', 'ATH'], [610, '20', 'Di Dunn', 'DET']])
+  assert.ok(r.picks.filter((p) => !p.notable_only).every((p) => ['1'].includes(p.round_code)))
+  assert.ok(!r.findings.some((f) => f.kind === 'UNKNOWN_SECTION'))
+  assert.ok(r.findings.some((f) => f.kind === 'COUNT_DIFFERS_FROM_STATED'), 'a partial list is reported as partial, never repaired')
+  assert.ok(r.findings.some((f) => f.kind === 'PICK_NUMBER_GAPS'))
+})
+
+test('the did-not-sign "*" marker is kept as a marker, not as part of the name; a curly-quote cell still parses', () => {
+  const r = parseDraftArticle(ARTICLE_2021, { year: 2021 })
+  const by = Object.fromEntries(r.picks.map((p) => [p.overall_pick, p]))
+  assert.equal(by[2].name, 'Bo Baker'); assert.equal(by[2].did_not_sign_marker, true)
+  assert.equal(by[610].name, 'Di Dunn'); assert.equal(by[610].did_not_sign_marker, true)
+  assert.equal(by[1].did_not_sign_marker, false)
+  assert.ok(r.picks.every((p) => !/[*”|]/.test(p.name)))
+})
