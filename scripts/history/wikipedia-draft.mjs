@@ -167,9 +167,10 @@ const COMMANDS = {
     const holdDoc = !releaseDir && fs.existsSync(holdFile) ? JSON.parse(fs.readFileSync(holdFile, 'utf8')) : {}
     const extraHolds = { ...(holdDoc.holds ?? {}), ...(releaseDir && opt('holds-file') ? JSON.parse(fs.readFileSync(path.resolve(root, opt('holds-file')), 'utf8')) : {}) }
     const suffixes = holdDoc.batch_suffix ?? {}
-    // A supplement run adds picks that earlier runs held: --only-picks 36,72 --suffix d1 (existing batch files are kept).
-    const only = !releaseDir && opt('only-picks') ? new Set(opt('only-picks').split(',').map(Number)) : null
-    const deltaSuffix = releaseDir ? null : opt('suffix')   // a staged batch is immutable: a changed batch gets a new key (org -> suffix)
+    // A supplement run adds picks that earlier runs held: --only-picks 36,72 --suffix d1 (existing batch files are kept). With --release-dir it
+    // builds a supplemental release of exactly those picks; --suffix gives its batches new keys (an applied batch is immutable).
+    const only = opt('only-picks') ? new Set(opt('only-picks').split(',').map(Number)) : null
+    const deltaSuffix = opt('suffix')   // a staged batch is immutable: a changed batch gets a new key (org -> suffix)
     // Verified ids come from the Chadwick register (validated patterns), attributed to it.
     const f = fetcher()
     const wanted = new Set(identity.picks.filter((x) => x.status === 'VERIFIED' && x.chadwick?.ids.MLBAM).map((x) => x.chadwick.ids.MLBAM))
@@ -236,7 +237,7 @@ const COMMANDS = {
       write(path.join(outDir, `${doc.batch_key}.json`), doc)
       summary.batches.push({ org, records: records.length, held: held.length }); summary.held.push(...held.map((h) => ({ org, ...h })))
     }
-    write(path.join(releaseDir ? path.resolve(root, releaseDir) : YEAR_DIR, only ? `build-${deltaSuffix ?? 'delta'}.json` : 'build.json'), { year, revision: a.revid, ...summary })
+    write(path.join(releaseDir ? path.resolve(root, releaseDir) : YEAR_DIR, only && !releaseDir ? `build-${deltaSuffix ?? 'delta'}.json` : 'build.json'), { year, revision: a.revid, ...summary })
     log(`${summary.batches.length} batches, ${summary.batches.reduce((n, b) => n + b.records, 0)} records, held ${summary.held.length}`)
   },
 

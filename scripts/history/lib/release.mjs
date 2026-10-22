@@ -26,7 +26,7 @@ export const manifestChecksum = (manifest) => { const { manifest_sha256: _drop, 
 const norm = (s) => String(s ?? '').normalize('NFD').replace(/\p{M}/gu, '').toLowerCase().replace(/\b(jr|sr|ii|iii|iv|v)\b\.?$/g, '').replace(/[^a-z0-9]+/g, ' ').trim()
 
 /** Builds a manifest from a release directory's batches (and the identity file's tiers). Pure given its inputs. */
-export function buildManifest ({ humanApprovals = [], releaseKey, year, draftKey, batches, identity, article, chadwickCommit, identityFileSha256, brownVariant, heldPicks, catalog, maxSelections, createdOn }) {
+export function buildManifest ({ humanApprovals = [], releaseKey, year, draftKey, batches, identity, article, chadwickCommit, identityFileSha256, brownVariant, heldPicks, catalog, maxSelections, createdOn, supplementOf = null }) {
   const docs = batches.map((b) => ({ ...b, picks: b.doc.records.map((r) => r.overall_pick).sort((x, y) => x - y) }))
   const records = docs.flatMap((b) => b.doc.records)
   const byPick = new Map(identity.picks.map((x) => [x.overall_pick, x]))
@@ -51,6 +51,7 @@ export function buildManifest ({ humanApprovals = [], releaseKey, year, draftKey
     authorization_scope: { draft_year: year, draft_key: draftKey, channel: 'DRAFT', max_selections: maxSelections, note: 'This manifest authorises nothing by itself. A separate, explicit approval must name its checksum.' },
     article: { revision: article.revision, response_sha256: article.response_sha256, title: `${year} Major League Baseball draft` },
     chadwick_commit: chadwickCommit, identity_file_sha256: identityFileSha256, tyler_brown_101: brownVariant,
+    ...(supplementOf ? { supplement_of: supplementOf } : {}),
     required_migration: REQUIRED_MIGRATION,
     batches: docs.map((b) => ({ file: b.file, batch_key: b.doc.batch_key, organization: b.doc.records[0].organization, sha256: b.sha256, records: b.doc.records.length, picks: b.picks })),
     totals: { selections: records.length, organizations: Object.keys(orgs).length, per_organization: orgs, held: heldPicks, identity_tiers: tier },
@@ -59,7 +60,7 @@ export function buildManifest ({ humanApprovals = [], releaseKey, year, draftKey
     sources, identity_confidence: confidence,
     expected_database_changes: {
       draft_selections_inserted: records.length, draft_signings_inserted: 0, signing_rows: 0, bonuses: 0,
-      players_created_max: records.length, external_ids_inserted_max: idCount, source_observations_inserted_max: wdObs + records.length * 3,
+      players_created_max: supplementOf ? 0 : records.length, external_ids_inserted_max: idCount, source_observations_inserted_max: wdObs + records.length * 3 + (supplementOf ? records.filter((r) => r.player.birth_date).length : 0),
       sources_inserted_max: sources.length, coverage_claims: Object.keys(orgs).length, import_batches: docs.length, research_classes_max: Object.keys(orgs).length, release_audits: 1,
       untouched: ['migrations', 'views', 'grants', 'certification', 'reviewers', 'historical years', 'existing players, selections and observations']
     },
@@ -266,6 +267,7 @@ export async function applyRelease (db, rel, { operator }) {
     const selectionCount = async () => (await db.query(`select count(*)::int n from public.draft_selections s join public.drafts d on d.id = s.draft_id where d.draft_key = $1`, [m.authorization_scope.draft_key])).rows[0].n
     const selectionsBefore = await selectionCount()
     const signingsBefore = await signingCount()
+    const playersBefore = (await db.query('select count(*)::int n from public.players')).rows[0].n
     const entries = []
     const batches = []
     for (const b of rel.batches) {
@@ -297,6 +299,8 @@ export async function applyRelease (db, rel, { operator }) {
       if (want && have !== want) throw new Error(`verification failed: pick ${r.overall_pick} should hold MLBAM ${want} but holds ${have}`)
       if (!want && have) throw new Error(`verification failed: pick ${r.overall_pick} is name-only in the manifest but holds MLBAM ${have} (a link nobody approved)`)
     }
+    const playersAfter = (await db.query('select count(*)::int n from public.players')).rows[0].n
+    if (playersAfter - playersBefore > Number(m.expected_database_changes.players_created_max)) throw new Error(`verification failed: ${playersAfter - playersBefore} player(s) created; the manifest allows ${m.expected_database_changes.players_created_max}`)
     const signingsAfter = await signingCount()
     if (signingsAfter !== signingsBefore + Number(m.expected_database_changes.draft_signings_inserted)) throw new Error(`verification failed: signing rows for the draft went from ${signingsBefore} to ${signingsAfter}; the manifest expects none added`)
     const counts = { selections: expected.size, imported: entries.filter((e) => !['SKIPPED_ALREADY_APPLIED', 'HELD'].includes(e.outcome)).length, skipped: entries.filter((e) => e.outcome === 'SKIPPED_ALREADY_APPLIED').length, held: entries.filter((e) => e.outcome === 'HELD').length, held_in_manifest: m.totals.held.length }
