@@ -159,12 +159,17 @@ const COMMANDS = {
     if (identity.revision !== a.revid) throw new Error(`identity.json is for revision ${identity.revision}, article is ${a.revid}: run identify again`)
     const byPick = new Map(identity.picks.map((x) => [x.overall_pick, x]))
     const holdFile = path.join(YEAR_DIR, 'holds.json')   // picks a dry run refused (a person decides what happens to them)
-    const holdDoc = fs.existsSync(holdFile) ? JSON.parse(fs.readFileSync(holdFile, 'utf8')) : {}
-    const extraHolds = holdDoc.holds ?? {}
+    // Release build (--release-dir): batches for a manifest-bound hosted release. Local run artifacts (holds.json, batch
+    // suffixes, supplements) are ignored: the batches come from the identity file and the article revision alone.
+    const releaseDir = opt('release-dir')
+    const brown = opt('brown', 'held')   // pick 101: 'held' (default) or 'name-only' (imported, identity explicitly unresolved)
+    if (!['held', 'name-only'].includes(brown)) throw new Error('--brown must be held or name-only')
+    const holdDoc = !releaseDir && fs.existsSync(holdFile) ? JSON.parse(fs.readFileSync(holdFile, 'utf8')) : {}
+    const extraHolds = { ...(holdDoc.holds ?? {}), ...(releaseDir && opt('holds-file') ? JSON.parse(fs.readFileSync(path.resolve(root, opt('holds-file')), 'utf8')) : {}) }
     const suffixes = holdDoc.batch_suffix ?? {}
     // A supplement run adds picks that earlier runs held: --only-picks 36,72 --suffix d1 (existing batch files are kept).
-    const only = opt('only-picks') ? new Set(opt('only-picks').split(',').map(Number)) : null
-    const deltaSuffix = opt('suffix')   // a staged batch is immutable: a changed batch gets a new key (org -> suffix)
+    const only = !releaseDir && opt('only-picks') ? new Set(opt('only-picks').split(',').map(Number)) : null
+    const deltaSuffix = releaseDir ? null : opt('suffix')   // a staged batch is immutable: a changed batch gets a new key (org -> suffix)
     // Verified ids come from the Chadwick register (validated patterns), attributed to it.
     const f = fetcher()
     const wanted = new Set(identity.picks.filter((x) => x.status === 'VERIFIED' && x.chadwick?.ids.MLBAM).map((x) => x.chadwick.ids.MLBAM))
@@ -174,11 +179,13 @@ const COMMANDS = {
     const wikiKey = `hist:wikipedia-${year}-${draftKey(year, 'JR').slice(5).toLowerCase().replace(/_/g, '-')}-r${a.revid}`
     const cwKey = `hist:chadwick-register-${commit7}`
     const wdKey = `hist:wikidata-${year}-identity`
+    // Deterministic: the latest Wikidata retrieval recorded in the committed manifest, never the build date.
+    const wdRetrieved = Object.entries(f.manifest.entries).filter(([k]) => k.startsWith('wikidata/')).map(([, e]) => e.retrieved_at.slice(0, 10)).sort().pop()
     const wikiSource = { source_key: wikiKey, source_type: 'REFERENCE_DATABASE', authority_level: 'AGGREGATOR', title: `Wikipedia: ${year} Major League Baseball draft, revision ${a.revid}`, publisher: 'Wikimedia Foundation (contributors)', url: `https://en.wikipedia.org/w/index.php?title=${year}_Major_League_Baseball_draft&oldid=${a.revid}`, retrieved_date: retrieved(a.entry.retrieved_at), published_date: a.timestamp.slice(0, 10), notes: `Revision ${a.revid} (${a.timestamp}); sha256 of the API response ${a.entry.sha256}. Facts only (pick, round table, club, school label); text CC BY-SA 4.0, not reproduced. No signing, bonus or outcome data.` }
     const cwSource = { source_key: cwKey, source_type: 'REFERENCE_DATABASE', authority_level: 'AGGREGATOR', title: `Chadwick Baseball Bureau Register, commit ${commit7}`, publisher: 'Chadwick Baseball Bureau', url: `https://github.com/chadwickbureau/register/tree/${chadwickSrc.pinned_commit}`, retrieved_date: retrieved(f.manifest.entries[`chadwick/${commit7}/people-0.csv`].retrieved_at), notes: 'MLBAM -> Baseball-Reference, Baseball-Reference minors, FanGraphs and Retrosheet ids; birth dates. Open Data Commons Attribution License 1.0.' }
-    const wdSource = { source_key: wdKey, source_type: 'REFERENCE_DATABASE', authority_level: 'AGGREGATOR', title: `Wikidata identity corroboration for the ${year} draft`, publisher: 'Wikimedia Foundation (Wikidata contributors)', url: 'https://www.wikidata.org/', retrieved_date: retrieved(new Date().toISOString()), notes: 'CC0 1.0. Used only to corroborate that a Chadwick candidate is the person named in the draft table (Q-id, MLBAM id or birth date agreeing).' }
+    const wdSource = { source_key: wdKey, source_type: 'REFERENCE_DATABASE', authority_level: 'AGGREGATOR', title: `Wikidata identity corroboration for the ${year} draft`, publisher: 'Wikimedia Foundation (Wikidata contributors)', url: 'https://www.wikidata.org/', retrieved_date: wdRetrieved, notes: 'CC0 1.0. Used only to corroborate that a Chadwick candidate is the person named in the draft table (Q-id, MLBAM id or birth date agreeing).' }
     const orgs = [...new Set(a.picks.map((p) => p.franchise))].sort()
-    const outDir = path.join(OUT, 'batches', String(year))
+    const outDir = releaseDir ? path.join(path.resolve(root, releaseDir), 'batches') : path.join(OUT, 'batches', String(year))
     if (!only) fs.rmSync(outDir, { recursive: true, force: true })
     const summary = { batches: [], held: [] }
     for (const org of orgs) {
@@ -190,7 +197,8 @@ const COMMANDS = {
       for (const p of mine) {
         if (only && !only.has(p.overall_pick)) continue
         const id = byPick.get(p.overall_pick)
-        const why = id.status === 'AMBIGUOUS' ? `identity ambiguous: ${id.reason}` : extraHolds[p.overall_pick] ?? null
+        const unresolvedImport = releaseDir && brown === 'name-only' && p.overall_pick === 101 && id.status === 'AMBIGUOUS'
+        const why = id.status === 'AMBIGUOUS' && !unresolvedImport ? `identity ambiguous: ${id.reason}` : extraHolds[p.overall_pick] ?? null
         if (why) { held.push({ pick: p.overall_pick, name: p.name, reason: why }); continue }
         const player = { full_name: p.name, source_key: wikiKey }
         const rec = { type: 'DRAFT_SELECTION', source_key: wikiKey, draft_key: draftKey(year, 'JR'), round_code: p.round_code, overall_pick: p.overall_pick, round_pick: null, organization: org, selection_type: p.selection_type, player }
@@ -201,8 +209,13 @@ const COMMANDS = {
             player.external_id_sources = Object.fromEntries(Object.keys(player.external_ids).map((k) => [k, cwKey]))
             if (c.birth[0] && c.birth[1] && c.birth[2]) { player.birth_date = `${c.birth[0]}-${String(c.birth[1]).padStart(2, '0')}-${String(c.birth[2]).padStart(2, '0')}`; rec.field_sources = { birth_date: cwKey } }
             usedCw = true; usedWd = true
+            if (releaseDir && id.wikidata?.qid) {
+              // Exact provenance of the identifier check: the Wikidata item and the agreeing fields, as observations citing Wikidata.
+              rec.evidence = [{ subject: 'player', field: 'wikidata_item', value: id.wikidata.qid, source_key: wdKey }, { subject: 'player', field: 'identity_basis', value: id.basis.join('+'), source_key: wdKey }]
+            }
           }
         }
+        if (unresolvedImport) rec.flags = [{ code: 'IDENTITY_UNRESOLVED', severity: 'WARNING', subject: 'player', note: 'Imported name-only by explicit choice: several register candidates share the name; no identifier is attached.' }]
         if (p.school) rec.school = { name: p.school.name, school_type: p.school.school_type, city: p.school.city, region: p.school.region, source_key: wikiKey }
         rec.signing = { status: 'UNKNOWN' }
         rec.notes = `From Wikipedia's ${year} draft article (revision ${a.revid}). Identity: ${id.status}${id.basis ? ` (${id.basis.join(', ')})` : ''}${id.status === 'VERIFIED' ? '' : '; no ids attached'}. Signing status not researched: unknown, not unsigned.${p.round_code === 'C-2' ? ' Round C-2 is derived from the article\'s "Compensatory round" table title, not from MLB\'s label.' : ''}`
@@ -223,7 +236,7 @@ const COMMANDS = {
       write(path.join(outDir, `${doc.batch_key}.json`), doc)
       summary.batches.push({ org, records: records.length, held: held.length }); summary.held.push(...held.map((h) => ({ org, ...h })))
     }
-    write(path.join(YEAR_DIR, only ? `build-${deltaSuffix ?? 'delta'}.json` : 'build.json'), { year, revision: a.revid, ...summary })
+    write(path.join(releaseDir ? path.resolve(root, releaseDir) : YEAR_DIR, only ? `build-${deltaSuffix ?? 'delta'}.json` : 'build.json'), { year, revision: a.revid, ...summary })
     log(`${summary.batches.length} batches, ${summary.batches.reduce((n, b) => n + b.records, 0)} records, held ${summary.held.length}`)
   },
 

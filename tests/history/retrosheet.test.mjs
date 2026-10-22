@@ -106,15 +106,14 @@ test('the cross-check proposes findings and never concludes', () => {
   assert.equal(absent.outcome, 'NO_RETROSHEET_RECORD', 'no Retrosheet record is not evidence of anything')
 })
 
-test('the catalog records Retrosheet and Wikidata with their terms and no site publication yet', () => {
+test('the catalog records Retrosheet (no site publication yet) and Wikidata (CC0, identity-bound publication)', () => {
   const catalog = loadCatalog(root)
   assert.deepEqual(validateCatalog(catalog), [])
   const ctx = { now: new Date('2026-10-22T12:00:00Z') }
   const ok = (id, use) => checkUse(catalog, id, use, ctx, { root }).ok
   for (const use of ['fetch_targeted', 'fetch_bulk', 'process_local', 'publish_repository']) assert.equal(ok('retrosheet-transactions', use), true, use)
   assert.equal(ok('retrosheet-transactions', 'publish_site'), false, 'hosted publication waits for the attribution surface and a person')
-  for (const use of ['fetch_targeted', 'process_local', 'publish_repository']) assert.equal(ok('wikidata', use), true, use)
-  assert.equal(ok('wikidata', 'publish_site'), false)
+  for (const use of ['fetch_targeted', 'process_local', 'publish_repository', 'publish_site']) assert.equal(ok('wikidata', use), true, use)
   const retro = catalog.sources.find((s) => s.id === 'retrosheet-transactions')
   assert.equal(retro.license.attribution, RETROSHEET_ATTRIBUTION)
   assert.ok(retro.does_not_supply.some((x) => /complete draft population/.test(x)))

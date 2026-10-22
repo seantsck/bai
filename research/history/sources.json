@@ -165,7 +165,18 @@
     }
    },
    "authorization": null,
-   "permission_notes": "Attribution required: cite the Chadwick Baseball Bureau on public pages that show ids from it. Pinned to one commit so replays are deterministic."
+   "permission_notes": "Attribution required: cite the Chadwick Baseball Bureau on public pages that show ids from it. Pinned to one commit so replays are deterministic.",
+   "identity": {
+    "url_prefixes": [
+     "https://github.com/chadwickbureau/register"
+    ],
+    "publishers": [
+     "Chadwick Baseball Bureau",
+     "Chadwick Baseball Bureau (GitHub)"
+    ],
+    "source_type": "REFERENCE_DATABASE",
+    "key_pattern": "^hist:chadwick-register-[0-9a-f]{7,40}$"
+   }
   },
   {
    "id": "wikipedia-draft-articles",
@@ -231,7 +242,18 @@
     }
    },
    "authorization": null,
-   "permission_notes": "Independent of MLB's feed for counts and dates. A secondary source: a disagreement with MLB is recorded, never resolved by preferring either."
+   "permission_notes": "Independent of MLB's feed for counts and dates. A secondary source: a disagreement with MLB is recorded, never resolved by preferring either.",
+   "identity": {
+    "hosts": [
+     "en.wikipedia.org"
+    ],
+    "publishers": [
+     "Wikimedia Foundation (contributors)",
+     "Wikipedia"
+    ],
+    "source_type": "REFERENCE_DATABASE",
+    "key_pattern": "^hist:wikipedia-[a-z0-9._:-]+$"
+   }
   },
   {
    "id": "bref-draft-archive",
@@ -503,7 +525,7 @@
    "review": {
     "reviewed_on": "2026-10-22",
     "review_due": "2027-01-22",
-    "reviewed_by": "BAI maintainer (Phase 10.1 spec: Retrosheet and Wikidata integration; terms read from the published notice and Wikidata's CC0 statement)"
+    "reviewed_by": "BAI maintainer (Phase 10.4 spec: migration 027 and the Wikidata CC0 publication basis)"
    },
    "uses": {
     "fetch_targeted": {
@@ -523,15 +545,25 @@
     },
     "publish_repository": {
      "state": "CLEARED",
-     "basis": "CC0; BAI commits only Q-ids attached to its own records."
+     "basis": "CC0 1.0 Universal: no restriction; BAI commits only Q-ids attached to its own records."
     },
     "publish_site": {
-     "state": "PENDING",
-     "basis": "CC0 permits it, but hosted has no Wikidata attribution category yet (the 025 guard refuses these records) and no public credit surface. A person grants this with the migration that adds it."
+     "state": "CLEARED",
+     "basis": "Wikidata structured data is CC0 1.0 (https://www.wikidata.org/wiki/Wikidata:Licensing): no permission or attribution is required. Credited on /sources as a courtesy. Only a source that carries the Wikidata identity (https URL on www.wikidata.org or query.wikidata.org, publisher \"Wikimedia Foundation (Wikidata contributors)\", type REFERENCE_DATABASE, key hist:wikidata-*) is recognised, by this catalog and by migration 027 (attribution category WIKIDATA). Hosted publication also needs migration 027 deployed."
     }
    },
    "authorization": null,
-   "permission_notes": "Secondary identity reference. A Wikidata match, or a missing one, never establishes membership of the draft population and never decides an ambiguous identity by itself."
+   "permission_notes": "Secondary identity reference: a Wikidata match supports an identity and never decides one alone or shows membership of a draft. The WIKIDATA category is recognised by URL, publisher, type and key together; a label alone is refused.",
+   "required_source_type": "REFERENCE_DATABASE",
+   "identity": {
+    "hosts": [
+     "www.wikidata.org",
+     "query.wikidata.org"
+    ],
+    "publisher": "Wikimedia Foundation (Wikidata contributors)",
+    "source_type": "REFERENCE_DATABASE",
+    "key_pattern": "^hist:wikidata-[a-z0-9._:-]+$"
+   }
   }
  ]
 }

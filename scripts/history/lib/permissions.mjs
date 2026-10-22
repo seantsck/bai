@@ -47,6 +47,7 @@ export function validateCatalog (catalog) {
     ids.add(s.id)
     if (!s.review?.reviewed_on || !s.review?.review_due) out.push(`${at}: review.reviewed_on and review.review_due are required`)
     if (!s.license?.name) out.push(`${at}: license.name is required`)
+    if (s.identity && (!((s.identity.hosts ?? []).length || (s.identity.url_prefixes ?? []).length) || !(s.identity.publisher || (s.identity.publishers ?? []).length) || !s.identity.source_type || !s.identity.key_pattern)) out.push(`${at}: identity needs hosts or url_prefixes, a publisher, source_type and key_pattern`)
     for (const use of USES) {
       const g = s.uses?.[use]
       if (!g) { out.push(`${at}: no grant for ${use}`); continue }
@@ -87,11 +88,26 @@ export function governingSources (catalog, cited) {
   if (byKey && (!byKey.required_source_type || byKey.required_source_type === cited.source_type)) out.push(byKey)
   const byUrl = sourceForUrl(catalog, cited.url)
   if (byUrl && !out.includes(byUrl)) out.push(byUrl)
-  return { sources: out, unknownHist: !out.length && /^hist:/i.test(String(cited.source_key ?? '').trim()) }
+  // An entry that declares an identity (hosts, publisher, type, key pattern) is matched by key only for a source that
+  // really carries it: a label alone never makes a source "the" Wikidata source.
+  const misidentified = out.filter((e) => e.identity && !matchesIdentity(e.identity, cited)).map((e) => e.id)
+  return { sources: out, misidentified, unknownHist: !out.length && /^hist:/i.test(String(cited.source_key ?? '').trim()) }
 }
-export function governingSource (catalog, cited) {
-  const { sources, unknownHist } = governingSources(catalog, cited)
-  return { source: sources[0] ?? null, unknownHist }
+
+/**
+ * Whether a cited source carries the identity an entry requires: an https URL on one of its hosts (or under one of its URL
+ * prefixes, ending at a path, query or the end), a publisher from its list, its source type and its key pattern. All of
+ * them, never one label.
+ */
+export function matchesIdentity (identity, cited) {
+  const url = String(cited.url ?? '')
+  const under = (prefix) => url.startsWith(prefix) && ['/', '?', ''].includes(url.charAt(prefix.length))
+  const urlOk = !/\s/.test(url) && ((identity.hosts ?? []).some((h) => under(`https://${h}`)) || (identity.url_prefixes ?? []).some(under))
+  const publishers = identity.publishers ?? (identity.publisher ? [identity.publisher] : [])
+  return urlOk &&
+    (!publishers.length || publishers.includes(cited.publisher)) &&
+    (!identity.source_type || cited.source_type === identity.source_type) &&
+    (!identity.key_pattern || new RegExp(identity.key_pattern).test(String(cited.source_key ?? '')))
 }
 
 function scopeProblem (scope, ctx) {
@@ -165,6 +181,8 @@ export function requireBatchUse (catalog, doc, use, ctx = {}, opts = {}) {
   for (const key of new Set((doc.sources ?? []).map((s) => s.source_key))) {
     const s = sourceForKey(catalog, key)
     if (!s) { ungoverned.push(key); continue }
+    const cited = doc.sources.find((x) => x.source_key === key)
+    if (s.identity && !matchesIdentity(s.identity, cited)) throw new PermissionDenied(`${key}: claims to be ${s.id} but does not carry its identity (hosts, publisher, type, key pattern)`, { source: key, use })
     requireUse(catalog, s, use, { ...ctx, year }, opts)
     governed.push(key)
   }
@@ -206,7 +224,8 @@ export function requireHostedPublication (catalog, doc, ctx = {}, opts = {}) {
   const historical = !years.length || years.some((y) => y < before)
   if (!(doc.sources ?? []).length) throw new PermissionDenied('a batch with no declared sources cannot reach hosted', { use: 'publish_site' })
   for (const cited of doc.sources) {
-    const { sources, unknownHist } = governingSources(catalog, cited)
+    const { sources, unknownHist, misidentified } = governingSources(catalog, cited)
+    if (misidentified.length) throw new PermissionDenied(`${cited.source_key}: claims to be ${misidentified.join(', ')} but does not carry its identity (hosts, publisher, type, key pattern)`, { source: cited.source_key, use: 'publish_site' })
     if (unknownHist) throw new PermissionDenied(`${cited.source_key}: a hist: source key the catalog does not govern`, { source: cited.source_key, use: 'publish_site' })
     if (!sources.length) throw new PermissionDenied(`${cited.source_key}: not in the source catalog, so there is no approved basis to publish it on hosted (research/history/sources.json)`, { source: cited.source_key, use: 'publish_site' })
     for (const source of sources) for (const year of years.length ? years : [null]) requireUse(catalog, source, 'publish_site', { ...ctx, year }, opts)

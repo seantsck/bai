@@ -76,7 +76,7 @@ async function adoptSupabaseHistory (client, history, applied, log) {
 }
 
 /** @param {import('pg').ClientBase} client */
-export async function applyMigrations (client, { log = () => {} } = {}) {
+export async function applyMigrations (client, { log = () => {}, through = null } = {}) {
   await client.query(`create schema if not exists bai_meta;
     revoke all on schema bai_meta from public;
     create table if not exists bai_meta.schema_migrations (
@@ -93,6 +93,7 @@ export async function applyMigrations (client, { log = () => {} } = {}) {
   }
   const ran = []
   for (const m of listMigrations()) {
+    if (through && m.version > through) break
     const prior = applied.get(m.version)
     if (prior) {
       if (prior.checksum !== m.checksum || prior.file !== m.file) throw new Error(`applied migration ${m.file} has changed (frozen); add a new migration instead`)

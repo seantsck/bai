@@ -154,7 +154,9 @@ test('research-ingestion schema: private staging area, lifecycle enums, identity
   const t = await rows("select table_name from information_schema.tables where table_schema = 'ingest' order by 1")
   // 025 adds the historical-year release table; this suite also runs against hosted before 025 is deployed.
   const with025 = (await one("select to_regclass('research.history_exceptions') is not null as ok")).ok
-  assert.deepEqual(t.map((r) => r.table_name), [...(with025 ? ['historical_releases'] : []), 'import_batches', ...(with025 ? ['source_publication_grants'] : []), 'staged_records', 'staged_sources'])
+  // 027 adds the private release audit table.
+  const with027 = (await one("select to_regclass('ingest.release_audits') is not null as ok")).ok
+  assert.deepEqual(t.map((r) => r.table_name), [...(with025 ? ['historical_releases'] : []), 'import_batches', ...(with027 ? ['release_audits'] : []), ...(with025 ? ['source_publication_grants'] : []), 'staged_records', 'staged_sources'])
   assert.equal((await one("select enum_range(null::ingest.identity_match_state)::text r")).r, '{EXACT_EXTERNAL_ID,EXACT_COMPOSITE,PROBABLE_MATCH,AMBIGUOUS,NO_MATCH,CONFLICT}')
   assert.equal((await one("select enum_range(null::ingest.apply_action)::text r")).r, '{INSERT,UPDATE_UNKNOWN,CORROBORATE,NO_CHANGE,CONFLICT,HELD}')
   assert.equal((await one("select count(*)::int n from conflict_rules")).n, 8)

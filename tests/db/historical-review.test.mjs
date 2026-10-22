@@ -27,9 +27,10 @@ test('attribution: each source is grouped by origin; the public summary and expl
     ['fx:mlbcom-archive', 'NEWS_REPORT', { url: 'https://web.archive.org/web/2019/https://www.mlb.com/news/x' }, 'MLB'],
     ['fx:bref', 'REFERENCE_DATABASE', { url: 'https://www.baseball-reference.com/draft/x' }, 'BASEBALL_REFERENCE'],
     ['fx:bref-archive', 'REFERENCE_DATABASE', { url: 'https://web.archive.org/web/2019id_/https://www.baseball-reference.com/x' }, 'BASEBALL_REFERENCE'],
-    ['fx:chadwick', 'REFERENCE_DATABASE', { url: 'https://github.com/chadwickbureau/register/tree/abc' }, 'CHADWICK_REGISTER'],
-    ['fx:wiki', 'REFERENCE_DATABASE', { url: 'https://en.wikipedia.org/w/index.php?oldid=1', title: '2019 Major League Baseball draft' }, 'WIKIPEDIA'],
-    ['fx:bai', 'BAI_REFERENCE', { url: 'https://www.mlb.com/history' }, 'BAI_RESEARCH'],
+    ['fx:chadwick', 'REFERENCE_DATABASE', { url: 'https://github.com/chadwickbureau/register/tree/abc', publisher: 'Chadwick Baseball Bureau' }, 'CHADWICK_REGISTER'],
+    ['fx:wiki', 'REFERENCE_DATABASE', { url: 'https://en.wikipedia.org/w/index.php?oldid=1', title: '2019 Major League Baseball draft', publisher: 'Wikipedia' }, 'WIKIPEDIA'],
+    ['bai-reference:fx', 'BAI_REFERENCE', { url: 'https://github.com/seantsck/bai' }, 'BAI_RESEARCH'],
+    ['bai-reference:fx-mlb', 'BAI_REFERENCE', { url: 'https://www.mlb.com/history' }, 'MLB'],   // 027: a BAI compilation citing a league page is judged by that page
     ['fx:news', 'NEWS_REPORT', { url: 'https://www.mlbtraderumors.com/x' }, 'OTHER_PUBLICATION'],
     ['fx:ba', 'PUBLICATION_RANKING', { url: 'https://www.baseballamerica.com/x' }, 'OTHER_PUBLICATION']
   ]
@@ -106,7 +107,7 @@ test('publication guard (hosted only): existing records stay readable; new MLB a
     await assert.rejects(db.query(`update draft_selections set source_id = (select id from sources where source_key = 'fx:mlb-api') where id = $1`, [wiki]), /new MLB record/)
     // Openly licensed and BAI's own sources need no grant; a recorded basis (a person's assertion, not verified) opens a group.
     assert.ok((await newPick(8, 'fx:chadwick')).rows[0].id)
-    assert.ok((await newPick(9, 'fx:bai')).rows[0].id)
+    assert.ok((await newPick(9, 'bai-reference:fx')).rows[0].id)
     await db.query(`insert into ingest.source_publication_grants (attribution_category, basis_reference, scope_note) values ('MLB', 'FIXTURE-AUTH-MLB', 'fixture authorization')`)
     assert.ok((await newPick(10, 'fx:mlb-api')).rows[0].id)
     await h.asRole(db, 'anon', () => assert.rejects(db.query('select * from ingest.source_publication_grants'), /permission denied/))

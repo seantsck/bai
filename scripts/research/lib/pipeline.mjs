@@ -13,6 +13,7 @@ import path from 'node:path'
 import crypto from 'node:crypto'
 import { validateEnvelope, validateRecordShape, roundStructure, slugify, EVIDENCE_SUBJECTS, organizationScopeErrors } from './import-format.mjs'
 import { loadCatalog, requireHostedPublication } from '../../history/lib/permissions.mjs'
+import * as txn from './txn.mjs'
 
 const SAFE_STATES = new Set(['EXACT_EXTERNAL_ID', 'EXACT_COMPOSITE', 'NO_MATCH'])
 const ACTION_RANK = { HELD: 6, CONFLICT: 5, INSERT: 4, UPDATE_UNKNOWN: 3, CORROBORATE: 2, NO_CHANGE: 1 }
@@ -66,7 +67,7 @@ export async function stageFile (db, file, { operator = 'cli', allowFixtures = f
   const clash = await db.query('select id from ingest.import_batches where batch_key = $1', [doc.batch_key])
   if (clash.rows[0]) throw new PipelineError(`batch_key ${doc.batch_key} is already used by a different file; batches are immutable, use a new key`)
 
-  await db.query('begin')
+  await txn.begin(db)
   try {
     const b = (await db.query(`insert into ingest.import_batches (batch_key, channel, file_name, file_sha256, description, coverage_claim, record_count, imported_by)
       values ($1, $2, $3, $4, $5, $6, $7, $8) returning id, batch_key, status`,
@@ -76,9 +77,9 @@ export async function stageFile (db, file, { operator = 'cli', allowFixtures = f
       await db.query(`insert into ingest.staged_records (batch_id, record_index, record_type, record_sha256, payload, source_key)
         values ($1, $2, $3, $4, $5, $6)`, [b.id, i, r.type ?? 'UNKNOWN_TYPE', sha256(JSON.stringify(r)), r, r.source_key ?? ''])
     }
-    await db.query('commit')
+    await txn.commit(db)
     return { batch: b, already: false }
-  } catch (err) { await db.query('rollback'); throw err }
+  } catch (err) { await txn.rollback(db); throw err }
 }
 
 // ---------------------------------------------------------------------------------------------------------------
@@ -121,7 +122,7 @@ export async function validateBatch (db, ref) {
   const counts = { records: records.length, valid: 0, invalid: 0, warnings: 0, identity: {} }
   const seenPicks = new Map()
 
-  await db.query('begin')
+  await txn.begin(db)
   try {
     for (const rec of records) {
       const r = rec.payload
@@ -189,9 +190,9 @@ export async function validateBatch (db, ref) {
     }
     const newStatus = counts.invalid ? 'VALIDATION_FAILED' : 'VALIDATED'
     await db.query('update ingest.import_batches set status = $2, validated_at = now(), last_report = $3 where id = $1', [batch.id, newStatus, JSON.stringify({ step: 'validate', ...counts })])
-    await db.query('commit')
+    await txn.commit(db)
     return { batch: { ...batch, status: newStatus }, counts, ok: counts.invalid === 0 }
-  } catch (err) { await db.query('rollback'); throw err }
+  } catch (err) { await txn.rollback(db); throw err }
 }
 
 // ---------------------------------------------------------------------------------------------------------------
@@ -791,7 +792,7 @@ export async function applyBatch (db, ref, { write = false, allowPartial = false
   const a = new Applier(db, batch)
   const results = []
   const conflicts = []
-  await db.query('begin')
+  await txn.begin(db)
   try {
     // Named in the decision history if this batch revokes a certification (021).
     await db.query("select set_config('bai.import_batch_id', $1, true), set_config('bai.actor', $2, true)", [String(batch.id), batch.imported_by])
@@ -837,9 +838,9 @@ export async function applyBatch (db, ref, { write = false, allowPartial = false
     }
     const report = { step: write ? 'apply' : 'dry-run', ...counts, coverage }
     await db.query(`update ingest.import_batches set last_report = $2 ${write ? ", status = 'APPLIED', applied_at = coalesce(applied_at, now())" : ''} where id = $1`, [batch.id, JSON.stringify(report)])
-    await db.query('commit')
+    await txn.commit(db)
     return { batch, report, results: results.map((r) => ({ record_index: r.rec.record_index, action: r.action, reason: r.reason ?? null, identity: r.identity ?? null })), conflicts }
-  } catch (err) { await db.query('rollback'); throw err }
+  } catch (err) { await txn.rollback(db); throw err }
 }
 
 // ---------------------------------------------------------------------------------------------------------------
