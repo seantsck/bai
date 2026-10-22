@@ -18,22 +18,31 @@ export function parseEvidenceRows (text) {
 }
 
 const fold = (s) => String(s ?? '').normalize('NFD').replace(/\p{M}/gu, '').toLowerCase()
-const STOP = new Set(['hs', 'high', 'school', 'university', 'college', 'of', 'the', 'academy', 'senior', 'catholic', 'state', 'ss', 'cc', 'institute', 'univ'])
+const STOP = new Set(['community', 'secondary', 'jc', 'jr', 'hs', 'high', 'school', 'university', 'college', 'of', 'the', 'academy', 'senior', 'catholic', 'ss', 'cc', 'institute', 'univ'])
 // Abbreviations that differ between outlets for the same school; state tails (", IL", "(Ill.)") are ignored.
-const ALIAS = { nc: 'north carolina', mt: 'mount', ill: 'il', calif: 'ca', fla: 'fl', ore: 'or', pa: 'pa', ga: 'ga', tenn: 'tn', okla: 'ok', ont: 'on', ariz: 'az', colo: 'co', hawaii: 'hi' }
+const ALIAS = { unc: 'north carolina', st: 'saint', lemoyne: 'le moyne', marjory: '', ole: '', miss: 'mississippi', nc: 'north carolina', mt: 'mount', ill: 'il', calif: 'ca', fla: 'fl', ore: 'or', pa: 'pa', ga: 'ga', tenn: 'tn', okla: 'ok', ont: 'on', ariz: 'az', colo: 'co', hawaii: 'hi' }
 const tokens = (s) => fold(s).replace(/\([^)]*\)/g, ' ').replace(/,\s*[a-z]{2}\s*$/, ' ').replace(/[^a-z0-9]+/g, ' ').split(' ').flatMap((t) => (ALIAS[t] ?? t).split(' ')).filter((t) => t && !STOP.has(t))
 
-/** 'SAME' | 'DIFFERENT' (token sets disjoint, or neither contained in the other) — conservative, a reviewer sees every DIFFERENT. */
+/** 'SAME' | 'DIFFERENT' (token sets not equal after dropping generic words and normalising abbreviations) — conservative, a reviewer sees every DIFFERENT. */
 export function compareSchools (a, b) {
   const x = tokens(a)
   const y = tokens(b)
   if (!x.length || !y.length) return 'UNKNOWN'
   const xs = new Set(x)
   const ys = new Set(y)
-  return x.every((t) => ys.has(t)) || y.every((t) => xs.has(t)) ? 'SAME' : 'DIFFERENT'
+  // Equal token sets only: "Michigan" and "Michigan State" are different schools.
+  return xs.size === ys.size && x.every((t) => ys.has(t)) ? 'SAME' : 'DIFFERENT'
 }
 
-const normClub = (s) => WIKI_TEAMS[String(s).replace(/\s*\(baseball\)$/, '').trim()] ?? null
+// Club codes outlets print (a franchise key, or a common alternative) -> BAI franchise key.
+const CLUB_CODES = { OAK: 'ATH', CHW: 'CWS', WAS: 'WSH', WSN: 'WSH', TBR: 'TB', SDP: 'SD', SFG: 'SF', KCR: 'KC', LA: 'LAD', ANA: 'LAA' }
+const FRANCHISES = new Set(Object.values(WIKI_TEAMS))
+const normClub = (s) => {
+  const t = String(s).replace(/\s*\(baseball\)$/, '').trim()
+  if (WIKI_TEAMS[t]) return WIKI_TEAMS[t]
+  const u = t.toUpperCase()
+  return FRANCHISES.has(u) ? u : CLUB_CODES[u] ?? null
+}
 
 /** Compare `picks` (wikipedia-draft parse) with evidence rows. Returns { matched, findings, summary }. */
 export function compareLists (picks, rows) {

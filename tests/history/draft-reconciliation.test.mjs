@@ -107,3 +107,32 @@ test('a namesake link never overrides the register tie, and a verified identity 
   assert.equal(tied.link_conflict, null)
   assert.equal(decideIdentity([c], [], namesake).status, 'SINGLE_SOURCE', 'a link to an unrelated item confirms nothing')
 })
+
+test('school comparison needs equal token sets: a state school is not the school it shares a word with', async () => {
+  const { compareSchools: cmp } = await import('../../scripts/history/lib/evidence-compare.mjs')
+  assert.equal(cmp('Michigan', 'Michigan State'), 'DIFFERENT')
+  assert.equal(cmp('Oklahoma State', 'Oklahoma'), 'DIFFERENT')
+  assert.equal(cmp('Ole Miss', 'Mississippi'), 'SAME')
+  assert.equal(cmp('Ole Miss', 'Mississippi State'), 'DIFFERENT')
+  assert.equal(cmp('McLennan Community College', 'McLennan CC'), 'SAME')
+  assert.equal(cmp('Le Moyne', 'LeMoyne College'), 'SAME')
+})
+
+test('club codes outlets print are normalised, and an unknown code is a finding', () => {
+  const p = [{ overall_pick: 1, name: 'Ann Able', franchise: 'ATH', school_label: 'Duke' }, { overall_pick: 2, name: 'Bo Baker', franchise: 'CWS', school_label: 'Duke' }, { overall_pick: 3, name: 'Cy Carter', franchise: 'SF', school_label: 'Duke' }]
+  const r = compareLists(p, parseEvidenceRows('1|OAK|Ann Able|Duke\n2|CHW|Bo Baker|Duke\n3|ZZZ|Cy Carter|Duke'))
+  assert.deepEqual(r.findings.map((f) => `${f.pick}:${f.kind}`), ['3:CLUB_DIFFERS'])
+})
+
+test('printed initials match their dotted form, and career reasons name each failure', async () => {
+  const { compareNames } = await import('../../scripts/history/lib/retrosheet.mjs')
+  assert.equal(compareNames('AJ Vukovich', 'A. J. Vukovich'), 'EXACT')
+  assert.equal(compareNames('RJ Dabovich', 'R. J. Dabovich'), 'EXACT')
+  assert.equal(compareNames('Mac Wainwright', 'Mackenzie Wainwright'), 'SAME_SURNAME_COMPATIBLE_FIRST')
+  assert.equal(compareNames('Jesse Franklin V', 'Jesse Franklin'), 'EXACT')
+  const { careerReasons } = await import('../../scripts/history/lib/identity-2020.mjs')
+  const [c] = cand(['a,u,,,,,,,Doe,Jo,Jo,,1999,1,1,,,2015,2016'], 'Jo Doe')
+  const why = careerReasons(c, { schoolType: 'COLLEGE', draftYear: 2020 })
+  assert.equal(why.length, 3)
+  assert.match(why.join(' | '), /no MLBAM id.*no professional start.*college record does not end at the draft/)
+})
