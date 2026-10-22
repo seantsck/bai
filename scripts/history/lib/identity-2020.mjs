@@ -63,7 +63,6 @@ export function candidatesFor (name, index, { draftYear }) {
   return out
 }
 
-/** Decide one pick's identity from its Chadwick candidates and Wikidata people (both lists may be empty). */
 /**
  * Career consistency inside the Chadwick register (one source, several of its fields): a draftee has an MLBAM id (MLB
  * registers draftees), starts professional play within three seasons of the draft or reaches the majors after it, and has a
@@ -72,17 +71,18 @@ export function candidatesFor (name, index, { draftYear }) {
  * only when exactly one candidate stays consistent. The result is a narrowed single-source candidate, never a verified one,
  * and every elimination is returned for review.
  */
+export function careerReasons (c, { schoolType, draftYear }) {
+  const out = []
+  if (!c.ids.MLBAM) out.push('no MLBAM id (MLB registers its draftees)')
+  if (c.mlb_played_first && c.mlb_played_first < draftYear) out.push(`in the majors in ${c.mlb_played_first}, before the draft`)
+  else if (!c.mlb_played_first && !(c.pro_played_first && c.pro_played_first >= draftYear && c.pro_played_first <= draftYear + 3)) out.push(`no professional start within three seasons of the draft (first pro season ${c.pro_played_first ?? 'none'})`)
+  if (schoolType === 'COLLEGE' && !(c.col_played_last && c.col_played_last >= draftYear - 1 && c.col_played_last <= draftYear)) out.push(`college record does not end at the draft (${c.col_played_first ?? '-'}-${c.col_played_last ?? '-'})`)
+  if (schoolType === 'HIGH_SCHOOL' && c.col_played_first && c.col_played_first <= draftYear) out.push(`college play from ${c.col_played_first}, before the draft`)
+  return out
+}
+
 export function narrowByCareer (candidates, { schoolType, draftYear }) {
-  const reasons = (c) => {
-    const out = []
-    if (!c.ids.MLBAM) out.push('no MLBAM id (MLB registers its draftees)')
-    if (c.mlb_played_first && c.mlb_played_first < draftYear) out.push(`in the majors in ${c.mlb_played_first}, before the draft`)
-    else if (!c.mlb_played_first && !(c.pro_played_first && c.pro_played_first >= draftYear && c.pro_played_first <= draftYear + 3)) out.push(`no professional start within three seasons of the draft (first pro season ${c.pro_played_first ?? 'none'})`)
-    if (schoolType === 'COLLEGE' && !(c.col_played_last && c.col_played_last >= draftYear - 1 && c.col_played_last <= draftYear)) out.push(`college record does not end at the draft (${c.col_played_first ?? '-'}-${c.col_played_last ?? '-'})`)
-    if (schoolType === 'HIGH_SCHOOL' && c.col_played_first && c.col_played_first <= draftYear) out.push(`college play from ${c.col_played_first}, before the draft`)
-    return out
-  }
-  const verdicts = candidates.map((c) => ({ c, why: reasons(c) }))
+  const verdicts = candidates.map((c) => ({ c, why: careerReasons(c, { schoolType, draftYear }) }))
   const consistent = verdicts.filter((v) => !v.why.length)
   if (candidates.length > 1 && consistent.length === 1) {
     return { kept: [consistent[0].c], eliminated: verdicts.filter((v) => v.why.length).map((v) => ({ key_person: v.c.key_person, reason: v.why.join('; ') })), narrowed: true }

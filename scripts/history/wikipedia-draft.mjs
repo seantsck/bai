@@ -14,7 +14,7 @@ import { createFetcher, PermissionDenied, BudgetExhausted } from './lib/fetch.mj
 import { userAgent } from './lib/outbound.mjs'
 import { SHARDS, indexShard } from './lib/chadwick.mjs'
 import { parseDraftArticle, WIKI_TEAMS } from './lib/wikipedia-draft.mjs'
-import { chadwickCandidates, candidatesFor, decideIdentity, narrowByCareer } from './lib/identity-2020.mjs'
+import { chadwickCandidates, candidatesFor, decideIdentity, narrowByCareer, careerReasons } from './lib/identity-2020.mjs'
 import { compareSchools } from './lib/evidence-compare.mjs'
 import { nameQuery, queryUrl, queryKey, parseNameResults, pagePropsUrl, pagePropsKey, parsePageProps, qidQuery, parseQidResults, mlbamQuery } from './lib/wikidata.mjs'
 import { parseDraftTransactions, RETROSHEET_ATTRIBUTION, compareNames } from './lib/retrosheet.mjs'
@@ -139,7 +139,7 @@ const COMMANDS = {
       if (rr) checks.push({ source: 'retrosheet', retrosheet_id: rr.retrosheet_id, club: rr.franchise, status: rr.status, club_agrees: rr.franchise === p.franchise })
       return {
         overall_pick: p.overall_pick, name: p.name, club: p.franchise, status: id.status, basis: id.basis ?? null, reason: id.reason ?? null,
-        candidates: id.candidates, wikidata_people: id.wikidata_people, link_conflict: id.link_conflict ?? null, link_title: p.link_title, link_qid: qid, narrowed_by_career: narrowed, narrowed_out: eliminated.length ? eliminated : null,
+        candidates: id.candidates, wikidata_people: id.wikidata_people, link_conflict: id.link_conflict ?? null, link_item: id.link_conflict && linked ? { qid: linked.qid, label: linked.label, mlbam: linked.mlbam, birth_date: linked.birth_date, bbref: linked.bbref, educated_at: linked.educated_at ?? [] } : null, link_title: p.link_title, link_qid: qid, narrowed_by_career: narrowed, narrowed_out: eliminated.length ? eliminated : null,
         chadwick: id.chadwick ? { key_person: id.chadwick.key_person, ids: id.chadwick.ids, birth: id.chadwick.birth, qid: id.chadwick.qid, pro_played_first: id.chadwick.pro_played_first, mlb_played_first: id.chadwick.mlb_played_first, name_match: id.chadwick.name_match } : null,
         wikidata: id.wikidata ?? null, corroboration: checks, candidate_keys: id.candidate_keys ?? null
       }
@@ -251,6 +251,76 @@ const COMMANDS = {
     log(`birth-date comparison: ${JSON.stringify(tally)}`)
   },
 
+  // Human-review package: every identity decision that is a person's to make, with the evidence for each option.
+  // Local files only (.local/history/<year>/review-package.json). Decides nothing and writes nothing to any database.
+  async 'review-package' () {
+    const identity = JSON.parse(fs.readFileSync(path.join(YEAR_DIR, 'identity.json'), 'utf8'))
+    const rc = JSON.parse(fs.readFileSync(path.join(YEAR_DIR, 'release-candidate.json'), 'utf8'))
+    const dobFile = path.join(YEAR_DIR, 'dob-comparison.json')
+    const dob = fs.existsSync(dobFile) ? JSON.parse(fs.readFileSync(dobFile, 'utf8')).rows : []
+    const evDir = path.join(YEAR_DIR, 'evidence')
+    const a = await article()
+    const lists = {}
+    for (const f of fs.readdirSync(evDir).filter((x) => x.endsWith('-rows.txt'))) lists[f.replace(/-rows\.txt$/, '')] = compareLists(a.picks, parseEvidenceRows(fs.readFileSync(path.join(evDir, f), 'utf8'))).per
+    const listsFor = (pick) => Object.fromEntries(Object.entries(lists).map(([k, per]) => [k, per.find((x) => x.pick === pick)?.status ?? null]))
+    const note = (n) => { const f = path.join(evDir, n); return fs.existsSync(f) ? JSON.parse(fs.readFileSync(f, 'utf8')) : null }
+
+    // Register candidates for every ambiguous pick (all of them, with the career fields used to narrow).
+    const idx = new Map()
+    const f = fetcher()
+    for (const sh of SHARDS) { const key = `chadwick/${commit7}/people-${sh}.csv`; chadwickCandidates((await f.get(key, f.manifest.entries[key].url, { source: 'chadwick-register', use: 'fetch_bulk' })).buf.toString('utf8'), { minBirth: year - 26, maxBirth: year - 16 }, idx) }
+    const pickRow = (n) => a.picks.find((p) => p.overall_pick === n)
+    const ambiguous = identity.picks.filter((x) => x.status === 'AMBIGUOUS').map((x) => {
+      const official = x.overall_pick === 101 ? note('vanderbilt-tyler-brown.json') : null
+      const schoolType = official ? 'COLLEGE' : pickRow(x.overall_pick)?.school?.school_type ?? null
+      // Constraints stated by an official record (high-school class year, college seasons), applied candidate by candidate.
+      const fits = (c) => {
+        const k = official?.candidate_constraints
+        if (!k) return null
+        const born = Number(c.birth[0])
+        return born >= k.born_from && born <= k.born_to && c.col_played_first === k.college_first && c.col_played_last === k.college_last
+      }
+      return {
+        pick: x.overall_pick, name: x.name, club: x.club, school: pickRow(x.overall_pick)?.school_label, lists_agree: listsFor(x.overall_pick),
+        candidates: candidatesFor(x.name, idx, { draftYear: year }).map((c) => ({ key_person: c.key_person, name: `${c.given || c.first} ${c.last}`, mlbam: c.ids.MLBAM ?? null, birth: c.birth.join('-'), first_pro_season: c.pro_played_first, college_seasons: [c.col_played_first, c.col_played_last],
+          register_career_check: careerReasons(c, { schoolType, draftYear: year }).join('; ') || 'consistent', fits_official_record: fits(c) })),
+        official_record: official,
+        options: ['keep held (nothing attached)', 'import name-only (identity unresolved)', 'attach a register identifier after a person decides the tie'],
+        recommendation: 'keep held unless a permitted source states a birth date or identifier; the elimination of other candidates is indirect (one register\'s fields)'
+      }
+    })
+
+    // The imported name-only players whose evidence now supports verified ids: a person links them (research:identity).
+    const links = rc.proposed_identity_links.map((l) => {
+      const x = identity.picks.find((y) => y.overall_pick === l.pick)
+      return { ...l, qid: x.wikidata?.qid ?? null, chadwick_birth: x.chadwick?.birth?.join('-') ?? null, article_link_conflict: x.link_conflict ?? null, lists_agree: listsFor(l.pick),
+        how: 'review the staged record in the research identity queue and record a link decision with a note (npm run research:identity -- --record <staged id> --player <slug> --operator <you> --note ...); not run here' }
+    })
+
+    const conflicts = identity.picks.filter((x) => x.link_conflict).map((x) => ({
+      pick: x.overall_pick, name: x.name, club: x.club, article_link: x.link_title, linked_item: x.link_item, tied_item: x.wikidata ? { qid: x.wikidata.qid, mlbam: x.wikidata.mlbam, birth_date: x.wikidata.birth_date } : null, register_mlbam: x.chadwick?.ids?.MLBAM ?? null, identity_status: x.status,
+      reading: !x.link_item?.mlbam && !x.link_item?.birth_date ? 'the linked item carries no MLB id, birth date or education, so it neither confirms nor refutes (a namesake page, a redirect to another page, or a duplicate item)' : 'the linked item carries identifiers that differ from the register tie: a real conflict'
+    }))
+    const sharedItems = {}
+    for (const c of conflicts) if (c.linked_item?.qid) (sharedItems[c.linked_item.qid] ??= []).push(`#${c.pick} ${c.name}`)
+    const sharedNote = Object.entries(sharedItems).filter(([, v]) => v.length > 1).map(([q, v]) => ({ item: q, picks: v, reading: 'one item linked from several different players: the link text resolves to a shared or unrelated page' }))
+
+    const single = identity.picks.filter((x) => x.status === 'SINGLE_SOURCE').map((x) => {
+      const d = dob.find((r) => r.pick === x.overall_pick)
+      return { pick: x.overall_pick, name: x.name, club: x.club, register_mlbam: x.chadwick?.ids?.MLBAM ?? null, register_birth: x.chadwick?.birth?.join('-') ?? null, narrowed_by_career: Boolean(x.narrowed_by_career), public_birth_date_check: d?.result ?? 'NOT_SEARCHED', proposal: d?.proposed ?? null, lists_agree: listsFor(x.overall_pick) }
+    })
+    const tally = {}
+    for (const r of single) tally[r.public_birth_date_check] = (tally[r.public_birth_date_check] ?? 0) + 1
+    const out = {
+      format: 'bai-review-package/1', year, revision: a.revid, generated_on: new Date().toISOString().slice(0, 10),
+      note: 'Decisions belong to a human reviewer. Nothing here was applied; no identifier was attached by automation.',
+      ambiguous, proposed_links: links, article_link_conflicts: conflicts, shared_link_items: sharedNote,
+      single_source: { total: single.length, by_public_birth_date_check: tally, rows: single }
+    }
+    write(path.join(YEAR_DIR, 'review-package.json'), out)
+    log(`review package: ${ambiguous.length} ambiguous, ${links.length} proposed links, ${conflicts.length} link conflicts (${sharedNote.length} shared items), ${single.length} single-source (${JSON.stringify(tally)})`)
+  },
+
   // Release-candidate checks: census reconciliation, integrity of what was imported, permissions, evidence comparison.
   // Reads the local database (read-only) and the local evidence files; writes .local/history/<year>/release-candidate.{json,md}.
   async 'release-check' () {
@@ -323,6 +393,13 @@ const COMMANDS = {
       try { requireHostedPublication(catalog, doc, {}, { root }) } catch (err) { refusals.set(`hosted: ${err.message}`, (refusals.get(`hosted: ${err.message}`) ?? 0) + 1) }
     }
     check('every batch may be processed locally', localOk === files.length, `${localOk} of ${files.length}`)
+    // Would the catalog gate pass if the Wikidata citation were dropped (ids then rest on Chadwick alone)?
+    let hostedWithoutWikidata = 0
+    for (const file of files) {
+      const doc = JSON.parse(fs.readFileSync(path.join(batchDir, file), 'utf8'))
+      const trimmed = { ...doc, sources: doc.sources.filter((x) => !String(x.source_key).startsWith('hist:wikidata-')) }
+      try { requireHostedPublication(catalog, trimmed, {}, { root }); hostedWithoutWikidata++ } catch { /* counted by difference */ }
+    }
     const hostedRefusals = [...refusals].filter(([k]) => k.startsWith('hosted')).map(([k, n]) => ({ reason: k.slice(8), batches: n }))
 
     const dobFile = path.join(YEAR_DIR, 'dob-comparison.json')
@@ -332,7 +409,7 @@ const COMMANDS = {
       identity_tiers: tier, proposed_identity_links: proposedLinks,
       clubs: Object.fromEntries(Object.keys(clubs).sort().map((c) => [c, { article: clubs[c], imported: byClubImported[c] ?? 0, evidence: Object.fromEntries(comparisons.map((x) => [x.id, x.clubs[c] ?? null])) }])),
       evidence_comparisons: comparisons.map((x) => ({ id: x.id, summary: x.summary, findings: x.findings })),
-      checks, permissions: { local_batches_ok: `${localOk}/${files.length}`, hosted_refusals: hostedRefusals },
+      checks, permissions: { local_batches_ok: `${localOk}/${files.length}`, hosted_refusals: hostedRefusals, hosted_gate_passes_without_wikidata_citation: `${hostedWithoutWikidata}/${files.length}` },
       dob_comparison: fs.existsSync(dobFile) ? JSON.parse(fs.readFileSync(dobFile, 'utf8')).summary : null
     }
     write(path.join(YEAR_DIR, 'release-candidate.json'), out)

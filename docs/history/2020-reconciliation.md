@@ -30,3 +30,9 @@ Never changed by this process. An aggregate statement ("all picks signed") is re
 
 ## Research agents
 Every brief carries `AGENT_REQUEST_RULES` (`scripts/history/lib/agent-brief.mjs`): web access only through the search and fetch tools, project-URL identification only, no personal information in any request or report, no workarounds when refused.
+
+## Second published list, review package, publication feasibility (Phase 10.3)
+- **A second list** (a tracker by another outlet) is read one page at a time, keyed locally as `<id>-rows.txt` (`pick|club|player|school`) and compared by `release-check`. Comparison is by overall pick; clubs may be printed as names or codes; school names must have equal token sets after generic words and abbreviations are normalised (so "Michigan" and "Michigan State" differ). The comparison reports differences, per-club agreement and nothing else: **agreement of publishers that name no source, or that may share the league's list, is not independence and never makes a census complete.**
+- **`review-package`** writes `review-package.json` for the human decisions: ambiguous picks (every register candidate with its career fields, the register career check, and, when an official record states constraints, whether each candidate fits it), imported name-only players with proposed verified links, article-link conflicts (with the linked item's own data and any item linked from several players), and single-source identities with their public birth-date checks. It decides and writes nothing.
+- **`release-check`** also reports whether the hosted catalog gate would pass if the Wikidata citation were dropped from the batches.
+- An official record (for example a university roster) that names the person, club and pick can settle which person the selection is, but without a birth date or identifier it does not tie the person to a register record: the pick stays held until a person decides.
