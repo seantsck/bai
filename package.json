@@ -82,6 +82,8 @@
     "history:publication-check": "node scripts/history/publication-check.mjs",
     "history:plan": "node --env-file-if-exists=.env.local scripts/history/plan.mjs",
     "history:retrosheet": "node --env-file-if-exists=.env.local scripts/history/retrosheet.mjs",
+    "history:release": "node --env-file-if-exists=.env.local scripts/history/release.mjs",
+    "hosted:release": "node --env-file=.env.hosted.local scripts/history/release.mjs",
     "history:wikipedia": "node --env-file-if-exists=.env.local scripts/history/wikipedia-draft.mjs",
     "history:review": "node --env-file-if-exists=.env.local scripts/history/review.mjs",
     "history:benchmark": "node --import ./tests/support/register-ts.mjs scripts/history/benchmark.mjs"

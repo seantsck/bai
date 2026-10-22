@@ -32,6 +32,11 @@ const GROUPS: { key: string, uses: string, credit: string }[] = [
     credit: 'Wikipedia contributors. Facts only; article text is not reproduced (text is CC BY-SA 4.0).'
   },
   {
+    key: 'WIKIDATA',
+    uses: 'Identity corroboration: a person\'s Wikidata item (Q-id), recorded as a field observation on records whose identifiers were checked against it.',
+    credit: 'Wikidata contributors. Structured data released under CC0 1.0; no permission or attribution is required, credited as a courtesy.'
+  },
+  {
     key: 'BAI_RESEARCH',
     uses: 'Independent researcher observations: BAI\'s own reference compilations (franchise histories, calendars) and research determinations, each citing the public evidence it rests on.',
     credit: 'BAI research.'
@@ -82,12 +87,11 @@ export default async function SourcesPage () {
 
       <h2>Reference data used in research</h2>
       <p>
-        BAI’s research tooling also reads two openly licensed reference datasets. Neither is shown on this site yet; they are credited here because
-        Retrosheet’s notice requires its statement to appear prominently wherever its data is used.
+        BAI’s research tooling also reads Retrosheet’s transactions file, an openly licensed reference dataset. It is not shown on this site yet; it is credited
+        here because Retrosheet’s notice requires its statement to appear prominently wherever its data is used.
       </p>
       <ul>
         <li>{RETROSHEET_CREDIT}</li>
-        <li>Wikidata, structured data released under CC0 1.0. Credited as a courtesy.</li>
       </ul>
 
       <h2>Rights</h2>

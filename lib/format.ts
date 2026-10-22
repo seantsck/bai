@@ -57,11 +57,12 @@ export const SOURCE_GROUP_LABELS: Record<string, string> = {
   BASEBALL_REFERENCE: 'Baseball-Reference',
   CHADWICK_REGISTER: 'Chadwick Register',
   WIKIPEDIA: 'Wikipedia',
+  WIKIDATA: 'Wikidata',
   BAI_RESEARCH: 'BAI research',
   OTHER_PUBLICATION: 'Other publications'
 }
 export const SOURCE_GROUP_SHORT: Record<string, string> = {
-  MLB: 'MLB', BASEBALL_REFERENCE: 'B-Ref', CHADWICK_REGISTER: 'Chadwick', WIKIPEDIA: 'Wikipedia', BAI_RESEARCH: 'BAI research', OTHER_PUBLICATION: 'Publication'
+  MLB: 'MLB', BASEBALL_REFERENCE: 'B-Ref', CHADWICK_REGISTER: 'Chadwick', WIKIPEDIA: 'Wikipedia', WIKIDATA: 'Wikidata', BAI_RESEARCH: 'BAI research', OTHER_PUBLICATION: 'Publication'
 }
 
 export const SIGNING_STATUS_LABELS: Record<string, string> = {

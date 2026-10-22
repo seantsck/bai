@@ -2,6 +2,7 @@
 // batches, blockers, source leads, stage transitions and certification. Works for any of the 30 organizations; nothing
 // here knows about a particular club. Canonical facts are never written here: they still enter only through ingest
 // batches (pipeline.mjs). This module writes the private `research` schema only.
+import * as txn from './txn.mjs'
 import { PipelineError, isoDate } from './pipeline.mjs'
 
 const one = async (db, sql, p) => (await db.query(sql, p)).rows[0]
@@ -15,13 +16,13 @@ const NON_BLOCKING = new Set(['OUTCOME_NOT_AUDITED', 'LOW_QUALITY_SOURCE', 'COVE
 
 /** Runs fn in a transaction with bai.actor set, so job/batch events record who acted. */
 async function tx (db, actor, fn) {
-  await db.query('begin')
+  await txn.begin(db)
   try {
     await db.query("select set_config('bai.actor', $1, true)", [actor])
     const r = await fn()
-    await db.query('commit')
+    await txn.commit(db)
     return r
-  } catch (err) { await db.query('rollback'); throw err }
+  } catch (err) { await txn.rollback(db); throw err }
 }
 
 const requireActor = (actor, what) => {
