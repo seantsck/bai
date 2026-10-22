@@ -22,6 +22,7 @@
 //     grant (publish_repository), enforced by `npm run history:publication-check` in `npm run check`.
 //   * Local databases only. Hosted imports are refused here until the permissions decisions are made and a reviewed batch
 //     plan exists (docs/history/backfill-plan.md).
+import { userAgent } from './lib/outbound.mjs'
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -48,7 +49,7 @@ const catalog = loadCatalog(root)
 const OUT = path.resolve(root, process.env.BAI_HISTORY_OUT || '.restricted/history')
 const chadwick = catalog.sources.find((s) => s.id === 'chadwick-register')
 const OPERATOR = process.env.BAI_OPERATOR || 'history-importer'
-const USER_AGENT = 'BAI-research/0.1 (historical draft importer; github.com/seantsck/bai)'
+const USER_AGENT = userAgent('historical draft importer')
 const log = (m) => console.log(m)
 
 const fetcher = () => createFetcher({ root, catalog, offline: flag('offline'), maxRequests: Number(opt('max-requests', 50)), minIntervalMs: Number(opt('interval-ms', 1500)), userAgent: USER_AGENT, log })

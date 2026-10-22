@@ -776,6 +776,70 @@
    "sha256": "63bcbc94163c43130abd47f4c333911303ea75abb7187fe0d4c54d655ee5f1b2",
    "retrieved_at": "2026-10-21T01:39:52.728Z",
    "content_type": "application/json;charset=UTF-8"
+  },
+  "retrosheet/notice.txt": {
+   "url": "https://www.retrosheet.org/notice.txt",
+   "source_key": "retrosheet-transactions",
+   "bytes": 971,
+   "sha256": "2218abe680e21d3308de06352c394baefbffc7618d36a821d38ed6e97c24105d",
+   "retrieved_at": "2026-10-22T01:09:58.661Z",
+   "content_type": "text/plain; charset=UTF-8"
+  },
+  "retrosheet/readme.txt": {
+   "url": "https://www.retrosheet.org/transactions/readme.txt",
+   "source_key": "retrosheet-transactions",
+   "bytes": 6953,
+   "sha256": "5f7652ad61a9de5596de8d8d81d51bf6f55856b84c32057ca42ae120c1433cc3",
+   "retrieved_at": "2026-10-22T01:09:59.946Z",
+   "content_type": "text/plain; charset=UTF-8"
+  },
+  "retrosheet/trandb.zip": {
+   "url": "https://www.retrosheet.org/transactions/tranDB.zip",
+   "source_key": "retrosheet-transactions",
+   "bytes": 1203773,
+   "sha256": "c5cd539f89991afa9a74fdc67b0f71e29413383792404013a2c69fdd450fd932",
+   "retrieved_at": "2026-10-22T01:10:07.872Z",
+   "content_type": "application/zip"
+  },
+  "wikidata/sparql-8d4e3f4cbc7f3998.json": {
+   "url": "https://query.wikidata.org/sparql?format=json&query=SELECT%20%3Fp%20%3Flabel%20%3Fmlb%20%3Fbirth%20%3Fbbref%20%3Fretro%20%3FdteamLabel%20%3Fdpick%20%3Fdtime%20WHERE%20%7B%0A%20%20VALUES%20%3Flabel%20%7B%20%22Sam%20Weatherly%22%40en%20%22David%20Calabrese%22%40en%20%22Adisyn%20Coffey%22%40en%20%22Bryce%20Bonnin%22%40en%20%22Kyle%20Harrison%22%40en%20%22Tekoah%20Roby%22%40en%20%22Casey%20Martin%22%40en%20%22Jordan%20Nwogu%22%40en%20%22Blaze%20Jordan%22%40en%20%22Liam%20Norris%22%40en%20%22Anthony%20Walters%22%40en%20%22Zavier%20Warren%22%40en%20%22Levi%20Prater%22%40en%20%22Holden%20Powell%22%40en%20%22Petey%20Halpin%22%40en%20%22Hunter%20Barnhart%22%40en%20%22Jesse%20Franklin%20V%22%40en%20%22Michael%20Guldberg%22%40en%20%22Trevor%20Hauver%22%40en%20%22Jake%20Vogel%22%40en%20%22Tyler%20Brown%22%40en%20%22Gage%20Workman%22%40en%20%22Coby%20Mayo%22%40en%20%22Jake%20Eder%22%40en%20%22Christian%20Chamberlain%22%40en%20%22Nick%20Frasso%22%40en%20%22Tyler%20Keenan%22%40en%20%22Jack%20Hartman%22%40en%20%22Levi%20Thomas%22%40en%20%22Case%20Williams%22%40en%20%22Werner%20Blakely%22%40en%20%22Kade%20Mechals%22%40en%20%22Mac%20Wainwright%22%40en%20%22R.%20J.%20Dabovich%22%40en%20%22Dylan%20MacLean%22%40en%20%22Carson%20Ragsdale%22%40en%20%22Luke%20Little%22%40en%20%22Jeremy%20Wu-Yelland%22%40en%20%22A.%20J.%20Vukovich%22%40en%20%22Matthew%20Dyer%22%40en%20%7D%0A%20%20%3Fp%20rdfs%3Alabel%20%3Flabel%20%3B%20wdt%3AP106%20wd%3AQ10871364%20.%0A%20%20OPTIONAL%20%7B%20%3Fp%20wdt%3AP3541%20%3Fmlb%20%7D%0A%20%20OPTIONAL%20%7B%20%3Fp%20wdt%3AP569%20%3Fbirth%20%7D%0A%20%20OPTIONAL%20%7B%20%3Fp%20wdt%3AP1825%20%3Fbbref%20%7D%0A%20%20OPTIONAL%20%7B%20%3Fp%20wdt%3AP6976%20%3Fretro%20%7D%0A%20%20OPTIONAL%20%7B%20%3Fp%20p%3AP647%20%3Fd%20.%20%3Fd%20ps%3AP647%20%3Fdteam%20.%20OPTIONAL%20%7B%20%3Fd%20pq%3AP1836%20%3Fdpick%20%7D%20OPTIONAL%20%7B%20%3Fd%20pq%3AP585%20%3Fdtime%20%7D%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%3Fdteam%20rdfs%3Alabel%20%3FdteamLabel%20.%20FILTER(LANG(%3FdteamLabel)%20%3D%20%22en%22)%20%7D%0A%7D",
+   "source_key": "wikidata",
+   "bytes": 6540,
+   "sha256": "f6b676c18b8c30972c066acbdb19e860ec70309145da8606eb47d9da9972eac0",
+   "retrieved_at": "2026-10-22T01:16:32.914Z",
+   "content_type": "application/sparql-results+json;charset=utf-8"
+  },
+  "wikidata/sparql-970b558bf11dd19c.json": {
+   "url": "https://query.wikidata.org/sparql?format=json&query=SELECT%20%3Fp%20%3Flabel%20%3Fmlb%20%3Fbirth%20%3Fbbref%20%3Fretro%20%3FdteamLabel%20%3Fdpick%20%3Fdtime%20WHERE%20%7B%0A%20%20VALUES%20%3Flabel%20%7B%20%22Spencer%20Torkelson%22%40en%20%22Heston%20Kjerstad%22%40en%20%22Max%20Meyer%22%40en%20%22Asa%20Lacy%22%40en%20%22Austin%20Martin%22%40en%20%22Emerson%20Hancock%22%40en%20%22Nick%20Gonzales%22%40en%20%22Robert%20Hassell%22%40en%20%22Zac%20Veen%22%40en%20%22Reid%20Detmers%22%40en%20%22Garrett%20Crochet%22%40en%20%22Austin%20Hendrick%22%40en%20%22Patrick%20Bailey%22%40en%20%22Justin%20Foscue%22%40en%20%22Mick%20Abel%22%40en%20%22Ed%20Howard%22%40en%20%22Nick%20Yorke%22%40en%20%22Bryce%20Jarvis%22%40en%20%22Pete%20Crow-Armstrong%22%40en%20%22Garrett%20Mitchell%22%40en%20%22Jordan%20Walker%22%40en%20%22Cade%20Cavalli%22%40en%20%22Carson%20Tucker%22%40en%20%22Nick%20Bitsko%22%40en%20%22Jared%20Shuster%22%40en%20%22Tyler%20Soderstrom%22%40en%20%22Aaron%20Sabato%22%40en%20%22Austin%20Wells%22%40en%20%22Bobby%20Miller%22%40en%20%22Jordan%20Westburg%22%40en%20%22Carmen%20Mlodzinski%22%40en%20%22Nick%20Loftin%22%40en%20%22Slade%20Cecconi%22%40en%20%22Justin%20Lange%22%40en%20%22Drew%20Romo%22%40en%20%22Tanner%20Burns%22%40en%20%22Alika%20Williams%22%40en%20%22Dillon%20Dingler%22%40en%20%22Hudson%20Haskin%22%40en%20%22Dax%20Fulton%22%40en%20%7D%0A%20%20%3Fp%20rdfs%3Alabel%20%3Flabel%20%3B%20wdt%3AP106%20wd%3AQ10871364%20.%0A%20%20OPTIONAL%20%7B%20%3Fp%20wdt%3AP3541%20%3Fmlb%20%7D%0A%20%20OPTIONAL%20%7B%20%3Fp%20wdt%3AP569%20%3Fbirth%20%7D%0A%20%20OPTIONAL%20%7B%20%3Fp%20wdt%3AP1825%20%3Fbbref%20%7D%0A%20%20OPTIONAL%20%7B%20%3Fp%20wdt%3AP6976%20%3Fretro%20%7D%0A%20%20OPTIONAL%20%7B%20%3Fp%20p%3AP647%20%3Fd%20.%20%3Fd%20ps%3AP647%20%3Fdteam%20.%20OPTIONAL%20%7B%20%3Fd%20pq%3AP1836%20%3Fdpick%20%7D%20OPTIONAL%20%7B%20%3Fd%20pq%3AP585%20%3Fdtime%20%7D%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%3Fdteam%20rdfs%3Alabel%20%3FdteamLabel%20.%20FILTER(LANG(%3FdteamLabel)%20%3D%20%22en%22)%20%7D%0A%7D",
+   "source_key": "wikidata",
+   "bytes": 28186,
+   "sha256": "fb2f9a525d62dfc434b826314eff48ab645f36e97fb42de530c17275ceae2a4f",
+   "retrieved_at": "2026-10-22T01:16:30.663Z",
+   "content_type": "application/sparql-results+json;charset=utf-8"
+  },
+  "wikidata/sparql-9d7fa08197dd87a7.json": {
+   "url": "https://query.wikidata.org/sparql?format=json&query=SELECT%20%3Fp%20%3Flabel%20%3Fmlb%20%3Fbirth%20%3Fbbref%20%3Fretro%20%3FdteamLabel%20%3Fdpick%20%3Fdtime%20WHERE%20%7B%0A%20%20VALUES%20%3Flabel%20%7B%20%22Joey%20Wiemer%22%40en%20%22Ian%20Bedell%22%40en%20%22Brady%20Lindsly%22%40en%20%22Milan%20Tolentino%22%40en%20%22Tanner%20Murray%22%40en%20%22Spencer%20Strider%22%40en%20%22Dane%20Acker%22%40en%20%22Marco%20Raya%22%40en%20%22Beck%20Way%22%40en%20%22Carson%20Taylor%22%40en%20%22Zach%20Daniels%22%40en%20%22Colt%20Keith%22%40en%20%22Carter%20Baumler%22%40en%20%22Kyle%20Hurt%22%40en%20%22Will%20Klein%22%40en%20%22Zach%20Britton%22%40en%20%22Taylor%20Dollard%22%40en%20%22Logan%20Hofmann%22%40en%20%22Jagger%20Haynes%22%40en%20%22Jack%20Blomgren%22%40en%20%22Adam%20Seminaris%22%40en%20%22Bailey%20Horn%22%40en%20%22Joe%20Boyle%22%40en%20%22Ryan%20Murphy%22%40en%20%22Thomas%20Saggese%22%40en%20%22Baron%20Radcliff%22%40en%20%22Koen%20Moreno%22%40en%20%22Shane%20Drohan%22%40en%20%22Brandon%20Pfaadt%22%40en%20%22Eric%20Orze%22%40en%20%22Hayden%20Cantrelle%22%40en%20%22LJ%20Jones%22%40en%20%22Mitchell%20Parker%22%40en%20%22Mason%20Hickman%22%40en%20%22Jeff%20Hakanson%22%40en%20%22Bryce%20Elder%22%40en%20%22Stevie%20Emanuels%22%40en%20%22Kala'i%20Rosario%22%40en%20%22Gavin%20Stone%22%40en%20%22Shay%20Whitcomb%22%40en%20%7D%0A%20%20%3Fp%20rdfs%3Alabel%20%3Flabel%20%3B%20wdt%3AP106%20wd%3AQ10871364%20.%0A%20%20OPTIONAL%20%7B%20%3Fp%20wdt%3AP3541%20%3Fmlb%20%7D%0A%20%20OPTIONAL%20%7B%20%3Fp%20wdt%3AP569%20%3Fbirth%20%7D%0A%20%20OPTIONAL%20%7B%20%3Fp%20wdt%3AP1825%20%3Fbbref%20%7D%0A%20%20OPTIONAL%20%7B%20%3Fp%20wdt%3AP6976%20%3Fretro%20%7D%0A%20%20OPTIONAL%20%7B%20%3Fp%20p%3AP647%20%3Fd%20.%20%3Fd%20ps%3AP647%20%3Fdteam%20.%20OPTIONAL%20%7B%20%3Fd%20pq%3AP1836%20%3Fdpick%20%7D%20OPTIONAL%20%7B%20%3Fd%20pq%3AP585%20%3Fdtime%20%7D%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%3Fdteam%20rdfs%3Alabel%20%3FdteamLabel%20.%20FILTER(LANG(%3FdteamLabel)%20%3D%20%22en%22)%20%7D%0A%7D",
+   "source_key": "wikidata",
+   "bytes": 14688,
+   "sha256": "3158d33581933b147a62513f998cba97a273487ccb7dc56be42d571e42276ac1",
+   "retrieved_at": "2026-10-22T01:16:34.904Z",
+   "content_type": "application/sparql-results+json;charset=utf-8"
+  },
+  "wikidata/sparql-de0da57a034f5df2.json": {
+   "url": "https://query.wikidata.org/sparql?format=json&query=SELECT%20%3Fp%20%3Flabel%20%3Fmlb%20%3Fbirth%20%3Fbbref%20%3Fretro%20%3FdteamLabel%20%3Fdpick%20%3Fdtime%20WHERE%20%7B%0A%20%20VALUES%20%3Flabel%20%7B%20%22Ben%20Hernandez%22%40en%20%22CJ%20Van%20Eyk%22%40en%20%22Zach%20DeLoach%22%40en%20%22Jared%20Jones%22%40en%20%22Owen%20Caissie%22%40en%20%22Chris%20McMahon%22%40en%20%22Jared%20Kelley%22%40en%20%22Christian%20Roa%22%40en%20%22Casey%20Schmitt%22%40en%20%22Evan%20Carter%22%40en%20%22Burl%20Carraway%22%40en%20%22J.%20T.%20Ginn%22%40en%20%22Freddy%20Zamora%22%40en%20%22Masyn%20Winn%22%40en%20%22Cole%20Henry%22%40en%20%22Logan%20Allen%22%40en%20%22Ian%20Seymour%22%40en%20%22Jeff%20Criswell%22%40en%20%22Alerick%20Soularie%22%40en%20%22Landon%20Knack%22%40en%20%22Kyle%20Nicolas%22%40en%20%22Daniel%20Cabrera%22%40en%20%22Tink%20Hence%22%40en%20%22Connor%20Phillips%22%40en%20%22Jackson%20Miller%22%40en%20%22Clayton%20Beeter%22%40en%20%22Nick%20Swiney%22%40en%20%22Jimmy%20Glowenke%22%40en%20%22Isaiah%20Greene%22%40en%20%22Alec%20Burleson%22%40en%20%22Sammy%20Infante%22%40en%20%22Alex%20Santos%22%40en%20%22Trei%20Cruz%22%40en%20%22Anthony%20Servideo%22%40en%20%22Zach%20McCambley%22%40en%20%22Tyler%20Gentry%22%40en%20%22Trent%20Palmer%22%40en%20%22Kaden%20Polcovich%22%40en%20%22Nick%20Garcia%22%40en%20%22Cole%20Wilcox%22%40en%20%7D%0A%20%20%3Fp%20rdfs%3Alabel%20%3Flabel%20%3B%20wdt%3AP106%20wd%3AQ10871364%20.%0A%20%20OPTIONAL%20%7B%20%3Fp%20wdt%3AP3541%20%3Fmlb%20%7D%0A%20%20OPTIONAL%20%7B%20%3Fp%20wdt%3AP569%20%3Fbirth%20%7D%0A%20%20OPTIONAL%20%7B%20%3Fp%20wdt%3AP1825%20%3Fbbref%20%7D%0A%20%20OPTIONAL%20%7B%20%3Fp%20wdt%3AP6976%20%3Fretro%20%7D%0A%20%20OPTIONAL%20%7B%20%3Fp%20p%3AP647%20%3Fd%20.%20%3Fd%20ps%3AP647%20%3Fdteam%20.%20OPTIONAL%20%7B%20%3Fd%20pq%3AP1836%20%3Fdpick%20%7D%20OPTIONAL%20%7B%20%3Fd%20pq%3AP585%20%3Fdtime%20%7D%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%3Fdteam%20rdfs%3Alabel%20%3FdteamLabel%20.%20FILTER(LANG(%3FdteamLabel)%20%3D%20%22en%22)%20%7D%0A%7D",
+   "source_key": "wikidata",
+   "bytes": 16236,
+   "sha256": "931d618eb05d65109acb3d51bec87cdbedaffa134d048eadf4f3008a51fa77b7",
+   "retrieved_at": "2026-10-22T01:16:31.347Z",
+   "content_type": "application/sparql-results+json;charset=utf-8"
+  },
+  "wikipedia/2020-major-league-baseball-draft.json": {
+   "url": "https://en.wikipedia.org/w/api.php?action=query&prop=revisions&rvprop=ids|timestamp|content&rvslots=main&format=json&formatversion=2&titles=2020_Major_League_Baseball_draft",
+   "source_key": "wikipedia-draft-articles",
+   "bytes": 50102,
+   "sha256": "e6c539de1e3b0c6e012b535b4d93f54daa62dba88286980bc2294b84e92f1ee5",
+   "retrieved_at": "2026-10-22T01:11:03.833Z",
+   "content_type": "application/json; charset=utf-8"
   }
  }
 }

@@ -14,6 +14,7 @@ import crypto from 'node:crypto'
 import fs from 'node:fs'
 import path from 'node:path'
 import { requireUse, PermissionDenied } from './permissions.mjs'
+import { assertSafeHeaders } from './outbound.mjs'
 
 export class BudgetExhausted extends Error {}
 export { PermissionDenied }
@@ -68,7 +69,7 @@ export function createFetcher ({ root, catalog, offline = false, maxRequests = 5
       lastHit.set(host, Date.now())
       requests++
       perSource.set(s.id, (perSource.get(s.id) ?? 0) + 1)
-      const res = await fetchImpl(url, { headers: { 'User-Agent': userAgent, Accept: 'application/json, text/csv, text/html;q=0.8' } })
+      const res = await fetchImpl(url, { headers: assertSafeHeaders({ 'User-Agent': userAgent, Accept: 'application/json, text/csv, text/html;q=0.8' }) })
       if (res.status === 429 || res.status >= 500) {
         attempt++
         const retryAfter = Number(res.headers.get('retry-after'))

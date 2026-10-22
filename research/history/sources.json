@@ -394,6 +394,144 @@
     }
    },
    "authorization": null
+  },
+  {
+   "id": "retrosheet-transactions",
+   "title": "Retrosheet transactions database (draft and signing records)",
+   "publisher": "Retrosheet",
+   "authority_level": "AGGREGATOR",
+   "source_type": "REFERENCE_DATABASE",
+   "hosts": [
+    "www.retrosheet.org"
+   ],
+   "url_prefixes": [
+    "https://www.retrosheet.org/transactions/",
+    "https://www.retrosheet.org/notice.txt"
+   ],
+   "governs_hosts": [
+    "retrosheet.org"
+   ],
+   "url_template": "https://www.retrosheet.org/transactions/tranDB.zip",
+   "source_key_prefixes": [
+    "hist:retrosheet-"
+   ],
+   "supplies": [
+    "Retrosheet player ids",
+    "draft year, club, draft type (secondary/active/Legion/Dominican), round, first-round pick number",
+    "'drafted, did not sign' (Dn) and signing date (Da) observations"
+   ],
+   "does_not_supply": [
+    "a complete draft population: only people Retrosheet tracks, mostly those who reached the majors (about 140-250 records a year, 1965-2021, almost none after 2018)",
+    "overall pick numbers after round 1",
+    "schools",
+    "bonuses"
+   ],
+   "license": {
+    "name": "Retrosheet notice: free to make any desired use, including selling it, provided the attribution statement appears prominently",
+    "url": "https://www.retrosheet.org/notice.txt",
+    "attribution": "The information used here was obtained free of charge from and is copyrighted by Retrosheet. Interested parties may contact Retrosheet at \"www.retrosheet.org\"."
+   },
+   "terms": "https://www.retrosheet.org/notice.txt (read 2026-10-21): recipients may make any desired use, including selling the data or building a commercial product, if the attribution statement appears prominently. No accuracy guarantee. Fetch only /transactions/tranDB.zip and /transactions/readme.txt (one file, about 1.2 MB, last modified 2022-05-09); never crawl the site.",
+   "review": {
+    "reviewed_on": "2026-10-22",
+    "review_due": "2027-01-22",
+    "reviewed_by": "BAI maintainer (Phase 10.1 spec: Retrosheet and Wikidata integration; terms read from the published notice and Wikidata's CC0 statement)"
+   },
+   "uses": {
+    "fetch_targeted": {
+     "state": "CLEARED",
+     "basis": "The notice permits any use; BAI fetches the one published transactions file and its readme."
+    },
+    "fetch_bulk": {
+     "state": "CLEARED",
+     "basis": "The same single file; cached, checksummed in research/history/manifest.json and never re-downloaded while the cache is valid."
+    },
+    "process_local": {
+     "state": "CLEARED",
+     "basis": "The notice permits any use."
+    },
+    "publish_repository": {
+     "state": "CLEARED",
+     "basis": "Facts attached to BAI's own records, with the attribution statement. The raw file stays in the gitignored cache."
+    },
+    "publish_site": {
+     "state": "PENDING",
+     "basis": "The licence permits it, but its condition (the attribution statement shown prominently) has no public surface yet and hosted has no Retrosheet attribution category (the 025 guard would refuse these records). A person grants this after the /sources credit and a migration exist."
+    }
+   },
+   "authorization": null,
+   "permission_notes": "Attribution statement is mandatory wherever Retrosheet-derived records are shown (see license.attribution). A Retrosheet record is evidence that a person was drafted; its absence is not evidence that a person was not. Never treat it as the draft population."
+  },
+  {
+   "id": "wikidata",
+   "title": "Wikidata (identity and biographical reference)",
+   "publisher": "Wikimedia Foundation (Wikidata contributors)",
+   "authority_level": "AGGREGATOR",
+   "source_type": "REFERENCE_DATABASE",
+   "hosts": [
+    "www.wikidata.org",
+    "query.wikidata.org"
+   ],
+   "url_prefixes": [
+    "https://www.wikidata.org/w/api.php",
+    "https://www.wikidata.org/wiki/Special:EntityData/",
+    "https://query.wikidata.org/sparql"
+   ],
+   "governs_hosts": [
+    "wikidata.org"
+   ],
+   "url_template": "https://www.wikidata.org/wiki/Special:EntityData/{qid}.json",
+   "source_key_prefixes": [
+    "hist:wikidata-"
+   ],
+   "supplies": [
+    "a Q-id per person",
+    "birth date and place, external ids (Baseball-Reference, MLB, Retrosheet)",
+    "a 'draft pick' statement for about 400 people"
+   ],
+   "does_not_supply": [
+    "a draft census (well under 1% of selections carry a draft statement)",
+    "signing status",
+    "bonuses"
+   ],
+   "license": {
+    "name": "CC0 1.0 Universal (public domain dedication)",
+    "url": "https://www.wikidata.org/wiki/Wikidata:Licensing",
+    "attribution": "Not required; BAI credits Wikidata as a courtesy."
+   },
+   "terms": "Wikidata structured data is CC0 (Wikidata:Licensing). Access follows the Wikimedia API and User-Agent policies: a descriptive agent with a project URL (never a person's email), serial requests and caching.",
+   "review": {
+    "reviewed_on": "2026-10-22",
+    "review_due": "2027-01-22",
+    "reviewed_by": "BAI maintainer (Phase 10.1 spec: Retrosheet and Wikidata integration; terms read from the published notice and Wikidata's CC0 statement)"
+   },
+   "uses": {
+    "fetch_targeted": {
+     "state": "CLEARED",
+     "basis": "CC0; one entity or one query per request, serial, with the project User-Agent."
+    },
+    "fetch_bulk": {
+     "state": "LIMITED",
+     "basis": "At most one request every 1.5 s and 80 requests per run; cached.",
+     "scope": {
+      "max_requests_per_run": 80
+     }
+    },
+    "process_local": {
+     "state": "CLEARED",
+     "basis": "CC0."
+    },
+    "publish_repository": {
+     "state": "CLEARED",
+     "basis": "CC0; BAI commits only Q-ids attached to its own records."
+    },
+    "publish_site": {
+     "state": "PENDING",
+     "basis": "CC0 permits it, but hosted has no Wikidata attribution category yet (the 025 guard refuses these records) and no public credit surface. A person grants this with the migration that adds it."
+    }
+   },
+   "authorization": null,
+   "permission_notes": "Secondary identity reference. A Wikidata match, or a missing one, never establishes membership of the draft population and never decides an ambiguous identity by itself."
   }
  ]
 }
