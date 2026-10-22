@@ -38,6 +38,22 @@ export function plain (wikitext) {
   return s.replace(/\s+/g, ' ').trim()
 }
 
+/** The Wikipedia page a player cell links to: a sortname template (with its dab) or a [[target|label]] link; null for plain text. */
+export function linkTitle (rawCell) {
+  const body = cellValue(rawCell)
+  const sn = body.match(/\{\{\s*sortname\s*\|([^{}]*)\}\}/i)
+  if (sn) {
+    const parts = sn[1].split('|').map((x) => x.trim())
+    const named = Object.fromEntries(parts.filter((x) => x.includes('=')).map((x) => [x.slice(0, x.indexOf('=')).trim(), x.slice(x.indexOf('=') + 1).trim()]))
+    if (named.nolink) return null
+    const pos = parts.filter((x) => !x.includes('='))
+    if (pos.length < 2) return null
+    return `${pos[0]} ${pos[1]}${named.dab ? ` (${named.dab})` : ''}`
+  }
+  const l = body.match(/\[\[([^\]|#]+)(?:#[^\]|]*)?(?:\|[^\]]*)?\]\]/)
+  return l ? l[1].trim() : null
+}
+
 /** The text before the first top-level `|` of a cell, e.g. `style="..."|value` -> value. */
 const cellValue = (line) => {
   const body = line.replace(/^[|!]/, '')
@@ -94,7 +110,7 @@ export function parseDraftArticle (wikitext, { year }) {
       n++
       picks.push({
         year, overall_pick: Number.isInteger(overall) ? overall : null, round_title: title, round_code: code, selection_type: selectionType(code),
-        name: playerC, team_label: team, franchise: WIKI_TEAMS[team] ?? null, position: posC || null, school_label: school || null, school: schoolFromLabel(school),
+        name: playerC, link_title: linkTitle(cells[1]), team_label: team, franchise: WIKI_TEAMS[team] ?? null, position: posC || null, school_label: school || null, school: schoolFromLabel(school),
         did_not_sign_marker: /\*\s*$/.test(playerC) || /\*/.test(cells[1])
       })
     }
