@@ -111,7 +111,18 @@ export function verifyReleaseContent (rel, { root }) {
   const m = rel.manifest
   const problems = []
   const catalog = loadCatalog(root)
-  if (m.coverage?.documented_selections != null && m.coverage.absent_selections !== m.coverage.documented_selections - m.totals.selections) problems.push(`coverage states ${m.coverage.absent_selections} absent selections but ${m.coverage.documented_selections} documented less ${m.totals.selections} represented is ${m.coverage.documented_selections - m.totals.selections}`)
+  // A declared documented population needs three mutually consistent whole-number counts.
+  const cov = m.coverage ?? {}
+  if (['documented_selections', 'represented_selections', 'absent_selections'].some((k) => Object.hasOwn(cov, k))) {
+    const whole = (v) => Number.isSafeInteger(v) && v >= 0
+    const { documented_selections: documented, represented_selections: represented, absent_selections: absent } = cov
+    if (![documented, represented, absent].every(whole)) problems.push(`coverage counts must all be whole numbers of at least 0 (documented ${JSON.stringify(documented)}, represented ${JSON.stringify(represented)}, absent ${JSON.stringify(absent)})`)
+    else {
+      if (documented < represented) problems.push(`coverage represents ${represented} selections of a documented ${documented}`)
+      if (represented !== m.totals.selections) problems.push(`coverage states ${represented} represented selections but the release has ${m.totals.selections}`)
+      if (absent !== documented - represented) problems.push(`coverage states ${absent} absent selections but ${documented} documented less ${represented} represented is ${documented - represented}`)
+    }
+  }
   const picks = []
   let signing = 0
   for (const b of rel.batches) {

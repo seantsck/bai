@@ -79,8 +79,21 @@ test('a partial release states how many documented selections are represented an
   assert.match(rel.manifest.coverage.interpretation, /not an unsigned player or a failed outcome/)
   assert.match(rel.manifest.coverage.representation, /not a representative sample/)
   assert.deepEqual(verifyReleaseContent(rel, { root }), [])
-  const bad = writeRelease('represented-bad', [batch('KC', [record(1, 'KC', 'Fixture Release One')], false)], { documentedSelections: 612, mutate: (m) => { m.coverage.absent_selections = 5; return m } })
-  assert.ok(verifyReleaseContent(loadRelease(bad), { root }).some((p) => /absent selections/.test(p)))
+  // Every tampered or invalid shape is refused, each for its own reason.
+  const tamper = (name, change, pattern) => {
+    const dir = writeRelease(`represented-${name}`, [batch('KC', [record(1, 'KC', 'Fixture Release One')], false)], { documentedSelections: 612, mutate: (m) => { change(m.coverage); return m } })
+    assert.ok(verifyReleaseContent(loadRelease(dir), { root }).some((p) => pattern.test(p)), name)
+  }
+  tamper('absent', (c) => { c.absent_selections = 5 }, /absent selections/)
+  tamper('represented', (c) => { c.represented_selections = 2; c.absent_selections = 610 }, /represented selections but the release has 1/)
+  tamper('represented-high', (c) => { c.represented_selections = 700; c.absent_selections = -88 }, /whole numbers/)
+  tamper('documented-below', (c) => { c.documented_selections = 0; c.absent_selections = -1 }, /whole numbers/)
+  tamper('documented-below-ok', (c) => { c.documented_selections = 0; c.represented_selections = 1; c.absent_selections = 0 }, /represents 1 selections of a documented 0/)
+  tamper('fractional', (c) => { c.documented_selections = 612.5 }, /whole numbers/)
+  tamper('string', (c) => { c.represented_selections = '1' }, /whole numbers/)
+  tamper('null', (c) => { c.absent_selections = null }, /whole numbers/)
+  tamper('missing', (c) => { delete c.absent_selections }, /whole numbers/)
+  tamper('nan', (c) => { c.documented_selections = NaN }, /whole numbers/)
 })
 
 test('scope and content: another draft, a complete-census claim, signing data, ids without provenance or corroboration are refused', () => {

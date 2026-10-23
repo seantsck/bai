@@ -3,6 +3,7 @@ import { PageHeader, SubNav, DataTable, Notice, load, Unavailable } from '../../
 import { getDraftExplorer, getOrganizationKeys, getSelectionAttribution } from '../../../lib/queries.ts'
 import { formatUsd, label, KIND_LABELS, SIGNING_STATUS_LABELS, SOURCE_GROUP_SHORT } from '../../../lib/format.ts'
 import { DRAFT_NAV } from '../../../lib/nav.ts'
+import { editorialNote } from '../../../lib/partial-years.ts'
 import { parseExplorerParams, explorerHref, PAGE_SIZE, DRAFT_KINDS } from '../../../lib/search.ts'
 
 export const dynamic = 'force-dynamic'
@@ -28,12 +29,16 @@ export default async function ExplorerPage ({ searchParams }: { searchParams: Pr
     const sign = a.signing_source_category ? label(SOURCE_GROUP_SHORT, a.signing_source_category) : null
     return sign && sign !== sel ? `${sel}; signing: ${sign}` : sel
   }
+  // The 2021 later-round note shows only when 2021 rows are on screen or the search can include 2021.
+  const covers2021 = f.year ? f.year === 2021 : (f.from ?? 0) <= 2021 && 2021 <= (f.to ?? 9999)
+  const note = editorialNote([...rows.map((r) => r.draft_year), ...(covers2021 && (f.year || f.from || f.to) ? [2021] : [])])
   return (
     <>
       <PageHeader title='Historical draft explorer'
         lede='Every imported selection since 1965, searchable by player, franchise, year, phase, round and school. Clubs appear under the name they used that year.' />
       <SubNav items={DRAFT_NAV} />
-      <Notice>Historical years are being added in stages and most are partial. See <Link href='/draft/years'>draft years &amp; coverage</Link> before reading a year as complete. “Not researched” signing status is not the same as “did not sign”. In partial years the later-round players shown are editorially selected notable players, not a representative sample, and a pick that is absent is not an unsigned or failed outcome.</Notice>
+      <Notice>Historical years are being added in stages and most are partial. See <Link href='/draft/years'>draft years &amp; coverage</Link> before reading a year as complete. “Not researched” signing status is not the same as “did not sign”. A pick that is absent is a gap in BAI&apos;s sources, not an unsigned player or a failed outcome.</Notice>
+      {note && <Notice>{note}</Notice>}
       <form className='filters' method='get' action='/draft/explorer'>
         <label>Player <input name='q' defaultValue={rawQ} placeholder='Name begins with' maxLength={80} /></label>
         <label>Franchise
