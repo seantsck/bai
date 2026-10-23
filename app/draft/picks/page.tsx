@@ -2,16 +2,19 @@ import Link from 'next/link'
 import { PageHeader, DataTable, Notice, load, Unavailable } from '../../../components/ui.tsx'
 import { getDraftPicks, LIST_LIMIT } from '../../../lib/queries.ts'
 import { formatUsd, label, SIGNING_STATUS_LABELS } from '../../../lib/format.ts'
+import { editorialNote } from '../../../lib/partial-years.ts'
 
 export const dynamic = 'force-dynamic'
 export const metadata = { title: 'Draft picks' }
 
 export default async function PicksPage () {
   const res = await load(getDraftPicks)
+  const note = res.ok ? editorialNote(res.data.map((r) => r.draft_year)) : null
   return (
     <>
       <PageHeader title='Draft picks' lede={`Most recent ${LIST_LIMIT} tracked selections.`} />
-      <Notice>“Not researched” means no signing evidence has been recorded — it is not the same as “Did not sign”.</Notice>
+      <Notice>“Not researched” means no signing evidence has been recorded — it is not the same as “Did not sign”. Some years are published only in part (see <Link href='/draft/years'>draft years &amp; coverage</Link>): an absent pick is a gap in BAI&apos;s sources, never an unsigned player or a failed outcome.</Notice>
+      {res.ok && note && <Notice>{note}</Notice>}
       {!res.ok ? <Unavailable message={res.message} /> : (
         <DataTable rows={res.data} empty='No draft selections recorded yet.' columns={[
           { key: 'draft_year', header: 'Year' },

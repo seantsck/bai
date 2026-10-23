@@ -564,6 +564,73 @@
     "source_type": "REFERENCE_DATABASE",
     "key_pattern": "^hist:wikidata-[a-z0-9._:-]+$"
    }
-  }
- ]
+  },
+    {
+      "id": "edsfootball-mlb-draft-results",
+      "title": "EDSFootball.com MLB draft results pages (full pick list per year)",
+      "publisher": "EDSFootball.com (Eat, Drink and Sleep Football; site owner named on its About page; Torrance, CA)",
+      "authority_level": "AGGREGATOR",
+      "source_type": "REFERENCE_DATABASE",
+      "hosts": [
+        "eatdrinkandsleepfootball.com",
+        "www.eatdrinkandsleepfootball.com"
+      ],
+      "url_prefixes": [
+        "https://eatdrinkandsleepfootball.com/draft/mlb/results/year/"
+      ],
+      "governs_hosts": [
+        "eatdrinkandsleepfootball.com",
+        "edsfootball.com"
+      ],
+      "source_key_prefixes": [
+        "hist:edsfootball-"
+      ],
+      "supplies": [
+        "a 612-pick list for 2021 (pick, round or section label, club, player, school as shown)"
+      ],
+      "does_not_supply": [
+        "a stated source or provenance",
+        "a license or terms of use",
+        "signing status",
+        "bonus",
+        "identifiers",
+        "a last-updated date"
+      ],
+      "license": {
+        "name": "None stated (no terms of use, copyright notice, license or source credit found on the page, About, Privacy or footer)",
+        "url": "https://eatdrinkandsleepfootball.com/aboutus.html",
+        "attribution": "Unknown"
+      },
+      "terms": "Silence is not permission. The site publishes no terms and no source credit; it is a draft-and-fantasy site whose draft lists are most plausibly compiled from the league's own feed or a licensed provider, which cannot be shown either way. No robots.txt exists (HTTP 404). If the list derives from MLB data, the mlb-statsapi-draft restrictions travel with it.",
+      "review": {
+        "reviewed_on": "2026-10-23",
+        "review_due": "2027-01-23",
+        "reviewed_by": "BAI maintainer (Phase 11.1 source-rights review: one page view for the audit; no rows copied)"
+      },
+      "uses": {
+        "fetch_targeted": {
+          "state": "PENDING",
+          "basis": "One page view was made to read headings, footer and credits only. No terms permit or forbid extraction, and provenance is unknown. Every downloader is refused until a person decides or the owner answers in writing."
+        },
+        "fetch_bulk": {
+          "state": "PROHIBITED",
+          "basis": "Multi-year or multi-page crawling of an unlicensed hobby site is not polite and not authorized."
+        },
+        "process_local": {
+          "state": "PROHIBITED",
+          "basis": "No rows were saved. Do not save the page's rows locally while rights are pending."
+        },
+        "publish_repository": {
+          "state": "PROHIBITED",
+          "basis": "Lists, extracts and counts from this site stay out of the public repository."
+        },
+        "publish_site": {
+          "state": "PENDING",
+          "basis": "No approved basis. Provenance is unknown and may be MLB-derived; needs written authorization from the owner that also states the upstream source, or an MLB authorization."
+        }
+      },
+      "authorization": null,
+      "permission_notes": "Phase 11.1 decision: NOT CLEARED. Can technically support a full 612-row reconstruction (the page shows 612 picks in 20 numbered rounds plus labelled sections), but BAI may not use it until the owner authorizes in writing and states provenance. Inquiry drafted in docs/history/license-outreach-drafts.md, not sent."
+    }
+  ]
 }

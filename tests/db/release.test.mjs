@@ -37,13 +37,13 @@ const batch = (org, records, verified) => ({
   coverage_claims: [{ domain: 'DRAFT', scope_key: '2020-JUNE_AMATEUR', organization: org, coverage_state: 'PARTIAL_RECONSTRUCTION', source_key: WIKI, gap_notes: 'fixture: one list' }],
   sources: sources(verified), records
 })
-const writeRelease = (name, docs, { approvals = [], mutate = null, supplementOf = null } = {}) => {
+const writeRelease = (name, docs, { approvals = [], mutate = null, supplementOf = null, documentedSelections = null } = {}) => {
   const dir = path.join(tmp, name)
   fs.rmSync(dir, { recursive: true, force: true })
   fs.mkdirSync(path.join(dir, 'batches'), { recursive: true })
   const batches = docs.map((doc, i) => { const file = `${String(i).padStart(2, '0')}-${doc.batch_key}.json`; fs.writeFileSync(path.join(dir, 'batches', file), JSON.stringify(doc, null, 1) + '\n'); return { file, sha256: fileSha256(path.join(dir, 'batches', file)), doc } })
   let manifest = buildManifest({ releaseKey: `fixture-${name}`, year: 2020, draftKey: '2020-JUNE_AMATEUR', batches, identity: { picks: [] }, article: { revision: 1, response_sha256: 'a'.repeat(64) }, chadwickCommit: 'f'.repeat(40),
-    identityFileSha256: 'b'.repeat(64), brownVariant: 'HELD', heldPicks: [], humanApprovals: approvals, supplementOf, catalog, maxSelections: docs.reduce((n, d) => n + d.records.length, 0), createdOn: '2026-10-22' })
+    identityFileSha256: 'b'.repeat(64), brownVariant: 'HELD', heldPicks: [], humanApprovals: approvals, supplementOf, documentedSelections, catalog, maxSelections: docs.reduce((n, d) => n + d.records.length, 0), createdOn: '2026-10-22' })
   if (mutate) { manifest = mutate(manifest); manifest.manifest_sha256 = manifestChecksum(manifest) }
   fs.writeFileSync(path.join(dir, 'release-manifest.json'), JSON.stringify(manifest, null, 1) + '\n')
   return dir
@@ -70,6 +70,30 @@ test('the manifest is checksummed, batches are checksummed, and edits are refuse
   fs.writeFileSync(path.join(dir2, 'batches', 'extra.json'), '{}')
   fs.writeFileSync(bf, fs.readFileSync(bf, 'utf8').replace('Fixture Release Won', 'Fixture Release One'))
   assert.throws(() => loadRelease(dir2), /not in the manifest/)
+})
+
+test('a partial release states how many documented selections are represented and absent, and an inconsistent statement is refused', () => {
+  const dir = writeRelease('represented', [batch('KC', [record(1, 'KC', 'Fixture Release One')], false)], { documentedSelections: 612 })
+  const rel = loadRelease(dir)
+  assert.deepEqual([rel.manifest.coverage.documented_selections, rel.manifest.coverage.represented_selections, rel.manifest.coverage.absent_selections], [612, 1, 611])
+  assert.match(rel.manifest.coverage.interpretation, /not an unsigned player or a failed outcome/)
+  assert.match(rel.manifest.coverage.representation, /not a representative sample/)
+  assert.deepEqual(verifyReleaseContent(rel, { root }), [])
+  // Every tampered or invalid shape is refused, each for its own reason.
+  const tamper = (name, change, pattern) => {
+    const dir = writeRelease(`represented-${name}`, [batch('KC', [record(1, 'KC', 'Fixture Release One')], false)], { documentedSelections: 612, mutate: (m) => { change(m.coverage); return m } })
+    assert.ok(verifyReleaseContent(loadRelease(dir), { root }).some((p) => pattern.test(p)), name)
+  }
+  tamper('absent', (c) => { c.absent_selections = 5 }, /absent selections/)
+  tamper('represented', (c) => { c.represented_selections = 2; c.absent_selections = 610 }, /represented selections but the release has 1/)
+  tamper('represented-high', (c) => { c.represented_selections = 700; c.absent_selections = -88 }, /whole numbers/)
+  tamper('documented-below', (c) => { c.documented_selections = 0; c.absent_selections = -1 }, /whole numbers/)
+  tamper('documented-below-ok', (c) => { c.documented_selections = 0; c.represented_selections = 1; c.absent_selections = 0 }, /represents 1 selections of a documented 0/)
+  tamper('fractional', (c) => { c.documented_selections = 612.5 }, /whole numbers/)
+  tamper('string', (c) => { c.represented_selections = '1' }, /whole numbers/)
+  tamper('null', (c) => { c.absent_selections = null }, /whole numbers/)
+  tamper('missing', (c) => { delete c.absent_selections }, /whole numbers/)
+  tamper('nan', (c) => { c.documented_selections = NaN }, /whole numbers/)
 })
 
 test('scope and content: another draft, a complete-census claim, signing data, ids without provenance or corroboration are refused', () => {

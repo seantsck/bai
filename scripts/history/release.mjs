@@ -73,7 +73,7 @@ const COMMANDS = {
     const manifest = buildManifest({
       releaseKey: opt('only-picks') ? `wikipedia-${year}-june-amateur-r${identity.revision}-supplement-picks-${opt('only-picks').split(',').join('-')}-n${total}` : `wikipedia-${year}-june-amateur-r${identity.revision}${hasBrown ? `-${brown === 'held' ? 'brown-held' : 'brown-name-only'}` : ''}-n${total}`, year, draftKey: `${year}-JUNE_AMATEUR`, batches, identity,
       article: { revision: identity.revision, response_sha256: art.sha256 }, chadwickCommit: identity.chadwick_commit, identityFileSha256: fileSha256(identityFile), brownVariant: opt('only-picks') || !hasBrown ? 'NOT_IN_THIS_RELEASE' : brown === 'held' ? 'HELD' : 'IMPORTED_NAME_ONLY_UNRESOLVED', supplementOf: opt('parent-manifest-sha256') ? { manifest_sha256: opt('parent-manifest-sha256'), note: 'Adds picks the parent release held for a human decision. The parent manifest is not modified.' } : null,
-      heldPicks: built.held, humanApprovals: approvals, catalog, maxSelections: total, createdOn: art.retrieved_at.slice(0, 10)
+      heldPicks: built.held, humanApprovals: approvals, catalog, maxSelections: total, documentedSelections: built.documented_selections ?? null, createdOn: art.retrieved_at.slice(0, 10)
     })
     const text = JSON.stringify(manifest, null, 1) + '\n'
     if (existing !== null && existing !== text) {

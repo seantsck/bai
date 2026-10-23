@@ -2,6 +2,7 @@ import { PageHeader, SubNav, DataTable, Notice, load, Unavailable } from '../../
 import { getDraftYearCoverage } from '../../../lib/queries.ts'
 import { formatDate, label, KIND_LABELS } from '../../../lib/format.ts'
 import { DRAFT_NAV } from '../../../lib/nav.ts'
+import { partialYear, partialYearText, editorialNote, PARTIAL_YEAR_DETAIL } from '../../../lib/partial-years.ts'
 
 export const dynamic = 'force-dynamic'
 export const metadata = { title: 'Draft years & coverage' }
@@ -13,6 +14,11 @@ export default async function DraftYearsPage () {
       <PageHeader title='Draft years & coverage' lede='Every draft phase on the calendar since 1965, with what BAI holds for it. Counts only: no rates are published.' />
       <SubNav items={DRAFT_NAV} />
       <Notice>A phase is complete only when every club that existed that year has a sourced census. “Expected” stays blank until then: one source&apos;s row count is not proof of the population. Months shown without a day are known only to the month.</Notice>
+      {res.ok && res.data.filter((r) => r.draft_kind === 'JUNE_AMATEUR').map((r) => ({ r, p: partialYear(Number(r.draft_year), Number(r.imported_selections)) })).filter((x) => x.p).map(({ r, p }) => (
+        <Notice key={r.draft_key}>
+          <strong>{partialYearText(p!)}</strong> {PARTIAL_YEAR_DETAIL} {editorialNote([p!.year])}
+        </Notice>
+      ))}
       {!res.ok ? <Unavailable message={res.message} /> : (
         <DataTable rows={res.data} empty='No drafts recorded yet.' columns={[
           { key: 'draft_year', header: 'Year' },

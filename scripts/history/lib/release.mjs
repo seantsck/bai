@@ -26,7 +26,7 @@ export const manifestChecksum = (manifest) => { const { manifest_sha256: _drop, 
 const norm = (s) => String(s ?? '').normalize('NFD').replace(/\p{M}/gu, '').toLowerCase().replace(/\b(jr|sr|ii|iii|iv|v)\b\.?$/g, '').replace(/[^a-z0-9]+/g, ' ').trim()
 
 /** Builds a manifest from a release directory's batches (and the identity file's tiers). Pure given its inputs. */
-export function buildManifest ({ humanApprovals = [], releaseKey, year, draftKey, batches, identity, article, chadwickCommit, identityFileSha256, brownVariant, heldPicks, catalog, maxSelections, createdOn, supplementOf = null }) {
+export function buildManifest ({ humanApprovals = [], releaseKey, year, draftKey, batches, identity, article, chadwickCommit, identityFileSha256, brownVariant, heldPicks, catalog, maxSelections, createdOn, supplementOf = null, documentedSelections = null }) {
   const docs = batches.map((b) => ({ ...b, picks: b.doc.records.map((r) => r.overall_pick).sort((x, y) => x - y) }))
   const records = docs.flatMap((b) => b.doc.records)
   const byPick = new Map(identity.picks.map((x) => [x.overall_pick, x]))
@@ -55,7 +55,14 @@ export function buildManifest ({ humanApprovals = [], releaseKey, year, draftKey
     required_migration: REQUIRED_MIGRATION,
     batches: docs.map((b) => ({ file: b.file, batch_key: b.doc.batch_key, organization: b.doc.records[0].organization, sha256: b.sha256, records: b.doc.records.length, picks: b.picks })),
     totals: { selections: records.length, organizations: Object.keys(orgs).length, per_organization: orgs, held: heldPicks, identity_tiers: tier },
-    coverage: { state: 'PARTIAL_RECONSTRUCTION', clubs: Object.keys(orgs).length, note: 'One aggregator list per club; no independently compiled list. No club is a complete census.' },
+    coverage: {
+      state: 'PARTIAL_RECONSTRUCTION', clubs: Object.keys(orgs).length, note: 'One aggregator list per club; no independently compiled list. No club is a complete census.',
+      ...(documentedSelections && !supplementOf ? {
+        documented_selections: documentedSelections, represented_selections: records.length, absent_selections: documentedSelections - records.length,
+        representation: 'Rows are the article\'s contiguous opening picks plus rows from its editor-chosen "Other notable selections" table; later rounds are not a representative sample.',
+        interpretation: 'An absent selection is a gap in BAI\'s sources, not an unsigned player or a failed outcome. No league-wide, signing-rate or club-efficiency figure may be computed from this population. Signing dates and bonuses are not inferred (none are included).'
+      } : {})
+    },
     human_approvals: humanApprovals,
     sources, identity_confidence: confidence,
     expected_database_changes: {
@@ -104,6 +111,18 @@ export function verifyReleaseContent (rel, { root }) {
   const m = rel.manifest
   const problems = []
   const catalog = loadCatalog(root)
+  // A declared documented population needs three mutually consistent whole-number counts.
+  const cov = m.coverage ?? {}
+  if (['documented_selections', 'represented_selections', 'absent_selections'].some((k) => Object.hasOwn(cov, k))) {
+    const whole = (v) => Number.isSafeInteger(v) && v >= 0
+    const { documented_selections: documented, represented_selections: represented, absent_selections: absent } = cov
+    if (![documented, represented, absent].every(whole)) problems.push(`coverage counts must all be whole numbers of at least 0 (documented ${JSON.stringify(documented)}, represented ${JSON.stringify(represented)}, absent ${JSON.stringify(absent)})`)
+    else {
+      if (documented < represented) problems.push(`coverage represents ${represented} selections of a documented ${documented}`)
+      if (represented !== m.totals.selections) problems.push(`coverage states ${represented} represented selections but the release has ${m.totals.selections}`)
+      if (absent !== documented - represented) problems.push(`coverage states ${absent} absent selections but ${documented} documented less ${represented} represented is ${documented - represented}`)
+    }
+  }
   const picks = []
   let signing = 0
   for (const b of rel.batches) {

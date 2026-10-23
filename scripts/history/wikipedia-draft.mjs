@@ -238,7 +238,7 @@ const COMMANDS = {
       write(path.join(outDir, `${doc.batch_key}.json`), doc)
       summary.batches.push({ org, records: records.length, held: held.length }); summary.held.push(...held.map((h) => ({ org, ...h })))
     }
-    write(path.join(releaseDir ? path.resolve(root, releaseDir) : YEAR_DIR, only && !releaseDir ? `build-${deltaSuffix ?? 'delta'}.json` : 'build.json'), { year, revision: a.revid, ...summary })
+    write(path.join(releaseDir ? path.resolve(root, releaseDir) : YEAR_DIR, only && !releaseDir ? `build-${deltaSuffix ?? 'delta'}.json` : 'build.json'), { year, revision: a.revid, documented_selections: a.stated.overall, ...summary })
     log(`${summary.batches.length} batches, ${summary.batches.reduce((n, b) => n + b.records, 0)} records, held ${summary.held.length}`)
   },
 
