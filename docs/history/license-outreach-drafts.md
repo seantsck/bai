@@ -37,3 +37,22 @@ I run BAI, an independent, non-commercial baseball research project (https://git
 We will not copy, purchase or republish anything without a written agreement and will keep your data identified as yours. Thank you for your time.
 
 [name, role, contact for the project]
+
+## EDSFootball.com (owner of the draft results pages)
+
+Not sent. A person decides whether to send it; the site publishes no terms, so a written answer is the only basis for use. Contact shown on the site: its info@ address.
+
+Subject: Question about reusing the 2021 MLB draft results list
+
+Hello,
+
+I run BAI, an independent, non-commercial baseball research project (https://github.com/seantsck/bai) that records amateur draft selections with their sources. Your 2021 MLB draft results page lists every pick, and we would like to ask before using anything from it:
+
+1. Where do the draft lists come from (for example MLB, a licensed provider, or your own compilation)?
+2. May we extract the facts (pick, round or section, club, player, school) for research and publish them on a public website with attribution to EDSFootball.com?
+3. If yes, which years, and is there a file or feed rather than page copies?
+4. What attribution and any other conditions do you require?
+
+We have not copied or stored the page's rows and will not use them without your written reply. Thank you for considering it.
+
+[name, role, contact for the project]

@@ -11,7 +11,7 @@ export default async function PicksPage () {
   return (
     <>
       <PageHeader title='Draft picks' lede={`Most recent ${LIST_LIMIT} tracked selections.`} />
-      <Notice>“Not researched” means no signing evidence has been recorded — it is not the same as “Did not sign”.</Notice>
+      <Notice>“Not researched” means no signing evidence has been recorded — it is not the same as “Did not sign”. Some years are published only in part (see <Link href='/draft/years'>draft years &amp; coverage</Link>): an absent pick is a gap in BAI&apos;s sources, never an unsigned player, and later-round picks in partial years are not a representative sample.</Notice>
       {!res.ok ? <Unavailable message={res.message} /> : (
         <DataTable rows={res.data} empty='No draft selections recorded yet.' columns={[
           { key: 'draft_year', header: 'Year' },

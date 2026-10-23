@@ -37,3 +37,42 @@ The article marks 11 rows "Player did not sign": a single aggregator's statement
 
 ## 6. Proposed next release boundary
 A partial release of the 205 rows that are SAFE now (two held for human decision), all 30 clubs PARTIAL_RECONSTRUCTION, built and rehearsed exactly like the 2020 release; or wait for a permitted source for rounds 3-20. Neither is approved or applied. Reaching the full 612 needs one of: written MLB authorization, a licensed dataset (Baseball America / The Baseball Cube), or a lawful newspaper/press transcription plan.
+
+## 7. Structure of the 2021 draft (Phase 11.1 correction)
+The draft has **20 numbered rounds**. Everything else is a labelled section, kept under its exact historical label and never counted as a further numbered round:
+
+| Section label | Position | Picks |
+|---|---|---|
+| Round 1 | numbered round | 29 (Houston forfeited its first-round pick) |
+| Compensation Pick | after Round 1 | 1 |
+| Competitive Balance Round A | after Round 1 | 6 |
+| Round 2 | numbered round | 27 |
+| Competitive Balance Round B | after Round 2 | 8 |
+| Rounds 3-4, 5-20 | numbered rounds | 30 each, plus the extra pick below |
+| Compensation Pick (second) | after Round 4 | 1: **pick #132, Houston's fourth-round compensation selection** |
+
+Picks #1-71 are the opening block through Competitive Balance Round B; rounds 3-20 then hold the remaining 541 picks. The derived layout check is 71 + 18 x 30 + 1 = 612 (arithmetic, not evidence of any pick).
+
+Rules for BAI data and copy:
+- `round_code` keeps the section's own label (compensation, competitive balance A/B); a compensation or competitive-balance section is never shown as "round 21" or any other numbered round. The DiamondIQ page's "24 rounds" is not adopted.
+- Pick #132 is stored in the round the article gives it (round 4) and identified as the compensation selection, not as a fifth-round or additional-round pick.
+- This section describes structure only. No row from an MLB-derived or unlicensed source was ingested to write it; the section labels were read from a page's headings and from the Wikipedia article.
+
+## 8. EDSFootball.com draft results page (Phase 11.1 source-rights review)
+`eatdrinkandsleepfootball.com/draft/mlb/results/year/2021.html` presents all 612 picks in 20 numbered rounds with the section labels above. Review of the page, its About and Privacy pages and its footer (one view; no rows copied or saved):
+
+| Question | Finding |
+|---|---|
+| Publisher | EDSFootball.com ("Eat, Drink and Sleep Football"); About page names an individual owner and a contributor; Privacy Policy names the Company with a Torrance, CA city and ZIP only |
+| Provenance of the draft data | **None stated.** No source credit, "data via" line, or last-updated date. The About page credits other sources (fantasy and accuracy-ranking providers) but nothing for MLB draft results |
+| Independent or MLB-derived | Unknown. A complete 612-pick list with club, round and school is most plausibly taken from the league's feed or a licensed provider; this cannot be shown either way |
+| Terms of use | **No terms page, copyright notice or license** (the /terms URL does not exist; footer links are About, Privacy, Links, Partners). No robots.txt (404) |
+| Contact for permissions | info@ the site's own domain (shown on About and Privacy) |
+| Authorization process | None published |
+
+Decision (catalog id `edsfootball-mlb-draft-results`): **NOT CLEARED**. Facts such as pick numbers are not themselves protected in many jurisdictions, but BAI's rights policy does not treat silence as permission, a complete list of this kind can be a protected compilation, and if it derives from MLB data the `mlb-statsapi-draft` restriction (no bulk use without written MLBAM authorization) travels with it. So: fetch PENDING (one audit view only), bulk and local processing PROHIBITED, repository publication PROHIBITED, site publication PENDING. The page **can technically support** a full 612-row reconstruction; BAI is **not permitted** to build it from this source today.
+
+To unlock: a written statement from the owner that (a) names the upstream source of the lists, (b) permits extraction and public republication of facts with attribution, recorded under `authorization` in the catalog with the document's SHA-256; or an MLB authorization. An inquiry is drafted in `license-outreach-drafts.md` and has not been sent.
+
+## 9. Partial release of the permitted rows (205 of 612)
+Rebuilt manifest `partial-205` (local, unapplied): 205 selections, 30 clubs all PARTIAL_RECONSTRUCTION, #492 and #359 held, signing UNKNOWN for every row with no dates or bonuses. The manifest's coverage block now records 612 documented, 205 represented, 407 absent, that later-round rows are an editor-chosen set, and that absence is not an unsigned or failed outcome. Public pages (draft years, draft picks, explorer) carry the same statements; rates stay disabled for partial coverage.
