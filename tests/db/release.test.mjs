@@ -8,7 +8,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import * as h from './harness.mjs'
 import { loadCatalog } from '../../scripts/history/lib/permissions.mjs'
-import { buildManifest, observationMax, loadRelease, verifyReleaseContent, collisionReport, applyRelease, canonicalJson, manifestChecksum, fileSha256 } from '../../scripts/history/lib/release.mjs'
+import { buildManifest, observationMax, observationLimit, HISTORICAL_OBSERVATION_ALLOWANCES, loadRelease, verifyReleaseContent, collisionReport, applyRelease, canonicalJson, manifestChecksum, fileSha256 } from '../../scripts/history/lib/release.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 const catalog = loadCatalog(root)
@@ -339,4 +339,107 @@ test('manifest instructions use the manifest\'s own draft year and key, not 2020
   assert.match(text, /2021 class as partial/)
   assert.match(text, /draft 2021-JUNE_AMATEUR/)
   assert.doesNotMatch(text, /2020/)
+})
+
+// --- historical compatibility, pinned by checksum (Phase 11.4A) ---------------------------------------------------------------------
+// A fixture release whose declared observation maximum is understated by one, as the three historical manifests were.
+const understated = (name, picks, { approvals = [], supplementOf = null } = {}) => {
+  const docs = () => [batch('KC', picks, true)]
+  const exactDir = writeRelease(`${name}-probe`, docs(), { approvals, supplementOf })
+  const exact = loadRelease(exactDir).manifest.expected_database_changes.source_observations_inserted_max
+  const dir = writeRelease(name, docs(), { approvals, supplementOf, mutate: (m) => { m.expected_database_changes.source_observations_inserted_max = exact - 1; return m } })
+  return { rel: loadRelease(dir), declared: exact - 1, exact }
+}
+const state = async () => ({ obs: await obsCount(), ids: await count('select count(*) n from player_external_ids'), players: await count('select count(*) n from players'), sel: await count('select count(*) n from draft_selections'), audits: await count('select count(*) n from ingest.release_audits'), staged: await count('select count(*) n from ingest.import_batches') })
+
+test('the historical allowances pin exactly the three applied manifests, by checksum and declared maximum', () => {
+  assert.deepEqual(Object.fromEntries(Object.entries(HISTORICAL_OBSERVATION_ALLOWANCES).map(([sha, p]) => [sha.slice(0, 8), [p.declared_max, p.allowed]])), { d3bdbdac: [692, 959], '7d9130bc': [12, 12], '4987ca6b': [963, 1342] })
+  assert.ok(Object.isFrozen(HISTORICAL_OBSERVATION_ALLOWANCES) && Object.values(HISTORICAL_OBSERVATION_ALLOWANCES).every(Object.isFrozen))
+})
+
+test('a checksum-pinned historical manifest may spend its pinned observation count; a new manifest with the same understatement is refused', async () => {
+  const pinned = understated('hist-pinned', [record(131, 'KC', 'Fixture Hist One', { ids: { MLBAM: '970001' }, birth: '1999-07-07' })])
+  const allowances = { [pinned.rel.manifest.manifest_sha256]: { declared_max: pinned.declared, allowed: pinned.exact, release: 'fixture historical release' } }
+  assert.deepEqual(observationLimit(pinned.rel.manifest, allowances), { limit: pinned.exact, basis: 'historical allowance for the fixture historical release' })
+  assert.equal(observationLimit(pinned.rel.manifest).limit, pinned.declared, 'the real table does not know this manifest')
+  // Without the pin the same understated manifest rolls back, writing nothing.
+  const before = await state()
+  await assert.rejects(applyRelease(db, pinned.rel, { operator: 'Fixture Owner' }), /source observation\(s\) inserted; the manifest allows/)
+  assert.deepEqual(await state(), before)
+  // With the pin it commits, spends exactly the pinned count, and replays idempotently.
+  const obs0 = await obsCount()
+  const out = await applyRelease(db, pinned.rel, { operator: 'Fixture Owner', historicalAllowances: allowances })
+  assert.equal(out.already, false)
+  assert.equal(await obsCount() - obs0, pinned.exact)
+  assert.match(out.observation_limit.basis, /historical allowance/)
+  const after = await state()
+  assert.equal((await applyRelease(db, pinned.rel, { operator: 'Fixture Owner', historicalAllowances: allowances })).already, true)
+  assert.deepEqual(await state(), after)
+})
+
+test('a forged, altered or unrelated manifest cannot use a historical allowance, and a pin relaxes nothing but observations', async () => {
+  const base = understated('hist-forge-base', [record(141, 'KC', 'Fixture Forge One', { ids: { MLBAM: '970101' }, birth: '1999-08-08' })])
+  const allowances = { [base.rel.manifest.manifest_sha256]: { declared_max: base.declared, allowed: base.exact, release: 'fixture historical release' } }
+  // 1. Same understatement, different content (a different pick): another checksum, so no pin applies.
+  const other = understated('hist-forge-other', [record(142, 'KC', 'Fixture Forge Other', { ids: { MLBAM: '970102' }, birth: '1999-08-08' })])
+  assert.notEqual(other.rel.manifest.manifest_sha256, base.rel.manifest.manifest_sha256)
+  assert.equal(observationLimit(other.rel.manifest, allowances).limit, other.declared)
+  // 2. A manifest that copies the pinned checksum but changes content: its own checksum no longer matches, so the pin is ignored.
+  const forged = structuredClone(base.rel); forged.manifest.totals.selections += 1
+  assert.equal(observationLimit(forged.manifest, allowances).limit, base.declared)
+  // 3. Self-declared compatibility fields are inert.
+  const claims = structuredClone(base.rel.manifest); Object.assign(claims, { legacy: true, version: 'historical', release_class: 'HISTORICAL', operator: 'Sean T. Cannon' }); claims.expected_database_changes.legacy_allowance = 99999
+  const claimsPinned = { [claims.manifest_sha256]: { declared_max: base.declared, allowed: base.exact, release: 'x' } }
+  assert.equal(observationLimit(claims, claimsPinned).limit, base.declared)
+  // 4. A pinned checksum with a different declared maximum is ignored.
+  const wrongDeclared = { [base.rel.manifest.manifest_sha256]: { declared_max: base.declared + 5, allowed: base.exact, release: 'x' } }
+  assert.equal(observationLimit(base.rel.manifest, wrongDeclared).limit, base.declared)
+  // 5. A loaded manifest edited on disk is refused outright; an in-memory forgery and an unrelated understated manifest fail without writes.
+  const before = await state()
+  await assert.rejects(applyRelease(db, forged, { operator: 'Fixture Owner', historicalAllowances: allowances }), /source observation\(s\) inserted; the manifest allows/)
+  await assert.rejects(applyRelease(db, other.rel, { operator: 'Fixture Owner', historicalAllowances: allowances }), /source observation\(s\) inserted; the manifest allows/)
+  assert.deepEqual(await state(), before)
+  assert.equal(await count('select count(*) n from draft_selections where overall_pick in (141, 142)'), 0)
+  // 6. The pin covers observations only: the same pinned manifest with an understated PLAYER maximum still rolls back.
+  const players = understated('hist-pin-players', [record(143, 'KC', 'Fixture Pin Players', { ids: { MLBAM: '970103' }, birth: '1999-08-08' })])
+  const tampered = loadRelease(writeRelease('hist-pin-players-t', [batch('KC', [record(143, 'KC', 'Fixture Pin Players', { ids: { MLBAM: '970103' }, birth: '1999-08-08' })], true)], { mutate: (m) => { m.expected_database_changes.source_observations_inserted_max = players.declared; m.expected_database_changes.players_created_max = 0; return m } }))
+  const pins = { [tampered.manifest.manifest_sha256]: { declared_max: players.declared, allowed: players.exact, release: 'fixture' } }
+  await assert.rejects(applyRelease(db, tampered, { operator: 'Fixture Owner', historicalAllowances: pins }), /player\(s\) created; the manifest allows 0/)
+  assert.deepEqual(await state(), before)
+})
+
+// The real, immutable manifests are local-only (gitignored); this replay runs where they exist and is skipped elsewhere.
+const HIST = path.join(root, '.local/history')
+const REAL = [['2020/release/final-brown-name-only', 959], ['2020/release/supplement-52-106', 12], ['2021/release/partial-205', 1342]].map(([d, n]) => [path.join(HIST, d), n])
+test('the three immutable historical manifests replay in order on a clean database, spend their verified observation counts, and replay idempotently', { skip: REAL.some(([d]) => !fs.existsSync(path.join(d, 'release-manifest.json'))) && 'the local historical release directories are not present' }, async () => {
+  const clean = await h.freshDatabase()
+  const q = async (s, p) => Number((await h.one(clean, s, p)).n)
+  const rels = REAL.map(([d]) => loadRelease(d))
+  assert.deepEqual(rels.map((r) => r.manifest.manifest_sha256), Object.keys(HISTORICAL_OBSERVATION_ALLOWANCES))
+  // Baseline: the supplement links two players that existed before the 2020 draft. They are rebuilt from the supplement's own records
+  // (identifiers and birth dates), so nothing per-player is stored in the repository.
+  const supp = rels[1].batches.flatMap((b) => b.doc.records)
+  for (const [i, r] of supp.entries()) {
+    const p = r.player
+    const { rows: [pl] } = await clean.query(`insert into players (slug, full_name, display_name, birth_date, birth_date_precision) values ($1, $2, $2, $3, 'DAY') returning id`, [`baseline-${i}`, p.full_name, p.birth_date])
+    for (const [system, value] of Object.entries(p.external_ids ?? {})) await clean.query('insert into player_external_ids (player_id, id_system, external_id) values ($1, $2, $3)', [pl.id, system, value])
+  }
+  const deltas = []
+  for (const [i, rel] of rels.entries()) {
+    const before = await q('select count(*) n from source_observations')
+    const out = await applyRelease(clean, rel, { operator: 'Fixture Owner' })
+    assert.equal(out.already, false, rel.manifest.release_key)
+    deltas.push(await q('select count(*) n from source_observations') - before)
+    assert.match(out.observation_limit.basis, /historical allowance/)
+    assert.ok(deltas[i] <= observationLimit(rel.manifest).limit)
+  }
+  assert.deepEqual(deltas, REAL.map(([, n]) => n))
+  assert.equal(await q('select count(*) n from ingest.release_audits'), 3)
+  assert.equal(await q('select count(*) n from draft_signings'), 0)
+  // Already applied: replays write nothing.
+  const snap = [await q('select count(*) n from source_observations'), await q('select count(*) n from draft_selections'), await q('select count(*) n from ingest.release_audits')]
+  for (const rel of rels) assert.equal((await applyRelease(clean, rel, { operator: 'Fixture Owner' })).already, true)
+  assert.deepEqual([await q('select count(*) n from source_observations'), await q('select count(*) n from draft_selections'), await q('select count(*) n from ingest.release_audits')], snap)
+  // The original manifests are untouched on disk.
+  assert.deepEqual(REAL.map(([d]) => fs.readFileSync(path.join(d, 'release-manifest.sha256'), 'utf8').split(/\s+/)[0]), Object.keys(HISTORICAL_OBSERVATION_ALLOWANCES))
 })

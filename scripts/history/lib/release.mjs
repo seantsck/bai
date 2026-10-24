@@ -288,12 +288,37 @@ export async function collisionReport (db, rel) {
 }
 
 /**
+ * Historical compatibility, pinned by manifest checksum. The three releases applied before observations were enforced declared
+ * source-observation maxima that the importer exceeded (Phase 11.4). Their manifests, checksum files and release audits are
+ * immutable, so they are reproduced in a clean database by allowing exactly the observation counts verified on hosted:
+ *   2020 original (audit 1): declared 692, inserted 959;  2020 supplement (audit 2): declared 12, inserted 12;
+ *   2021 partial  (audit 3): declared 963, inserted 1,342.
+ * A pin matches only a manifest whose OWN content hashes to the pinned checksum and whose declared maximum equals the
+ * pinned declared_max. No field, name or version inside a manifest can opt a release in, and nothing else is relaxed:
+ * players, signings, external ids, sources, collisions and source permissions are enforced as for any release.
+ * A new manifest is never added here; it declares a correct maximum (observationMax) and is held to it.
+ */
+export const HISTORICAL_OBSERVATION_ALLOWANCES = Object.freeze({
+  'd3bdbdac548e8a88811f2c28587a79aa21b0c5abcc77a4a70ab88d9e9a19c9c9': Object.freeze({ declared_max: 692, allowed: 959, release: '2020 original (release audit 1)' }),
+  '7d9130bccdb09709b86330d2e2960cbc65dd70703c99aa7864bb9e3d391f0a7d': Object.freeze({ declared_max: 12, allowed: 12, release: '2020 supplement (release audit 2)' }),
+  '4987ca6b5234a0eac234d7051cc99c434d811c59ea5eecf1ca9d57934a2ee5bc': Object.freeze({ declared_max: 963, allowed: 1342, release: '2021 partial (release audit 3)' })
+})
+
+/** The observation limit that applies to a manifest: its declared maximum, or a checksum-pinned historical allowance. */
+export function observationLimit (m, allowances = HISTORICAL_OBSERVATION_ALLOWANCES) {
+  const declared = Number(m.expected_database_changes.source_observations_inserted_max)
+  const pin = Object.hasOwn(allowances, m.manifest_sha256) ? allowances[m.manifest_sha256] : null
+  if (!pin || manifestChecksum(m) !== m.manifest_sha256 || declared !== pin.declared_max) return { limit: declared, basis: 'declared in the manifest' }
+  return { limit: pin.allowed, basis: `historical allowance for the ${pin.release}` }
+}
+
+/**
  * Applies a verified release to the target in ONE transaction, through the research pipeline (stage, validate, dry run,
  * write for every batch). Refuses unless the migration history is exact and the collision report is SAFE; commits only if
  * no record was held and the in-transaction counts equal the manifest; writes the release audit in the same transaction.
  * Returns { already } for a replay. Throws (after rolling everything back) on any failure.
  */
-export async function applyRelease (db, rel, { operator }) {
+export async function applyRelease (db, rel, { operator, historicalAllowances = HISTORICAL_OBSERVATION_ALLOWANCES }) {
   const m = rel.manifest
   if (!operator || /^agent:/i.test(operator)) throw new Error('an operator who approved the release is required (not agent:*)')
   const mig = await migrationProblems(db)
@@ -348,9 +373,10 @@ export async function applyRelease (db, rel, { operator }) {
     // Every declared maximum is enforced here, before the audit is written and before the transaction can commit.
     const grew = async (table) => (await db.query(`select count(*)::int n from public.${table}`)).rows[0].n
     const maxima = m.expected_database_changes
-    for (const [table, before, key, noun] of [['player_external_ids', externalIdsBefore, 'external_ids_inserted_max', 'external id'], ['sources', sourcesBefore, 'sources_inserted_max', 'source'], ['source_observations', observationsBefore, 'source_observations_inserted_max', 'source observation']]) {
+    const obsLimit = observationLimit(m, historicalAllowances)
+    for (const [table, before, limit, noun] of [['player_external_ids', externalIdsBefore, maxima.external_ids_inserted_max, 'external id'], ['sources', sourcesBefore, maxima.sources_inserted_max, 'source'], ['source_observations', observationsBefore, obsLimit.limit, 'source observation']]) {
       const added = (await grew(table)) - before
-      if (maxima[key] !== undefined && added > Number(maxima[key])) throw new Error(`verification failed: ${added} ${noun}(s) inserted; the manifest allows ${maxima[key]}`)
+      if (limit !== undefined && added > Number(limit)) throw new Error(`verification failed: ${added} ${noun}(s) inserted; the manifest allows ${limit}`)
     }
     const signingsAfter = await signingCount()
     if (signingsAfter !== signingsBefore + Number(m.expected_database_changes.draft_signings_inserted)) throw new Error(`verification failed: signing rows for the draft went from ${signingsBefore} to ${signingsAfter}; the manifest expects none added`)
@@ -361,5 +387,5 @@ export async function applyRelease (db, rel, { operator }) {
     await db.query('insert into ingest.release_audits (release_key, manifest_sha256, draft_year, operator, counts, entries) values ($1, $2, $3, $4, $5, $6)', [m.release_key, m.manifest_sha256, m.authorization_scope.draft_year, operator, JSON.stringify(counts), JSON.stringify(entries)])
     return { counts, entries, batches }
   })
-  return { already: false, collision_overall: report.overall, ...result }
+  return { already: false, collision_overall: report.overall, observation_limit: observationLimit(m, historicalAllowances), ...result }
 }
