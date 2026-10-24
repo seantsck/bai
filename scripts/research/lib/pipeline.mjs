@@ -256,14 +256,18 @@ class Applier {
    * Reconcile one field of an existing canonical row against an incoming value.
    * column = null for fields that are evidence-only (e.g. round_code on a selection).
    */
-  async reconcile ({ table, id, field, column = field, canonical, incoming, sourceKey, rowSourceId, locator, conflicts }) {
+  async reconcile ({ table, id, field, column = field, alsoSet = null, canonical, incoming, sourceKey, rowSourceId, locator, conflicts }) {
     if (incoming === undefined || incoming === null) return 'NO_CHANGE'
     if (canonical === null || canonical === undefined) {
       const rival = await this.one(`select 1 from public.source_observations where subject_table = $1 and subject_id = $2 and field_name = $3
         and status = 'ACTIVE' and observed_value is not null and observed_value <> $4::jsonb`, [table, id, field, observedJson(field, incoming)])
       const obs = await this.observe(sourceKey, table, id, field, incoming, locator)
       if (rival || obs === 'SAME_SOURCE_DIFFERENT') { conflicts.push({ table, id, field, incoming, canonical: null }); return 'CONFLICT' }
-      if (column) await this.q(`update public.${table} set ${column} = $2 where id = $1`, [id, incoming])
+      // alsoSet: companion columns written in the SAME statement (a table check may require them together, e.g. players_check).
+      if (column) {
+        const extra = Object.entries(alsoSet ?? {})
+        await this.q(`update public.${table} set ${[column, ...extra.map(([c]) => c)].map((c, i) => `${c} = $${i + 2}`).join(', ')} where id = $1`, [id, incoming, ...extra.map(([, v]) => v)])
+      }
       return 'UPDATE_UNKNOWN'
     }
     if (same(field, canonical, incoming)) {
@@ -304,8 +308,8 @@ class Applier {
     const cur = await this.one('select id, birth_date, birth_country from public.players where id = $1', [playerId])
     const src = p.source_key ?? sourceKey
     for (const [field, incoming] of [['birth_date', p.birth_date], ['birth_country', p.birth_country]]) {
-      const res = await this.reconcile({ table: 'players', id: playerId, field, canonical: cur[field], incoming, sourceKey: src, rowSourceId: null, conflicts })
-      if (res === 'UPDATE_UNKNOWN' && field === 'birth_date') await this.q("update public.players set birth_date_precision = 'DAY' where id = $1", [playerId])
+      // A newly accepted birth date and its precision are written together: players_check requires both or neither.
+      const res = await this.reconcile({ table: 'players', id: playerId, field, alsoSet: field === 'birth_date' ? { birth_date_precision: 'DAY' } : null, canonical: cur[field], incoming, sourceKey: src, rowSourceId: null, conflicts })
       action = strongest(action, res)
     }
     return action
