@@ -6,8 +6,10 @@ export const DOCUMENTED_SELECTIONS: Record<number, number> = { 2021: 612, 2022: 
 // notable players only. `excludedClubs` names clubs a release leaves out by scope, so their absence is not read as a source gap.
 const EDITORIAL_YEARS: Record<number, { listedThrough: number, excludedClubs?: string[] }> = {
   2021: { listedThrough: 71 },
-  2022: { listedThrough: 80, excludedClubs: ['Los Angeles Dodgers'] },
-  2023: { listedThrough: 71, excludedClubs: ['Los Angeles Dodgers'] }
+  2022: { listedThrough: 80 },
+  // 2023: the opening tables list picks 1-70 (28 first round, 1 prospect promotion pick, 10 + 6 competitive balance, 22 second, 3 compensatory);
+  // pick 71 opens the editor-chosen table, so it is not part of the full listing.
+  2023: { listedThrough: 70 }
 }
 
 export type PartialYear = { year: number, documented: number, represented: number, absent: number }
@@ -30,8 +32,8 @@ export const PARTIAL_YEAR_DETAIL = 'An absent selection is not an unsigned playe
 // represented is held for identity or collision review; the rest of the documented draft is not listed by the source at all.
 const RELEASE_ACCOUNTING: Record<number, { listed: number, scopeExcluded: number }> = {
   2021: { listed: 207, scopeExcluded: 0 },
-  2022: { listed: 186, scopeExcluded: 5 },
-  2023: { listed: 167, scopeExcluded: 4 }
+  2022: { listed: 186, scopeExcluded: 0 },
+  2023: { listed: 167, scopeExcluded: 0 }
 }
 
 export type AbsentBreakdown = { notListed: number, scope: number, held: number }
@@ -47,14 +49,17 @@ export function absentBreakdown (p: PartialYear | null): AbsentBreakdown | null 
   return { notListed, scope: a.scopeExcluded, held }
 }
 
+/** The sentence for a breakdown (`clubs` names the clubs a release leaves out by scope, when any). */
+export function formatAbsent (absent: number, b: AbsentBreakdown, clubs?: string): string {
+  const parts = [`${b.notListed} are not listed by BAI's source (a source gap)`]
+  if (b.scope) parts.push(`${b.scope} ${clubs ? `${clubs} ` : ''}selection${b.scope === 1 ? ' is' : 's are'} outside this release by scope (not a source gap)`)
+  parts.push(`${b.held} listed selection${b.held === 1 ? ' is' : 's are'} held for identity or collision review`)
+  return `Of the ${absent} absent: ${parts.join('; ')}.`
+}
+
 export function absentBreakdownText (p: PartialYear | null): string | null {
   const b = absentBreakdown(p)
-  if (!b || !p) return null
-  const clubs = EDITORIAL_YEARS[p.year]?.excludedClubs?.join(' and ')
-  const parts = [`${b.notListed} are not listed by BAI's source (a source gap)`]
-  if (b.scope) parts.push(`${b.scope} ${clubs ?? 'selections'} selection${b.scope === 1 ? ' is' : 's are'} outside this release by scope (not a source gap)`)
-  parts.push(`${b.held} listed selection${b.held === 1 ? ' is' : 's are'} held for identity or collision review`)
-  return `Of the ${p.absent} absent: ${parts.join('; ')}.`
+  return b && p ? formatAbsent(p.absent, b, EDITORIAL_YEARS[p.year]?.excludedClubs?.join(' and ')) : null
 }
 
 const editorialNoteFor = (year: number): string => `For the incomplete ${year} draft, picks 1 to ${EDITORIAL_YEARS[year].listedThrough} are listed in full, but later-round entries are editorially selected notable players, not a representative sample.`

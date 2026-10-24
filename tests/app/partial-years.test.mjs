@@ -32,7 +32,7 @@ test('the editorially-selected later-round note belongs to 2021 only', () => {
 test('2022 is declared: 616 documented, opening picks 1 to 80, and nothing is shown until rows are published', async () => {
   const { partialYear: py, partialYearText: pt, editorialNote: en } = await import('../../lib/partial-years.ts')
   assert.equal(py(2022, 0), null, 'no notice before any 2022 selection is on the database')
-  assert.equal(pt(py(2022, 173)), '2022: 173 of 616 documented selections are represented; 443 are absent.')
+  assert.equal(pt(py(2022, 178)), '2022: 178 of 616 documented selections are represented; 438 are absent.')
   assert.equal(en([2022]), 'For the incomplete 2022 draft, picks 1 to 80 are listed in full, but later-round entries are editorially selected notable players, not a representative sample.')
   assert.equal(en([2021, 2022]).split('. ').length, 2, 'one sentence per declared year')
   assert.equal(en([2020, 2019]), null)
@@ -40,14 +40,17 @@ test('2022 is declared: 616 documented, opening picks 1 to 80, and nothing is sh
 })
 
 test('the absent selections are told apart: not listed by the source, outside the release by scope, held for review', async () => {
-  const { partialYear: py, absentBreakdown: ab, absentBreakdownText: at } = await import('../../lib/partial-years.ts')
-  assert.deepEqual(ab(py(2022, 173)), { notListed: 430, scope: 5, held: 8 })
-  assert.equal(at(py(2022, 173)), "Of the 443 absent: 430 are not listed by BAI's source (a source gap); 5 Los Angeles Dodgers selections are outside this release by scope (not a source gap); 8 listed selections are held for identity or collision review.")
-  // Approving held cases moves them into the represented count; the other groups do not change.
-  assert.deepEqual(ab(py(2022, 176)), { notListed: 430, scope: 5, held: 5 })
+  const { partialYear: py, absentBreakdown: ab, absentBreakdownText: at, formatAbsent: fa } = await import('../../lib/partial-years.ts')
+  // All 30 clubs are in scope for 2022 and 2023: nothing is excluded by scope; the held selections are the listed ones not yet represented.
+  assert.deepEqual(ab(py(2022, 178)), { notListed: 430, scope: 0, held: 8 })
+  assert.equal(at(py(2022, 178)), "Of the 438 absent: 430 are not listed by BAI's source (a source gap); 8 listed selections are held for identity or collision review.")
+  // Approving held cases moves them into the represented count; the other group does not change.
+  assert.deepEqual(ab(py(2022, 181)), { notListed: 430, scope: 0, held: 5 })
   assert.deepEqual(ab(py(2021, 205)), { notListed: 405, scope: 0, held: 2 })
-  assert.doesNotMatch(at(py(2021, 205)), /by scope/)
   assert.match(at(py(2021, 205)), /2 listed selections are held/)
+  // The scope branch for a release that does exclude a club.
+  assert.equal(fa(443, { notListed: 430, scope: 5, held: 8 }, 'Los Angeles Dodgers'), "Of the 443 absent: 430 are not listed by BAI's source (a source gap); 5 Los Angeles Dodgers selections are outside this release by scope (not a source gap); 8 listed selections are held for identity or collision review.")
+  assert.equal(fa(1, { notListed: 0, scope: 1, held: 0 }), "Of the 1 absent: 0 are not listed by BAI's source (a source gap); 1 selection is outside this release by scope (not a source gap); 0 listed selections are held for identity or collision review.")
   assert.equal(ab(py(2020, 100)), null, 'an undeclared year has no accounting')
   assert.equal(ab({ year: 2022, documented: 616, represented: 190, absent: 426 }), null, 'impossible accounting is not shown')
 })
@@ -82,11 +85,11 @@ test('the general absence statement distinguishes unavailable sources, scope exc
   assert.doesNotMatch(s, /is a gap in BAI/)
 })
 
-test('2023 is declared: 614 documented, picks 1 to 71 listed, the absent selections told apart', async () => {
+test('2023 is declared: 614 documented, picks 1 to 70 listed, the absent selections told apart', async () => {
   const { partialYear: py, absentBreakdown: ab, absentBreakdownText: at, editorialNote: en } = await import('../../lib/partial-years.ts')
   assert.equal(py(2023, 0), null, 'no 2023 notice before 2023 selections exist')
-  assert.deepEqual(ab(py(2023, 160)), { notListed: 447, scope: 4, held: 3 })
-  assert.match(at(py(2023, 160)), /^Of the 454 absent: 447 are not listed by BAI's source \(a source gap\); 4 Los Angeles Dodgers selections are outside this release by scope \(not a source gap\); 3 listed selections are held/)
-  assert.match(en([2023]), /^For the incomplete 2023 draft, picks 1 to 71 are listed in full/)
+  assert.deepEqual(ab(py(2023, 161)), { notListed: 447, scope: 0, held: 6 })
+  assert.equal(at(py(2023, 161)), "Of the 453 absent: 447 are not listed by BAI's source (a source gap); 6 listed selections are held for identity or collision review.")
+  assert.match(en([2023]), /^For the incomplete 2023 draft, picks 1 to 70 are listed in full/)
 }
 )
