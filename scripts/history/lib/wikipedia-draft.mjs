@@ -73,10 +73,12 @@ const ROUND_TITLES = [
 // Compensation picks (for a club that lost a qualifying free agent) are placed after the second round and the competitive
 // balance round B in the article; BAI's convention for them is C-2. This label is derived from the table title, not from
 // MLB's own pick label, and is reported as such.
-const roundFor = (title) => {
+// A "Compensatory round" table that comes BEFORE the second round (2024 and 2025 list one after the first round's incentive picks) holds
+// compensation picks for the first round: C-1. One after the second round's competitive balance picks is C-2.
+const roundFor = (title, { afterSecondRound = true } = {}) => {
   const t = title.replace(/\s+/g, ' ').trim()
   for (const [re, code] of ROUND_TITLES) if (re.test(t)) return roundCode(code)
-  if (/^compensat(?:ory|ion) round$/i.test(t)) return 'C-2'
+  if (/^compensat(?:ory|ion) round$/i.test(t)) return afterSecondRound ? 'C-2' : 'C-1'
   return null
 }
 
@@ -105,12 +107,16 @@ export function parseDraftArticle (wikitext, { year }) {
   const picks = []
   const sections = []
   const parts = body.split(/^===\s*(.+?)\s*===\s*$/m)
+  let sawSecondRound = false
   for (let i = 1; i < parts.length; i += 2) {
     const title = parts[i]
     // "Other notable selections" (later rounds, only some picks): a table with the round in the first column. These rows are
     // real selections, but the table is a selection of the article's editors, not a list of the round: never a census.
     const notable = /^other notable selections$/i.test(title.trim())
-    const code = notable ? null : roundFor(title)
+    if (/^second round$/i.test(title.trim())) sawSecondRound = true
+    // C-1 only if the second round has not come yet AND comes later in the article; otherwise the table follows the second round (C-2).
+    const secondRoundAhead = parts.slice(i + 2).some((x, k) => k % 2 === 0 && /^second round$/i.test(x.trim()))
+    const code = notable ? null : roundFor(title, { afterSecondRound: sawSecondRound || !secondRoundAhead })
     if (!code && !notable) { findings.push({ kind: 'UNKNOWN_SECTION', detail: title }); continue }
     const rows = parts[i + 1].split(/^\|-\s*$/m).slice(1)
     let n = 0

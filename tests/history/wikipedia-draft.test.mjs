@@ -261,3 +261,71 @@ test('the prospect promotion incentive section is parsed as the PPI round, a PRI
   assert.equal(selectionType('PPI'), 'PRIZE')
   assert.equal(selectionType('1'), 'STANDARD')
 })
+
+// 2024 and 2025 list a "Compensatory round" after the first round's incentive picks and another after the second round's competitive balance picks.
+const ARTICLE_COMP = `{{Infobox sports draft
+| first_round = 3
+| overall     = 6
+| rounds      = 20
+}}
+==Draft selections==
+===First round===
+{| class="wikitable"
+|-
+|1
+!scope="row"|Ann Able
+|[[Detroit Tigers]]
+|[[Pitcher]]
+|[[Arizona State Sun Devils baseball|Arizona State]]
+|}
+===Compensatory round===
+{| class="wikitable"
+|-
+|2
+!scope="row"|Bo Baker
+|[[Texas Rangers (baseball)|Texas Rangers]]
+|[[Outfielder]]
+|[[Dallas Baptist Patriots baseball|Dallas Baptist]]
+|}
+===Second round===
+{| class="wikitable"
+|-
+|3
+!scope="row"|Cy Carter
+|[[Kansas City Royals]]
+|[[Shortstop]]
+|[[Oregon Ducks baseball|Oregon]]
+|}
+===Competitive balance round B===
+{| class="wikitable"
+|-
+|4
+!scope="row"|Dee Dunn
+|[[Seattle Mariners]]
+|[[Pitcher]]
+|[[Gonzaga Bulldogs baseball|Gonzaga]]
+|}
+===Compensatory round===
+{| class="wikitable"
+|-
+|5
+!scope="row"|Eve Ebbs
+|[[Miami Marlins]]
+|[[Catcher]]
+|[[Florida Gators baseball|Florida]]
+|}
+==Summary==
+`
+
+test('a compensatory round before the second round is C-1 and one after it is C-2', () => {
+  const a = parseDraftArticle(ARTICLE_COMP, { year: 2024 })
+  const by = (n) => a.picks.find((p) => p.overall_pick === n)
+  assert.deepEqual([by(1).round_code, by(2).round_code, by(3).round_code, by(4).round_code, by(5).round_code], ['1', 'C-1', '2', 'CB-B', 'C-2'])
+  assert.deepEqual([by(2).selection_type, by(5).selection_type], ['COMPENSATION', 'COMPENSATION'])
+})
+
+test('a pick number that two rows claim is reported, never resolved by choosing one', () => {
+  const dup = ARTICLE_INLINE.replace('|4||[[Pick|109]]', '|3||81')   // both notable rows now claim pick 81
+  const a = parseDraftArticle(dup, { year: 2023 })
+  assert.ok(a.findings.some((f) => f.kind === 'DUPLICATE_PICK_NUMBER' && /#81/.test(f.detail)))
+})
