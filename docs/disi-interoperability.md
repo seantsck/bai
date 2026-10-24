@@ -111,3 +111,5 @@ This document classifies DISI concepts so that a later, deliberate migration can
 4. Re-run BAI's checks. Nothing from DISI bypasses BAI constraints.
 
 Phase 12A's read-only reconciliation method and aggregate findings: `docs/history/disi-reconciliation-12a.md`.
+
+Phase 12B's evidence verification and import-readiness findings: `docs/history/disi-reconciliation-12b.md`.
