@@ -60,7 +60,7 @@ test('rows become picks with rounds, clubs and school labels; footnotes and the 
 test('integrity findings are reported, never repaired', () => {
   const bad = ARTICLE.replace('|2\n!scope="row" style="background-color:#FFCC00"', '|1\n!scope="row" style="background-color:#FFCC00"').replace('[[Oakland Athletics]]', '[[Springfield Isotopes]]')
   const f = parseDraftArticle(bad, { year: 2020 }).findings.map((x) => x.kind).sort()
-  assert.deepEqual(f, ['DUPLICATE_PICK_NUMBER', 'PICK_NUMBER_GAPS', 'UNKNOWN_TEAM'].sort())
+  assert.deepEqual(f, ['DUPLICATE_PICK_NUMBER', 'PICK_NUMBER_GAPS', 'SOURCE_CONFLICT', 'SOURCE_CONFLICT', 'UNKNOWN_TEAM'].sort())
 })
 
 test('plain() strips markup but keeps names', () => {
@@ -255,9 +255,132 @@ test('the prospect promotion incentive section is parsed as the PPI round, a PRI
   const ppi = a.picks.find((p) => p.overall_pick === 2)
   assert.deepEqual([ppi.round_code, ppi.selection_type, ppi.franchise, ppi.name, ppi.notable_only], ['PPI', 'PRIZE', 'SEA', 'Cy Carter', undefined])
   assert.equal(a.picks.find((p) => p.overall_pick === 3).round_code, 'CB-A')
-  assert.deepEqual(roundStructure('PPI'), { order: 15, phase: 'PRIZE' })
-  assert.ok(roundStructure('1').order < roundStructure('PPI').order && roundStructure('PPI').order < roundStructure('CB-A').order, 'PPI sorts after round 1 and before Competitive Balance A')
+  assert.deepEqual(roundStructure('PPI'), { order: 11, phase: 'PRIZE' })
+  assert.ok(roundStructure('1').order < roundStructure('PPI').order && roundStructure('PPI').order < roundStructure('C-1').order, 'PPI sorts after round 1 and before first-round compensation (C-1)')
   assert.equal(roundCode('ppi'), 'PPI')
   assert.equal(selectionType('PPI'), 'PRIZE')
   assert.equal(selectionType('1'), 'STANDARD')
+})
+
+// 2024 and 2025 list a "Compensatory round" after the first round's incentive picks and another after the second round's competitive balance picks.
+const ARTICLE_COMP = `{{Infobox sports draft
+| first_round = 3
+| overall     = 6
+| rounds      = 20
+}}
+==Draft selections==
+===First round===
+{| class="wikitable"
+|-
+|1
+!scope="row"|Ann Able
+|[[Detroit Tigers]]
+|[[Pitcher]]
+|[[Arizona State Sun Devils baseball|Arizona State]]
+|}
+===Compensatory round===
+{| class="wikitable"
+|-
+|2
+!scope="row"|Bo Baker
+|[[Texas Rangers (baseball)|Texas Rangers]]
+|[[Outfielder]]
+|[[Dallas Baptist Patriots baseball|Dallas Baptist]]
+|}
+===Second round===
+{| class="wikitable"
+|-
+|3
+!scope="row"|Cy Carter
+|[[Kansas City Royals]]
+|[[Shortstop]]
+|[[Oregon Ducks baseball|Oregon]]
+|}
+===Competitive balance round B===
+{| class="wikitable"
+|-
+|4
+!scope="row"|Dee Dunn
+|[[Seattle Mariners]]
+|[[Pitcher]]
+|[[Gonzaga Bulldogs baseball|Gonzaga]]
+|}
+===Compensatory round===
+{| class="wikitable"
+|-
+|5
+!scope="row"|Eve Ebbs
+|[[Miami Marlins]]
+|[[Catcher]]
+|[[Florida Gators baseball|Florida]]
+|}
+==Summary==
+`
+
+test('a compensatory round before the second round is C-1 and one after it is C-2', () => {
+  const a = parseDraftArticle(ARTICLE_COMP, { year: 2024 })
+  const by = (n) => a.picks.find((p) => p.overall_pick === n)
+  assert.deepEqual([by(1).round_code, by(2).round_code, by(3).round_code, by(4).round_code, by(5).round_code], ['1', 'C-1', '2', 'CB-B', 'C-2'])
+  assert.deepEqual([by(2).selection_type, by(5).selection_type], ['COMPENSATION', 'COMPENSATION'])
+})
+
+test('a pick number that two rows claim is reported, never resolved by choosing one', () => {
+  const dup = ARTICLE_INLINE.replace('|4||[[Pick|109]]', '|3||81')   // both notable rows now claim pick 81
+  const a = parseDraftArticle(dup, { year: 2023 })
+  assert.ok(a.findings.some((f) => f.kind === 'DUPLICATE_PICK_NUMBER' && /#81/.test(f.detail)))
+})
+
+const notableRow = (round, pick, name, team) => `|-\n|${round}||${pick}\n!scope="row"|${name}\n|[[${team}]]\n|[[Pitcher]]\n|[[Georgia Bulldogs baseball|Georgia]]\n`
+const ARTICLE_NOTABLE = (rows) => `{{Infobox sports draft\n| overall = 4\n}}\n==Draft selections==\n===Other notable selections===\n{| class="wikitable"\n${rows.join('')}|}\n==Summary==\n`
+
+test('a round label that contradicts pick order marks every row involved as a source conflict, and holds are never repaired from elsewhere', () => {
+  const a = parseDraftArticle(ARTICLE_NOTABLE([
+    notableRow(5, 165, 'Dev One', 'Texas Rangers (baseball)'), notableRow(6, 168, 'Eat Two', 'Colorado Rockies'),
+    notableRow(5, 173, 'Col Three', 'New York Mets'), notableRow(6, 181, 'Her Four', 'New York Yankees')
+  ]), { year: 2024 })
+  const by = (n) => a.picks.find((p) => p.overall_pick === n)
+  assert.equal(by(165).source_conflict, undefined)
+  assert.equal(by(181).source_conflict, undefined)
+  assert.match(by(168).source_conflict, /round label conflicts with pick order/)
+  assert.match(by(173).source_conflict, /round label conflicts with pick order/)
+  assert.equal(by(173).round_code, '5', 'the article value is kept, not replaced')
+  assert.ok(a.findings.some((f) => f.kind === 'SOURCE_CONFLICT' && /#173/.test(f.detail)))
+})
+
+test('rounds in pick order raise no source conflict, and a duplicate pick number marks both rows', () => {
+  const ok = parseDraftArticle(ARTICLE_NOTABLE([notableRow(5, 165, 'A One', 'Texas Rangers (baseball)'), notableRow(6, 168, 'B Two', 'Colorado Rockies'), notableRow(6, 181, 'C Three', 'New York Yankees')]), { year: 2024 })
+  assert.equal(ok.picks.filter((p) => p.source_conflict).length, 0)
+  const dup = parseDraftArticle(ARTICLE_NOTABLE([notableRow(6, 182, 'G One', 'Chicago Cubs'), notableRow(6, 182, 'P Two', 'Miami Marlins')]), { year: 2024 })
+  assert.equal(dup.picks.filter((p) => /duplicate pick number/.test(p.source_conflict ?? '')).length, 2)
+})
+
+test('round order is the full official sequence: round 1, PPI, C-1, CB-A, round 2, CB-B, C-2, with distinct collision-free values', async () => {
+  const fs = await import('node:fs')
+  const { roundStructure } = await import('../../scripts/research/lib/import-format.mjs')
+  const sequence = ['1', 'PPI', 'C-1', 'CB-A', '2', 'CB-B', 'C-2']
+  const orders = sequence.map((c) => roundStructure(c).order)
+  assert.deepEqual(orders, [10, 11, 13, 16, 20, 26, 27])
+  assert.equal(new Set(orders).size, orders.length)
+  assert.ok(orders.every((n, i) => !i || n > orders[i - 1]), 'strictly increasing in the official order')
+  // Later rounds still follow: round 3 (30) and supplemental/other compensation codes never collide with the sequence above.
+  const all = ['3', 'C-3', 'S-1', 'S-2', 'S-3'].map((c) => roundStructure(c).order)
+  assert.equal(new Set([...orders, ...all]).size, orders.length + all.length)
+  assert.ok(roundStructure('C-2').order < roundStructure('3').order)
+  assert.equal(roundStructure('PPI').phase, 'PRIZE')
+  for (const year of [2023, 2024, 2025]) {
+    const file = new URL(`../../.cache/history/wikipedia/${year}-major-league-baseball-draft.json`, import.meta.url)
+    if (!fs.existsSync(file)) continue   // the cache is local; CI has no cached article
+    const rev = JSON.parse(fs.readFileSync(file, 'utf8')).query.pages[0].revisions[0]
+    const a = parseDraftArticle(rev.slots?.main?.content ?? rev.content, { year })
+    // The article's opening tables list the rounds in this order: every round code present sorts the same way as its section.
+    const seen = []
+    for (const p of a.picks.filter((x) => !x.notable_only)) if (seen[seen.length - 1] !== p.round_code) seen.push(p.round_code)
+    const o = seen.map((c) => roundStructure(c).order)
+    const comp = seen.filter((c) => c === 'C-2')
+    if (comp.length) assert.ok(roundStructure('C-2').order > roundStructure('CB-B').order, `${year}: C-2 after CB-B`)
+    assert.ok(seen.includes('PPI') && o.every((n) => Number.isInteger(n)), `${year} sections ${seen.join(',')}`)
+    const i = (c) => seen.indexOf(c)
+    if (i('PPI') >= 0 && i('1') >= 0) assert.ok(i('1') < i('PPI'))
+    if (i('CB-B') >= 0 && i('C-2') >= 0) assert.ok(i('CB-B') < i('C-2'), `${year}: the article lists CB-B before C-2`)
+  }
 })
