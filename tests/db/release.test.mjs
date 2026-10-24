@@ -443,3 +443,40 @@ test('the three immutable historical manifests replay in order on a clean databa
   // The original manifests are untouched on disk.
   assert.deepEqual(REAL.map(([d]) => fs.readFileSync(path.join(d, 'release-manifest.sha256'), 'utf8').split(/\s+/)[0]), Object.keys(HISTORICAL_OBSERVATION_ALLOWANCES))
 })
+
+// --- existing players with an unknown birth date (issue #25) ----------------------------------------------------------------------
+test('a supplemental release links an existing player with an unknown birth date: date and precision set together, no duplicate, limits kept, replay idempotent', async () => {
+  await db.query(`insert into players (slug, full_name, display_name) values ('fixture-nobirth-a', 'Fixture Nobirth Alpha', 'Fixture Nobirth Alpha')`)
+  await db.query(`insert into player_external_ids (player_id, id_system, external_id) values ((select id from players where slug = 'fixture-nobirth-a'), 'MLBAM', '980001')`)
+  const rel = loadRelease(writeRelease('nobirth-supp', [batch('KC', [record(151, 'KC', 'Fixture Nobirth Alpha', { ids: { MLBAM: '980001' }, birth: '1999-09-09' })], true)],
+    { approvals: [approval(151)], supplementOf: { manifest_sha256: PARENT, note: 'fixture parent' } }))
+  assert.deepEqual(verifyReleaseContent(rel, { root }), [])
+  assert.equal((await collisionReport(db, rel)).overall, 'SAFE')
+  const players = await count('select count(*) n from players'); const obs0 = await obsCount()
+  const out = await applyRelease(db, rel, { operator: 'Fixture Owner' })
+  assert.equal(out.counts.imported, 1)
+  assert.deepEqual(await h.one(db, `select birth_date::text d, birth_date_precision p from players where slug = 'fixture-nobirth-a'`), { d: '1999-09-09', p: 'DAY' })
+  assert.equal(await count('select count(*) n from players'), players, 'no duplicate player')
+  assert.equal(await count(`select count(*) n from draft_selections s join players p on p.id = s.player_id where s.overall_pick = 151 and p.slug = 'fixture-nobirth-a'`), 1)
+  const added = await obsCount() - obs0
+  assert.ok(added > 0 && added <= rel.manifest.expected_database_changes.source_observations_inserted_max, `${added} observations within the declared maximum`)
+  const after = await state()
+  assert.equal((await applyRelease(db, rel, { operator: 'Fixture Owner' })).already, true)
+  assert.deepEqual(await state(), after)
+})
+
+test('a later failure rolls back the birth-date update, selections, observations, staging and audit of an earlier batch', async () => {
+  await db.query(`insert into players (slug, full_name, display_name) values ('fixture-nobirth-b', 'Fixture Nobirth Beta', 'Fixture Nobirth Beta')`)
+  await db.query(`insert into player_external_ids (player_id, id_system, external_id) values ((select id from players where slug = 'fixture-nobirth-b'), 'MLBAM', '980002')`)
+  const good = batch('KC', [record(161, 'KC', 'Fixture Nobirth Beta', { ids: { MLBAM: '980002' }, birth: '1999-10-10' })], true)
+  const bad = batch('LAD', [record(162, 'LAD', 'Fixture Nobirth Bad')], false)
+  bad.records[0].round_code = 'not-a-round'
+  const rel = loadRelease(writeRelease('nobirth-rollback', [good, bad], { approvals: [approval(161)] }))
+  assert.equal((await collisionReport(db, rel)).overall, 'SAFE')
+  const before = await state()
+  const player = await h.one(db, `select birth_date::text d, birth_date_precision p from players where slug = 'fixture-nobirth-b'`)
+  await assert.rejects(applyRelease(db, rel, { operator: 'Fixture Owner' }), /validation failed|invalid/)
+  assert.deepEqual(await state(), before, 'selections, players, observations, external ids, staging and audits are all unchanged')
+  assert.deepEqual(await h.one(db, `select birth_date::text d, birth_date_precision p from players where slug = 'fixture-nobirth-b'`), player)
+  assert.equal(await count('select count(*) n from draft_selections where overall_pick in (161, 162)'), 0)
+})
