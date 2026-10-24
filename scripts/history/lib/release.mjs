@@ -25,6 +25,28 @@ export const manifestChecksum = (manifest) => { const { manifest_sha256: _drop, 
 
 const norm = (s) => String(s ?? '').normalize('NFD').replace(/\p{M}/gu, '').toLowerCase().replace(/\b(jr|sr|ii|iii|iv|v)\b\.?$/g, '').replace(/[^a-z0-9]+/g, ' ').trim()
 
+/**
+ * Upper bound on the source observations the research importer inserts for these records (scripts/research/lib/pipeline.mjs).
+ * Per record, counting only fields the record actually carries:
+ *   player:     a NEW player observes full_name, birth_date, birth_country (1 + bd + bc); an EXISTING player linked by identifier
+ *               reconciles birth_date and birth_country, each at most a baseline plus the incoming value (2 x (bd + bc));
+ *               the bound is the larger of the two, so it holds whichever way the record resolves;
+ *   selection:  round_code, organization (always), round_pick, position, school name (when present);
+ *   evidence:   one observation per evidence entry (other sources' statements about player or selection fields).
+ * Signing data is refused in these releases (verifyReleaseContent), so none is counted.
+ */
+export function observationMax (records) {
+  let n = 0
+  for (const r of records) {
+    const bd = r.player.birth_date ? 1 : 0
+    const bc = r.player.birth_country ? 1 : 0
+    n += Math.max(1 + bd + bc, 2 * (bd + bc))
+    n += 2 + (r.round_pick != null ? 1 : 0) + (r.position ? 1 : 0) + (r.school?.name ? 1 : 0)
+    n += r.evidence?.length ?? 0
+  }
+  return n
+}
+
 /** Builds a manifest from a release directory's batches (and the identity file's tiers). Pure given its inputs. */
 export function buildManifest ({ humanApprovals = [], releaseKey, year, draftKey, batches, identity, article, chadwickCommit, identityFileSha256, brownVariant, heldPicks, catalog, maxSelections, createdOn, supplementOf = null, documentedSelections = null }) {
   const docs = batches.map((b) => ({ ...b, picks: b.doc.records.map((r) => r.overall_pick).sort((x, y) => x - y) }))
@@ -45,7 +67,6 @@ export function buildManifest ({ humanApprovals = [], releaseKey, year, draftKey
   })
   const orgs = Object.fromEntries([...new Set(records.map((r) => r.organization))].sort().map((o) => [o, records.filter((r) => r.organization === o).length]))
   const idCount = records.reduce((n, r) => n + Object.keys(r.player.external_ids ?? {}).length, 0)
-  const wdObs = records.reduce((n, r) => n + (r.evidence?.length ?? 0), 0)
   const manifest = {
     format: RELEASE_FORMAT, release_key: releaseKey, created_on: createdOn,
     authorization_scope: { draft_year: year, draft_key: draftKey, channel: 'DRAFT', max_selections: maxSelections, note: 'This manifest authorises nothing by itself. A separate, explicit approval must name its checksum.' },
@@ -67,19 +88,19 @@ export function buildManifest ({ humanApprovals = [], releaseKey, year, draftKey
     sources, identity_confidence: confidence,
     expected_database_changes: {
       draft_selections_inserted: records.length, draft_signings_inserted: 0, signing_rows: 0, bonuses: 0,
-      players_created_max: supplementOf ? 0 : records.length, external_ids_inserted_max: idCount, source_observations_inserted_max: wdObs + records.length * 3 + (supplementOf ? records.filter((r) => r.player.birth_date).length : 0),
+      players_created_max: supplementOf ? 0 : records.length, external_ids_inserted_max: idCount, source_observations_inserted_max: observationMax(records),
       sources_inserted_max: sources.length, coverage_claims: Object.keys(orgs).length, import_batches: docs.length, research_classes_max: Object.keys(orgs).length, release_audits: 1,
       untouched: ['migrations', 'views', 'grants', 'certification', 'reviewers', 'historical years', 'existing players, selections and observations']
     },
     verification_plan: [
       'preview with --target hosted (read-only): every batch checksum, source permission, organization, identity and collision check is SAFE',
-      'apply runs every batch inside ONE transaction and commits only if the in-transaction counts equal this manifest (selections, per-club counts, zero signings)',
-      'after commit: npm run hosted:refresh; hosted:verify (11/11); hosted:parity (0 differences over expected objects); hosted:security; integrity violations 0; public /draft shows the 2020 class as partial',
+      'apply runs every batch inside ONE transaction and commits only if the in-transaction counts equal this manifest (selections, per-club counts, zero signings) and stay within its maxima (players, external ids, sources, source observations)',
+      `after commit: npm run hosted:refresh; hosted:verify (11/11); hosted:parity (0 differences over expected objects); hosted:security; integrity violations 0; public /draft/years shows the ${year} class as partial`,
       'ingest.release_audits holds the per-record outcomes for this manifest'
     ],
     rollback_plan: [
       'before commit: any failed check rolls the whole transaction back; nothing persists',
-      'after commit, if a verification fails: delete only what this release inserted, identified by the batch keys and release audit (draft selections of draft 2020-JUNE_AMATEUR whose source is the manifest article revision, their observations and the players created by those batches that have no other citation), in one transaction, then refresh read models; the audit table keeps its record',
+      `after commit, if a verification fails: delete only what this release inserted, identified by the batch keys and release audit (draft selections of draft ${draftKey} whose source is the manifest article revision, their observations and the players created by those batches that have no other citation), in one transaction, then refresh read models; the audit table keeps its record`,
       'Vercel needs no rollback: production code is unchanged by this release'
     ]
   }
@@ -287,6 +308,10 @@ export async function applyRelease (db, rel, { operator }) {
     const selectionsBefore = await selectionCount()
     const signingsBefore = await signingCount()
     const playersBefore = (await db.query('select count(*)::int n from public.players')).rows[0].n
+    const countOf = async (table) => (await db.query(`select count(*)::int n from public.${table}`)).rows[0].n
+    const externalIdsBefore = await countOf('player_external_ids')
+    const sourcesBefore = await countOf('sources')
+    const observationsBefore = await countOf('source_observations')
     const entries = []
     const batches = []
     for (const b of rel.batches) {
@@ -320,6 +345,13 @@ export async function applyRelease (db, rel, { operator }) {
     }
     const playersAfter = (await db.query('select count(*)::int n from public.players')).rows[0].n
     if (playersAfter - playersBefore > Number(m.expected_database_changes.players_created_max)) throw new Error(`verification failed: ${playersAfter - playersBefore} player(s) created; the manifest allows ${m.expected_database_changes.players_created_max}`)
+    // Every declared maximum is enforced here, before the audit is written and before the transaction can commit.
+    const grew = async (table) => (await db.query(`select count(*)::int n from public.${table}`)).rows[0].n
+    const maxima = m.expected_database_changes
+    for (const [table, before, key, noun] of [['player_external_ids', externalIdsBefore, 'external_ids_inserted_max', 'external id'], ['sources', sourcesBefore, 'sources_inserted_max', 'source'], ['source_observations', observationsBefore, 'source_observations_inserted_max', 'source observation']]) {
+      const added = (await grew(table)) - before
+      if (maxima[key] !== undefined && added > Number(maxima[key])) throw new Error(`verification failed: ${added} ${noun}(s) inserted; the manifest allows ${maxima[key]}`)
+    }
     const signingsAfter = await signingCount()
     if (signingsAfter !== signingsBefore + Number(m.expected_database_changes.draft_signings_inserted)) throw new Error(`verification failed: signing rows for the draft went from ${signingsBefore} to ${signingsAfter}; the manifest expects none added`)
     const counts = { selections: expected.size, imported: entries.filter((e) => !['SKIPPED_ALREADY_APPLIED', 'HELD'].includes(e.outcome)).length, skipped: entries.filter((e) => e.outcome === 'SKIPPED_ALREADY_APPLIED').length, held: entries.filter((e) => e.outcome === 'HELD').length, held_in_manifest: m.totals.held.length }

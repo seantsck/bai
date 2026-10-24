@@ -8,7 +8,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import * as h from './harness.mjs'
 import { loadCatalog } from '../../scripts/history/lib/permissions.mjs'
-import { buildManifest, loadRelease, verifyReleaseContent, collisionReport, applyRelease, canonicalJson, manifestChecksum, fileSha256 } from '../../scripts/history/lib/release.mjs'
+import { buildManifest, observationMax, loadRelease, verifyReleaseContent, collisionReport, applyRelease, canonicalJson, manifestChecksum, fileSha256 } from '../../scripts/history/lib/release.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 const catalog = loadCatalog(root)
@@ -25,9 +25,9 @@ const sources = (verified) => [
   ...(verified ? [{ source_key: CW, source_type: 'REFERENCE_DATABASE', authority_level: 'AGGREGATOR', title: 'Chadwick Baseball Bureau Register, fixture', publisher: 'Chadwick Baseball Bureau', url: 'https://github.com/chadwickbureau/register/tree/fixture', retrieved_date: '2026-10-22' },
     { source_key: WD, source_type: 'REFERENCE_DATABASE', authority_level: 'AGGREGATOR', title: 'Wikidata identity corroboration fixture', publisher: 'Wikimedia Foundation (Wikidata contributors)', url: 'https://www.wikidata.org/', retrieved_date: '2026-10-22' }] : [])
 ]
-const record = (pick, org, name, { ids = null } = {}) => ({
-  type: 'DRAFT_SELECTION', source_key: WIKI, draft_key: '2020-JUNE_AMATEUR', round_code: '1', overall_pick: pick, round_pick: null, organization: org, selection_type: 'STANDARD',
-  player: { full_name: name, source_key: WIKI, ...(ids ? { external_ids: ids, external_id_sources: Object.fromEntries(Object.keys(ids).map((k) => [k, CW])) } : {}) },
+const record = (pick, org, name, { ids = null, birth = null, birthCountry = null, position = null, roundPick = null } = {}) => ({
+  type: 'DRAFT_SELECTION', source_key: WIKI, draft_key: '2020-JUNE_AMATEUR', round_code: '1', overall_pick: pick, round_pick: roundPick, ...(position ? { position } : {}), organization: org, selection_type: 'STANDARD',
+  player: { full_name: name, source_key: WIKI, ...(birth ? { birth_date: birth } : {}), ...(birthCountry ? { birth_country: birthCountry } : {}), ...(ids ? { external_ids: ids, external_id_sources: Object.fromEntries(Object.keys(ids).map((k) => [k, CW])) } : {}) },
   ...(ids ? { evidence: [{ subject: 'player', field: 'wikidata_item', value: 'Q1', source_key: WD }] } : {}),
   signing: { status: 'UNKNOWN' }, notes: 'fixture'
 })
@@ -262,4 +262,81 @@ test('a supplemental release that would create a player is refused and rolls bac
   assert.equal(await count('select count(*) n from draft_selections where overall_pick = 71'), 0)
   assert.equal(await count('select count(*) n from ingest.import_batches'), staged, 'staging rolled back too')
   assert.equal(await count(`select count(*) n from ingest.release_audits where release_key = 'fixture-supp-new-player'`), 0)
+})
+
+// --- source-observation accounting and the transactional guards (Phase 11.4) ---------------------------------------------------
+const obsCount = () => count('select count(*) n from source_observations')
+const withSource = (b, key) => JSON.parse(JSON.stringify(b).replaceAll(WIKI, key))
+
+test('the observation maximum is derived from the importer\'s fields: verified, name-only and mixed populations are exact, and every declared maximum holds', async () => {
+  const verified = record(81, 'KC', 'Fixture Acct Verified', { ids: { MLBAM: '940001' }, birth: '1999-01-01', position: 'RHP', roundPick: 11 })
+  const nameOnly = record(82, 'KC', 'Fixture Acct Name Only')
+  // Verified: player name + birth date (2), selection round, club, round pick, position (4), one evidence entry (1). Name-only: name (1) + round, club (2).
+  assert.equal(observationMax([verified]), 7)
+  assert.equal(observationMax([nameOnly]), 3)
+  assert.equal(observationMax([verified, nameOnly]), 10)
+  // A record with both a birth date and a country is bounded by the larger of the new-player and linked-player paths (4 vs 3).
+  assert.equal(observationMax([record(83, 'KC', 'Fixture Acct Both', { birth: '1999-01-01', birthCountry: 'USA' })]), 4 + 2)
+  for (const [name, recs, exact] of [['verified', [verified], 7], ['name-only', [nameOnly], 3], ['mixed', [record(84, 'LAD', 'Fixture Acct Mixed One', { ids: { MLBAM: '940004' }, birth: '2000-02-02' }), record(85, 'LAD', 'Fixture Acct Mixed Two')], 5 + 3]]) {
+    const dir = writeRelease(`acct-${name}`, [batch(recs[0].organization, recs, true)])
+    const rel = loadRelease(dir)
+    const e = rel.manifest.expected_database_changes
+    const before = { obs: await obsCount(), ids: await count('select count(*) n from player_external_ids'), src: await count('select count(*) n from sources'), players: await count('select count(*) n from players') }
+    await applyRelease(db, rel, { operator: 'Fixture Owner' })
+    assert.equal(await obsCount() - before.obs, exact, `${name}: observations inserted`)
+    assert.equal(e.source_observations_inserted_max, exact, `${name}: the manifest maximum is exact for new players`)
+    assert.ok(await count('select count(*) n from player_external_ids') - before.ids <= e.external_ids_inserted_max)
+    assert.ok(await count('select count(*) n from sources') - before.src <= e.sources_inserted_max)
+    assert.ok(await count('select count(*) n from players') - before.players <= e.players_created_max)
+  }
+})
+
+test('an existing-player supplement stays within the observation maximum and creates no player', async () => {
+  await db.query(`insert into players (slug, full_name, display_name, birth_date, birth_date_precision) values ('fixture-acct-link-a', 'Fixture Acct Link Alpha', 'Fixture Acct Link Alpha', '1998-04-04', 'DAY'), ('fixture-acct-link-b', 'Fixture Acct Link Beta', 'Fixture Acct Link Beta', '1999-03-03', 'DAY')`)
+  await db.query(`insert into player_external_ids (player_id, id_system, external_id) values ((select id from players where slug = 'fixture-acct-link-a'), 'MLBAM', '940101'), ((select id from players where slug = 'fixture-acct-link-b'), 'MLBAM', '940102')`)
+  const docs = [batch('KC', [record(91, 'KC', 'Fixture Acct Link Alpha', { ids: { MLBAM: '940101' }, birth: '1998-04-04' })], true), batch('LAD', [record(92, 'LAD', 'Fixture Acct Link Beta', { ids: { MLBAM: '940102' }, birth: '1999-03-03' })], true)]
+  const rel = loadRelease(writeRelease('acct-supp', docs, { approvals: [approval(91), approval(92)], supplementOf: { manifest_sha256: PARENT, note: 'fixture parent' } }))
+  const max = rel.manifest.expected_database_changes.source_observations_inserted_max
+  assert.equal(max, observationMax(rel.batches.flatMap((b) => b.doc.records)))
+  const before = await obsCount(); const players = await count('select count(*) n from players')
+  await applyRelease(db, rel, { operator: 'Fixture Owner' })
+  const added = await obsCount() - before
+  assert.ok(added > 0 && added <= max, `${added} observations within ${max}`)
+  assert.equal(await count('select count(*) n from players'), players, 'no player created')
+})
+
+test('an understated maximum rolls the whole release back: observations, external ids and sources', async () => {
+  const snap = async () => ({ obs: await obsCount(), ids: await count('select count(*) n from player_external_ids'), src: await count('select count(*) n from sources'), players: await count('select count(*) n from players'),
+    sel: await count('select count(*) n from draft_selections'), staged: await count('select count(*) n from ingest.import_batches'), audits: await count('select count(*) n from ingest.release_audits') })
+  let n = 0
+  for (const [key, pattern] of [['source_observations_inserted_max', /source observation\(s\) inserted; the manifest allows/], ['external_ids_inserted_max', /external id\(s\) inserted; the manifest allows 0/], ['sources_inserted_max', /source\(s\) inserted; the manifest allows 0/]]) {
+    n++
+    const sourceKey = `hist:wikipedia-2020-cap${n}-r1`
+    const rec = record(100 + n, 'KC', `Fixture Cap Case ${n}`, { ids: { MLBAM: `95000${n}` }, birth: '1999-05-05' })
+    const dir = writeRelease(`cap-${n}`, [withSource(batch('KC', [rec], true), sourceKey)], { mutate: (m) => { m.expected_database_changes[key] = key === 'source_observations_inserted_max' ? m.expected_database_changes[key] - 1 : 0; return m } })
+    const rel = loadRelease(dir)
+    assert.equal((await collisionReport(db, rel)).overall, 'SAFE')
+    const before = await snap()
+    await assert.rejects(applyRelease(db, rel, { operator: 'Fixture Owner' }), pattern, key)
+    assert.deepEqual(await snap(), before, `${key}: nothing persisted`)
+    assert.equal(await count('select count(*) n from draft_selections where overall_pick = $1', [100 + n]), 0)
+    assert.equal(await count(`select count(*) n from ingest.release_audits where release_key = $1`, [`fixture-cap-${n}`]), 0)
+  }
+})
+
+test('a committed release replays without inserting anything, even after its maxima were spent', async () => {
+  const rel = loadRelease(writeRelease('replay-acct', [batch('KC', [record(121, 'KC', 'Fixture Replay Acct', { ids: { MLBAM: '960001' }, birth: '1999-06-06' })], true)]))
+  await applyRelease(db, rel, { operator: 'Fixture Owner' })
+  const before = { obs: await obsCount(), ids: await count('select count(*) n from player_external_ids'), src: await count('select count(*) n from sources'), audits: await count('select count(*) n from ingest.release_audits') }
+  const again = await applyRelease(db, rel, { operator: 'Fixture Owner' })
+  assert.equal(again.already, true)
+  assert.deepEqual({ obs: await obsCount(), ids: await count('select count(*) n from player_external_ids'), src: await count('select count(*) n from sources'), audits: await count('select count(*) n from ingest.release_audits') }, before)
+})
+
+test('manifest instructions use the manifest\'s own draft year and key, not 2020', () => {
+  const m = buildManifest({ releaseKey: 'fixture-year', year: 2021, draftKey: '2021-JUNE_AMATEUR', batches: [{ file: 'x.json', sha256: 'a'.repeat(64), doc: batch('KC', [{ ...record(1, 'KC', 'Fixture Year'), draft_key: '2021-JUNE_AMATEUR' }], false) }], identity: { picks: [] }, article: { revision: 1, response_sha256: 'a'.repeat(64) }, chadwickCommit: 'f'.repeat(40), identityFileSha256: 'b'.repeat(64), brownVariant: 'NOT_IN_THIS_RELEASE', heldPicks: [], humanApprovals: [], catalog, maxSelections: 1, createdOn: '2026-10-24' })
+  const text = JSON.stringify([m.verification_plan, m.rollback_plan])
+  assert.match(text, /2021 class as partial/)
+  assert.match(text, /draft 2021-JUNE_AMATEUR/)
+  assert.doesNotMatch(text, /2020/)
 })

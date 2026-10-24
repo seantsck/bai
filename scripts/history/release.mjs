@@ -110,7 +110,7 @@ const COMMANDS = {
     report.content_problems = problems
     const out = path.join(releaseDir, `collision-report-${report.target_label.replace(/\s+/g, '-')}.json`)
     fs.writeFileSync(out, JSON.stringify(report, null, 1) + '\n')
-    log(`preview on ${report.target_label}: ${canonicalJson(report.summary)} overall ${report.overall}; content problems ${problems.length}; target migrations ${canonicalJson(report.target.migrations)}; draft ${report.target.draft}; existing 2020 selections ${report.target.existing_selections_in_draft}  -> ${out}`)
+    log(`preview on ${report.target_label}: ${canonicalJson(report.summary)} overall ${report.overall}; content problems ${problems.length}; target migrations ${canonicalJson(report.target.migrations)}; draft ${report.target.draft}; existing ${rel.manifest.authorization_scope.draft_year} selections ${report.target.existing_selections_in_draft}  -> ${out}`)
     process.exit(report.overall === 'BLOCKED' || problems.length ? EXIT.problems : report.overall === 'HUMAN_REVIEW' ? EXIT.review : 0)
   },
 
