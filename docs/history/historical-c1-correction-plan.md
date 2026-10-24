@@ -14,6 +14,17 @@ Round 467 (2021 C-2) holds only pick 30. Round 500 (2022 C-2) holds 8 selections
 ## Evidence (no new source needed)
 The pinned Wikipedia revisions, already the cited sources (audit 3 and 4 revisions): 2021 revision 1373807660 lists sections First round, **Compensatory round** (pick 30), Competitive balance A, Second round, Competitive balance B, with no later compensatory section. 2022 revision 1374495794 lists First round, **Compensatory round** (picks 31-32), Competitive balance A, Second round, Competitive balance B, then a separate **Compensatory round** (picks 75-80). A compensation table before the second round is C-1; after it, C-2. The parser now encodes that rule (tested), and cached 2020, 2023, 2024 and 2025 are unaffected.
 
+## Related round-order normalization (also not executed)
+Future code now orders second-round compensation (C-2) at 27, after Competitive Balance B (26). Existing hosted rows keep the old values (read-only listing 2026-10-24), so they sort C-2 before CB-B:
+| Draft | Round row | Now | Normalized | Selections |
+|---|---|---|---|---|
+| 2020 | C-2 (round 432) | 23 | 27 | 6 |
+| 2021 | C-2 (round 467) | 23 | 13 as C-1 (the correction above) | 1 |
+| 2022 | C-2 (round 500) | 23 | 27 (the six genuine C-2 picks stay here) | 8, of which 2 move to the new C-1 |
+| 2023 | C-2 (round 542) | 23 | 27 | 3 |
+| 2023 | PPI (round 564) | 15 | 11 | 1 |
+Each is an `UPDATE draft_rounds SET round_order` on a row nothing depends on by order (`UNIQUE (draft_id, round_order)`: 27 and 11 are free in those drafts). Order is a sort key only; display of the selections changes, their data does not. The same rehearse-first, audit-trail, rollback and verification steps apply (rollback: set the old values back). Until then public views sort those years' C-2 picks before CB-B.
+
 ## Dependent records
 - `source_observations` (subject `draft_selections`), field `round_code`, status ACTIVE, value `C-2`: three rows, citing source 2998 (2021) and 3262 (2022). The organization and school observations are unaffected.
 - `draft_signings`, `acquisition_dispositions`, `acquisition_expectation_links` referencing these selections: 0 rows each. `research.certifications` active: 0 (so the evidence-change trigger revokes nothing).

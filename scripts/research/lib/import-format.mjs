@@ -30,7 +30,9 @@ export function roundStructure (code) {
   const m = /^(\d+)$/.exec(code)
   if (m) return { order: Number(m[1]) * 10, phase: 'REGULAR' }
   const c = /^C-(\d+)$/.exec(code)
-  if (c) return { order: Number(c[1]) * 10 + 3, phase: 'COMPENSATION' }
+  // First-round compensation (C-1) sorts at 13. Second-round compensation (C-2) comes AFTER Competitive Balance B (26) in the official draft order, so it
+  // is 27: free of every other code (S-n is n*10+5). Rounds already stored keep their order: an existing round is reused and never recomputed.
+  if (c) return { order: Number(c[1]) === 2 ? 27 : Number(c[1]) * 10 + 3, phase: 'COMPENSATION' }
   const sup = /^S-(\d+)$/.exec(code)
   if (sup) return { order: Number(sup[1]) * 10 + 5, phase: 'SUPPLEMENTAL' }
   // The Prospect Promotion Incentive pick(s) sit right after the first round's numbered picks (10) and before first-round compensation (13) and

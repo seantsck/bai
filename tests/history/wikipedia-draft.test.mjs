@@ -354,26 +354,33 @@ test('rounds in pick order raise no source conflict, and a duplicate pick number
   assert.equal(dup.picks.filter((p) => /duplicate pick number/.test(p.source_conflict ?? '')).length, 2)
 })
 
-test('round order for 2023, 2024 and 2025 follows the pick order of the opening tables: round 1 (10), PPI (11), C-1 (13), CB-A (16), round 2 (20), CB-B (26), C-2 (23)', async () => {
+test('round order is the full official sequence: round 1, PPI, C-1, CB-A, round 2, CB-B, C-2, with distinct collision-free values', async () => {
   const fs = await import('node:fs')
   const { roundStructure } = await import('../../scripts/research/lib/import-format.mjs')
-  assert.deepEqual(['1', 'PPI', 'C-1', 'CB-A', '2'].map((c) => roundStructure(c).order), [10, 11, 13, 16, 20])
-  assert.equal(roundStructure('CB-B').order, 26)
-  assert.equal(roundStructure('C-2').order, 23)
+  const sequence = ['1', 'PPI', 'C-1', 'CB-A', '2', 'CB-B', 'C-2']
+  const orders = sequence.map((c) => roundStructure(c).order)
+  assert.deepEqual(orders, [10, 11, 13, 16, 20, 26, 27])
+  assert.equal(new Set(orders).size, orders.length)
+  assert.ok(orders.every((n, i) => !i || n > orders[i - 1]), 'strictly increasing in the official order')
+  // Later rounds still follow: round 3 (30) and supplemental/other compensation codes never collide with the sequence above.
+  const all = ['3', 'C-3', 'S-1', 'S-2', 'S-3'].map((c) => roundStructure(c).order)
+  assert.equal(new Set([...orders, ...all]).size, orders.length + all.length)
+  assert.ok(roundStructure('C-2').order < roundStructure('3').order)
+  assert.equal(roundStructure('PPI').phase, 'PRIZE')
   for (const year of [2023, 2024, 2025]) {
     const file = new URL(`../../.cache/history/wikipedia/${year}-major-league-baseball-draft.json`, import.meta.url)
     if (!fs.existsSync(file)) continue   // the cache is local; CI has no cached article
     const rev = JSON.parse(fs.readFileSync(file, 'utf8')).query.pages[0].revisions[0]
     const a = parseDraftArticle(rev.slots?.main?.content ?? rev.content, { year })
-    const phases = a.picks.filter((p) => !p.notable_only).map((p) => p.round_code)
-    const seq = phases.map((c) => roundStructure(c).order)
-    // Within the opening tables the sections are in the article's order; the PPI picks always sort between round 1 and C-1/CB-A.
-    assert.ok(phases.includes('PPI'), `${year} has PPI picks`)
-    const ppi = roundStructure('PPI').order
-    for (const c of phases) {
-      if (c === '1') assert.ok(roundStructure(c).order < ppi)
-      if (c === 'C-1' || c === 'CB-A') assert.ok(roundStructure(c).order > ppi)
-    }
-    assert.ok(seq.every((n) => Number.isInteger(n)))
+    // The article's opening tables list the rounds in this order: every round code present sorts the same way as its section.
+    const seen = []
+    for (const p of a.picks.filter((x) => !x.notable_only)) if (seen[seen.length - 1] !== p.round_code) seen.push(p.round_code)
+    const o = seen.map((c) => roundStructure(c).order)
+    const comp = seen.filter((c) => c === 'C-2')
+    if (comp.length) assert.ok(roundStructure('C-2').order > roundStructure('CB-B').order, `${year}: C-2 after CB-B`)
+    assert.ok(seen.includes('PPI') && o.every((n) => Number.isInteger(n)), `${year} sections ${seen.join(',')}`)
+    const i = (c) => seen.indexOf(c)
+    if (i('PPI') >= 0 && i('1') >= 0) assert.ok(i('1') < i('PPI'))
+    if (i('CB-B') >= 0 && i('C-2') >= 0) assert.ok(i('CB-B') < i('C-2'), `${year}: the article lists CB-B before C-2`)
   }
 })
