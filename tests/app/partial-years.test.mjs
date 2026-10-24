@@ -59,3 +59,25 @@ test('an explorer year range includes the declared partial years it can contain'
   assert.deepEqual(between(null, 2021), [2021])
   assert.deepEqual(between(2019, 2023), [2021, 2022])
 })
+
+test('the explorer shows a later-round note for a searched year only when that year has imported selections', async () => {
+  const { editorialYearsToShow: show, editorialNote: note } = await import('../../lib/partial-years.ts')
+  // A filter for 2022 before any 2022 selection exists announces nothing.
+  assert.equal(note(show([], [2022], [2020, 2021])), null)
+  assert.equal(note(show([], [2022], [])), null)
+  // A filter for an already represented year still shows its note, even with no matching rows.
+  assert.match(note(show([], [2021], [2020, 2021])), /^For the incomplete 2021 draft/)
+  // Rows on screen always count, as before; a range shows only the represented declared years.
+  assert.match(note(show([2022], [], [])), /^For the incomplete 2022 draft/)
+  assert.equal(note(show([], [2021, 2022], [2021])).includes('2022'), false)
+  assert.equal(note(show([2020], [], [2020])), null)
+})
+
+test('the general absence statement distinguishes unavailable sources, scope exclusions and held selections, and never reads absence as an outcome', async () => {
+  const { ABSENCE_STATEMENT: s } = await import('../../lib/partial-years.ts')
+  assert.match(s, /unavailable in BAI’s sources/)
+  assert.match(s, /outside a release’s scope/)
+  assert.match(s, /held for review/)
+  assert.match(s, /Absence never means an unsigned player or a failed outcome/)
+  assert.doesNotMatch(s, /is a gap in BAI/)
+})

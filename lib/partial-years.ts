@@ -68,3 +68,15 @@ export function editorialNote (years: Array<number | string | null | undefined>)
 export function editorialYearsBetween (from: number | null, to: number | null): number[] {
   return Object.keys(EDITORIAL_YEARS).map(Number).filter((y) => y >= (from ?? 0) && y <= (to ?? 9999))
 }
+
+/**
+ * Years whose later-round note the explorer shows: every year with rows on screen, plus the declared years a search can include, but a searched
+ * year only counts when BAI has imported selections for it (a filter alone must not announce a release that has not happened).
+ */
+export function editorialYearsToShow (rowYears: Array<number | string>, searchedYears: number[], importedYears: Iterable<number>): number[] {
+  const imported = new Set(importedYears)
+  return [...rowYears.map(Number), ...searchedYears.filter((y) => imported.has(y))]
+}
+
+/** What an absent pick can mean. It never means an unsigned player or a failed outcome. */
+export const ABSENCE_STATEMENT = 'A pick that is absent may be unavailable in BAI’s sources, deliberately outside a release’s scope, or held for review. Absence never means an unsigned player or a failed outcome.'

@@ -1,9 +1,9 @@
 import Link from 'next/link'
 import { PageHeader, SubNav, DataTable, Notice, load, Unavailable } from '../../../components/ui.tsx'
-import { getDraftExplorer, getOrganizationKeys, getSelectionAttribution } from '../../../lib/queries.ts'
+import { getDraftExplorer, getOrganizationKeys, getSelectionAttribution, getDraftYearCoverage } from '../../../lib/queries.ts'
 import { formatUsd, label, KIND_LABELS, SIGNING_STATUS_LABELS, SOURCE_GROUP_SHORT } from '../../../lib/format.ts'
 import { DRAFT_NAV } from '../../../lib/nav.ts'
-import { editorialNote, editorialYearsBetween } from '../../../lib/partial-years.ts'
+import { editorialNote, editorialYearsBetween, editorialYearsToShow, ABSENCE_STATEMENT } from '../../../lib/partial-years.ts'
 import { parseExplorerParams, explorerHref, PAGE_SIZE, DRAFT_KINDS } from '../../../lib/search.ts'
 
 export const dynamic = 'force-dynamic'
@@ -29,15 +29,17 @@ export default async function ExplorerPage ({ searchParams }: { searchParams: Pr
     const sign = a.signing_source_category ? label(SOURCE_GROUP_SHORT, a.signing_source_category) : null
     return sign && sign !== sel ? `${sel}; signing: ${sign}` : sel
   }
-  // The later-round note shows only for declared partial years that are on screen or that the search can include.
+  // The later-round note shows for declared partial years on screen, and for a searched declared year only when BAI has imported selections for it.
+  const coverage = await load(getDraftYearCoverage)
+  const importedYears = coverage.ok ? coverage.data.filter((r) => Number(r.imported_selections) > 0).map((r) => Number(r.draft_year)) : []
   const searchedYears = f.year ? [f.year] : (f.from || f.to) ? editorialYearsBetween(f.from, f.to) : []
-  const note = editorialNote([...rows.map((r) => r.draft_year), ...searchedYears])
+  const note = editorialNote(editorialYearsToShow(rows.map((r) => r.draft_year), searchedYears, importedYears))
   return (
     <>
       <PageHeader title='Historical draft explorer'
         lede='Every imported selection since 1965, searchable by player, franchise, year, phase, round and school. Clubs appear under the name they used that year.' />
       <SubNav items={DRAFT_NAV} />
-      <Notice>Historical years are being added in stages and most are partial. See <Link href='/draft/years'>draft years &amp; coverage</Link> before reading a year as complete. “Not researched” signing status is not the same as “did not sign”. A pick that is absent is a gap in BAI&apos;s sources, not an unsigned player or a failed outcome.</Notice>
+      <Notice>Historical years are being added in stages and most are partial. See <Link href='/draft/years'>draft years &amp; coverage</Link> before reading a year as complete. “Not researched” signing status is not the same as “did not sign”. {ABSENCE_STATEMENT}</Notice>
       {note && <Notice>{note}</Notice>}
       <form className='filters' method='get' action='/draft/explorer'>
         <label>Player <input name='q' defaultValue={rawQ} placeholder='Name begins with' maxLength={80} /></label>
