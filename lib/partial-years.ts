@@ -1,6 +1,6 @@
 // Years BAI publishes only in part. The documented size is the draft's published pick count; the note appears only while fewer
 // selections than that are represented, so it never shows for a cohort whose pick list is complete (such as 2020).
-export const DOCUMENTED_SELECTIONS: Record<number, number> = { 2021: 612, 2022: 616, 2023: 614 }
+export const DOCUMENTED_SELECTIONS: Record<number, number> = { 2021: 612, 2022: 616, 2023: 614, 2024: 615, 2025: 615 }
 
 // Years whose represented later-round rows are an editor-chosen set: the source lists the opening picks in full (through `listedThrough`), then
 // notable players only. `excludedClubs` names clubs a release leaves out by scope, so their absence is not read as a source gap.
@@ -9,7 +9,11 @@ const EDITORIAL_YEARS: Record<number, { listedThrough: number, excludedClubs?: s
   2022: { listedThrough: 80 },
   // 2023: the opening tables list picks 1-70 (28 first round, 1 prospect promotion pick, 10 + 6 competitive balance, 22 second, 3 compensatory);
   // pick 71 opens the editor-chosen table, so it is not part of the full listing.
-  2023: { listedThrough: 70 }
+  2023: { listedThrough: 70 },
+  // 2024: picks 1-74 (30 first round, 2 prize-pool-incentive, 1 + 1 compensation, 6 + 8 competitive balance, 26 second); pick 75 opens the editor-chosen table.
+  2024: { listedThrough: 74 },
+  // 2025: picks 1-75 (27 first round, 1 prize-pool-incentive, 4 + 1 compensation, 11 + 9 competitive balance, 22 second); pick 76 opens the editor-chosen table.
+  2025: { listedThrough: 75 }
 }
 
 export type PartialYear = { year: number, documented: number, represented: number, absent: number }
@@ -27,13 +31,17 @@ export function partialYearText (p: PartialYear): string {
 
 export const PARTIAL_YEAR_DETAIL = 'An absent selection is not an unsigned player or a failed outcome, and no signing outcome may be inferred from a missing row. No league-wide or club-efficiency rates are published from this incomplete sample.'
 
-// What each declared release listed and left out by scope, so the absent selections can be told apart: `listed` is the number of selections the
-// source article lists; `scopeExcluded` is how many of those the release leaves out by scope. Everything else the source lists but BAI has not
+// What each declared release listed and left out by scope, so the absent selections can be told apart: `listed` is the number of DISTINCT overall
+// pick numbers the source article lists (a pick number that two rows claim counts once; `listedRows` records the raw row count where it differs);
+// `scopeExcluded` is how many of those the release leaves out by scope. Everything else the source lists but BAI has not
 // represented is held for identity or collision review; the rest of the documented draft is not listed by the source at all.
-const RELEASE_ACCOUNTING: Record<number, { listed: number, scopeExcluded: number }> = {
+const RELEASE_ACCOUNTING: Record<number, { listed: number, listedRows?: number, scopeExcluded: number }> = {
   2021: { listed: 207, scopeExcluded: 0 },
   2022: { listed: 186, scopeExcluded: 0 },
-  2023: { listed: 167, scopeExcluded: 0 }
+  2023: { listed: 167, scopeExcluded: 0 },
+  // 2024: 146 rows but 145 distinct pick numbers (two rows claim pick 182), so 145 picks are listed.
+  2024: { listed: 145, listedRows: 146, scopeExcluded: 0 },
+  2025: { listed: 128, scopeExcluded: 0 }
 }
 
 export type AbsentBreakdown = { notListed: number, scope: number, held: number }

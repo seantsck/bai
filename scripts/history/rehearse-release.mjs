@@ -208,6 +208,29 @@ try {
     seqStep('integrity violations after the whole sequence: 0', viol.length === 0, JSON.stringify(viol).slice(0, 200))
     const dup = (await q(db, `select count(*)::int n from (select name_normalized, birth_date from public.players group by 1, 2 having count(*) > 1) x`))[0].n
     const multi = (await q(db, `select count(*)::int n from (select player_id from public.draft_selections group by 1 having count(*) > 1) x`))[0].n
+    // Round order: in every drafted year the rounds sort as round 1 (10), PPI (11), C-1 (13), CB-A (16), round 2 (20) wherever they exist.
+    const ord = await q(db, `select d.draft_year y, r.round_code c, r.round_order o from public.draft_rounds r join public.drafts d on d.id = r.draft_id where r.round_code in ('1','PPI','C-1','CB-A','2','CB-B','C-2') and d.draft_year >= 2024`)
+    const badOrder = []
+    for (const y of [...new Set(ord.map((x) => x.y))]) {
+      const o = Object.fromEntries(ord.filter((x) => x.y === y).map((x) => [x.c, x.o]))
+      const seq = ['1', 'PPI', 'C-1', 'CB-A', '2', 'CB-B', 'C-2'].filter((c) => o[c] != null).map((c) => o[c])
+      if (seq.some((v, i) => i && v <= seq[i - 1])) badOrder.push(y)
+    }
+    seqStep('round order is 1 (10) < PPI (11) < C-1 (13) < CB-A (16) < 2 (20) < CB-B (26) < C-2 (27) in 2024 and 2025, C-2 after CB-B', ord.length > 0 && badOrder.length === 0 && ord.some((x) => x.c === 'C-2' && x.o === 27), JSON.stringify(ord.map((x) => `${x.y}:${x.c}=${x.o}`)))
+    // International (including Dodgers) records: every table whose name mentions international is byte-identical to the hosted copy.
+    const copy = new pg.Client({ connectionString: url('bai_hosted_copy') }); await copy.connect()
+    const intl = (await q(db, `select table_schema s, table_name t from information_schema.tables where table_type = 'BASE TABLE' and table_schema in ('public','ingest','research') and table_name like '%international%' order by 1, 2`))
+    const fp = async (c, s_, t) => (await q(c, `select md5(coalesce(string_agg(x::text, '|' order by x::text), '')) h, count(*)::int n from ${s_}.${t} x`))[0]
+    const diffs = []
+    for (const { s: s_, t } of intl) { const a = await fp(db, s_, t); const b = await fp(copy, s_, t); if (a.h !== b.h || a.n !== b.n) diffs.push(`${s_}.${t}`) }
+    const rq = `select md5(coalesce(string_agg(x::text, '|' order by x.id), '')) h, count(*)::int n from (select r.* from public.draft_rounds r join public.drafts d on d.id = r.draft_id where d.draft_year < 2024) x`
+    const rA = (await q(copy, rq))[0]; const rB = (await q(db, rq))[0]
+    seqStep('draft rounds of every draft before 2024 (ids, codes, orders, phases) are byte-identical to the hosted copy', rA.h === rB.h && rA.n === rB.n && rA.n > 0, `${rA.n} round rows`)
+    const au = `select md5(coalesce(string_agg(x::text, '|' order by id), '')) h, count(*)::int n from ingest.release_audits x`
+    const auA = (await q(copy, au))[0]; const auB = (await q(db, `${au} where id <= ${auA.n}`.replace('from ingest.release_audits x', 'from (select * from ingest.release_audits where id <= ' + auA.n + ') x')))[0]
+    seqStep('the historical release audits already on the hosted copy are byte-identical after the sequence', auA.h === auB.h && auA.n === auB.n, `${auA.n} audits`)
+    await copy.end()
+    seqStep('international tables (Dodgers international signings included) are unchanged from the hosted copy', intl.length > 0 && diffs.length === 0, `${intl.length} tables fingerprinted; changed: ${JSON.stringify(diffs)}`)
     seqStep('players holding more than one draft selection (repeat draftees)', true, String(multi))
     seqStep('duplicate player identities by name and birth date: 0', dup === 0, String(dup))
     await db.end()

@@ -30,11 +30,15 @@ export function roundStructure (code) {
   const m = /^(\d+)$/.exec(code)
   if (m) return { order: Number(m[1]) * 10, phase: 'REGULAR' }
   const c = /^C-(\d+)$/.exec(code)
-  if (c) return { order: Number(c[1]) * 10 + 3, phase: 'COMPENSATION' }
+  // First-round compensation (C-1) sorts at 13. Second-round compensation (C-2) comes AFTER Competitive Balance B (26) in the official draft order, so it
+  // is 27: free of every other code (S-n is n*10+5). Rounds already stored keep their order: an existing round is reused and never recomputed.
+  if (c) return { order: Number(c[1]) === 2 ? 27 : Number(c[1]) * 10 + 3, phase: 'COMPENSATION' }
   const sup = /^S-(\d+)$/.exec(code)
   if (sup) return { order: Number(sup[1]) * 10 + 5, phase: 'SUPPLEMENTAL' }
-  // The Prospect Promotion Incentive pick sits after the first round's numbered picks and before Competitive Balance A (an existing PRIZE phase).
-  if (code === 'PPI') return { order: 15, phase: 'PRIZE' }
+  // The Prospect Promotion Incentive pick(s) sit right after the first round's numbered picks (10) and before first-round compensation (13) and
+  // Competitive Balance A (16): 2024 and 2025 list the PPI picks ahead of the compensation pick. The published 2023 draft's PPI round row was
+  // created with order 15 and is not changed: an existing round is reused as is and its order is never recomputed.
+  if (code === 'PPI') return { order: 11, phase: 'PRIZE' }
   if (code === 'CB-A') return { order: 16, phase: 'COMPETITIVE_BALANCE_A' }
   if (code === 'CB-B') return { order: 26, phase: 'COMPETITIVE_BALANCE_B' }
   return null
