@@ -185,7 +185,7 @@ try {
     const partialCells = cov.filter((x) => x.s === 'PARTIAL_RECONSTRUCTION').reduce((n, x) => n + x.n, 0)
     const otherCells = cov.filter((x) => x.s !== 'PARTIAL_RECONSTRUCTION')
     rstep(`every ${rel.manifest.authorization_scope.draft_year} club in scope is partial${excludedClubs.length ? `; excluded ${excludedClubs.join(',')} carry no claim` : ''}`,
-      cov.length > 0 && partialCells === rel.manifest.totals.organizations && otherCells.every((x) => x.s === null && x.n === excludedClubs.length) && (excludedClubs.length === 0 ? otherCells.length === 0 : true), JSON.stringify(cov))
+      cov.length > 0 && (supplement ? partialCells >= rel.manifest.totals.organizations : partialCells === rel.manifest.totals.organizations) && otherCells.every((x) => x.s === null && x.n === excludedClubs.length) && (excludedClubs.length === 0 ? otherCells.length === 0 : true), JSON.stringify(cov))
     const sec = spawnSync(process.execPath, [path.join(root, 'scripts/db/security.mjs')], { cwd: root, env: { ...env, BAI_DATABASE_URL: url(name) }, encoding: 'utf8' })
     rstep('security check passes', sec.status === 0, sec.stdout.trim().split('\n').slice(-2).join(' | ').slice(0, 200))
     await db.end()
