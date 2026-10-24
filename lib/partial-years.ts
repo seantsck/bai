@@ -31,14 +31,16 @@ export function partialYearText (p: PartialYear): string {
 
 export const PARTIAL_YEAR_DETAIL = 'An absent selection is not an unsigned player or a failed outcome, and no signing outcome may be inferred from a missing row. No league-wide or club-efficiency rates are published from this incomplete sample.'
 
-// What each declared release listed and left out by scope, so the absent selections can be told apart: `listed` is the number of selections the
-// source article lists; `scopeExcluded` is how many of those the release leaves out by scope. Everything else the source lists but BAI has not
+// What each declared release listed and left out by scope, so the absent selections can be told apart: `listed` is the number of DISTINCT overall
+// pick numbers the source article lists (a pick number that two rows claim counts once; `listedRows` records the raw row count where it differs);
+// `scopeExcluded` is how many of those the release leaves out by scope. Everything else the source lists but BAI has not
 // represented is held for identity or collision review; the rest of the documented draft is not listed by the source at all.
-const RELEASE_ACCOUNTING: Record<number, { listed: number, scopeExcluded: number }> = {
+const RELEASE_ACCOUNTING: Record<number, { listed: number, listedRows?: number, scopeExcluded: number }> = {
   2021: { listed: 207, scopeExcluded: 0 },
   2022: { listed: 186, scopeExcluded: 0 },
   2023: { listed: 167, scopeExcluded: 0 },
-  2024: { listed: 146, scopeExcluded: 0 },
+  // 2024: 146 rows but 145 distinct pick numbers (two rows claim pick 182), so 145 picks are listed.
+  2024: { listed: 145, listedRows: 146, scopeExcluded: 0 },
   2025: { listed: 128, scopeExcluded: 0 }
 }
 

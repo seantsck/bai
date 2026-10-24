@@ -98,9 +98,12 @@ test('2024 and 2025 are declared: 615 documented each, the absent selections tol
   const { partialYear: py, absentBreakdown: ab, absentBreakdownText: at, editorialNote: en } = await import('../../lib/partial-years.ts')
   assert.equal(py(2024, 0), null)
   assert.equal(py(2025, 0), null)
-  assert.deepEqual(ab(py(2024, 133)), { notListed: 469, scope: 0, held: 13 })
+  // 146 source rows, 145 distinct pick numbers; 131 represented -> 14 distinct listed picks held, 470 picks not listed by the pinned revision.
+  assert.deepEqual(ab(py(2024, 131)), { notListed: 470, scope: 0, held: 14 })
   assert.deepEqual(ab(py(2025, 126)), { notListed: 487, scope: 0, held: 2 })
-  assert.equal(at(py(2024, 133)), "Of the 482 absent: 469 are not listed by BAI's source (a source gap); 13 listed selections are held for identity or collision review.")
+  // The 2024 accounting counts distinct pick numbers, never the raw row count that includes the duplicated pick 182.
+  assert.notDeepEqual(ab(py(2024, 131)), { notListed: 469, scope: 0, held: 15 })
+  assert.equal(at(py(2024, 131)), "Of the 484 absent: 470 are not listed by BAI's source (a source gap); 14 listed selections are held for identity or collision review.")
   assert.match(en([2024]), /^For the incomplete 2024 draft, picks 1 to 74 are listed in full/)
   assert.match(en([2025]), /^For the incomplete 2025 draft, picks 1 to 75 are listed in full/)
 })

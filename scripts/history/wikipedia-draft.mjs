@@ -199,7 +199,7 @@ const COMMANDS = {
         if (only && !only.has(p.overall_pick)) continue
         const id = byPick.get(p.overall_pick)
         const unresolvedImport = releaseDir && brown === 'name-only' && p.overall_pick === 101 && id.status === 'AMBIGUOUS'
-        const why = id.status === 'AMBIGUOUS' && !unresolvedImport ? `identity ambiguous: ${id.reason}` : extraHolds[p.overall_pick] ?? null
+        const why = id.status === 'AMBIGUOUS' && !unresolvedImport ? `identity ambiguous: ${id.reason}` : extraHolds[p.overall_pick] ?? (releaseDir && p.source_conflict ? `source conflict, held until a person decides: ${p.source_conflict}` : null)
         if (why) { held.push({ pick: p.overall_pick, name: p.name, reason: why }); continue }
         const player = { full_name: p.name, source_key: wikiKey }
         const rec = { type: 'DRAFT_SELECTION', source_key: wikiKey, draft_key: draftKey(year, 'JR'), round_code: p.round_code, overall_pick: p.overall_pick, round_pick: null, organization: org, selection_type: p.selection_type, player }

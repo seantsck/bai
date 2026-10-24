@@ -164,6 +164,24 @@ export function parseDraftArticle (wikitext, { year }) {
   for (let k = 1; k <= max; k++) if (!seen.has(k)) gaps.push(k)
   if (gaps.length) findings.push({ kind: 'PICK_NUMBER_GAPS', detail: gaps.join(', ') })
   if (stated.overall && picks.length !== stated.overall) findings.push({ kind: 'COUNT_DIFFERS_FROM_STATED', detail: `${picks.length} rows, article states ${stated.overall}` })
+  // Source-structure conflicts, found by deterministic checks on the article alone (no other source). Every row involved is marked so the
+  // release build holds it: a person decides which row is wrong, and the article value is never replaced from elsewhere.
+  const conflict = (p, reason) => { p.source_conflict = p.source_conflict ? `${p.source_conflict}; ${reason}` : reason }
+  const byNumber = new Map()
+  for (const p of picks) if (p.overall_pick) byNumber.set(p.overall_pick, [...(byNumber.get(p.overall_pick) ?? []), p])
+  for (const [n, rows] of byNumber) if (rows.length > 1) for (const p of rows) conflict(p, `duplicate pick number in the source article: ${rows.length} rows claim pick ${n} (${rows.map((r) => r.name).join(' / ')})`)
+  // A numbered round is a contiguous block of picks: a row labelled with a lower round cannot follow a higher-round row by pick number.
+  const numbered = picks.filter((p) => p.overall_pick && /^\d+$/.test(p.round_code)).sort((a, b) => a.overall_pick - b.overall_pick)
+  for (let i = 0; i < numbered.length; i++) {
+    for (let j = i + 1; j < numbered.length; j++) {
+      const a = numbered[i]; const b = numbered[j]
+      if (Number(a.round_code) > Number(b.round_code) && a.overall_pick < b.overall_pick) {
+        const why = `round label conflicts with pick order in the source article: #${a.overall_pick} ${a.name} is labelled round ${a.round_code} but #${b.overall_pick} ${b.name} (a later pick) is labelled round ${b.round_code}`
+        conflict(a, why); conflict(b, why)
+      }
+    }
+  }
+  for (const p of picks) if (p.source_conflict) findings.push({ kind: 'SOURCE_CONFLICT', detail: `#${p.overall_pick} ${p.name}: ${p.source_conflict}` })
   picks.sort((a, b) => (a.overall_pick ?? 1e9) - (b.overall_pick ?? 1e9))
   return { picks, findings, stated, sections }
 }
