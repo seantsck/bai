@@ -158,3 +158,54 @@ test('the did-not-sign "*" marker is kept as a marker, not as part of the name; 
   assert.equal(by[1].did_not_sign_marker, false)
   assert.ok(r.picks.every((p) => !/[*”|]/.test(p.name)))
 })
+
+// A notable-selections table whose rows join round and pick with "||" on one line (the 2022 article's markup).
+const ARTICLE_INLINE = `{{Infobox sports draft
+| first_round = 1
+| overall     = 40
+| rounds      = 20
+}}
+==Draft selections==
+===First round===
+{| class="wikitable"
+|-
+|1
+!scope="row"|{{sortname|Ann|Able}}
+|[[Detroit Tigers]]
+|[[Pitcher]]
+|[[Arizona State Sun Devils baseball|Arizona State]]
+|}
+===Other notable selections===
+{| class="wikitable sortable"
+|-
+! scope="col" | Round
+! scope="col" | Pick
+|-
+|3||81
+!scope="row" style="text-align:center; background:#bfb;"|{{sortname|Dee|Dunn}}*
+|[[Baltimore Orioles]]
+|[[Pitcher]]
+|[[Oklahoma State Cowboys baseball|Oklahoma State]]
+|-
+|4||[[Pick|109]]
+!scope="row"|{{sortname|Eve|Ebbs|dab=baseball}}
+|[[Texas Rangers (baseball)|Texas Rangers]]
+|[[Outfielder]]
+|[[Liberty High School (Liberty, Missouri)|Liberty High School]] ([[Missouri|MO]])
+|}
+==Summary==
+`
+
+test('inline "||" cells are split outside links and templates, so a one-line round and pick parse', async () => {
+  const { splitInlineCells } = await import('../../scripts/history/lib/wikipedia-draft.mjs')
+  assert.deepEqual(splitInlineCells('|3||81'), ['|3', '|81'])
+  assert.deepEqual(splitInlineCells('|4||[[Pick|109]]'), ['|4', '|[[Pick|109]]'])
+  assert.deepEqual(splitInlineCells('|{{t|a||b}}||x'), ['|{{t|a||b}}', '|x'])
+  assert.deepEqual(splitInlineCells('|plain'), ['|plain'])
+  assert.deepEqual(splitInlineCells('!scope="row"|Name'), ['!scope="row"|Name'])
+  const a = parseDraftArticle(ARTICLE_INLINE, { year: 2022 })
+  assert.deepEqual(a.findings.filter((f) => f.kind === 'SHORT_ROW'), [])
+  const notable = a.picks.filter((p) => p.notable_only)
+  assert.deepEqual(notable.map((p) => [p.overall_pick, p.round_code, p.name, p.franchise, p.did_not_sign_marker]), [[81, '3', 'Dee Dunn', 'BAL', true], [109, '4', 'Eve Ebbs', 'TEX', false]])
+  assert.equal(a.picks.find((p) => p.overall_pick === 1).name, 'Ann Able')
+})

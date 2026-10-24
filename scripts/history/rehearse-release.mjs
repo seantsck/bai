@@ -18,8 +18,9 @@ import { loadRelease } from './lib/release.mjs'
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 const argv = process.argv.slice(2)
 const dirs = argv.flatMap((a, i) => (a === '--release-dir' && argv[i + 1] ? [path.resolve(root, argv[i + 1])] : []))
+const sequential = argv.includes('--sequential')   // apply the releases in order on ONE database (default: each on its own clone)
 const outFile = argv.includes('--out') ? path.resolve(root, argv[argv.indexOf('--out') + 1]) : null
-if (!dirs.length) { console.error('usage: rehearse-release.mjs --release-dir <dir> [--release-dir <dir2> ...] [--out report.json]'); process.exit(2) }
+if (!dirs.length) { console.error('usage: rehearse-release.mjs --release-dir <dir> [--release-dir <dir2> ...] [--sequential] [--out report.json]'); process.exit(2) }
 const log = (m) => console.log(m)
 const SCHEMAS = ['public', 'ingest', 'research', 'bai_meta']
 
@@ -100,10 +101,10 @@ try {
   const admin = new pg.Client({ connectionString: url('postgres') }); await admin.connect()
   const env = { PATH: process.env.PATH, HOME: process.env.HOME, TMPDIR: process.env.TMPDIR ?? os.tmpdir() }
   let n = 0
+  let name = null
   for (const releaseDir of dirs) {
     const rel = loadRelease(releaseDir)
-    const name = `bai_rehearsal_${++n}`
-    await admin.query(`create database ${name} template bai_hosted_copy`)
+    if (!(sequential && name)) { name = `bai_rehearsal_${++n}`; await admin.query(`create database ${name} template bai_hosted_copy`) }
     const db = new pg.Client({ connectionString: url(name) }); await db.connect()
     const run = (cmd, extra = []) => spawnSync(process.execPath, [path.join(root, 'scripts/history/release.mjs'), cmd, '--release-dir', releaseDir, ...extra], { cwd: root, env: { ...env, BAI_DATABASE_URL: url(name) }, encoding: 'utf8' })
     const r = { release_key: rel.manifest.release_key, manifest_sha256: rel.manifest.manifest_sha256, selections: rel.manifest.totals.selections, steps: [] }
@@ -129,6 +130,11 @@ try {
     rstep('signing rows added: 0', !delta['public.draft_signings'], String(delta['public.draft_signings'] ?? 0))
     rstep('players created within the expected maximum', (delta['public.players'] ?? 0) <= e.players_created_max, `${delta['public.players'] ?? 0} (max ${e.players_created_max})`)
     rstep('external ids within the expected maximum', (delta['public.player_external_ids'] ?? 0) <= e.external_ids_inserted_max, `${delta['public.player_external_ids']} (max ${e.external_ids_inserted_max})`)
+    if (!supplement) {
+      rstep('source observations within the expected maximum', (delta['public.source_observations'] ?? 0) <= e.source_observations_inserted_max, `${delta['public.source_observations'] ?? 0} (max ${e.source_observations_inserted_max})`)
+      rstep('sources within the expected maximum', (delta['public.sources'] ?? 0) <= e.sources_inserted_max, `${delta['public.sources'] ?? 0} (max ${e.sources_inserted_max})`)
+    }
+    rstep('exactly one release audit added', delta['ingest.release_audits'] === 1, String(delta['ingest.release_audits'] ?? 0))
     const untouched = ['public.drafts', 'public.organizations', 'bai_meta.schema_migrations', 'research.reviewers', 'research.certifications'].filter((t) => tl.includes(t) && delta[t])
     rstep('migrations, organizations, drafts, reviewers and certifications untouched', !untouched.length, untouched.join(', '))
     const audit = (await q(db, 'select counts, jsonb_array_length(entries) n from ingest.release_audits where manifest_sha256 = $1', [rel.manifest.manifest_sha256]))[0]
@@ -157,11 +163,15 @@ try {
       r.new_observations = addedRows('public.source_observations').map((x) => ({ subject: x.subject_table ?? x.subject_type ?? null, field: x.field_name ?? x.field ?? null, source: srcKey[x.source_id] }))
       r.coverage_changes = changed['public.coverage_assessments']?.map((c) => { const b = addedRows('public.coverage_assessments').length; return c })
       rstep('observations within the expected maximum', (delta['public.source_observations'] ?? 0) <= e.source_observations_inserted_max, `${delta['public.source_observations'] ?? 0} (max ${e.source_observations_inserted_max})`)
-      rstep('new external ids belong to the two linked players only', r.new_external_ids.every((x) => ['679', '636'].includes(String(x.player_id))), JSON.stringify(r.new_external_ids))
+      rstep('new external ids belong to the linked players only', r.new_external_ids.every((x) => Object.values(want).map(String).includes(String(x.player_id))), JSON.stringify(r.new_external_ids))
       r.new_rows = Object.fromEntries(tl.map((t) => [t, [...snap1[t]].filter((j) => !snap0[t].has(j)).length]).filter(([, n]) => n))
     }
     const ap2 = run('apply', ['--manifest-sha256', rel.manifest.manifest_sha256, '--operator', 'rehearsal operator']); const c2 = await counts(db, tl)
     rstep('replay is idempotent (already applied, no change)', ap2.status === 0 && /already applied/.test(ap2.stdout) && tl.every((t) => c2[t] === c1[t]))
+    // Exact counts before the apply, after it and after the replay, for the tables a release is accountable for.
+    const accountable = ['public.draft_selections', 'public.players', 'public.player_external_ids', 'public.sources', 'public.source_observations', 'public.draft_signings', 'ingest.release_audits']
+    r.before_after_replay = Object.fromEntries(accountable.filter((t) => tl.includes(t)).map((t) => [t, { before: c0[t], after: c1[t], replay: c2[t] }]))
+    log(`counts before / after / replay: ${JSON.stringify(r.before_after_replay)}`)
     const pv2 = run('preview'); rstep('preview after the apply reports the replay as SAFE', pv2.status === 0, (pv2.stdout.trim().split('\n').pop() ?? '').slice(0, 160))
     const refresh = spawnSync(process.execPath, [path.join(root, 'scripts/db/refresh-read-models.mjs')], { cwd: root, env: { ...env, BAI_DATABASE_URL: url(name) }, encoding: 'utf8' })
     rstep('read models refreshed', refresh.status === 0, refresh.stdout.trim().split('\n').pop())
@@ -170,11 +180,37 @@ try {
     rstep('integrity violations: 0', viol.length === 0, JSON.stringify(viol).slice(0, 200))
     const cov = await q(db, `select coverage_state::text s, count(*)::int n from public.rm_research_coverage rc where rc.scope_key = $1 group by 1`, [rel.manifest.authorization_scope.draft_key]).catch(() => [])
     r.coverage_states = cov
-    rstep(`every ${rel.manifest.authorization_scope.draft_year} club coverage cell is partial`, cov.length > 0 && cov.every((x) => x.s === 'PARTIAL_RECONSTRUCTION'), JSON.stringify(cov))
+    // Clubs in scope are PARTIAL_RECONSTRUCTION; a club the release excludes by scope has no coverage claim at all (never a state).
+    const excludedClubs = rel.manifest.authorization_scope.excluded_organizations ?? []
+    const partialCells = cov.filter((x) => x.s === 'PARTIAL_RECONSTRUCTION').reduce((n, x) => n + x.n, 0)
+    const otherCells = cov.filter((x) => x.s !== 'PARTIAL_RECONSTRUCTION')
+    rstep(`every ${rel.manifest.authorization_scope.draft_year} club in scope is partial${excludedClubs.length ? `; excluded ${excludedClubs.join(',')} carry no claim` : ''}`,
+      cov.length > 0 && (supplement ? partialCells >= rel.manifest.totals.organizations : partialCells === rel.manifest.totals.organizations) && otherCells.every((x) => x.s === null && x.n === excludedClubs.length) && (excludedClubs.length === 0 ? otherCells.length === 0 : true), JSON.stringify(cov))
     const sec = spawnSync(process.execPath, [path.join(root, 'scripts/db/security.mjs')], { cwd: root, env: { ...env, BAI_DATABASE_URL: url(name) }, encoding: 'utf8' })
     rstep('security check passes', sec.status === 0, sec.stdout.trim().split('\n').slice(-2).join(' | ').slice(0, 200))
     await db.end()
     report.releases.push(r)
+  }
+  if (sequential && dirs.length > 1) {
+    // After the whole sequence, every release replays as already applied and nothing moves, whichever order they were applied in.
+    const db = new pg.Client({ connectionString: url(name) }); await db.connect()
+    const tl = await tables(db); const before = await counts(db, tl)
+    const seqStep = (nm, ok, detail) => { report.steps.push({ name: nm, ok, detail }); log(`${ok ? 'ok  ' : 'FAIL'} [sequence] ${nm}${detail ? `: ${detail}` : ''}`) }
+    for (const releaseDir of dirs) {
+      const rel = loadRelease(releaseDir)
+      const ap = spawnSync(process.execPath, [path.join(root, 'scripts/history/release.mjs'), 'apply', '--release-dir', releaseDir, '--manifest-sha256', rel.manifest.manifest_sha256, '--operator', 'rehearsal operator'], { cwd: root, env: { ...env, BAI_DATABASE_URL: url(name) }, encoding: 'utf8' })
+      seqStep(`final replay of ${rel.manifest.release_key} is already applied`, ap.status === 0 && /already applied/.test(ap.stdout))
+    }
+    const after = await counts(db, tl)
+    seqStep('the replays changed no table', tl.every((t) => after[t] === before[t]))
+    const { integrityViolations } = await import('../research/lib/integrity.mjs')
+    const viol = await integrityViolations(db)
+    seqStep('integrity violations after the whole sequence: 0', viol.length === 0, JSON.stringify(viol).slice(0, 200))
+    const dup = (await q(db, `select count(*)::int n from (select name_normalized, birth_date from public.players group by 1, 2 having count(*) > 1) x`))[0].n
+    const multi = (await q(db, `select count(*)::int n from (select player_id from public.draft_selections group by 1 having count(*) > 1) x`))[0].n
+    seqStep('players holding more than one draft selection (repeat draftees)', true, String(multi))
+    seqStep('duplicate player identities by name and birth date: 0', dup === 0, String(dup))
+    await db.end()
   }
   await admin.end()
   report.ok = report.steps.every((s) => s.ok) && report.releases.every((r) => r.steps.every((s) => s.ok))
