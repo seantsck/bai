@@ -66,7 +66,9 @@ const cellValue = (line) => {
 
 const ROUND_TITLES = [
   [/^first round$/i, '1'], [/^second round$/i, '2'], [/^third round$/i, '3'], [/^fourth round$/i, '4'], [/^fifth round$/i, '5'],
-  [/^competitive balance round a$/i, 'CBA'], [/^competitive balance round b$/i, 'CBB']
+  [/^competitive balance round a$/i, 'CBA'], [/^competitive balance round b$/i, 'CBB'],
+  // The Prospect Promotion Incentive pick (2022 CBA): one added pick after the first round's numbered picks and before Competitive Balance A.
+  [/^prospect promotion incentive picks?$/i, 'PPI']
 ]
 // Compensation picks (for a club that lost a qualifying free agent) are placed after the second round and the competitive
 // balance round B in the article; BAI's convention for them is C-2. This label is derived from the table title, not from
@@ -78,7 +80,6 @@ const roundFor = (title) => {
   return null
 }
 
-/** Parse the article. Returns { picks, findings, stated, sections }. */
 /** A cell line may hold several cells joined by "||" ("|3||81"). Splits at "||" outside [[links]] and {{templates}}. */
 export function splitInlineCells (line) {
   if (!line.startsWith('|') || !line.includes('||')) return [line]
@@ -92,6 +93,7 @@ export function splitInlineCells (line) {
   return out.map((c) => `|${c}`)
 }
 
+/** Parse the article. Returns { picks, findings, stated, sections }. */
 export function parseDraftArticle (wikitext, { year }) {
   const findings = []
   const infobox = (name) => wikitext.match(new RegExp(`\\|\\s*${name}\\s*=\\s*(\\d+)`))?.[1]

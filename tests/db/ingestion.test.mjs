@@ -268,3 +268,13 @@ test('coverage dashboard and queue read models: bounded, public, no internals ex
     await assert.rejects(h.asRole(db, 'anon', () => db.query(sql)), /permission denied/, sql)
   }
 })
+
+test('the prospect promotion incentive pick imports as the published round PPI with the existing PRIZE phase, between round 1 and competitive balance A', async () => {
+  const rec = (overall, round, type, name, mlbam) => pick({ draft_key: '2023-JUNE_AMATEUR', round_code: round, overall_pick: overall, round_pick: 1, selection_type: type, organization: 'SEA', player: { full_name: name, external_ids: { MLBAM: mlbam } }, signing: { status: 'UNKNOWN' } })
+  const out = await run({ batch_key: 'test-ppi', channel: 'DRAFT', sources: [src('test:official', 'OFFICIAL')], records: [rec(29, 'PPI', 'PRIZE', 'Ppi Fixture One', '9981001'), rec(30, 'CB-A', 'COMPETITIVE_BALANCE', 'Ppi Fixture Two', '9981002'), rec(5, '1', 'STANDARD', 'Ppi Fixture Three', '9981003')] })
+  assert.equal(out.validation.ok, true)
+  const rounds = (await h.rows(db, `select r.round_code, r.phase::text phase, r.round_order from draft_rounds r join drafts d on d.id = r.draft_id where d.draft_key = '2023-JUNE_AMATEUR' and r.round_code in ('1', 'PPI', 'CB-A') order by r.round_order`))
+  assert.deepEqual(rounds.map((r) => [r.round_code, r.phase]), [['1', 'REGULAR'], ['PPI', 'PRIZE'], ['CB-A', 'COMPETITIVE_BALANCE_A']])
+  const sel = await h.one(db, `select s.selection_type::text t, r.round_code c from draft_selections s join draft_rounds r on r.id = s.round_id where s.overall_pick = 29 and s.draft_id = (select id from drafts where draft_key = '2023-JUNE_AMATEUR')`)
+  assert.deepEqual(sel, { t: 'PRIZE', c: 'PPI' })
+})

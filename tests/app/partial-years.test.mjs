@@ -58,9 +58,9 @@ test('the absent selections are told apart: not listed by the source, outside th
 test('an explorer year range includes the declared partial years it can contain', async () => {
   const { editorialYearsBetween: between } = await import('../../lib/partial-years.ts')
   assert.deepEqual(between(2020, 2020), [])
-  assert.deepEqual(between(2022, null), [2022])
+  assert.deepEqual(between(2022, null), [2022, 2023])
   assert.deepEqual(between(null, 2021), [2021])
-  assert.deepEqual(between(2019, 2023), [2021, 2022])
+  assert.deepEqual(between(2019, 2023), [2021, 2022, 2023])
 })
 
 test('the explorer shows a later-round note for a searched year only when that year has imported selections', async () => {
@@ -84,3 +84,12 @@ test('the general absence statement distinguishes unavailable sources, scope exc
   assert.match(s, /Absence never means an unsigned player or a failed outcome/)
   assert.doesNotMatch(s, /is a gap in BAI/)
 })
+
+test('2023 is declared: 614 documented, picks 1 to 70 listed, the absent selections told apart', async () => {
+  const { partialYear: py, absentBreakdown: ab, absentBreakdownText: at, editorialNote: en } = await import('../../lib/partial-years.ts')
+  assert.equal(py(2023, 0), null, 'no 2023 notice before 2023 selections exist')
+  assert.deepEqual(ab(py(2023, 161)), { notListed: 447, scope: 0, held: 6 })
+  assert.equal(at(py(2023, 161)), "Of the 453 absent: 447 are not listed by BAI's source (a source gap); 6 listed selections are held for identity or collision review.")
+  assert.match(en([2023]), /^For the incomplete 2023 draft, picks 1 to 70 are listed in full/)
+}
+)

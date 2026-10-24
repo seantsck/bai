@@ -56,7 +56,7 @@ export function parseExplorerParams (p: Params): ExplorerFilters {
     from: yearOf(one(p, 'from')),
     to: yearOf(one(p, 'to')),
     kind: pick(one(p, 'kind'), DRAFT_KINDS),
-    round: round && /^(\d{1,3}|C-\d{1,2}|S-\d{1,2}|CB-[AB])$/i.test(round) ? round.toUpperCase() : null,
+    round: round && /^(\d{1,3}|C-\d{1,2}|S-\d{1,2}|CB-[AB]|PPI)$/i.test(round) ? round.toUpperCase() : null,
     school: school ? normalizeName(school.slice(0, 80)) : null,
     schoolType: pick(one(p, 'schoolType'), SCHOOL_TYPES),
     signing: pick(one(p, 'signing'), SIGNING_FILTERS),

@@ -209,3 +209,55 @@ test('inline "||" cells are split outside links and templates, so a one-line rou
   assert.deepEqual(notable.map((p) => [p.overall_pick, p.round_code, p.name, p.franchise, p.did_not_sign_marker]), [[81, '3', 'Dee Dunn', 'BAL', true], [109, '4', 'Eve Ebbs', 'TEX', false]])
   assert.equal(a.picks.find((p) => p.overall_pick === 1).name, 'Ann Able')
 })
+
+// The prospect promotion incentive pick (2022 CBA): one added pick in its own section, kept as the published round "PPI".
+const ARTICLE_PPI = `{{Infobox sports draft
+| first_round = 2
+| overall     = 3
+| rounds      = 20
+}}
+==Draft selections==
+===First round===
+{| class="wikitable"
+|-
+|1
+!scope="row"|{{sortname|Ann|Able}}
+|[[Detroit Tigers]]
+|[[Pitcher]]
+|[[Arizona State Sun Devils baseball|Arizona State]]
+|}
+===Prospect promotion incentive pick===
+{| class="wikitable"
+|-
+|2
+!scope="row"|[[Cy Carter]]
+|[[Seattle Mariners]]{{#tag:ref|Received for a player winning the Rookie of the Year Award|group="Incentive"}}
+|[[Outfielder]]
+|[[Westfield High School (Fairfax County, Virginia)|Westfield High School]] ([[Virginia|VA]])
+|}
+===Competitive balance round A===
+{| class="wikitable"
+|-
+|3
+!scope="row"|Dee Dunn
+|[[Texas Rangers (baseball)|Texas Rangers]]
+|[[Shortstop]]
+|[[Dallas Baptist Patriots baseball|Dallas Baptist]]
+|}
+==Summary==
+`
+
+test('the prospect promotion incentive section is parsed as the PPI round, a PRIZE selection, and no section is left unknown', async () => {
+  const { roundStructure } = await import('../../scripts/research/lib/import-format.mjs')
+  const { roundCode, selectionType } = await import('../../scripts/history/lib/mlb.mjs')
+  const a = parseDraftArticle(ARTICLE_PPI, { year: 2023 })
+  assert.deepEqual(a.findings.filter((f) => f.kind === 'UNKNOWN_SECTION'), [])
+  const ppi = a.picks.find((p) => p.overall_pick === 2)
+  assert.deepEqual([ppi.round_code, ppi.selection_type, ppi.franchise, ppi.name, ppi.notable_only], ['PPI', 'PRIZE', 'SEA', 'Cy Carter', undefined])
+  assert.equal(a.picks.find((p) => p.overall_pick === 3).round_code, 'CB-A')
+  assert.deepEqual(roundStructure('PPI'), { order: 15, phase: 'PRIZE' })
+  assert.ok(roundStructure('1').order < roundStructure('PPI').order && roundStructure('PPI').order < roundStructure('CB-A').order, 'PPI sorts after round 1 and before Competitive Balance A')
+  assert.equal(roundCode('ppi'), 'PPI')
+  assert.equal(selectionType('PPI'), 'PRIZE')
+  assert.equal(selectionType('1'), 'STANDARD')
+})

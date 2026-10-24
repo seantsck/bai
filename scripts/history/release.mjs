@@ -3,6 +3,7 @@
 //
 //   node scripts/history/release.mjs build   --year 2020 --release-dir .local/history/2020/release/<name> [--brown held|name-only]
 //                                  [--only-picks 52,106 --suffix supp1 --parent-manifest-sha256 <hex> --approvals <file>]   (a supplemental release of exactly those picks)
+//                                  [--hold-picks 12,34 --hold-reason "..."]   (picks held out by the operator, listed as held)
 //                                  [--exclude-orgs LAD,...]   (organizations outside the release's scope; recorded in the manifest and enforced by verify)
 //   node scripts/history/release.mjs verify  --release-dir <dir>                       (files, scope, source permissions; no database)
 //   node --env-file=... scripts/history/release.mjs preview --release-dir <dir>        (read-only collision report on BAI_DATABASE_URL)
@@ -62,6 +63,9 @@ const COMMANDS = {
       const idPicks = JSON.parse(fs.readFileSync(path.join(path.resolve(root, process.env.BAI_HISTORY_OUT || '.local/history'), String(year), 'identity.json'), 'utf8')).picks
       for (const p of idPicks) if (excludeOrgs.includes(p.club)) holds[p.overall_pick] = `excluded by release scope: organization ${p.club}`
     }
+    // Picks the operator holds out (for example a repeat draftee of another candidate release): never built, listed as held with the reason.
+    const holdPicks = opt('hold-picks', '').split(',').map((s) => Number(s.trim())).filter(Number.isInteger)
+    for (const pick of holdPicks) holds[pick] = `held at the operator's request: ${opt('hold-reason', 'no reason given')}`
     fs.writeFileSync(holdsFile, JSON.stringify(holds))
     const stage = `${releaseDir}.building`
     fs.rmSync(stage, { recursive: true, force: true })

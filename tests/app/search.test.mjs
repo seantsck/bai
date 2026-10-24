@@ -31,3 +31,8 @@ test('normalizeName mirrors public.normalize_name on representative names', () =
   assert.equal(normalizeName('  B.J.  Surhoff '), 'b j surhoff')
   assert.equal(normalizeName('!!!'), null)
 })
+
+test('the round filter accepts the prospect promotion incentive code', () => {
+  assert.equal(parseExplorerParams({ round: 'ppi' }).round, 'PPI')
+  assert.equal(parseExplorerParams({ round: 'PPI-1' }).round, null)
+})
