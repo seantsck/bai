@@ -109,3 +109,5 @@ This document classifies DISI concepts so that a later, deliberate migration can
 2. Map identities through external ids (MLBAM first). Name-only matches become research tasks.
 3. Import as BAI observations with `source_key`s that preserve DISI provenance, and add coverage rows that match what DISI actually established.
 4. Re-run BAI's checks. Nothing from DISI bypasses BAI constraints.
+
+Phase 12A's read-only reconciliation method and aggregate findings: `docs/history/disi-reconciliation-12a.md`.
