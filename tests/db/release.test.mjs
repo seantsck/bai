@@ -77,6 +77,11 @@ test('a partial release states how many documented selections are represented an
   const rel = loadRelease(dir)
   assert.deepEqual([rel.manifest.coverage.documented_selections, rel.manifest.coverage.represented_selections, rel.manifest.coverage.absent_selections], [612, 1, 611])
   assert.match(rel.manifest.coverage.interpretation, /not an unsigned player or a failed outcome/)
+  // The absent selections are told apart: source gaps, held selections and scope exclusions are different things.
+  assert.match(rel.manifest.coverage.interpretation, /source does not list \(a source gap\)/)
+  assert.match(rel.manifest.coverage.interpretation, /holds for identity or collision review/)
+  assert.match(rel.manifest.coverage.interpretation, /left out by scope/)
+  assert.doesNotMatch(rel.manifest.coverage.interpretation, /is a gap in BAI/)
   assert.match(rel.manifest.coverage.representation, /not a representative sample/)
   assert.deepEqual(verifyReleaseContent(rel, { root }), [])
   // Every tampered or invalid shape is refused, each for its own reason.

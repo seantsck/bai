@@ -81,7 +81,7 @@ export function buildManifest ({ humanApprovals = [], releaseKey, year, draftKey
       ...(documentedSelections && !supplementOf ? {
         documented_selections: documentedSelections, represented_selections: records.length, absent_selections: documentedSelections - records.length,
         representation: 'Rows are the article\'s contiguous opening picks plus rows from its editor-chosen "Other notable selections" table; later rounds are not a representative sample.',
-        interpretation: 'An absent selection is a gap in BAI\'s sources, not an unsigned player or a failed outcome. No league-wide, signing-rate or club-efficiency figure may be computed from this population. Signing dates and bonuses are not inferred (none are included).'
+        interpretation: 'An absent selection is not an unsigned player or a failed outcome. Absent selections are the ones the source does not list (a source gap), any the release holds for identity or collision review, and any club left out by scope; the held and excluded ones are listed in totals.held with their reasons. No league-wide, signing-rate or club-efficiency figure may be computed from this population. Signing dates and bonuses are not inferred (none are included).'
       } : {})
     },
     human_approvals: humanApprovals,
