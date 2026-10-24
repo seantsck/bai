@@ -22,7 +22,38 @@ export function partialYearText (p: PartialYear): string {
   return `${p.year}: ${p.represented} of ${p.documented} documented selections are represented; ${p.absent} are absent.`
 }
 
-export const PARTIAL_YEAR_DETAIL = 'A missing selection is a gap in BAI’s sources: no signing outcome or failed outcome may be inferred from a missing row. No league-wide or club-efficiency rates are published from this incomplete sample.'
+export const PARTIAL_YEAR_DETAIL = 'An absent selection is not an unsigned player or a failed outcome, and no signing outcome may be inferred from a missing row. No league-wide or club-efficiency rates are published from this incomplete sample.'
+
+// What each declared release listed and left out by scope, so the absent selections can be told apart: `listed` is the number of selections the
+// source article lists; `scopeExcluded` is how many of those the release leaves out by scope. Everything else the source lists but BAI has not
+// represented is held for identity or collision review; the rest of the documented draft is not listed by the source at all.
+const RELEASE_ACCOUNTING: Record<number, { listed: number, scopeExcluded: number }> = {
+  2021: { listed: 207, scopeExcluded: 0 },
+  2022: { listed: 186, scopeExcluded: 5 }
+}
+
+export type AbsentBreakdown = { notListed: number, scope: number, held: number }
+
+/** Splits a year's absent selections into: not listed by the source, left out by release scope, and held for review. Null when the year has no accounting. */
+export function absentBreakdown (p: PartialYear | null): AbsentBreakdown | null {
+  const a = p ? RELEASE_ACCOUNTING[p.year] : undefined
+  if (!p) return null
+  if (!a) return null
+  const notListed = p.documented - a.listed
+  const held = a.listed - a.scopeExcluded - p.represented
+  if (notListed < 0 || held < 0) return null
+  return { notListed, scope: a.scopeExcluded, held }
+}
+
+export function absentBreakdownText (p: PartialYear | null): string | null {
+  const b = absentBreakdown(p)
+  if (!b || !p) return null
+  const clubs = EDITORIAL_YEARS[p.year]?.excludedClubs?.join(' and ')
+  const parts = [`${b.notListed} are not listed by BAI's source (a source gap)`]
+  if (b.scope) parts.push(`${b.scope} ${clubs ?? 'selections'} selection${b.scope === 1 ? ' is' : 's are'} outside this release by scope (not a source gap)`)
+  parts.push(`${b.held} listed selection${b.held === 1 ? ' is' : 's are'} held for identity or collision review`)
+  return `Of the ${p.absent} absent: ${parts.join('; ')}.`
+}
 
 const editorialNoteFor = (year: number): string => `For the incomplete ${year} draft, picks 1 to ${EDITORIAL_YEARS[year].listedThrough} are listed in full, but later-round entries are editorially selected notable players, not a representative sample.`
 export const EDITORIAL_NOTE_2021 = editorialNoteFor(2021)
@@ -31,12 +62,6 @@ export const EDITORIAL_NOTE_2021 = editorialNoteFor(2021)
 export function editorialNote (years: Array<number | string | null | undefined>): string | null {
   const shown = [...new Set(years.map(Number).filter((y) => Object.hasOwn(EDITORIAL_YEARS, y)))].sort()
   return shown.length ? shown.map(editorialNoteFor).join(' ') : null
-}
-
-/** Clubs a year's release leaves out by scope, as a sentence (null when none). */
-export function scopeNote (year: number): string | null {
-  const clubs = EDITORIAL_YEARS[year]?.excludedClubs
-  return clubs?.length ? `${clubs.join(' and ')} selections are outside this release by scope and are not shown; that is not a gap in the sources.` : null
 }
 
 /** Declared years inside an explorer year range (open ends allowed), so the note shows when a search can include them. */

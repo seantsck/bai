@@ -129,6 +129,11 @@ try {
     rstep('signing rows added: 0', !delta['public.draft_signings'], String(delta['public.draft_signings'] ?? 0))
     rstep('players created within the expected maximum', (delta['public.players'] ?? 0) <= e.players_created_max, `${delta['public.players'] ?? 0} (max ${e.players_created_max})`)
     rstep('external ids within the expected maximum', (delta['public.player_external_ids'] ?? 0) <= e.external_ids_inserted_max, `${delta['public.player_external_ids']} (max ${e.external_ids_inserted_max})`)
+    if (!supplement) {
+      rstep('source observations within the expected maximum', (delta['public.source_observations'] ?? 0) <= e.source_observations_inserted_max, `${delta['public.source_observations'] ?? 0} (max ${e.source_observations_inserted_max})`)
+      rstep('sources within the expected maximum', (delta['public.sources'] ?? 0) <= e.sources_inserted_max, `${delta['public.sources'] ?? 0} (max ${e.sources_inserted_max})`)
+    }
+    rstep('exactly one release audit added', delta['ingest.release_audits'] === 1, String(delta['ingest.release_audits'] ?? 0))
     const untouched = ['public.drafts', 'public.organizations', 'bai_meta.schema_migrations', 'research.reviewers', 'research.certifications'].filter((t) => tl.includes(t) && delta[t])
     rstep('migrations, organizations, drafts, reviewers and certifications untouched', !untouched.length, untouched.join(', '))
     const audit = (await q(db, 'select counts, jsonb_array_length(entries) n from ingest.release_audits where manifest_sha256 = $1', [rel.manifest.manifest_sha256]))[0]
@@ -162,6 +167,10 @@ try {
     }
     const ap2 = run('apply', ['--manifest-sha256', rel.manifest.manifest_sha256, '--operator', 'rehearsal operator']); const c2 = await counts(db, tl)
     rstep('replay is idempotent (already applied, no change)', ap2.status === 0 && /already applied/.test(ap2.stdout) && tl.every((t) => c2[t] === c1[t]))
+    // Exact counts before the apply, after it and after the replay, for the tables a release is accountable for.
+    const accountable = ['public.draft_selections', 'public.players', 'public.player_external_ids', 'public.sources', 'public.source_observations', 'public.draft_signings', 'ingest.release_audits']
+    r.before_after_replay = Object.fromEntries(accountable.filter((t) => tl.includes(t)).map((t) => [t, { before: c0[t], after: c1[t], replay: c2[t] }]))
+    log(`counts before / after / replay: ${JSON.stringify(r.before_after_replay)}`)
     const pv2 = run('preview'); rstep('preview after the apply reports the replay as SAFE', pv2.status === 0, (pv2.stdout.trim().split('\n').pop() ?? '').slice(0, 160))
     const refresh = spawnSync(process.execPath, [path.join(root, 'scripts/db/refresh-read-models.mjs')], { cwd: root, env: { ...env, BAI_DATABASE_URL: url(name) }, encoding: 'utf8' })
     rstep('read models refreshed', refresh.status === 0, refresh.stdout.trim().split('\n').pop())
