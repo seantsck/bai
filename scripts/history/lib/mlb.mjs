@@ -13,7 +13,7 @@ export const PHASES = {
 
 export const draftKey = (year, code) => `${year}-${PHASES[code].kind}`
 
-/** MLB round labels -> BAI round codes: "1C"/"C-1" compensation, "CB-A"/"CBA" competitive balance, plain numbers pass. */
+/** MLB round labels -> BAI round codes: "PPI" the prospect promotion incentive pick (kept as published, phase PRIZE), "1C"/"C-1" compensation, "CB-A"/"CBA" competitive balance, plain numbers pass. */
 export function roundCode (label) {
   const s = String(label).trim().toUpperCase()
   let m
@@ -25,7 +25,7 @@ export function roundCode (label) {
   return s
 }
 
-export const selectionType = (code) => /^CB-/.test(code) ? 'COMPETITIVE_BALANCE' : /^C-/.test(code) ? 'COMPENSATION' : /^S-/.test(code) ? 'SUPPLEMENTAL' : 'STANDARD'
+export const selectionType = (code) => code === 'PPI' ? 'PRIZE' : /^CB-/.test(code) ? 'COMPETITIVE_BALANCE' : /^C-/.test(code) ? 'COMPENSATION' : /^S-/.test(code) ? 'SUPPLEMENTAL' : 'STANDARD'
 
 /**
  * School label -> { name, school_type | null, rule }. MLB's labels are free text ("Great Bridge HS, VA",

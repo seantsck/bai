@@ -33,6 +33,8 @@ export function roundStructure (code) {
   if (c) return { order: Number(c[1]) * 10 + 3, phase: 'COMPENSATION' }
   const sup = /^S-(\d+)$/.exec(code)
   if (sup) return { order: Number(sup[1]) * 10 + 5, phase: 'SUPPLEMENTAL' }
+  // The Prospect Promotion Incentive pick sits after the first round's numbered picks and before Competitive Balance A (an existing PRIZE phase).
+  if (code === 'PPI') return { order: 15, phase: 'PRIZE' }
   if (code === 'CB-A') return { order: 16, phase: 'COMPETITIVE_BALANCE_A' }
   if (code === 'CB-B') return { order: 26, phase: 'COMPETITIVE_BALANCE_B' }
   return null
