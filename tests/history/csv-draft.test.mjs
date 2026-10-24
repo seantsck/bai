@@ -8,7 +8,7 @@ import { spawnSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 import { loadCatalog } from '../../scripts/history/lib/permissions.mjs'
 import { SHARDS } from '../../scripts/history/lib/chadwick.mjs'
-import { CSV_COLUMNS, csvTemplate, readCsv, validateRow, buildCsvBatches } from '../../scripts/history/lib/csv-draft.mjs'
+import { CSV_COLUMNS, csvTemplate, readCsv, validateRow, buildCsvBatches, findDuplicates } from '../../scripts/history/lib/csv-draft.mjs'
 import { loadRelease, verifyReleaseContent } from '../../scripts/history/lib/release.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
@@ -20,8 +20,15 @@ const HEADER = CSV_COLUMNS.join(',')
 const REGISTER_HEAD = 'key_person,key_mlbam,key_retro,key_bbref,key_bbref_minors,key_fangraphs,name_first,name_last,birth_year,birth_month,birth_day,pro_played_first,mlb_played_first,mlb_played_last'
 const person = (mlbam, first, last, by = 2003) => `p${mlbam},${mlbam},,,,,${first},${last},${by},5,6,2024,,`
 const shard = (people) => `${REGISTER_HEAD}\n${people.join('\n')}\n`
-const REGISTER = shard([person(900001, 'Ann', 'Able'), person(900002, 'Bo', 'Barker'), person(900005, 'Eve', 'Ebbs'), person(900010, 'Jo', 'Jay'), person(900099, 'Dee', 'Dunn'), person(900011, 'Kit', 'Kane', 1980), person(900012, 'Mia', 'Mars'), person(900013, 'Ned', 'North')])
-const WIKIDATA = { 900001: { qid: 'Q9000001', birth: '2003-05-06' }, 900010: { qid: 'Q9000010', birth: null }, 900013: { qid: 'Q9000013', birth: '2003-07-07' } }   // 900012 has no item; 900013's birth date disagrees
+const REGISTER = shard([person(900001, 'Ann', 'Able'), person(900002, 'Bo', 'Barker'), person(900005, 'Eve', 'Ebbs'), person(900010, 'Jo', 'Jay'), person(900099, 'Dee', 'Dunn'), person(900011, 'Kit', 'Kane', 1980), person(900012, 'Mia', 'Mars'), person(900013, 'Ned', 'North'), person(900014, 'Opal', 'Orr'), person(900015, 'Pat', 'Pike', ''), person(900016, 'Quin', 'Quill'), person(900017, 'Tia', 'Tate')])
+const WIKIDATA = {
+  900001: { qid: 'Q9000001', birth: '2003-05-06' }, 900010: { qid: 'Q9000010', birth: '2003-05-06' },
+  900013: { qid: 'Q9000013', birth: '2003-07-07' },   // birth date disagrees with the register
+  900014: { qid: 'Q9000014', birth: null },            // Wikidata item without a birth date: corroboration missing
+  900015: { qid: 'Q9000015', birth: '2003-05-06' },    // the register has no full birth date for this id
+  900016: { qid: null, ambiguous: true },              // two Wikidata items hold the id
+  900017: { qid: 'Q9000017', birth: '2003-05-06' }
+}   // 900012 has no item at all
 const ROWS = [
   row({ pick: 1, team: 'DET', name: 'Ann Able', mlbam: 900001, pos: 'SS', school: 'Fixture State' }),
   row({ pick: 2, team: 'TEX', name: 'Bo Baker', mlbam: 900002 }),                       // MLBAM belongs to "Bo Barker"
@@ -32,13 +39,20 @@ const ROWS = [
   row({ pick: 7, team: 'CHC', name: 'Gus Gray', bonus: '500,000' }),                     // bonus without SIGNED
   row({ pick: 8, team: 'CIN', name: 'Hal Hart', status: 'SIGNED' }),                     // SIGNED, bonus unknown
   row({ pick: 9, team: 'CLE', name: 'Ivy Ito' }),                                        // blank status, blank bonus
-  row({ pick: 1, team: 'COL', name: 'Zed Zane' }),                                       // duplicate pick number
+  row({ pick: 18, team: 'COL', name: 'Rae Reed' }),                                      // two rows for pick 18: both held
+  row({ pick: 18, team: 'WSH', name: 'Sol Stone' }),
+  row({ pick: 19, team: 'TB', name: 'Tia Tate', mlbam: 900017 }),                        // one MLBAM id in two rows: both held
+  row({ pick: 20, team: 'TB', name: 'Tia Tate', mlbam: 900017 }),
   row({ pick: 29, round: 'PPI', team: 'SEA', name: 'Jo Jay', mlbam: 900010 }),           // prospect promotion incentive pick
   row({ pick: 11, team: 'ATL', name: 'Kit Kane', url: 'https://example.org/draft', perm: 'wikipedia-draft-articles' }),   // host the catalog does not know
   row({ pick: 12, team: 'Los Angeles Dodgers', name: 'Lou Lane', status: 'DID_NOT_SIGN' }),
   row({ pick: 13, team: 'MIA', name: 'Mia Mars', mlbam: 900012 }),                      // register agrees, no Wikidata corroboration: held
-  row({ pick: 14, team: 'MIN', name: 'Ned North', mlbam: 900013 })                      // Wikidata birth date disagrees: held
+  row({ pick: 14, team: 'MIN', name: 'Ned North', mlbam: 900013 }),                     // Wikidata birth date disagrees: held
+  row({ pick: 15, team: 'ATH', name: 'Opal Orr', mlbam: 900014 }),                      // Wikidata has no birth date: held, never verified
+  row({ pick: 16, team: 'PHI', name: 'Pat Pike', mlbam: 900015 }),                      // register has no full birth date: held
+  row({ pick: 17, team: 'PIT', name: 'Quin Quill', mlbam: 900016 })                     // two Wikidata items: held
 ].join('\n')
+const recs0 = (loaded) => loaded.batches.flatMap((b) => b.doc.records)
 const CSV = `${HEADER}\n${ROWS}\n`
 
 test('the template names exactly the documented columns, and the reader rejects a changed header or a ragged row', () => {
@@ -63,6 +77,10 @@ test('row rules: blank is unknown, a bonus needs SIGNED, and rights and labels a
   assert.match(v({ pick: 1, team: 'DET', name: 'A B', mlbam: '12' }).errors.join(), /player_mlbam_id/)
   assert.match(v({ pick: 1, team: 'DET', name: 'A B', rev: '' }).errors.join(), /source_revision required/)
   assert.match(v({ pick: 1, team: 'DET', name: 'A B', url: 'http://en.wikipedia.org/x' }).errors.join(), /https/)
+  // A Wikipedia citation is a pin only if its URL names the claimed revision.
+  assert.match(v({ pick: 1, team: 'DET', name: 'A B', url: 'https://en.wikipedia.org/wiki/2024_Major_League_Baseball_draft' }).errors.join(), /must be pinned: the URL needs oldid=<revision>/)
+  assert.match(v({ pick: 1, team: 'DET', name: 'A B', rev: '2' }).errors.join(), /must be pinned/)
+  assert.equal(v({ pick: 1, team: 'DET', name: 'A B' }).errors.length, 0)
   // A copied MLB or Baseball-Reference table is held whoever typed it: its catalog source does not permit site publication.
   assert.match(v({ pick: 5, team: 'NYY', name: 'Eve Ebbs', url: 'https://statsapi.mlb.com/api/v1/draft/2024', perm: 'mlb-statsapi-draft' }).errors.join(), /rights: .*publish_site refused/)
   assert.match(v({ pick: 5, team: 'NYY', name: 'Eve Ebbs', url: 'https://www.baseball-reference.com/draft/', perm: 'bref-draft-archive' }).errors.join(), /rights:/)
@@ -75,14 +93,21 @@ test('identity is by supplied MLBAM id checked against the register, or name-onl
   const { rows } = readCsv(CSV)
   const clean = rows.map((r) => validateRow(r, { year: 2024, catalog, root })).filter((x) => x.clean).map((x) => x.clean)
   assert.equal(clean.length, rows.length - 4, 'four rows fail the row rules (restricted source, wrong label, bonus without SIGNED, unknown host)')
-  const out = buildCsvBatches({ rows: clean, year: 2024, chadwick: { commit7: 'abc1234', commitFull: 'a'.repeat(40), shardTexts: [REGISTER] }, retrieved: '2026-10-24', csvSha256: 'f'.repeat(64), wikidata: WIKIDATA })
+  const out = buildCsvBatches({ rows: clean, year: 2024, chadwick: { commit7: 'abc1234', commitFull: 'a'.repeat(40), shardTexts: [REGISTER] }, retrieved: '2026-10-24', csvSha256: 'f'.repeat(64), wikidata: WIKIDATA, duplicates: findDuplicates(rows) })
   const status = Object.fromEntries(out.picks.map((p) => [p.name, p.status]))
-  assert.deepEqual(status, { 'Ann Able': 'VERIFIED', 'Bo Baker': 'AMBIGUOUS', 'Cy Carter': 'SINGLE_SOURCE', 'Dee Dunn': 'AMBIGUOUS', 'Hal Hart': 'SINGLE_SOURCE', 'Ivy Ito': 'SINGLE_SOURCE', 'Jo Jay': 'VERIFIED', 'Lou Lane': 'SINGLE_SOURCE', 'Mia Mars': 'SINGLE_SOURCE', 'Ned North': 'AMBIGUOUS' })
+  assert.deepEqual(status, { 'Ann Able': 'VERIFIED', 'Bo Baker': 'AMBIGUOUS', 'Cy Carter': 'SINGLE_SOURCE', 'Dee Dunn': 'AMBIGUOUS', 'Hal Hart': 'SINGLE_SOURCE', 'Ivy Ito': 'SINGLE_SOURCE', 'Jo Jay': 'VERIFIED', 'Lou Lane': 'SINGLE_SOURCE', 'Mia Mars': 'SINGLE_SOURCE', 'Ned North': 'AMBIGUOUS', 'Opal Orr': 'SINGLE_SOURCE', 'Pat Pike': 'SINGLE_SOURCE', 'Quin Quill': 'AMBIGUOUS' })
   const heldBy = Object.fromEntries(out.held.map((h) => [h.name, h.reason]))
   assert.match(heldBy['Bo Baker'], /belongs to "Bo Barker" in the register, not "Bo Baker"/)
   assert.match(heldBy['Dee Dunn'], /share the name in the plausible birth window: supply the MLBAM id/)
-  assert.match(heldBy['Zed Zane'], /pick 1 appears twice/)
   assert.match(heldBy['Mia Mars'], /no Wikidata corroboration/)
+  assert.match(heldBy['Opal Orr'], /Wikidata item Q9000014 has no birth date: the birth-date corroboration is missing/)
+  assert.match(heldBy['Pat Pike'], /register has no full birth date for MLBAM 900015/)
+  assert.match(heldBy['Quin Quill'], /two Wikidata items hold MLBAM 900016/)
+  // Duplicates hold every row involved, never just the later one.
+  assert.match(heldBy['Rae Reed'], /pick 18 appears in 2 rows of the file \(lines \d+, \d+\): none is imported/)
+  assert.match(heldBy['Sol Stone'], /pick 18 appears in 2 rows/)
+  assert.equal(out.held.filter((h) => h.name === 'Tia Tate').length, 2)
+  assert.match(heldBy['Tia Tate'], /MLBAM 900017 appears in 2 rows of the file/)
   assert.match(heldBy['Ned North'], /birth dates disagree \(register 2003-05-06, Wikidata 2003-07-07\)/)
   assert.deepEqual(out.signingProposals.map((s) => [s.name, s.signing_status, s.bonus_usd]), [['Hal Hart', 'SIGNED', null], ['Lou Lane', 'DID_NOT_SIGN', null]], 'signing facts are proposals, never part of the release')
   const recs = out.batches.flatMap((b) => b.doc.records)
@@ -92,7 +117,7 @@ test('identity is by supplied MLBAM id checked against the register, or name-onl
   assert.deepEqual([by('Jo Jay').round_code, by('Jo Jay').selection_type], ['PPI', 'PRIZE'])
   assert.deepEqual(by('Ivy Ito').signing, { status: 'UNKNOWN' })
   assert.deepEqual(by('Hal Hart').signing, { status: 'UNKNOWN' }, 'a release carries no signing status')
-  assert.deepEqual(by('Ann Able').evidence.map((e) => [e.field, e.value]), [['wikidata_item', 'Q9000001'], ['identity_basis', 'SUPPLIED_MLBAM+REGISTER_NAME_AGREES+WIKIDATA_MLBAM_TIE']])
+  assert.deepEqual(by('Ann Able').evidence.map((e) => [e.field, e.value]), [['wikidata_item', 'Q9000001'], ['identity_basis', 'SUPPLIED_MLBAM+REGISTER_NAME_AGREES+WIKIDATA_MLBAM_TIE+BIRTH_DATE_AGREES']])
   assert.equal(by('Lou Lane').organization, 'LAD')
   assert.ok(out.batches.every((b) => b.doc.coverage_claims[0].coverage_state === 'PARTIAL_RECONSTRUCTION'))
   assert.ok(recs.every((r) => /^hist:wikipedia-csv-2024-[0-9a-f]{8}$/.test(r.source_key)), 'sources are keyed under the governing catalog source')
@@ -113,6 +138,9 @@ test('build writes a release directory the ordinary tools accept: verified, immu
     const m = loaded.manifest
     assert.equal(m.coverage.state, 'PARTIAL_RECONSTRUCTION')
     assert.deepEqual([m.coverage.documented_selections, m.coverage.represented_selections, m.coverage.absent_selections], [614, 6, 608])
+    assert.ok(recs0(loaded).every((x) => /the cited source is the supplier's claim and was not read by BAI/.test(x.notes)), 'every record says its provenance is supplied and unverified')
+    assert.ok(loaded.batches.every((b) => b.doc.sources.filter((s) => /^hist:wikipedia-csv-/.test(s.source_key)).every((s) => /BAI has not read the source/.test(s.notes))))
+    assert.equal(JSON.parse(fs.readFileSync(path.join(rel, 'build.json'), 'utf8')).provenance, 'SUPPLIED_UNVERIFIED')
     assert.equal(m.expected_database_changes.draft_signings_inserted, 0, 'the release writes no signing rows; unsourced signing status stays unknown')
     const recs = loaded.batches.flatMap((b) => b.doc.records)
     assert.deepEqual(JSON.parse(fs.readFileSync(path.join(rel, 'signing-proposals.json'), 'utf8')).map((s) => s.name), ['Hal Hart', 'Lou Lane'])

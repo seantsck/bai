@@ -9,8 +9,14 @@
 //     permit for publication holds the row, whoever typed it (a copied MLB or Baseball-Reference table is not a licence);
 //   - identity is never by name alone: a supplied MLBAM id must exist in the Chadwick register under the same name; a row without one is
 //     imported name-only only when the register has no same-name person in the plausible birth window, otherwise it is held. A
-//     release carries identifiers only with recorded Wikidata corroboration, so a row with an MLBAM id also needs the Wikidata map
-//     (mlbam -> item) and an agreeing birth date, otherwise it is held;
+//     row's MLBAM id is VERIFIED only with all of: the id in the register under the same name, a Wikidata item tied to the same id,
+//     a full birth date in the register AND on the Wikidata item, and the two dates equal. Any missing piece holds the row for
+//     review; nothing is verified on partial evidence (a release carries identifiers only with this corroboration);
+//   - a cited source is a claim by the supplier, not proof: the importer checks that the source's host is governed by the catalog and
+//     permits publication, that the label matches, and (for Wikipedia) that the URL pins the stated revision; it does not read the
+//     source, so every record says its provenance is supplied and unverified by BAI;
+//   - a pick number or MLBAM id that appears in more than one row of the file holds ALL of those rows (which row is right is a
+//     person's decision, never the first one's);
 //   - a release carries no signing status, date or bonus: the signing columns are kept as proposals for a separate reviewed path and every
 //     selection is built with signing unknown.
 import crypto from 'node:crypto'
@@ -76,25 +82,33 @@ export function validateRow (r, { year, catalog, root, orgKeys = FRANCHISE_KEYS 
     else {
       const use = checkUse(catalog, gov, 'publish_site', { year }, { root })
       if (!use.ok) errors.push(`rights: ${use.reason}`)
+      // A Wikipedia citation is only a pin if the URL names the revision the row claims.
+      if (new URL(r.source_url).hostname.endsWith('wikipedia.org') && new URL(r.source_url).searchParams.get('oldid') !== r.source_revision) errors.push('a Wikipedia source must be pinned: the URL needs oldid=<revision>, equal to source_revision')
     }
   }
   return { errors, clean: errors.length ? null : { line: r.line, year, overall_pick: overall, round_code: code, round_pick: roundPick, organization: team, name: r.player_name, mlbam: r.player_mlbam_id || null, position: r.position || null, school: r.school || null, signing_status: status, bonus_usd: bonus, source_url: r.source_url, source_revision: r.source_revision, gov } }
+}
+
+/** Pick numbers and MLBAM ids that appear in more than one raw row of the file (rows that fail the row rules count too). */
+export function findDuplicates (rawRows) {
+  const count = (key) => { const m = new Map(); for (const r of rawRows) { const v = r[key]; if (v) m.set(v, [...(m.get(v) ?? []), r.line]) } return new Map([...m].filter(([, lines]) => lines.length > 1)) }
+  return { picks: count('overall_pick'), mlbams: count('player_mlbam_id') }
 }
 
 /**
  * Validated rows + Chadwick shard texts -> identity decisions, held rows and one import batch per club. Deterministic.
  * `chadwick` = { commit7, commitFull, shardTexts }, `retrieved` = the source retrieval date (YYYY-MM-DD).
  */
-export function buildCsvBatches ({ rows, year, chadwick, retrieved, csvSha256, wikidata = {} }) {
+export function buildCsvBatches ({ rows, year, chadwick, retrieved, csvSha256, wikidata = {}, duplicates = findDuplicates(rows.map((c) => ({ line: c.line, overall_pick: String(c.overall_pick), player_mlbam_id: c.mlbam ?? '' }))) }) {
   const held = []
   const signingProposals = []
   const picks = []   // identity.json-compatible
-  const seenPick = new Map(); const seenMlbam = new Map()
   const ok = []
-  for (const c of rows) {   // duplicates inside the file are held (the draft allows a pick and a player once)
-    if (seenPick.has(c.overall_pick)) { held.push({ pick: c.overall_pick, name: c.name, org: c.organization, reason: `pick ${c.overall_pick} appears twice in the file (lines ${seenPick.get(c.overall_pick)} and ${c.line})` }); continue }
-    if (c.mlbam && seenMlbam.has(c.mlbam)) { held.push({ pick: c.overall_pick, name: c.name, org: c.organization, reason: `MLBAM ${c.mlbam} appears twice in the file (a player is selected once per draft)` }); continue }
-    seenPick.set(c.overall_pick, c.line); if (c.mlbam) seenMlbam.set(c.mlbam, c.line); ok.push(c)
+  for (const c of rows) {   // every row of a duplicated pick or id is held: which one is right is a person's decision
+    const dp = duplicates.picks.get(String(c.overall_pick)); const dm = c.mlbam ? duplicates.mlbams.get(c.mlbam) : null
+    if (dp) { held.push({ pick: c.overall_pick, name: c.name, org: c.organization, reason: `pick ${c.overall_pick} appears in ${dp.length} rows of the file (lines ${dp.join(', ')}): none is imported until a person decides which is right` }); continue }
+    if (dm) { held.push({ pick: c.overall_pick, name: c.name, org: c.organization, reason: `MLBAM ${c.mlbam} appears in ${dm.length} rows of the file (lines ${dm.join(', ')}): a player is selected once per draft; none is imported until a person decides` }); continue }
+    ok.push(c)
   }
   const wanted = new Set(ok.filter((c) => c.mlbam).map((c) => c.mlbam))
   const register = new Map()
@@ -111,7 +125,7 @@ export function buildCsvBatches ({ rows, year, chadwick, retrieved, csvSha256, w
     if (!bySource.has(k)) {
       const prefix = c.gov.source_key_prefixes?.[0]
       if (!prefix) throw new Error(`catalog source ${c.gov.id} has no source key prefix: cannot key a CSV source`)
-      bySource.set(k, { source_key: `${prefix}csv-${year}-${sha8(k)}`, source_type: c.gov.source_type ?? 'REFERENCE_DATABASE', authority_level: c.gov.authority_level, title: `Staged CSV source (${c.gov.id}), revision ${c.source_revision}`, publisher: c.gov.publisher, url: c.source_url, retrieved_date: retrieved, notes: `Rows supplied through the staging CSV (sha256 ${csvSha256}); revision ${c.source_revision}. Permission basis: catalog source ${c.gov.id}.` })
+      bySource.set(k, { source_key: `${prefix}csv-${year}-${sha8(k)}`, source_type: c.gov.source_type ?? 'REFERENCE_DATABASE', authority_level: c.gov.authority_level, title: `Staged CSV source (${c.gov.id}), revision ${c.source_revision}`, publisher: c.gov.publisher, url: c.source_url, retrieved_date: retrieved, notes: `Rows supplied through the staging CSV (sha256 ${csvSha256}); revision ${c.source_revision}. Permission basis: catalog source ${c.gov.id}. Provenance is supplied: the supplier asserts that this source supports the rows; BAI has not read the source.` })
     }
     return bySource.get(k).source_key
   }
@@ -126,9 +140,13 @@ export function buildCsvBatches ({ rows, year, chadwick, retrieved, csvSha256, w
       if (fold(reg.name) !== fold(c.name)) { held.push({ pick: c.overall_pick, name: c.name, org: c.organization, reason: `MLBAM ${c.mlbam} belongs to "${reg.name}" in the register, not "${c.name}": identity needs review` }); picks.push({ overall_pick: c.overall_pick, name: c.name, club: c.organization, status: 'AMBIGUOUS', reason: 'MLBAM and name disagree' }); continue }
       const wd = wikidata[c.mlbam]
       const regBirth = reg.birth[0] && reg.birth[1] && reg.birth[2] ? `${reg.birth[0]}-${String(reg.birth[1]).padStart(2, '0')}-${String(reg.birth[2]).padStart(2, '0')}` : null
-      if (!wd?.qid) { held.push({ pick: c.overall_pick, name: c.name, org: c.organization, reason: `MLBAM ${c.mlbam} agrees with the register but has no Wikidata corroboration: supply the Wikidata map or review the identity` }); picks.push({ overall_pick: c.overall_pick, name: c.name, club: c.organization, status: 'SINGLE_SOURCE', reason: 'no Wikidata corroboration' }); continue }
-      if (wd.birth && regBirth && wd.birth !== regBirth) { held.push({ pick: c.overall_pick, name: c.name, org: c.organization, reason: `birth dates disagree (register ${regBirth}, Wikidata ${wd.birth}): identity needs review` }); picks.push({ overall_pick: c.overall_pick, name: c.name, club: c.organization, status: 'AMBIGUOUS', reason: 'birth dates disagree' }); continue }
-      status = 'VERIFIED'; basis = ['SUPPLIED_MLBAM', 'REGISTER_NAME_AGREES', 'WIKIDATA_MLBAM_TIE']
+      const hold = (reason, st = 'SINGLE_SOURCE') => { held.push({ pick: c.overall_pick, name: c.name, org: c.organization, reason }); picks.push({ overall_pick: c.overall_pick, name: c.name, club: c.organization, status: st, reason }) }
+      if (wd?.ambiguous) { hold(`two Wikidata items hold MLBAM ${c.mlbam}: identity needs review`, 'AMBIGUOUS'); continue }
+      if (!wd?.qid) { hold(`MLBAM ${c.mlbam} agrees with the register but has no Wikidata corroboration: supply the Wikidata map or review the identity`); continue }
+      if (!regBirth) { hold(`the register has no full birth date for MLBAM ${c.mlbam}: the birth-date corroboration is impossible, so the identity is held for review`); continue }
+      if (!wd.birth) { hold(`Wikidata item ${wd.qid} has no birth date: the birth-date corroboration is missing, so the identity is held for review`); continue }
+      if (wd.birth !== regBirth) { hold(`birth dates disagree (register ${regBirth}, Wikidata ${wd.birth}): identity needs review`, 'AMBIGUOUS'); continue }
+      status = 'VERIFIED'; basis = ['SUPPLIED_MLBAM', 'REGISTER_NAME_AGREES', 'WIKIDATA_MLBAM_TIE', 'BIRTH_DATE_AGREES']
       identity = { ids: { MLBAM: c.mlbam, ...reg.ids }, birth: reg.birth, qid: wd.qid }
     } else {
       const n = names.get(fold(c.name)) ?? 0
@@ -151,7 +169,7 @@ export function buildCsvBatches ({ rows, year, chadwick, retrieved, csvSha256, w
     // A release carries no signing facts: they are kept as proposals for a separate reviewed path; the selection itself is built unknown.
     if (c.signing_status !== 'UNKNOWN' || c.bonus_usd != null) signingProposals.push({ pick: c.overall_pick, organization: c.organization, name: c.name, signing_status: c.signing_status, bonus_usd: c.bonus_usd, source_url: c.source_url, source_revision: c.source_revision })
     rec.signing = { status: 'UNKNOWN' }
-    rec.notes = `From a staged CSV row (line ${c.line}). Identity: ${status} (${basis.join(', ')}). Signing status not researched here: unknown, not "did not sign". Bonus unknown, not zero.`
+    rec.notes = `From a staged CSV row (line ${c.line}); the cited source is the supplier's claim and was not read by BAI. Identity: ${status} (${basis.join(', ')}). Signing status not researched here: unknown, not "did not sign". Bonus unknown, not zero.`
     if (!byOrg.has(c.organization)) byOrg.set(c.organization, [])
     byOrg.get(c.organization).push(rec)
   }
@@ -164,7 +182,7 @@ export function buildCsvBatches ({ rows, year, chadwick, retrieved, csvSha256, w
     const wdSource = { source_key: wdKey, source_type: 'REFERENCE_DATABASE', authority_level: 'AGGREGATOR', title: `Wikidata identity corroboration for the ${year} draft (staged CSV)`, publisher: 'Wikimedia Foundation (Wikidata contributors)', url: 'https://www.wikidata.org/', retrieved_date: retrieved, notes: 'Items tied to the supplied MLB id; CC0.' }
     const sources = [...srcs, ...(usedCw(records) ? [wdSource, { source_key: cwKey, source_type: 'REFERENCE_DATABASE', authority_level: 'AGGREGATOR', title: `Chadwick Baseball Bureau Register, commit ${chadwick.commit7}`, publisher: 'Chadwick Baseball Bureau', url: `https://github.com/chadwickbureau/register/tree/${chadwick.commitFull}`, retrieved_date: retrieved, notes: 'MLBAM to other systems\' ids; birth dates. Open Data Commons Attribution License 1.0.' }] : [])]
     batches.push({ org, doc: { format: 'bai-research-import/1', batch_key: `hist-${year}-june-amateur-${org.toLowerCase()}-csv`, channel: 'DRAFT', description: `${org}, ${year} June draft: ${records.length} selection(s) from a staged CSV (local research import).`, coverage_claims: [{ domain: 'DRAFT', scope_key: `${year}-JUNE_AMATEUR`, organization: org, coverage_state: 'PARTIAL_RECONSTRUCTION', source_key: records[0].source_key,
-      gap_notes: `A supplied CSV lists ${records.length} selection(s) for the club in the ${year} June draft. A supplied file is not proof of the population. ${mine.length ? `Held, not imported: ${mine.map((h) => `#${h.pick} (${h.reason})`).join('; ')}. ` : ''}Signing status, bonuses and outcomes are unknown unless a row states them with its source.` }], sources, records } })
+      gap_notes: `A supplied CSV lists ${records.length} selection(s) for the club in the ${year} June draft. A supplied file is not proof of the population, and its cited sources were not read by BAI. ${mine.length ? `Held, not imported: ${mine.map((h) => `#${h.pick} (${h.reason})`).join('; ')}. ` : ''}Signing status, bonuses and outcomes are unknown unless a row states them with its source.` }], sources, records } })
   }
   return { batches, picks, held, signingProposals, sourceCount: bySource.size }
 }

@@ -14,7 +14,7 @@ import { fileURLToPath } from 'node:url'
 import { loadCatalog } from './lib/permissions.mjs'
 import { SHARDS } from './lib/chadwick.mjs'
 import { buildManifest, fileSha256, canonicalJson } from './lib/release.mjs'
-import { CSV_COLUMNS, csvTemplate, readCsv, validateRow, buildCsvBatches } from './lib/csv-draft.mjs'
+import { CSV_COLUMNS, csvTemplate, readCsv, validateRow, buildCsvBatches, findDuplicates } from './lib/csv-draft.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 const argv = process.argv.slice(2)
@@ -68,8 +68,9 @@ const shardTexts = SHARDS.map((s) => { const f = path.join(shardDir, `people-${s
 const releaseDir = opt('release-dir'); if (!releaseDir) die('--release-dir required for build')
 const retrieved = opt('retrieved'); if (!/^\d{4}-\d{2}-\d{2}$/.test(retrieved ?? '')) die('--retrieved YYYY-MM-DD required (the source retrieval date; never the build date)')
 const wikidata = opt('wikidata-map') ? JSON.parse(fs.readFileSync(path.resolve(root, opt('wikidata-map')), 'utf8')) : {}
-const built = buildCsvBatches({ rows: clean, year, chadwick: { commit7, commitFull: chadwickSrc.pinned_commit, shardTexts }, retrieved, csvSha256: csvSha, wikidata })
+const built = buildCsvBatches({ rows: clean, year, chadwick: { commit7, commitFull: chadwickSrc.pinned_commit, shardTexts }, retrieved, csvSha256: csvSha, wikidata, duplicates: findDuplicates(rows) })
 const held = [...heldRows.filter((h) => h.pick).map((h) => ({ pick: Number(h.pick), name: h.name, org: '??', reason: h.reason })), ...built.held].map((h) => ({ org: h.org, pick: h.pick, name: h.name, reason: h.reason }))
+log('provenance: the cited sources are the supplier\'s claim; BAI did not read them')
 log(`${built.batches.length} batches, ${built.batches.reduce((n, b) => n + b.doc.records.length, 0)} records, held ${held.length}`)
 const abs = path.resolve(root, releaseDir)
 const stage = `${abs}.building`; fs.rmSync(stage, { recursive: true, force: true }); fs.mkdirSync(path.join(stage, 'batches'), { recursive: true })
@@ -90,7 +91,7 @@ if (fs.existsSync(manifestFile) && fs.readFileSync(manifestFile, 'utf8') !== man
 if (!fs.existsSync(manifestFile)) {
   fs.mkdirSync(abs, { recursive: true }); fs.rmSync(path.join(abs, 'batches'), { recursive: true, force: true })
   fs.renameSync(path.join(stage, 'batches'), path.join(abs, 'batches'))
-  fs.writeFileSync(path.join(abs, 'build.json'), JSON.stringify({ year, csv_sha256: csvSha, documented_selections: opt('documented') ? Number(opt('documented')) : null, held }, null, 1) + '\n')
+  fs.writeFileSync(path.join(abs, 'build.json'), JSON.stringify({ year, csv_sha256: csvSha, provenance: 'SUPPLIED_UNVERIFIED', documented_selections: opt('documented') ? Number(opt('documented')) : null, held }, null, 1) + '\n')
   fs.writeFileSync(path.join(abs, 'identity.json'), identityText)
   fs.writeFileSync(path.join(abs, 'signing-proposals.json'), JSON.stringify(built.signingProposals, null, 1) + '\n')   // not part of the release: a separate reviewed path
   fs.writeFileSync(manifestFile, manifestText)
