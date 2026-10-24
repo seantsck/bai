@@ -79,6 +79,19 @@ const roundFor = (title) => {
 }
 
 /** Parse the article. Returns { picks, findings, stated, sections }. */
+/** A cell line may hold several cells joined by "||" ("|3||81"). Splits at "||" outside [[links]] and {{templates}}. */
+export function splitInlineCells (line) {
+  if (!line.startsWith('|') || !line.includes('||')) return [line]
+  const body = line.slice(1)
+  const out = []; let depth = 0; let cur = ''
+  for (let i = 0; i < body.length; i++) {
+    const two = body.slice(i, i + 2)
+    if (two === '[[' || two === '{{') { depth++; cur += two; i++ } else if (two === ']]' || two === '}}') { depth = Math.max(0, depth - 1); cur += two; i++ } else if (two === '||' && depth === 0) { out.push(cur); cur = ''; i++ } else cur += body[i]
+  }
+  out.push(cur)
+  return out.map((c) => `|${c}`)
+}
+
 export function parseDraftArticle (wikitext, { year }) {
   const findings = []
   const infobox = (name) => wikitext.match(new RegExp(`\\|\\s*${name}\\s*=\\s*(\\d+)`))?.[1]
@@ -108,6 +121,8 @@ export function parseDraftArticle (wikitext, { year }) {
         if (/^[|!]/.test(l)) cells.push(l); else if (cells.length) cells[cells.length - 1] += ` ${l}`
       }
       void lines
+      // Inline cell separators ("|3||81" holds two cells): split outside links and templates. Rows without "||" are untouched.
+      cells.splice(0, cells.length, ...cells.flatMap(splitInlineCells))
       if (cells.length < (notable ? 6 : 5)) { if (cells.length) findings.push({ kind: 'SHORT_ROW', detail: `${title}: ${cells.length} cells` }); continue }
       const vals = cells.map((c) => plain(cellValue(c)))
       const [pickC, playerRaw, teamC, posC, schoolC] = notable ? vals.slice(1) : vals

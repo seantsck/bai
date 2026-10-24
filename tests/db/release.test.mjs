@@ -37,13 +37,13 @@ const batch = (org, records, verified) => ({
   coverage_claims: [{ domain: 'DRAFT', scope_key: '2020-JUNE_AMATEUR', organization: org, coverage_state: 'PARTIAL_RECONSTRUCTION', source_key: WIKI, gap_notes: 'fixture: one list' }],
   sources: sources(verified), records
 })
-const writeRelease = (name, docs, { approvals = [], mutate = null, supplementOf = null, documentedSelections = null } = {}) => {
+const writeRelease = (name, docs, { approvals = [], mutate = null, supplementOf = null, documentedSelections = null, excludedOrganizations = [] } = {}) => {
   const dir = path.join(tmp, name)
   fs.rmSync(dir, { recursive: true, force: true })
   fs.mkdirSync(path.join(dir, 'batches'), { recursive: true })
   const batches = docs.map((doc, i) => { const file = `${String(i).padStart(2, '0')}-${doc.batch_key}.json`; fs.writeFileSync(path.join(dir, 'batches', file), JSON.stringify(doc, null, 1) + '\n'); return { file, sha256: fileSha256(path.join(dir, 'batches', file)), doc } })
   let manifest = buildManifest({ releaseKey: `fixture-${name}`, year: 2020, draftKey: '2020-JUNE_AMATEUR', batches, identity: { picks: [] }, article: { revision: 1, response_sha256: 'a'.repeat(64) }, chadwickCommit: 'f'.repeat(40),
-    identityFileSha256: 'b'.repeat(64), brownVariant: 'HELD', heldPicks: [], humanApprovals: approvals, supplementOf, documentedSelections, catalog, maxSelections: docs.reduce((n, d) => n + d.records.length, 0), createdOn: '2026-10-22' })
+    identityFileSha256: 'b'.repeat(64), brownVariant: 'HELD', heldPicks: [], humanApprovals: approvals, supplementOf, documentedSelections, excludedOrganizations, catalog, maxSelections: docs.reduce((n, d) => n + d.records.length, 0), createdOn: '2026-10-22' })
   if (mutate) { manifest = mutate(manifest); manifest.manifest_sha256 = manifestChecksum(manifest) }
   fs.writeFileSync(path.join(dir, 'release-manifest.json'), JSON.stringify(manifest, null, 1) + '\n')
   return dir
@@ -479,4 +479,21 @@ test('a later failure rolls back the birth-date update, selections, observations
   assert.deepEqual(await state(), before, 'selections, players, observations, external ids, staging and audits are all unchanged')
   assert.deepEqual(await h.one(db, `select birth_date::text d, birth_date_precision p from players where slug = 'fixture-nobirth-b'`), player)
   assert.equal(await count('select count(*) n from draft_selections where overall_pick in (161, 162)'), 0)
+})
+
+// --- organizations excluded by release scope (Phase 13A) ---------------------------------------------------------------------------
+test('a release can exclude organizations by scope: the manifest records it and verification refuses any record or coverage claim for one', () => {
+  const ok = loadRelease(writeRelease('excl-ok', [batch('KC', [record(201, 'KC', 'Fixture Excl One')], false)], { excludedOrganizations: ['LAD', 'HOU'] }))
+  assert.deepEqual(ok.manifest.authorization_scope.excluded_organizations, ['HOU', 'LAD'])
+  assert.deepEqual(verifyReleaseContent(ok, { root }), [])
+  // A record of an excluded organization smuggled into the batches is refused (the manifest was built with a different exclusion list).
+  const bad = loadRelease(writeRelease('excl-bad', [batch('KC', [record(202, 'KC', 'Fixture Excl Two')], false), batch('LAD', [record(203, 'LAD', 'Fixture Excl Three')], false)], { mutate: (m) => { m.authorization_scope.excluded_organizations = ['LAD']; return m } }))
+  assert.ok(verifyReleaseContent(bad, { root }).some((p) => /pick 203 belongs to LAD, which this release excludes/.test(p)))
+  assert.ok(verifyReleaseContent(bad, { root }).some((p) => /a coverage claim names LAD/.test(p)))
+  // A malformed exclusion list is refused.
+  const malformed = loadRelease(writeRelease('excl-malformed', [batch('KC', [record(204, 'KC', 'Fixture Excl Four')], false)], { mutate: (m) => { m.authorization_scope.excluded_organizations = 'LAD'; return m } }))
+  assert.ok(verifyReleaseContent(malformed, { root }).some((p) => /excluded_organizations must be a list of franchise keys/.test(p)))
+  // Without the field nothing changes (older manifests).
+  const none = loadRelease(writeRelease('excl-none', [batch('KC', [record(205, 'KC', 'Fixture Excl Five')], false)]))
+  assert.equal(none.manifest.authorization_scope.excluded_organizations, undefined)
 })

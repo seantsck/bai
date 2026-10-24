@@ -48,7 +48,7 @@ export function observationMax (records) {
 }
 
 /** Builds a manifest from a release directory's batches (and the identity file's tiers). Pure given its inputs. */
-export function buildManifest ({ humanApprovals = [], releaseKey, year, draftKey, batches, identity, article, chadwickCommit, identityFileSha256, brownVariant, heldPicks, catalog, maxSelections, createdOn, supplementOf = null, documentedSelections = null }) {
+export function buildManifest ({ humanApprovals = [], releaseKey, year, draftKey, batches, identity, article, chadwickCommit, identityFileSha256, brownVariant, heldPicks, catalog, maxSelections, createdOn, supplementOf = null, documentedSelections = null, excludedOrganizations = [] }) {
   const docs = batches.map((b) => ({ ...b, picks: b.doc.records.map((r) => r.overall_pick).sort((x, y) => x - y) }))
   const records = docs.flatMap((b) => b.doc.records)
   const byPick = new Map(identity.picks.map((x) => [x.overall_pick, x]))
@@ -69,7 +69,7 @@ export function buildManifest ({ humanApprovals = [], releaseKey, year, draftKey
   const idCount = records.reduce((n, r) => n + Object.keys(r.player.external_ids ?? {}).length, 0)
   const manifest = {
     format: RELEASE_FORMAT, release_key: releaseKey, created_on: createdOn,
-    authorization_scope: { draft_year: year, draft_key: draftKey, channel: 'DRAFT', max_selections: maxSelections, note: 'This manifest authorises nothing by itself. A separate, explicit approval must name its checksum.' },
+    authorization_scope: { draft_year: year, draft_key: draftKey, channel: 'DRAFT', max_selections: maxSelections, ...(excludedOrganizations.length ? { excluded_organizations: [...excludedOrganizations].sort() } : {}), note: 'This manifest authorises nothing by itself. A separate, explicit approval must name its checksum.' },
     article: { revision: article.revision, response_sha256: article.response_sha256, title: `${year} Major League Baseball draft` },
     chadwick_commit: chadwickCommit, identity_file_sha256: identityFileSha256, tyler_brown_101: brownVariant,
     ...(supplementOf ? { supplement_of: supplementOf } : {}),
@@ -132,6 +132,14 @@ export function verifyReleaseContent (rel, { root }) {
   const m = rel.manifest
   const problems = []
   const catalog = loadCatalog(root)
+  // Organizations the release excludes by scope: no record or coverage claim may name one.
+  const excluded = m.authorization_scope.excluded_organizations
+  if (excluded !== undefined && !(Array.isArray(excluded) && excluded.every((o) => typeof o === 'string' && /^[A-Z]{2,4}$/.test(o)))) problems.push('excluded_organizations must be a list of franchise keys')
+  const excludedSet = new Set(Array.isArray(excluded) ? excluded : [])
+  for (const b of rel.batches) {
+    for (const r of b.doc.records) if (excludedSet.has(r.organization)) problems.push(`${b.file}: pick ${r.overall_pick} belongs to ${r.organization}, which this release excludes`)
+    for (const c of b.doc.coverage_claims ?? []) if (excludedSet.has(c.organization)) problems.push(`${b.file}: a coverage claim names ${c.organization}, which this release excludes`)
+  }
   // A declared documented population needs three mutually consistent whole-number counts.
   const cov = m.coverage ?? {}
   if (['documented_selections', 'represented_selections', 'absent_selections'].some((k) => Object.hasOwn(cov, k))) {

@@ -170,7 +170,12 @@ try {
     rstep('integrity violations: 0', viol.length === 0, JSON.stringify(viol).slice(0, 200))
     const cov = await q(db, `select coverage_state::text s, count(*)::int n from public.rm_research_coverage rc where rc.scope_key = $1 group by 1`, [rel.manifest.authorization_scope.draft_key]).catch(() => [])
     r.coverage_states = cov
-    rstep(`every ${rel.manifest.authorization_scope.draft_year} club coverage cell is partial`, cov.length > 0 && cov.every((x) => x.s === 'PARTIAL_RECONSTRUCTION'), JSON.stringify(cov))
+    // Clubs in scope are PARTIAL_RECONSTRUCTION; a club the release excludes by scope has no coverage claim at all (never a state).
+    const excludedClubs = rel.manifest.authorization_scope.excluded_organizations ?? []
+    const partialCells = cov.filter((x) => x.s === 'PARTIAL_RECONSTRUCTION').reduce((n, x) => n + x.n, 0)
+    const otherCells = cov.filter((x) => x.s !== 'PARTIAL_RECONSTRUCTION')
+    rstep(`every ${rel.manifest.authorization_scope.draft_year} club in scope is partial${excludedClubs.length ? `; excluded ${excludedClubs.join(',')} carry no claim` : ''}`,
+      cov.length > 0 && partialCells === rel.manifest.totals.organizations && otherCells.every((x) => x.s === null && x.n === excludedClubs.length) && (excludedClubs.length === 0 ? otherCells.length === 0 : true), JSON.stringify(cov))
     const sec = spawnSync(process.execPath, [path.join(root, 'scripts/db/security.mjs')], { cwd: root, env: { ...env, BAI_DATABASE_URL: url(name) }, encoding: 'utf8' })
     rstep('security check passes', sec.status === 0, sec.stdout.trim().split('\n').slice(-2).join(' | ').slice(0, 200))
     await db.end()

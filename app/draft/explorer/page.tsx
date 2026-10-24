@@ -3,7 +3,7 @@ import { PageHeader, SubNav, DataTable, Notice, load, Unavailable } from '../../
 import { getDraftExplorer, getOrganizationKeys, getSelectionAttribution } from '../../../lib/queries.ts'
 import { formatUsd, label, KIND_LABELS, SIGNING_STATUS_LABELS, SOURCE_GROUP_SHORT } from '../../../lib/format.ts'
 import { DRAFT_NAV } from '../../../lib/nav.ts'
-import { editorialNote } from '../../../lib/partial-years.ts'
+import { editorialNote, editorialYearsBetween } from '../../../lib/partial-years.ts'
 import { parseExplorerParams, explorerHref, PAGE_SIZE, DRAFT_KINDS } from '../../../lib/search.ts'
 
 export const dynamic = 'force-dynamic'
@@ -29,9 +29,9 @@ export default async function ExplorerPage ({ searchParams }: { searchParams: Pr
     const sign = a.signing_source_category ? label(SOURCE_GROUP_SHORT, a.signing_source_category) : null
     return sign && sign !== sel ? `${sel}; signing: ${sign}` : sel
   }
-  // The 2021 later-round note shows only when 2021 rows are on screen or the search can include 2021.
-  const covers2021 = f.year ? f.year === 2021 : (f.from ?? 0) <= 2021 && 2021 <= (f.to ?? 9999)
-  const note = editorialNote([...rows.map((r) => r.draft_year), ...(covers2021 && (f.year || f.from || f.to) ? [2021] : [])])
+  // The later-round note shows only for declared partial years that are on screen or that the search can include.
+  const searchedYears = f.year ? [f.year] : (f.from || f.to) ? editorialYearsBetween(f.from, f.to) : []
+  const note = editorialNote([...rows.map((r) => r.draft_year), ...searchedYears])
   return (
     <>
       <PageHeader title='Historical draft explorer'
