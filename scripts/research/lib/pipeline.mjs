@@ -14,6 +14,7 @@ import crypto from 'node:crypto'
 import { validateEnvelope, validateRecordShape, roundStructure, slugify, EVIDENCE_SUBJECTS, organizationScopeErrors } from './import-format.mjs'
 import { loadCatalog, requireHostedPublication } from '../../history/lib/permissions.mjs'
 import * as txn from './txn.mjs'
+import * as T from './transactions.mjs'
 
 const SAFE_STATES = new Set(['EXACT_EXTERNAL_ID', 'EXACT_COMPOSITE', 'NO_MATCH'])
 const ACTION_RANK = { HELD: 6, CONFLICT: 5, INSERT: 4, UPDATE_UNKNOWN: 3, CORROBORATE: 2, NO_CHANGE: 1 }
@@ -120,6 +121,10 @@ export async function validateBatch (db, ref) {
   const orgs = new Set((await db.query('select franchise_key from public.organizations where active')).rows.map((r) => r.franchise_key))
   const records = (await db.query('select * from ingest.staged_records where batch_id = $1 order by record_index', [batch.id])).rows
   const counts = { records: records.length, valid: 0, invalid: 0, warnings: 0, identity: {} }
+  // Version-2 trades: identity reuse and same-day same-club trades are decided across the whole batch.
+  const v2 = records.filter((x) => x.record_type === 'TRADE' && x.payload?.schema === T.TRADE_SCHEMA)
+  const v2problems = new Map()
+  if (batch.channel === 'TRADES' && v2.length) for (const [i, ps] of T.batchProblemsV2(v2.map((x) => x.payload)).entries()) v2problems.set(v2[i].record_index, ps)
   const seenPicks = new Map()
 
   await txn.begin(db)
@@ -155,6 +160,7 @@ export async function validateBatch (db, ref) {
           else if (periodId && String(derived) !== String(periodId)) errors.push(`signing date ${r.signing_date} is outside period ${r.period_key}`)
         }
       }
+      errors.push(...(v2problems.get(rec.record_index) ?? []))
       if (errors.length === 0 && batchProblems.length) errors.push(...batchProblems)
 
       if (batch.channel === 'OUTCOMES') {
@@ -170,6 +176,12 @@ export async function validateBatch (db, ref) {
             if (!p.player?.full_name) continue
             const id = (await db.query('select * from ingest.resolve_identity($1)', [identityInput(p.player)])).rows[0]
             if (!['EXACT_EXTERNAL_ID', 'NO_MATCH'].includes(id.state)) errors.push(`traded player ${p.player.full_name}: identity ${id.state}; decide it before importing the trade`)
+          }
+          for (const x of k.other_assets ?? []) {
+            const rp = x.resolution?.player
+            if (!rp?.full_name) continue
+            const id = (await db.query('select * from ingest.resolve_identity($1)', [identityInput(rp)])).rows[0]
+            if (!['EXACT_EXTERNAL_ID', 'NO_MATCH'].includes(id.state)) errors.push(`player named for a PTBNL ${rp.full_name}: identity ${id.state}; decide it before importing the trade`)
           }
         }
       }
@@ -714,6 +726,7 @@ class Applier {
   /** TRADE: every package and player of one trade, plus the players' observed WAR. New players only by a strong id. */
   async applyTrade (rec, conflicts) {
     const r = rec.payload
+    if (r.schema === T.TRADE_SCHEMA) return T.applyTradeV2(this, rec, { identityInput, PipelineError, conflicts })
     let action = 'NO_CHANGE'
     let newPlayers = 0
     let txId = null
@@ -806,7 +819,7 @@ export async function applyBatch (db, ref, { write = false, allowPartial = false
       const recConflicts = []
       if (rec.record_type === 'TRADE') {
         const res = await a.applyTrade(rec, recConflicts)
-        results.push({ rec, action: strongest(res.action, recConflicts.length ? 'CONFLICT' : 'NO_CHANGE'), canonical: res.canonical, playerAction: res.newPlayers ? 'INSERT' : null })
+        results.push({ rec, action: res.action === 'HELD' ? 'HELD' : strongest(res.action, recConflicts.length ? 'CONFLICT' : 'NO_CHANGE'), reason: res.reason, canonical: res.canonical, playerAction: res.newPlayers ? 'INSERT' : null })
         conflicts.push(...recConflicts.map((c) => ({ record_index: rec.record_index, ...c })))
         continue
       }

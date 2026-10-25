@@ -186,19 +186,27 @@ export function verifyReleaseContent (rel, { root }) {
 
 const rowsOf = async (db, sql, params) => (await db.query(sql, params)).rows
 
-/** The migration history must be exactly the committed files 001..REQUIRED, with their checksums. */
-export async function migrationProblems (db) {
-  const files = listMigrations().filter((m) => m.version <= REQUIRED_MIGRATION)
+/**
+ * The migration history must be a gapless prefix of the committed files that reaches at least REQUIRED (027), every applied
+ * file with its committed checksum. A LATER committed migration may also be applied (028 adds transaction tables, which a
+ * draft release never reads or writes) but never out of order: a missing intermediate migration is refused, as is a changed
+ * checksum, a different file name, or a migration the repository does not have at all. Every release is rehearsed on a copy
+ * of the target first, which is what proves a later migration changed nothing a release touches.
+ */
+export async function migrationProblems (db, { committed = listMigrations() } = {}) {
   const have = new Map((await rowsOf(db, 'select version, file, checksum from bai_meta.schema_migrations')).map((r) => [r.version, r]))
   const problems = []
-  for (const f of files) {
+  const known = new Set(committed.map((f) => f.version))
+  const extra = [...have.keys()].filter((v) => !known.has(v)).sort()
+  if (extra.length) problems.push(`target has migrations the repository does not: ${extra.join(', ')}`)
+  const highest = [...have.keys()].filter((v) => known.has(v)).sort().pop() ?? ''
+  const reach = highest > REQUIRED_MIGRATION ? highest : REQUIRED_MIGRATION
+  for (const f of committed) {
+    if (f.version > reach) break
     const h = have.get(f.version)
-    if (!h) problems.push(`migration ${f.file} is not applied`)
+    if (!h) problems.push(`migration ${f.file} is not applied${f.version > REQUIRED_MIGRATION ? ` (a later migration, ${highest}, is: migrations must be applied in order)` : ''}`)
     else if (h.checksum !== f.checksum || h.file !== f.file) problems.push(`migration ${f.file} differs from the committed file`)
   }
-  const known = new Set(files.map((f) => f.version))
-  const extra = [...have.keys()].filter((v) => !known.has(v))
-  if (extra.length) problems.push(`target has migrations the repository does not: ${extra.join(', ')}`)
   return problems
 }
 

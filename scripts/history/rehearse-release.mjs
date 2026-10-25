@@ -45,9 +45,11 @@ try {
   // Hosted before 027: build 001-026 and rehearse 027 too. Hosted after 027 (the first release is applied): build 001-027 as it is.
   const probe = new pg.Client({ connectionString: hostedUrl }); await probe.connect()
   const has027 = (await q(probe, "select count(*)::int n from bai_meta.schema_migrations where version = '027'"))[0].n === 1
+  // Build the copy through whatever migration the target has (027, or later once a later committed migration is applied there).
+  const hostedLatest = has027 ? (await q(probe, 'select max(version) v from bai_meta.schema_migrations'))[0].v : '026'
   await probe.end()
-  await applyMigrations(copy, { through: has027 ? '027' : '026' })
-  step(`disposable database built from migrations 001-${has027 ? '027' : '026'}`, true)
+  await applyMigrations(copy, { through: hostedLatest })
+  step(`disposable database built from migrations 001-${hostedLatest}`, true)
 
   // --- copy hosted data through a read-only transaction -----------------------------------------------------------
   const hosted = new pg.Client({ connectionString: hostedUrl }); await hosted.connect()
