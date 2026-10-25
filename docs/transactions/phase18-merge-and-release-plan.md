@@ -115,3 +115,16 @@ The batch files are derived data and stay out of the repository (source permissi
 ### What stays out of scope until separately requested
 
 Certification-gate enablement (human verification), any VERIFIED_COMPLETE claim, executive grades or rankings, WAR display beyond the providers' own permissions, contract or salary data, the later-added-player migration (031, not implemented), DISI, Diamond IQ, the pending 2025 draft release and the historical release audits.
+
+## 7. CI is not the release check
+
+The `check` workflow (PR #42, merged) runs on a fresh clone, which has none of the gitignored local caches. Its green result therefore does **not** validate the historical data. What CI cannot run:
+
+| Test | In CI | Needs |
+| --- | --- | --- |
+| `tests/history/retrosheet-transactions.test.mjs` "the real archive, when cached locally, matches its recorded checksum and parses with no malformed row" | **skipped** | the cached Retrosheet archive under `.local/retrosheet` |
+| `tests/db/release.test.mjs` "the three immutable historical manifests replay in order on a clean database …" | **skipped** | the local historical release directories under `.local/history` |
+| `tests/db/transaction-read-model.test.mjs` the Retrosheet notice comparison | passes **without checking** (guarded by `existsSync`) | `.local/retrosheet/notice.txt` |
+| `tests/history/wikipedia-draft.test.mjs` cached-article loop | passes **without checking** | the cached Wikipedia articles |
+
+**Every release gate (G1–G7) additionally requires** `npm run check` on a checkout that has those local caches, with the local run showing no skip of the first two rows (the full run reports `0` skipped in the history suite and a single database-suite skip, the hosted-only test), plus the checksum comparisons in section 6. A CI skip or pass-without-check must never be read as complete historical-data validation.
