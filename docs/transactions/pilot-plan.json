@@ -1,0 +1,39 @@
+{
+  "frozen_on": "2026-10-25",
+  "rule": "29 franchises other than LAD ordered ascending by SHA-256 hex of \"phase15|\"+franchise_key; first five drawn",
+  "fixed": [
+    "LAD"
+  ],
+  "drawn": [
+    {
+      "key": "LAA",
+      "sha256": "02429d1fed62eba6d51fffb511eba7703c998cc3af4f848415e919ebffb6cc54"
+    },
+    {
+      "key": "NYY",
+      "sha256": "04327488f24e83148a729276165c860421f38c06f85d325bd43c1b54c8a6c4d1"
+    },
+    {
+      "key": "SD",
+      "sha256": "130049e690ad65e798d02b734acb3a3fe31e2e6afc4059b7d7a39f75fcbb52b7"
+    },
+    {
+      "key": "HOU",
+      "sha256": "13fa56194394e5a983a5c6d86a02f805bd67302252348a3fa0e0f6bf6f14675e"
+    },
+    {
+      "key": "CIN",
+      "sha256": "1c024174c8a4271bfea622e08c875fdfe3f7c08f29520b99cededda3c6c04a0c"
+    }
+  ],
+  "first_not_drawn": {
+    "key": "COL",
+    "sha256": "1f0151b795255a7066c32243a3f0f9fe83c302713a4800c9435bea73628b8acf"
+  },
+  "windows": [
+    "2023",
+    "2024"
+  ],
+  "window_definition": "day after All-Star Game through trade deadline day; dates cited in season_calendar_events before sourcing",
+  "scope": "every trade involving a drawn club in either window; all counterparties and assets; no other transaction types, no contracts"
+}
