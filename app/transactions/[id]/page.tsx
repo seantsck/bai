@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { PageHeader, SubNav, DataTable, Notice, load, Unavailable } from '../../../components/ui.tsx'
 import { StatusBadge, Attribution, PlayerLink } from '../../../components/TransactionBits.tsx'
-import { getTransaction, getTransactionAssets, getTransactionSources, getTransactionFollowups, getTransactionReturns, getAttributionStatements } from '../../../lib/queries.ts'
+import { getTransaction, getTransactionAssets, getTransactionSources, getTransactionFollowups, getTransactionReturns, getTransactionPackages, getAttributionStatements } from '../../../lib/queries.ts'
 import { statusView, gapLabel, formatTransactionDate, CATEGORY_LABELS, EVIDENCE_LABELS, AMOUNT_LABELS } from '../../../lib/transactions.ts'
 import { formatUsd, formatDate } from '../../../lib/format.ts'
 import { TRANSACTION_NAV } from '../../../lib/nav.ts'
@@ -20,7 +20,7 @@ export default async function TransactionPage ({ params }: { params: Promise<{ i
   if (!res.data) notFound()
   const t = res.data
   const n = Number(t.transaction_id)
-  const [assets, sources, followups, returns, statements] = await Promise.all([load(() => getTransactionAssets(n)), load(() => getTransactionSources(n)), load(() => getTransactionFollowups(n)), load(() => getTransactionReturns(n)), load(getAttributionStatements)])
+  const [assets, sources, followups, returns, packages, statements] = await Promise.all([load(() => getTransactionAssets(n)), load(() => getTransactionSources(n)), load(() => getTransactionFollowups(n)), load(() => getTransactionReturns(n)), load(() => getTransactionPackages(n)), load(getAttributionStatements)])
   const sv = statusView(t.status, t.verified_on, t.gaps)
   const required = statements.ok ? statements.data.filter((s) => (t.source_categories as string[]).includes(s.attribution_category)) : []
   const parties = t.parties as Array<{ key: string, name: string, slug: string }>
@@ -77,14 +77,24 @@ export default async function TransactionPage ({ params }: { params: Promise<{ i
       {t.category === 'TRADE' && (
         <section>
           <h2>What each club received (performance evidence)</h2>
-          <p className='note'>Observed production of the players a club received, for that club, during the period it held them. It is evidence, not a verdict: no score, grade or winner is derived from it, and providers are never combined. Figures appear only where their source is authorized for display.</p>
+          <p className='note'>Observed production of the players a club received, for that club, during the period it held them. Each figure is the club&apos;s total across the whole trade: in a trade with three or more clubs it is not split by trading partner and is never added up per package. It is evidence, not a verdict: no score, grade or winner is derived from it, and providers are never combined. Figures appear only where the provider&apos;s sources may be displayed here.</p>
           {!returns.ok ? <Unavailable message={returns.message} /> : (
             <DataTable rows={returns.data} empty='No performance evidence is recorded.' columns={[
               { key: 'club_key', header: 'Club', render: (r) => nameOf(r.club_key) },
               { key: 'provider', header: 'WAR provider' },
-              { key: 'players_received', header: 'Players received', numeric: true },
-              { key: 'return_war_known', header: 'Known WAR', numeric: true, render: (r) => (r.return_war_known === null ? '—' : Number(r.return_war_known).toFixed(1)) },
+              { key: 'players_received', header: 'Players received (club total)', numeric: true },
+              { key: 'return_war_known', header: 'Known WAR (club total)', numeric: true, render: (r) => (r.return_war_known === null ? '—' : Number(r.return_war_known).toFixed(1)) },
               { key: 'evidence', header: 'Evidence', render: (r) => EVIDENCE_LABELS[r.evidence] ?? r.evidence }
+            ]} />
+          )}
+          <h3>Packages</h3>
+          <p className='note'>What each club sent to each other club. Counts only; the performance figures above belong to the club, not to a package.</p>
+          {!packages.ok ? <Unavailable message={packages.message} /> : (
+            <DataTable rows={packages.data} empty='No package is recorded.' columns={[
+              { key: 'from_key', header: 'From', render: (r) => nameOf(r.from_key) },
+              { key: 'to_key', header: 'To', render: (r) => nameOf(r.to_key) },
+              { key: 'players_sent', header: 'Players', numeric: true },
+              { key: 'other_assets_sent', header: 'Other assets', numeric: true }
             ]} />
           )}
         </section>

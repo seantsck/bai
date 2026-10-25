@@ -19,7 +19,9 @@ try {
   if (changed.length) failed = true
   const views = (await q(a, `select schemaname s, viewname v from pg_views where schemaname = 'public' and (viewname like 'v\\_draft%' or viewname like 'v\\_international%' or viewname like 'rm\\_%' or viewname like 'v\\_selection%' or viewname like 'v\\_source%') order by 2`))
   const vch = []
-  for (const { s, v } of views) { const [x, y] = [await fp(a, `${s}.${v}`), await fp(b, `${s}.${v}`)]; if (x.n !== y.n || x.h !== y.h) vch.push(v) }
+  // 030 moved the TRANSACTION rows of the Sources-page summary from the (now internal) raw table to the published read model, deliberately: every other row must be identical.
+  const fpView = async (db, v) => { const r = (await q(db, `select count(*)::int n, coalesce(md5(string_agg(x::text, '|' order by x::text)), '') h from public.${v} x${v === 'v_source_attribution' && process.env.BAI_VIEW_TRANSACTION_ROWS_MOVED ? " where x.domain <> 'TRANSACTION'" : ''}`))[0]; return r }
+  for (const { s, v } of views) { const [x, y] = [await fpView(a, v), await fpView(b, v)]; if (x.n !== y.n || x.h !== y.h) vch.push(v) }
   console.log(`${views.length} public draft / international / read-model views compared: ${vch.length ? `CHANGED ${vch.join(', ')}` : 'identical'}`)
   if (vch.length) failed = true
   const other = (await q(a, `select count(*)::int n from pg_views where schemaname = 'analytics'`))[0].n

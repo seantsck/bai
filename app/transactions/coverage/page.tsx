@@ -14,7 +14,7 @@ export default async function TransactionCoveragePage () {
   const [ov, seasons, clubSeasons, statements] = await Promise.all([load(getTransactionOverview), load(getTransactionSeasonTotals), load(getTransactionClubSeasons), load(getAttributionStatements)])
   const o = ov.ok ? ov.data : null
   const authorized: string[] = o?.display_authorized_categories ?? []
-  const required = statements.ok ? statements.data.filter((s) => authorized.includes(s.attribution_category)) : []
+  const required = statements.ok ? statements.data.filter((s) => !o || authorized.includes(s.attribution_category)) : []   // totals unavailable: credit every source rather than none
   const years = clubSeasons.ok ? [...new Set(clubSeasons.data.map((r) => Number(r.season)))].sort((a, b) => b - a) : []
   const clubs = clubSeasons.ok ? [...new Set(clubSeasons.data.map((r) => r.club_key as string))].sort() : []
   const cell = new Map((clubSeasons.ok ? clubSeasons.data : []).map((r) => [`${r.season}|${r.club_key}`, r]))
@@ -31,6 +31,7 @@ export default async function TransactionCoveragePage () {
           <div className='card'><h3>A club-season is a complete census</h3><p>Every transaction of the club in that season is known, with the expected number established from a source. Club-seasons with this state: {o ? o.complete_census_club_seasons : '—'}.</p></div>
         </div>
       </section>
+      {ov.ok && !o && <Notice tone='warn'>The totals on this page are being refreshed after a change to the record set (a permission, a verification or a record changed). Nothing is shown from the earlier counts, so none can be stale.</Notice>}
       {o && (
         <div className='stats'>
           <Stat label='Transactions shown' value={o.transactions} />

@@ -93,7 +93,7 @@ test('new rows: cash is explicit, a PTBNL is conditional, and the table checks r
   await db.query('delete from trade_package_assets where description in ($1, $2, $3)', ['stated zero', 'unknown cash', 'another PTBNL'])
 })
 
-test('internal by default: the new tables, the research tables and the analytics views are closed to public roles; legacy tables keep their grants', async () => {
+test('internal by default: the new tables, the research tables and the analytics views are closed to public roles; other legacy tables keep their grants; the raw transaction tables are closed (030)', async () => {
   const internal = ['transaction_external_ids', 'transaction_sources', 'transaction_source_links', 'transaction_conflicts', 'ptbnl_resolutions', 'season_calendar_events']
   for (const role of ['anon', 'authenticated']) {
     for (const t of internal) await assert.rejects(h.asRole(db, role, () => db.query(`select * from ${t}`)), /permission denied/, `${role}.${t}`)
@@ -101,7 +101,8 @@ test('internal by default: the new tables, the research tables and the analytics
       'select research.transaction_gaps(1)', "select * from research.verify_transaction(1, 'x', 'y')"]) {
       await assert.rejects(h.asRole(db, role, () => db.query(s)), /permission denied/, `${role}: ${s}`)
     }
-    await h.asRole(db, role, async () => { assert.equal((await h.one(db, 'select count(*)::int n from transactions')).n, 1) })
+    // 030 closed the raw record tables (they hold records no refresh has published); the public reads rm_transactions
+    for (const t of ['transactions', 'trade_packages', 'trade_package_assets']) await assert.rejects(h.asRole(db, role, () => db.query(`select * from ${t}`)), /permission denied/, `${role}.${t}`)
     for (const t of [...internal, 'transactions']) await assert.rejects(h.asRole(db, role, () => db.query(`delete from ${t}`)), /permission denied/, `${role} delete ${t}`)
   }
   const noRls = await h.rows(db, "select c.relname from pg_class c join pg_namespace n on n.oid = c.relnamespace where n.nspname in ('public', 'research') and c.relkind = 'r' and not c.relrowsecurity")

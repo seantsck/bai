@@ -55,7 +55,8 @@ test('attribution: each source is grouped by origin; the public summary and expl
 })
 
 // Internal until the transaction detail view (docs/transactions/phase16-foundation.md): the public summary cannot read them, so it does not count them yet.
-const EXCLUDED = ['coverage_assessments', 'fact_resolutions', 'ptbnl_resolutions', 'season_calendar_events', 'transaction_external_ids', 'transaction_sources']
+// 030 closed `transactions` to the public roles: the summary counts the transactions the read model publishes (rm_transaction_sources) instead.
+const EXCLUDED = ['coverage_assessments', 'fact_resolutions', 'ptbnl_resolutions', 'season_calendar_events', 'transaction_external_ids', 'transaction_sources', 'transactions']
 test('attribution summary covers every public table that cites a source', async () => {
   const def = (await h.one(db, `select pg_get_viewdef('public.v_source_attribution'::regclass) as d`)).d
   const tables = (await h.rows(db, `select c.table_name from information_schema.columns c join information_schema.tables t using (table_schema, table_name)

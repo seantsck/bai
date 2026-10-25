@@ -32,6 +32,12 @@ if (first) {
   check('detail never claims verification without one', !/badge-complete/.test(d.html) && /not been verified complete|cites no corroborating source/.test(d.text))
   check('detail names no winner or grade', !/>\s*(Winner|Grade|Score)\b/i.test(d.html) && /no score, grade or winner is derived/.test(d.text) === (/WAR provider/.test(d.text)))
 }
+const trades = await get('/transactions?type=TRADE')
+const tid = trades.html.match(/href="\/transactions\/(\d+)"/)
+if (tid) {
+  const d = await get(`/transactions/${tid[1]}`)
+  check('a trade shows club totals once and the packages separately', /club&#x27;s total across the whole trade|club's total across the whole trade/.test(d.text) && /<h3>Packages<\/h3>/.test(d.html) && /Known WAR \(club total\)/.test(d.text), `${d.ms} ms`)
+}
 const cov = await get('/transactions/coverage')
 check('coverage renders the three separate statements and the attribution', cov.status === 200 && /A source may be displayed/.test(cov.text) && /A transaction is verified complete/.test(cov.text) && /A club-season is a complete census/.test(cov.text) && cov.text.includes(STATEMENT), `${cov.ms} ms`)
 check('coverage says tracked is not complete', /Tracked is not the complete population/.test(cov.text))

@@ -173,7 +173,10 @@ export const getTransactionFollowups = (id: number) =>
     where f.transaction_id = $1 order by p.player_name, f.step limit 100`, [id])
 
 export const getTransactionReturns = (id: number) =>
-  publicQuery('select club_key, counterparty_key, provider, players_sent, players_received, return_war_known, evidence from rm_transaction_returns where transaction_id = $1 order by club_key, counterparty_key, provider limit 20', [id])
+  publicQuery('select club_key, provider, packages_sent, players_sent, players_received, return_war_known, evidence from rm_transaction_returns where transaction_id = $1 order by club_key, provider limit 20', [id])
+
+export const getTransactionPackages = (id: number) =>
+  publicQuery('select from_key, to_key, players_sent, other_assets_sent from rm_transaction_packages where transaction_id = $1 order by from_key, to_key limit 40', [id])
 
 export const getTransactionClubSeasons = () =>
   publicQuery('select season, club_key, records, coverage_state, expected_count from rm_transaction_club_seasons order by season desc, club_key limit 2000')

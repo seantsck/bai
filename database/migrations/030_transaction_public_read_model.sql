@@ -23,7 +23,15 @@
 --     A transaction enters it only if EVERY source it cites is authorized for display; WAR figures only if their provider's sources are.
 --     It carries no research notes, no reviewer identity and no restricted-source text: the verifier appears as "verified on <date>" only.
 --     Page queries are bounded, indexed and paginated; nothing public reads analytics.* or research.*.
--- Existing rows, views and privileges are untouched. Transaction types and the channel are enum additions only (no existing value changes).
+--   * hardening (amended before any hosted application; 030 is applied nowhere hosted):
+--       - rm_transaction_returns is CLUB-level, keyed (transaction, club, provider). analytics.trade_returns (029, unchanged) computes the received players'
+--         WAR once per transaction and club and repeats it on each package row the club sent, so a three-club trade would show one club's figure once per
+--         counterparty. The read model groups it (and refuses to refresh if the repeated figures ever differ); package-level counts live apart in rm_transaction_packages.
+--       - fail-closed withdrawal: a withdrawn publication grant, a revoked verification and any change to a published transaction's records or cited sources remove it
+--         from the public tables in the same transaction (triggers below); the aggregates are emptied and the refresh locks what it reads.
+--       - the raw tables transactions, trade_packages and trade_package_assets become internal (they were publicly readable since 028 and hold unpublished records).
+--         Nothing in the application reads them; the Sources page summary now counts the transactions the read model publishes.
+-- Existing rows, views and privileges are otherwise untouched. Transaction types and the channel are enum additions only (no existing value changes).
 
 -- ---------------------------------------------------------------------------------------------------------------
 -- 1. Retrosheet attribution category and its grant slot
@@ -279,21 +287,35 @@ create table public.rm_transaction_followups (
   primary key (transaction_id, player_id, step)
 );
 
+-- Performance returned to a club by a transaction. The grain is the CLUB (analytics.trade_returns computes the received players' WAR once per
+-- transaction and club, then repeats it on each package row the club sent, so a club that sends packages to two counterparties would show the same
+-- figure twice). One row per (transaction, club, provider): the figure is never attributed to a counterparty and never summed across packages.
 create table public.rm_transaction_returns (
   transaction_id bigint not null,
   club_key text not null,
-  counterparty_key text not null,
   provider text not null,
-  players_sent integer not null,
-  players_received integer not null,
+  packages_sent integer not null,
+  players_sent integer not null,        -- summed over the club's packages (each asset belongs to one package)
+  players_received integer not null,    -- a club-level count, not per counterparty
   return_war_known numeric,
   evidence text not null check (evidence in ('OBSERVED_COMPLETE', 'OBSERVED_PARTIAL', 'NOT_OBSERVED', 'WITHHELD_PERMISSION')),
-  primary key (transaction_id, club_key, counterparty_key, provider)
+  primary key (transaction_id, club_key, provider)
+);
+
+-- The package level, kept apart from the club totals: who sent what to whom. No WAR figure lives here.
+create table public.rm_transaction_packages (
+  transaction_id bigint not null,
+  from_key text not null,
+  to_key text not null,
+  players_sent integer not null,
+  other_assets_sent integer not null,
+  primary key (transaction_id, from_key, to_key)
 );
 
 create table public.rm_transaction_sources (
   transaction_id bigint not null,
   position integer not null,
+  source_id bigint not null,
   title text not null,
   publisher text,
   url text,
@@ -360,6 +382,11 @@ declare
   v_withheld integer;
 begin
   lock table public.rm_transaction_refreshes in exclusive mode;
+  -- Nothing the refresh reads may change while it runs (a grant revoked or a verification withdrawn after the refresh read it would otherwise be
+  -- published by the refresh's commit). The withdrawal triggers below fire in the writer's transaction; this lock orders them before or after the refresh.
+  lock table ingest.source_publication_grants, research.transaction_verifications, public.sources, public.transactions, public.trade_packages, public.trade_package_assets,
+             public.transaction_sources, public.transaction_source_links, public.transaction_external_ids, public.ptbnl_resolutions, public.transaction_conflicts,
+             public.transaction_player_moves in share mode;
   select coalesce(max(generation_id), 0) + 1 into v_generation from public.rm_transaction_refreshes;
 
   -- sources authorized for public display: the openly licensed groups, or a category with a recorded grant on this database
@@ -382,6 +409,7 @@ begin
 
   delete from public.rm_transaction_followups;
   delete from public.rm_transaction_returns;
+  delete from public.rm_transaction_packages;
   delete from public.rm_transaction_sources;
   delete from public.rm_transaction_assets;
   delete from public.rm_transaction_players;
@@ -478,25 +506,40 @@ begin
   create temporary table _war_ok on commit drop as
   select w.war_system::text as provider, bool_and(w.source_id in (select id from _auth)) as ok
   from public.war_observations w group by w.war_system;
-  insert into public.rm_transaction_returns (transaction_id, club_key, counterparty_key, provider, players_sent, players_received, return_war_known, evidence)
-  select r.transaction_id, o.franchise_key, cp.franchise_key, r.war_system::text, r.players_sent, cardinality(r.received_player_ids),
-         case when coalesce(w.ok, true) then r.return_war_known end,
-         case when not coalesce(w.ok, true) and r.return_war_known is not null then 'WITHHELD_PERMISSION'
-              when r.return_war_known is null then 'NOT_OBSERVED'
-              when r.return_coverage = 'COMPLETE' then 'OBSERVED_COMPLETE' else 'OBSERVED_PARTIAL' end
+  -- the club-level figure is identical on every package row of a club (same transaction, club, provider); anything else is a defect, not a choice
+  if exists (select 1 from analytics.trade_returns r join public.rm_transactions t on t.transaction_id = r.transaction_id
+             group by r.transaction_id, r.organization_id, r.war_system
+             having count(distinct r.return_war_known) > 1 or count(distinct r.return_coverage) > 1 or count(distinct cardinality(r.received_player_ids)) > 1) then
+    raise exception 'analytics.trade_returns gives one club different club-level figures within a transaction';
+  end if;
+  insert into public.rm_transaction_returns (transaction_id, club_key, provider, packages_sent, players_sent, players_received, return_war_known, evidence)
+  select r.transaction_id, o.franchise_key, r.war_system::text, count(*)::integer, sum(r.players_sent)::integer, max(cardinality(r.received_player_ids)),
+         case when coalesce(bool_and(w.ok), true) then max(r.return_war_known) end,
+         case when not coalesce(bool_and(w.ok), true) and max(r.return_war_known) is not null then 'WITHHELD_PERMISSION'
+              when max(r.return_war_known) is null then 'NOT_OBSERVED'
+              when max(r.return_coverage) = 'COMPLETE' then 'OBSERVED_COMPLETE' else 'OBSERVED_PARTIAL' end
   from analytics.trade_returns r
   join public.rm_transactions t on t.transaction_id = r.transaction_id
   join public.organizations o on o.id = r.organization_id
-  join public.organizations cp on cp.id = r.counterparty_id
-  left join _war_ok w on w.provider = r.war_system::text;
+  left join _war_ok w on w.provider = r.war_system::text
+  group by r.transaction_id, o.franchise_key, r.war_system;
 
-  insert into public.rm_transaction_sources (transaction_id, position, title, publisher, url, attribution_category, role, independence_group, locator)
-  select x.transaction_id, (row_number() over (partition by x.transaction_id order by x.ord, x.title))::integer, x.title, x.publisher, x.url, x.category, x.role, x.grp, x.locator
+  insert into public.rm_transaction_packages (transaction_id, from_key, to_key, players_sent, other_assets_sent)
+  select k.transaction_id, fo.franchise_key, too.franchise_key, coalesce(sum(r.players_sent), 0)::integer, coalesce(sum(r.other_assets_sent), 0)::integer
+  from public.trade_packages k
+  join public.rm_transactions t on t.transaction_id = k.transaction_id
+  join public.organizations fo on fo.id = k.from_organization_id
+  join public.organizations too on too.id = k.to_organization_id
+  left join (select distinct package_id, players_sent, other_assets_sent from analytics.trade_returns) r on r.package_id = k.id
+  group by k.transaction_id, fo.franchise_key, too.franchise_key;
+
+  insert into public.rm_transaction_sources (transaction_id, position, source_id, title, publisher, url, attribution_category, role, independence_group, locator)
+  select x.transaction_id, (row_number() over (partition by x.transaction_id order by x.ord, x.title))::integer, x.source_id, x.title, x.publisher, x.url, x.category, x.role, x.grp, x.locator
   from (
-    select t.id as transaction_id, 0 as ord, s.title, s.publisher, s.url, _src.category, 'RECORD' as role, null::text as grp, null::text as locator
+    select t.id as transaction_id, 0 as ord, s.id as source_id, s.title, s.publisher, s.url, _src.category, 'RECORD' as role, null::text as grp, null::text as locator
     from public.transactions t join _tx on _tx.id = t.id join public.sources s on s.id = t.source_id join _src on _src.id = s.id
     union all
-    select ts.transaction_id, 1, s.title, s.publisher, s.url, _src.category, ts.role, ts.independence_group, ts.locator
+    select ts.transaction_id, 1, s.id, s.title, s.publisher, s.url, _src.category, ts.role, ts.independence_group, ts.locator
     from public.transaction_sources ts join _tx on _tx.id = ts.transaction_id join public.sources s on s.id = ts.source_id join _src on _src.id = s.id
   ) x;
 
@@ -530,6 +573,291 @@ begin
   insert into public.rm_transaction_refreshes (generation_id, transactions, withheld_unauthorized) values (v_generation, v_displayable, v_withheld);
   return v_generation;
 end $$;
+
+-- ---------------------------------------------------------------------------------------------------------------
+-- Fail-closed withdrawal. The read model is a snapshot; a snapshot must never outlive the permission or verification it was built on.
+-- Any change that could withdraw a publication right or make a displayed claim obsolete removes the affected transactions from the public
+-- tables IN THE SAME TRANSACTION as the change, whoever makes it. The aggregates (overview, coverage, club-season states) cannot be corrected
+-- piecemeal, so they are emptied too and the pages say the counts await a refresh. Only a refresh (owner-run) publishes again.
+--   * a publication grant deleted, changed or truncated   -> every transaction citing that attribution category
+--   * a verification revoked (by a person or by the 028 evidence-changed trigger) -> that transaction
+--   * a change to a transaction's parties, assets, sources, provenance, conflicts or resolutions, or to a cited source row -> that transaction
+-- Withdrawals are logged in the internal rm_transaction_withdrawals. Unpublished transactions are untouched (an import costs one indexed lookup).
+-- ---------------------------------------------------------------------------------------------------------------
+
+create table public.rm_transaction_withdrawals (
+  id bigint generated always as identity primary key,
+  withdrawn_at timestamptz not null default now(),
+  reason text not null,
+  withdrawn_transactions integer not null,
+  session_role name not null default session_user
+);
+insert into public.internal_objects values ('rm_transaction_withdrawals', 'read-model withdrawal log') on conflict (object_name) do nothing;
+
+create function public.rm_withdraw_transactions(p_ids bigint[], p_reason text) returns integer
+language plpgsql
+set search_path = pg_catalog, public
+as $$
+declare
+  n integer;
+begin
+  if p_ids is null or cardinality(p_ids) = 0 or not exists (select 1 from public.rm_transactions where transaction_id = any (p_ids)) then return 0; end if;
+  delete from public.rm_transaction_followups where transaction_id = any (p_ids) or later_transaction_id = any (p_ids);
+  delete from public.rm_transaction_returns where transaction_id = any (p_ids);
+  delete from public.rm_transaction_packages where transaction_id = any (p_ids);
+  delete from public.rm_transaction_sources where transaction_id = any (p_ids);
+  delete from public.rm_transaction_assets where transaction_id = any (p_ids);
+  delete from public.rm_transaction_players where transaction_id = any (p_ids);
+  with d as (delete from public.rm_transactions where transaction_id = any (p_ids) returning 1) select count(*) into n from d;
+  delete from public.rm_transaction_coverage;
+  delete from public.rm_transaction_club_seasons;
+  delete from public.rm_transaction_overview;
+  insert into public.rm_transaction_withdrawals (reason, withdrawn_transactions) values (p_reason, n);
+  return n;
+end $$;
+
+-- The openly licensed groups need no grant; every other category is displayed only while its grant exists.
+create function public.rm_withdraw_category(p_category text, p_reason text) returns integer
+language plpgsql
+set search_path = pg_catalog, public
+as $$
+declare
+  n integer;
+begin
+  n := public.rm_withdraw_transactions(array(select distinct transaction_id from public.rm_transaction_sources where attribution_category = p_category), p_reason);
+  delete from public.rm_transaction_returns;   -- a performance figure may rest on the revoked source group
+  delete from public.rm_transaction_overview;  -- it lists the categories authorized for display
+  return n;
+end $$;
+
+create function public.rm_grant_changed() returns trigger
+language plpgsql security definer
+set search_path = pg_catalog, public
+as $$
+begin
+  if tg_op = 'TRUNCATE' then
+    perform public.rm_withdraw_transactions(array(select distinct transaction_id from public.rm_transaction_sources
+                                                  where attribution_category not in ('CHADWICK_REGISTER', 'WIKIPEDIA', 'BAI_RESEARCH', 'WIKIDATA')), 'publication grants truncated');
+    delete from public.rm_transaction_returns;
+    delete from public.rm_transaction_overview;
+  else
+    perform public.rm_withdraw_category(old.attribution_category, format('publication grant %s on %s', lower(tg_op), old.attribution_category));
+  end if;
+  return null;
+end $$;
+create trigger source_publication_grants_withdraw after update or delete on ingest.source_publication_grants
+  for each row execute function public.rm_grant_changed();
+create trigger source_publication_grants_withdraw_truncate after truncate on ingest.source_publication_grants
+  for each statement execute function public.rm_grant_changed();
+
+create function public.rm_verification_changed() returns trigger
+language plpgsql security definer
+set search_path = pg_catalog, public
+as $$
+begin
+  if tg_op = 'DELETE' then perform public.rm_withdraw_transactions(array[old.transaction_id], 'verification deleted');
+  elsif old.state = 'ACTIVE' and new.state <> 'ACTIVE' then perform public.rm_withdraw_transactions(array[new.transaction_id], 'verification revoked'); end if;
+  return null;
+end $$;
+create trigger transaction_verifications_withdraw after update or delete on research.transaction_verifications
+  for each row execute function public.rm_verification_changed();
+
+-- Resolves the transaction(s) a changed row belongs to, as research.transaction_changed (028) does, and adds the tables the fingerprint also reads.
+create function public.rm_facts_changed() returns trigger
+language plpgsql security definer
+set search_path = pg_catalog, public
+as $$
+declare
+  v_ids bigint[] := '{}';
+  o jsonb := case when tg_op in ('UPDATE', 'DELETE') then to_jsonb(old) else '{}'::jsonb end;
+  n jsonb := case when tg_op in ('UPDATE', 'INSERT') then to_jsonb(new) else '{}'::jsonb end;
+  k text[];
+begin
+  if tg_table_name = 'transactions' then
+    v_ids := array[(o->>'id')::bigint, (n->>'id')::bigint];
+  elsif tg_table_name in ('trade_packages', 'transaction_external_ids', 'transaction_sources', 'transaction_conflicts', 'transaction_player_moves') then
+    v_ids := array[(o->>'transaction_id')::bigint, (n->>'transaction_id')::bigint];
+  elsif tg_table_name = 'trade_package_assets' then
+    v_ids := array(select transaction_id from public.trade_packages where id in ((o->>'trade_package_id')::bigint, (n->>'trade_package_id')::bigint));
+  elsif tg_table_name = 'transaction_source_links' then
+    v_ids := array(select transaction_id from public.transaction_sources where id in ((o->>'transaction_source_id')::bigint, (n->>'transaction_source_id')::bigint));
+  elsif tg_table_name = 'ptbnl_resolutions' then
+    v_ids := array(select k2.transaction_id from public.trade_package_assets a join public.trade_packages k2 on k2.id = a.trade_package_id
+                   where a.id in ((o->>'trade_package_asset_id')::bigint, (n->>'trade_package_asset_id')::bigint));
+  elsif tg_table_name = 'sources' then
+    v_ids := array(select id from public.transactions where source_id in ((o->>'id')::bigint, (n->>'id')::bigint)
+                   union select transaction_id from public.transaction_sources where source_id in ((o->>'id')::bigint, (n->>'id')::bigint)
+                   union select transaction_id from public.transaction_external_ids where source_id in ((o->>'id')::bigint, (n->>'id')::bigint)
+                   union select k2.transaction_id from public.ptbnl_resolutions r join public.trade_package_assets a on a.id = r.trade_package_asset_id join public.trade_packages k2 on k2.id = a.trade_package_id
+                         where r.source_id in ((o->>'id')::bigint, (n->>'id')::bigint));
+  end if;
+  perform public.rm_withdraw_transactions(array(select distinct x from unnest(v_ids) x where x is not null), format('%s on %s', lower(tg_op), tg_table_name));
+  return null;
+end $$;
+
+do $$
+declare
+  t text;
+begin
+  foreach t in array array['transactions', 'trade_packages', 'trade_package_assets', 'transaction_external_ids', 'transaction_sources', 'transaction_source_links', 'ptbnl_resolutions',
+                           'transaction_conflicts', 'transaction_player_moves', 'sources'] loop
+    execute format('create trigger %I after %s on public.%I for each row execute function public.rm_facts_changed()', t || '_withdraw', case when t = 'sources' then 'update or delete' else 'insert or update or delete' end, t);
+  end loop;
+end $$;
+
+-- ---------------------------------------------------------------------------------------------------------------
+-- The raw transaction tables are not a second public door. 028 left transactions, trade_packages and trade_package_assets readable by the
+-- public roles (they predate the read model); they hold every imported record, including those whose source is not licensed for display and
+-- those no refresh has published. Nothing in the application reads them. They become internal; the public reads rm_*.
+-- The Sources page counted transactions per source group from transactions.source_id; it now counts the transactions the read model publishes.
+-- ---------------------------------------------------------------------------------------------------------------
+
+insert into public.internal_objects values
+  ('transactions', 'raw record: published only through rm_transactions (030)'),
+  ('trade_packages', 'raw record: published only through rm_transaction_assets and rm_transaction_packages (030)'),
+  ('trade_package_assets', 'raw record: published only through rm_transaction_assets (030)')
+on conflict (object_name) do nothing;
+
+-- The public attribution summary counts displayed transactions (rm_transaction_sources, the record-level source) instead of the now-internal transactions table.
+create or replace view public.v_source_attribution with (security_invoker = true) as
+WITH cited(domain, source_id) AS (
+         SELECT 'DRAFT'::text,
+            draft_selections.source_id
+           FROM public.draft_selections
+        UNION ALL
+         SELECT 'DRAFT'::text,
+            draft_signings.source_id
+           FROM public.draft_signings
+        UNION ALL
+         SELECT 'DRAFT'::text,
+            slot_values.source_id
+           FROM public.slot_values
+        UNION ALL
+         SELECT 'DRAFT'::text,
+            drafts.source_id
+           FROM public.drafts
+        UNION ALL
+         SELECT 'DRAFT'::text,
+            organization_draft_pools.source_id
+           FROM public.organization_draft_pools
+        UNION ALL
+         SELECT 'DRAFT'::text,
+            schools.source_id
+           FROM public.schools
+        UNION ALL
+         SELECT 'INTERNATIONAL'::text,
+            international_signings.source_id
+           FROM public.international_signings
+        UNION ALL
+         SELECT 'INTERNATIONAL'::text,
+            international_signing_periods.source_id
+           FROM public.international_signing_periods
+        UNION ALL
+         SELECT 'INTERNATIONAL'::text,
+            organization_signing_period_context.source_id
+           FROM public.organization_signing_period_context
+        UNION ALL
+         SELECT 'INTERNATIONAL'::text,
+            academies.source_id
+           FROM public.academies
+        UNION ALL
+         SELECT 'INTERNATIONAL'::text,
+            trainers.source_id
+           FROM public.trainers
+        UNION ALL
+         SELECT 'INTERNATIONAL'::text,
+            player_academy_relationships.source_id
+           FROM public.player_academy_relationships
+        UNION ALL
+         SELECT 'INTERNATIONAL'::text,
+            player_trainer_relationships.source_id
+           FROM public.player_trainer_relationships
+        UNION ALL
+         SELECT 'DEVELOPMENT'::text,
+            affiliate_seasons.source_id
+           FROM public.affiliate_seasons
+        UNION ALL
+         SELECT 'DEVELOPMENT'::text,
+            development_events.source_id
+           FROM public.development_events
+        UNION ALL
+         SELECT 'DEVELOPMENT'::text,
+            player_assignments.source_id
+           FROM public.player_assignments
+        UNION ALL
+         SELECT 'EXPECTATION'::text,
+            evaluations.source_id
+           FROM public.evaluations
+        UNION ALL
+         SELECT 'EXPECTATION'::text,
+            ranking_lists.source_id
+           FROM public.ranking_lists
+        UNION ALL
+         SELECT 'VALUE'::text,
+            organization_value_attributions.source_id
+           FROM public.organization_value_attributions
+        UNION ALL
+         SELECT 'IDENTITY'::text,
+            player_external_ids.source_id
+           FROM public.player_external_ids
+        UNION ALL
+         SELECT 'IDENTITY'::text,
+            player_aliases.source_id
+           FROM public.player_aliases
+        UNION ALL
+         SELECT 'OUTCOME'::text,
+            outcome_audits.source_id
+           FROM public.outcome_audits
+        UNION ALL
+         SELECT 'OUTCOME'::text,
+            outcome_audit_details.source_id
+           FROM public.outcome_audit_details
+        UNION ALL
+         SELECT 'OUTCOME'::text,
+            war_observations.source_id
+           FROM public.war_observations
+        UNION ALL
+         SELECT 'OUTCOME'::text,
+            mlb_debuts.source_id
+           FROM public.mlb_debuts
+        UNION ALL
+         SELECT 'OUTCOME'::text,
+            acquisition_dispositions.source_id
+           FROM public.acquisition_dispositions
+        UNION ALL
+         SELECT 'TRANSACTION'::text,
+            rts.source_id
+           FROM public.rm_transaction_sources rts
+          WHERE rts.role = 'RECORD'
+        UNION ALL
+         SELECT 'ORGANIZATION'::text,
+            organization_names.source_id
+           FROM public.organization_names
+        UNION ALL
+         SELECT 'ORGANIZATION'::text,
+            organization_league_seasons.source_id
+           FROM public.organization_league_seasons
+        UNION ALL
+         SELECT 'ORGANIZATION'::text,
+            rules_eras.source_id
+           FROM public.rules_eras
+        UNION ALL
+         SELECT 'FIELD_OBSERVATION'::text,
+            source_observations.source_id
+           FROM public.source_observations
+        )
+ SELECT s.attribution_category,
+    c.domain,
+    (count(*))::integer AS records,
+    (count(DISTINCT s.id))::integer AS sources
+   FROM (cited c
+     JOIN public.sources s ON ((s.id = c.source_id)))
+  WHERE (s.attribution_category <> 'TEST_FIXTURE'::text)
+  GROUP BY s.attribution_category, c.domain;
+
+drop policy if exists public_read on public.transactions;
+drop policy if exists public_read on public.trade_packages;
+drop policy if exists public_read on public.trade_package_assets;
 
 -- ---------------------------------------------------------------------------------------------------------------
 -- Boundary: rm_* are public facts; the refresh and the bookkeeping are not

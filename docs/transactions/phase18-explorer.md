@@ -50,7 +50,7 @@ Explorer page queries run as `anon` in a read-only transaction, 20 runs, gate < 
 
 Read-model refresh: ~20 s (owner-run, convergent). No count(*) in pagination; one extra row detects a next page; `page` is capped at 200. Value-view parity: `trade_returns`, `acquisition_value`, `class_value` and the draft/international views are byte-identical (canonical JSON dumps) between 029 and 030 at the 401-trade scale; 030 adds only tables and new functions. Repeat: `node scripts/db/bench/build-p18-all.mjs` then `node --import ./tests/support/register-ts.mjs scripts/db/bench/explorer.mjs --db bai_p18_all`.
 
-A load test found and fixed a real defect before commit: a three-team trade yields several return rows for one club and provider, so `rm_transaction_returns` is keyed by (transaction, club, counterparty, provider).
+A load test found a real defect: a three-team trade yields several return rows for one club and provider. The first fix (adding the counterparty to the key) only hid it; see "Hardening" below for the real correction.
 
 ## Rendered smoke test
 
@@ -73,5 +73,52 @@ Decision: **not implemented.** Nothing in Phase 18 requires it; PTBNL resolution
 5. **WAR returns** appear only where the WAR source permits display.
 6. **Held records** (name-only, id/name mismatch, approximate dates) stay out until identity or dates are resolved by a person.
 7. **Refresh** must be run by the database owner after any import, grant or verification; the read model is stale until then.
-8. **Legacy raw tables.** `transactions`, `trade_packages`, `trade_package_assets` are publicly readable on hosted and protected only by the write-time guard; the explorer reads the gated read model, not them. Consider tightening separately.
+8. **Legacy raw tables** are closed by 030 (see Hardening). On hosted they are publicly readable today; applying 030 closes them, which is a visible behaviour change to anyone using the Data API directly. Nothing in this application reads them.
 9. PRs #37–#41 remain drafts; none merged.
+
+
+## Hardening (second pass, before any merge review)
+
+Migration 030 was amended in place (it is applied nowhere hosted; 001–029 are untouched). Every change:
+
+**1. Club-level returns, not per-counterparty.** `analytics.trade_returns` (029, deliberately unchanged) computes the received players' WAR once per transaction and club, then repeats it on every package row that club *sent*. In a three-club trade a club that sends two packages therefore carries the same figure twice; on the load-test data 12 club rows were affected, all with identical figures (so nothing was ever summed, but the first fix of adding the counterparty to the key would have displayed one club total as two counterparty figures).
+- `rm_transaction_returns` is now (transaction, club, provider): one figure per club and provider, labelled on the page as the club's total across the whole trade, `players_sent` summed over the club's packages, `players_received` a club count.
+- New `rm_transaction_packages` keeps the package level (who sent how many players and other assets to whom); it carries no WAR figure.
+- The refresh raises an exception if the repeated club figures ever disagree rather than choosing one.
+- Providers are never combined; a provider whose sources are not licensed for display is `WITHHELD_PERMISSION` while another provider's figure shows; no evidence is `NOT_OBSERVED`, never zero.
+
+**2. Fail-closed withdrawal (stale authorization and stale verification).** Before: a revoked grant or verification kept its rows in the public tables until the owner next ran the refresh. After, in the *same transaction* as the change, rows are removed from the public tables:
+| Event | Effect |
+| --- | --- |
+| a publication grant deleted, updated or truncated | every transaction citing that category is withdrawn; all performance figures and the overview are removed |
+| a verification revoked (by a person, or automatically by 028 when evidence changes) | that transaction is withdrawn |
+| any insert, update or delete on a transaction's record, packages, assets, sources, links, external ids, conflicts, PTBNL resolutions or moves, or an update/delete of a cited `sources` row | that transaction is withdrawn |
+Aggregates (overview, coverage matrix, club-season states) cannot be corrected piecemeal and are emptied; the pages say the totals await a refresh instead of showing old counts. A withdrawal also removes other transactions' "later movement" rows that point at the withdrawn one. A new grant or verification publishes nothing until the owner refreshes. The refresh now locks the tables it reads (SHARE) so a revocation cannot interleave with it. Importing new transactions withdraws nothing (they are unpublished) and import timings are unchanged (59/84/17 s against 60/85/16 s for the three acquisition batches). Withdrawals are logged in the internal `rm_transaction_withdrawals`. `sources` rows are in the fingerprint of 028 but not covered by 028's revocation triggers; the new trigger covers them (a changed source URL withdraws the claim even though the verification row stays ACTIVE and mismatched).
+
+**3. Raw transaction tables.** Before: `public.transactions`, `trade_packages`, `trade_package_assets` were readable by anon and authenticated (RLS `using (true)`), exposing every imported record, including those whose source is not licensed (the 65 BAI trades; any Retrosheet row). `transaction_player_moves`, `transaction_sources`, `transaction_external_ids`, `transaction_source_links`, `ptbnl_resolutions`, `transaction_conflicts`, `research.*`, `analytics.*` and `ingest.*` were already closed. After: the three tables are internal (grants revoked, `public_read` policies dropped, registered in `internal_objects`). Consumers audited: the application reads none of them; research tooling and tests use the owner role; the only public dependent was `public.v_source_attribution` (the Sources page), whose TRANSACTION rows now count the transactions the read model publishes. Draft, international and organization reads are unchanged (all other tables and views byte-identical, below).
+
+**Verified** (`tests/db/transaction-read-model-hardening.test.mjs`, direct SQL as `anon` and `authenticated`): two-club and three-club trades, one club with two packages, two WAR providers, NULL and partial coverage; grant withdrawn, re-granted, truncated; verification revoked; each of an asset edit, a link edit, a source-row edit, a link removal and an added asset on a verified record; convergence of the refresh after a withdrawal; no withdrawal on import; every raw table and every BAI function refused to both roles.
+
+## Reconciled load-test population (`node scripts/db/bench/reconcile.mjs --db bai_p18_all`)
+
+The earlier 602 was not a loss: 602 trades is the Retrosheet imports, and the read model withholds the 65 existing BAI trades because their source (MLB) is not licensed for display on that database. Canonical and published populations reconcile exactly.
+
+| | Count |
+| --- | ---: |
+| Existing BAI trades (source MLB) | 65 |
+| Imported trades 2010–2014 / 2015–2020 / 2021 | 244 / 336 / 22 (= 602) |
+| **Total trades (canonical)** | **667** |
+| Non-trade acquisitions (FA 8,333; amateur FA 371; waiver 1,241; purchase 533; Rule 5 177) | 10,655 |
+| **Total transactions (canonical)** | **11,322** |
+| Published by the read model | 11,257 (602 trades + 10,655) |
+| Withheld by permission (65 BAI trades, MLB-sourced) | 65 |
+
+Held or excluded before import (local staging summaries, nothing forced): trade groups held 271 / 378 / 91 (name-only players, one direction only, unstated conditions, free-text assets, later-dated members without a placeholder, id/name mismatch; 2015–2020 also leaves 2 groups HELD at apply and 14 groups that match an existing BAI trade, 9 confirmed + 5 possible, which are not re-imported), acquisitions held 31 / 20 / 28, and not acquisitions at all: departures 4,450 / 5,418 / 921, draft selections 1,169 / 500 / 0, voids 8 / 2 / 0, returns 19 / 32 / 3, roster status 1 / 0 / 0.
+
+## Hardened benchmark (disposable PG17, 11,257 published of 11,322)
+
+Every page query under 30 ms median (first page 1.7 ms, page 200 28 ms, filters 1–3 ms, search 1–2 ms, detail queries under 1 ms, coverage queries 10.6 ms in total); refresh 20.8 s. `explorer-hardened.json`. At benchmark scale the three value views are IDENTICAL between a 029-only and a 029+030 database (trade_returns 1518 rows, acquisition_value 3176, class_value 350), and all 100 tables and the draft / international views are identical except the intended `internal_objects` rows and the Sources-page TRANSACTION rows (`verify-unchanged.mjs`).
+
+## Readiness for merge review
+
+Phase 18 is ready for *merge review*, not for production. Remaining production requirements are the blockers listed above, plus: apply 028, 029 and 030 to hosted in order under separate authorization; record the Retrosheet publication basis (a person); import under separate authorization; run the refresh as owner. Reviewing the effect of closing the three raw tables on any Data API consumer before applying 030 to hosted.

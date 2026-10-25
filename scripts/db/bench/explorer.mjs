@@ -33,7 +33,8 @@ try {
     assets: ['select position, from_key, to_key, asset_kind, player_name from rm_transaction_assets where transaction_id = $1 order by position limit 200', [sample]],
     sources: ['select position, title from rm_transaction_sources where transaction_id = $1 order by position limit 50', [sample]],
     followups: ['select f.player_id, f.step, f.later_transaction_id from rm_transaction_followups f where f.transaction_id = $1 order by f.player_id, f.step limit 100', [sample]],
-    returns: ['select club_key, provider, evidence from rm_transaction_returns where transaction_id = $1 limit 20', [sample]]
+    returns: ['select club_key, provider, packages_sent, players_sent, players_received, return_war_known, evidence from rm_transaction_returns where transaction_id = $1 order by club_key, provider limit 20', [sample]],
+    packages: ['select from_key, to_key, players_sent, other_assets_sent from rm_transaction_packages where transaction_id = $1 order by from_key, to_key limit 40', [sample]]
   } : {}
   const coverage = {
     overview: ['select * from rm_transaction_overview limit 1'],

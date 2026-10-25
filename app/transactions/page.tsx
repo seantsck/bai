@@ -20,13 +20,14 @@ export default async function TransactionsPage ({ searchParams }: { searchParams
   const o = overview.ok ? overview.data : null
   const shown = new Set(rows.flatMap((r) => (r.attribution_required ? ['x'] : [])))
   const authorized: string[] = o?.display_authorized_categories ?? []
-  const required = statements.ok ? statements.data.filter((s) => authorized.includes(s.attribution_category) || shown.size > 0) : []
+  const required = statements.ok ? statements.data.filter((s) => authorized.includes(s.attribution_category) || shown.size > 0) : []   // every statement while totals are unavailable and rows are shown
   return (
     <>
       <PageHeader title='Transactions' lede='A searchable ledger of reconstructed historical transactions: trades, signings, waiver claims, purchases and Rule 5 selections. Each is shown with what is known, what is not, and where it came from.' />
       <SubNav items={TRANSACTION_NAV} />
       <Attribution statements={required} />
       <Notice>Everything here is a reconstruction from the sources listed on each record. <strong>Partial</strong> means sourced but not verified complete; <strong>Verified complete</strong> appears only after a person has checked a record against two independent sources, and is withdrawn if the record changes. A source being shown here is a separate matter from a record being complete, and neither says a club-season list is complete (see <Link href='/transactions/coverage'>coverage &amp; limitations</Link>). No trade is graded and no winner is named.</Notice>
+      {overview.ok && !o && <Notice tone='warn'>Totals are being refreshed after a change to the record set. The rows below are unaffected; counts return when the refresh completes.</Notice>}
       {o && (
         <div className='stats'>
           <Stat label='Transactions shown' value={o.transactions} />
