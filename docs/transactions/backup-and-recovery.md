@@ -55,6 +55,8 @@ scripts/db/backup-pack.sh unpack <file.tar.zst.gpg> <new empty directory>      #
 
 GnuPG symmetric AES-256 with a salted, heavily iterated key derivation; no network is used and **nothing is uploaded by these scripts**. The passphrase is typed into gpg's own prompt and never appears in a command line or the environment. Keep it in a password manager, *not* beside the file: without it the backup cannot be opened and no one can recover it. The procedure is tested end to end on synthetic data (round trip, no plaintext in the ciphertext, wrong passphrase refused, tampered file refused, overwrite refused; `tests/db/backup-pack.test.mjs`).
 
+**Runbook for the real copy and its Google Drive destination: `offsite-backup.md`** (`scripts/db/backup-offsite.sh` enforces ciphertext-only, a typed destination and hash re-verification).
+
 **Status:** the procedure is ready and tested; **the real encrypted second copy has not been created** — it needs your passphrase and your choice of destination, and no database content has been encrypted, copied off this machine or uploaded.
 
 ## 5. Order of use at a gate

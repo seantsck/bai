@@ -15,6 +15,7 @@ cmd="${1:-}"; shift || true
 pf=(); pfile=()
 args=()
 while [ $# -gt 0 ]; do case "$1" in --passphrase-file) pf=(--batch --pinentry-mode loopback --passphrase-file "$2"); pfile=(--passphrase-file "$2"); shift 2 ;; *) args+=("$1"); shift ;; esac; done
+GPG_TTY="$(tty 2>/dev/null || true)"; export GPG_TTY   # so gpg's own passphrase prompt can reach the terminal
 for t in gpg tar zstd sha256sum; do command -v "$t" >/dev/null || { echo "missing tool: $t" >&2; exit 2; }; done
 gpg_enc() { gpg --symmetric --cipher-algo AES256 --s2k-mode 3 --s2k-digest-algo SHA512 --s2k-count 65011712 --compress-algo none "${pf[@]}" "$@"; }
 tree_hash() { (cd "$1" && find . -type f | LC_ALL=C sort | xargs sha256sum | sha256sum | cut -d' ' -f1); }
