@@ -1,33 +1,24 @@
-// Fixed input snapshot of hosted BAI data for the benchmarks: one READ-ONLY transaction, every row of every BAI table as
-// newline-delimited JSON, with a SHA-256 manifest. Hosted is never written. The snapshot stays on local disk (gitignored area).
-//   node --env-file=.env.hosted.local scripts/db/bench/snapshot-hosted.mjs
+// A consistent snapshot of the hosted BAI data: ONE REPEATABLE READ, READ ONLY transaction (migration level and every table from the same database snapshot),
+// every row of every BAI table as newline-delimited JSON with a SHA-256 manifest (library: scripts/db/lib/snapshot.mjs). Hosted is never written.
+//   node --env-file=.env.hosted.local scripts/db/bench/snapshot-hosted.mjs --out <new directory>
+// Without --out the historical benchmark location (BAI_BENCH_DIR/snapshot) is used, but an existing, non-empty snapshot is never overwritten or deleted:
+// the fixed input of the benchmarks stays as it was. The snapshot stays on local disk.
 import fs from 'node:fs'
 import path from 'node:path'
-import crypto from 'node:crypto'
 import pg from 'pg'
 import { ownerDatabaseUrl, isLocalUrl } from '../lib/connection.mjs'
+import { takeSnapshot, verifySnapshot } from '../lib/snapshot.mjs'
 import { benchDir } from './cluster.mjs'
 
+const argv = process.argv.slice(2)
+const o = argv.indexOf('--out')
+const dir = path.resolve(o >= 0 ? argv[o + 1] : path.join(benchDir, 'snapshot'))
 const url = ownerDatabaseUrl()
-if (isLocalUrl(url)) throw new Error('point this at the hosted read-only source')
-const dir = path.join(benchDir, 'snapshot')
-fs.rmSync(dir, { recursive: true, force: true }); fs.mkdirSync(dir, { recursive: true })
+if (isLocalUrl(url) && !argv.includes('--allow-local')) throw new Error('point this at the hosted read-only source')
 const db = new pg.Client({ connectionString: url }); await db.connect()
-const manifest = { taken_at: new Date().toISOString(), tables: {} }
-try {
-  await db.query('begin read only')
-  manifest.migrations = (await db.query('select max(version) v, count(*)::int n from bai_meta.schema_migrations')).rows[0]
-  const tables = (await db.query(`select table_schema s, table_name t from information_schema.tables where table_schema in ('public','ingest','research') and table_type = 'BASE TABLE' order by 1, 2`)).rows
-  for (const { s, t } of tables) {
-    const rows = (await db.query(`select to_jsonb(x) j from ${s}.${t} x`)).rows.map((r) => JSON.stringify(r.j))
-    const text = rows.join('\n') + (rows.length ? '\n' : '')
-    const file = `${s}.${t}.ndjson`
-    fs.writeFileSync(path.join(dir, file), text)
-    manifest.tables[`${s}.${t}`] = { rows: rows.length, sha256: crypto.createHash('sha256').update(text).digest('hex') }
-  }
-  await db.query('rollback')
-} finally { await db.end() }
-manifest.total_rows = Object.values(manifest.tables).reduce((a, b) => a + b.rows, 0)
-manifest.manifest_sha256 = crypto.createHash('sha256').update(JSON.stringify(manifest.tables)).digest('hex')
-fs.writeFileSync(path.join(dir, 'manifest.json'), JSON.stringify(manifest, null, 1) + '\n')
-console.log(`snapshot: ${Object.keys(manifest.tables).length} tables, ${manifest.total_rows} rows, migrations ${manifest.migrations.v}, sha256 ${manifest.manifest_sha256}`)
+let manifest
+try { manifest = await takeSnapshot(db, dir) } finally { await db.end() }
+const problems = verifySnapshot(dir)
+if (problems.length) { console.error(`snapshot written to ${dir} but verification FAILED:\n  ${problems.join('\n  ')}`); process.exit(1) }
+fs.chmodSync(dir, 0o700)
+console.log(`snapshot: ${Object.keys(manifest.tables).length} tables, ${manifest.total_rows} rows, migrations ${manifest.migrations.v}, ${manifest.snapshot.isolation} read-only, sha256 ${manifest.manifest_sha256}\n  verified: manifest, per-file SHA-256, row counts, columns -> ${dir}`)
