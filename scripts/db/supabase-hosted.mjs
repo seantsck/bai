@@ -22,6 +22,18 @@ if (args[0] !== 'link' && linked !== ref) {
 if (args[0] === 'link' && !args.includes(ref)) { console.error(`link only to the BAI project: --project-ref ${ref}`); process.exit(1) }
 if (args.some((a) => /^--(db-url|password)$|^-p$/.test(a))) { console.error('pass credentials through .env.hosted.local, not flags'); process.exit(1) }
 
+// A push applies every committed migration that hosted has not got, so it is only allowed under a gate (scripts/db/gate.mjs): BAI_GATE_FILE must name the gate
+// file, the working directory must be the gate's restricted checkout, and `gate.mjs check --dry-run` must pass (it runs the dry run itself and demands exactly the
+// gate's migration). No push-widening flag is accepted.
+if (args[0] === 'db' && args[1] === 'push' && !args.includes('--dry-run')) {
+  const extra = args.slice(2).filter((a) => a !== '--linked')
+  if (extra.length) { console.error(`refusing: db push takes no extra flags under a gate (${extra.join(' ')})`); process.exit(1) }
+  const gateFile = process.env.BAI_GATE_FILE
+  if (!gateFile || !fs.existsSync(gateFile)) { console.error('refusing: db push needs BAI_GATE_FILE=<gate file> naming the authorized gate (scripts/db/gate.mjs); nothing was pushed'); process.exit(1) }
+  const chk = spawnSync(process.execPath, [path.join(repoRoot, 'scripts/db/gate.mjs'), 'check', '--gate', gateFile, '--dry-run'], { stdio: 'inherit', env: process.env, cwd: repoRoot })
+  if (chk.status !== 0) { console.error('refusing: the gate check failed; nothing was pushed'); process.exit(1) }
+}
+
 const needsDb = !['link', 'projects', 'login'].includes(args[0])
 const linkedFlag = needsDb && !args.includes('--linked') && !args.includes('--local') ? ['--linked'] : []
 const env = { ...process.env, SUPABASE_DB_PASSWORD: process.env.BAI_SUPABASE_DB_PASSWORD ?? '' }
