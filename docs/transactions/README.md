@@ -1,6 +1,6 @@
 # Phase 15: transaction forensics foundation (planning)
 
-Status: **planning and specification only**, written 2026-10-25. No migration, hosted write, import, deploy, manifest change, or change to DISI or Diamond IQ was made. The pending 2025 draft release and the historical round corrections are untouched and independent of this plan; no new migration here is needed by them.
+Status: **planning and specification only**, written 2026-10-25. No migration, hosted write, import, deploy, manifest change, or change to DISI or Diamond IQ was made. The 2025 draft release (not applied) and the historical round corrections are untouched and independent of this plan; no new migration here is needed by them.
 
 | Document | Content |
 |---|---|
@@ -9,6 +9,8 @@ Status: **planning and specification only**, written 2026-10-25. No migration, h
 | [03 Data model and ingestion](03-data-model-and-ingestion.md) | additive tables, identity design, ingestion flow, tests |
 | [04 Evaluation specification](04-evaluation-specification.md) | decision-time and realized assessments, assumptions, ranking eligibility |
 | [05 Pilot and public surface](05-pilot-and-public-surface.md) | 2023/2024 deadline pilot, transaction detail view, report |
+| [06 Approved decisions and pilot freeze](06-approved-decisions-and-pilot-freeze.md) | owner approvals, verified hosted baseline, frozen club draw, independence and human-verification rules |
+| [outreach/](outreach/) | three unsent licensing drafts (MLBAM, SportsDataIO, Retrosheet) |
 
 ## Principles carried through every document
 1. Reuse 010/022/023, 005, 019 and the release machinery; add only what a named gap requires.
@@ -21,7 +23,7 @@ Status: **planning and specification only**, written 2026-10-25. No migration, h
 ## Headline findings
 - The value-attribution core is reusable; the weak point is the transaction record (no identity, no completeness state, one source).
 - **No free, cleared source covers 2023-2024 transactions** (Retrosheet's file stops at 2020; Lahman has no transactions) and **none covers contracts**. Rights decisions, not schema, gate the work.
-- Hosted holds 65 pilot trades, 354 WAR rows and no contracts or executives: nothing can be ranked today.
+- Hosted (verified read-only 2026-10-25, migrations through 027): 65 pilot trades, 354 WAR rows, no contracts or executives; the 2024 draft release is applied, 2025 is not. Nothing can be ranked today. See `06`.
 
 ## Roadmap (each phase ends with review and its own authorization; none starts a hosted write on its own)
 | Phase | Work | Needs | Exit |

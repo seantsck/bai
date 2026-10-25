@@ -4,14 +4,14 @@ Proposal only. Nothing is built, imported or applied. The pilot is deliberately 
 
 ## 1. Population rule
 - **Windows:** the trade-deadline window of 2023 and of 2024. Dates (deadline day, All-Star Game, window start) are recorded in `season_calendar_events` from a cited source before anything else is built. Proposed window: the day after the All-Star Game through deadline day.
-- **Clubs:** the Los Angeles Dodgers plus five clubs chosen **deterministically in advance**: sort the 29 other franchise keys by SHA-256 of `"phase15|" + key` and take the first five. The seed string and result are written to the pilot plan before sourcing starts (no later swaps).
+- **Clubs:** the Los Angeles Dodgers plus five clubs chosen **deterministically in advance**: sort the 29 other franchise keys by SHA-256 of `"phase15|" + key` and take the first five. **Frozen 2026-10-25: LAD, LAA, NYY, SD, HOU, CIN** (`06` section 3, `pilot-plan.json`); no later swaps.
 - **Transactions:** **every** trade involving one of the six clubs inside either window (not just the famous ones). Every counterparty and every asset in each of those trades is recorded, including counterparties outside the six clubs; the counterparty's other trades are out of scope. Non-trade transactions and contracts are out of scope for the pilot.
 - **Expected size:** a few dozen transactions. The pilot reports the actual count after discovery; it does not choose the sample to fit a number.
 - **Illustration only:** well-known deadline trades such as the 2023 Verlander and Scherzer trades or the 2024 Jack Flaherty trade (recalled, **unverified**) may or may not fall into the drawn clubs; they are included only if the rule selects them.
 
 ## 2. Sourcing and completeness
 Each transaction needs, before it can be marked `VERIFIED_COMPLETE`:
-1. **Two independent sources** that agree on the set of parties, every asset, cash status, the PTBNL/conditions text and the date: one primary announcement (a club or league release, used individually and non-bulk, cited by URL) and one independent publication or reference. Sources without a publication grant stay local and are never committed (the repository is public).
+1. **Two independent source groups** (two articles repeating one announcement are one group; see `06` section 4) that agree on the set of parties, every asset, cash status, the PTBNL/conditions text and the date: one primary announcement (a club or league release, used individually and non-bulk, cited by URL) and one independent publication or reference. Sources without a publication grant stay local and are never committed (the repository is public).
 2. **Every player asset resolved by a strong id** (MLBAM from the Chadwick register, corroborated by Wikidata where present). A minor leaguer with no strong id is recorded as `UNRESOLVED_NAME_ONLY`; the transaction stays `PARTIAL`.
 3. **Cash** stated as DISCLOSED (amount) or UNDISCLOSED; never zero by default.
 4. **PTBNL and conditional pieces** resolved, or the transaction stays `PARTIAL` with the open item listed.
