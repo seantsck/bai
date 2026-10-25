@@ -209,3 +209,39 @@ test('the raw transaction tables are not readable by anon or authenticated; the 
     for (const t of ['drafts', 'draft_selections', 'organizations', 'players', 'sources', 'international_signings', 'v_source_attribution', 'rm_transactions']) await db.query(`select * from ${t} limit 1`)
   })
 })
+
+// The club-level consistency guard of the refresh. analytics.trade_returns repeats one club figure on each package row the club sent; the refresh must refuse
+// a repeat that disagrees, including a NULL beside a number (count(distinct) ignores NULL). The view is replaced by a wrapper INSIDE a transaction that is rolled back.
+async function tampered (sets, fn) {
+  const kc = await orgId('KC')
+  const pids = (await h.rows(db, "select package_id from analytics.trade_returns where transaction_id = $1 and organization_id = $2 and war_system = 'BREF' order by package_id", [three, kc])).map((r) => Number(r.package_id))
+  assert.equal(pids.length, 2, 'KC sent two packages in the three-club trade')
+  await db.query('begin')
+  try {
+    await db.query('alter view analytics.trade_returns rename to trade_returns_real')
+    const cols = (await h.rows(db, "select column_name c from information_schema.columns where table_schema = 'analytics' and table_name = 'trade_returns_real' order by ordinal_position")).map((r) => r.c)
+    const sel = cols.map((c) => (sets[c] ? `case when package_id = any (array[${sets[c].pids(pids).join(',')}]::bigint[]) and war_system = 'BREF' then ${sets[c].expr} else ${c} end` : c)).join(', ')
+    await db.query(`create view analytics.trade_returns as select ${sel} from analytics.trade_returns_real`)
+    return await fn()
+  } finally { await db.query('rollback') }
+}
+const first = (p) => [p[0]]
+const all = (p) => p
+const refused = (re = /different club-level figures/) => assert.rejects(db.query('select public.refresh_transaction_read_models()'), re)
+
+test('guard: identical repeated club figures pass (a number, and NULL on every row)', async () => {
+  await tampered({}, () => db.query('select public.refresh_transaction_read_models()'))
+  await tampered({ return_war_known: { pids: all, expr: 'null::numeric' } }, async () => { await db.query('select public.refresh_transaction_read_models()') })
+})
+test('guard: NULL on one package row and a number on the other is refused', async () => { await tampered({ return_war_known: { pids: first, expr: 'null::numeric' } }, () => refused()) })
+test('guard: two different numbers are refused', async () => { await tampered({ return_war_known: { pids: first, expr: 'return_war_known + 1' } }, () => refused()) })
+test('guard: disagreeing coverage classifications are refused', async () => { await tampered({ return_coverage: { pids: first, expr: "case return_coverage when 'COMPLETE' then 'PARTIAL' else 'COMPLETE' end" } }, () => refused()) })
+test('guard: disagreeing received-player counts are refused', async () => { await tampered({ received_player_ids: { pids: first, expr: "'{}'::bigint[]" } }, () => refused()) })
+test('guard: a refused refresh publishes nothing new and leaves the published state exactly as it was', async () => {
+  await refresh()
+  const snap = async () => (await h.one(db, 'select md5(string_agg(x, $$|$$ order by x)) m from (select r::text x from rm_transaction_returns r union all select t::text from rm_transactions t) y')).m
+  const a = await snap()
+  await tampered({ return_war_known: { pids: first, expr: 'return_war_known + 1' } }, () => refused())
+  assert.equal(await snap(), a)
+  await asBoth(async () => assert.ok((await h.one(db, 'select count(*)::int n from rm_transaction_returns')).n > 0))
+})

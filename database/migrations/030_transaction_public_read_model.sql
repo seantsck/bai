@@ -29,6 +29,9 @@
 --         counterparty. The read model groups it (and refuses to refresh if the repeated figures ever differ); package-level counts live apart in rm_transaction_packages.
 --       - fail-closed withdrawal: a withdrawn publication grant, a revoked verification and any change to a published transaction's records or cited sources remove it
 --         from the public tables in the same transaction (triggers below); the aggregates are emptied and the refresh locks what it reads.
+--       - the refresh requires READ COMMITTED and locks everything it reads in SHARE mode with NOWAIT: a writer mid-transaction makes it fail at once (55P03,
+--         nothing published) instead of waiting while holding locks, so it can never take part in a deadlock; its operator command retries 55P03/40P01/40001.
+--         The club-level consistency guard is NULL-safe (a NULL beside a number, different numbers, coverage or received-count disagreements all refuse the refresh).
 --       - the raw tables transactions, trade_packages and trade_package_assets become internal (they were publicly readable since 028 and hold unpublished records).
 --         Nothing in the application reads them; the Sources page summary now counts the transactions the read model publishes.
 -- Existing rows, views and privileges are otherwise untouched. Transaction types and the channel are enum additions only (no existing value changes).
@@ -382,11 +385,17 @@ declare
   v_withheld integer;
 begin
   lock table public.rm_transaction_refreshes in exclusive mode;
+  -- Every statement below must see the latest committed state: a snapshot taken before a revocation committed would publish it.
+  if current_setting('transaction_isolation') <> 'read committed' then
+    raise exception 'refresh_transaction_read_models must run in a READ COMMITTED transaction (it is %)', current_setting('transaction_isolation') using errcode = 'invalid_transaction_state';
+  end if;
   -- Nothing the refresh reads may change while it runs (a grant revoked or a verification withdrawn after the refresh read it would otherwise be
-  -- published by the refresh's commit). The withdrawal triggers below fire in the writer's transaction; this lock orders them before or after the refresh.
+  -- published by the refresh's commit). The withdrawal triggers below fire in the writer's transaction; this lock orders them strictly before or after
+  -- the refresh. NOWAIT: the refresh never waits for a lock while holding another, so it cannot take part in a deadlock; if a writer is mid-transaction it
+  -- fails at once with SQLSTATE 55P03 (lock_not_available) and publishes nothing. scripts/db/refresh-transaction-read-models.mjs retries that and 40P01/40001.
   lock table ingest.source_publication_grants, research.transaction_verifications, public.sources, public.transactions, public.trade_packages, public.trade_package_assets,
              public.transaction_sources, public.transaction_source_links, public.transaction_external_ids, public.ptbnl_resolutions, public.transaction_conflicts,
-             public.transaction_player_moves in share mode;
+             public.transaction_player_moves in share mode nowait;
   select coalesce(max(generation_id), 0) + 1 into v_generation from public.rm_transaction_refreshes;
 
   -- sources authorized for public display: the openly licensed groups, or a category with a recorded grant on this database
@@ -506,10 +515,13 @@ begin
   create temporary table _war_ok on commit drop as
   select w.war_system::text as provider, bool_and(w.source_id in (select id from _auth)) as ok
   from public.war_observations w group by w.war_system;
-  -- the club-level figure is identical on every package row of a club (same transaction, club, provider); anything else is a defect, not a choice
+  -- The club-level figure is identical on every package row of a club (same transaction, club, provider). Anything else is a defect, not a choice.
+  -- NULL-safe: count(distinct x) ignores NULL, so a NULL beside a number would pass; a column must be all NULL or all non-NULL, and single-valued.
   if exists (select 1 from analytics.trade_returns r join public.rm_transactions t on t.transaction_id = r.transaction_id
              group by r.transaction_id, r.organization_id, r.war_system
-             having count(distinct r.return_war_known) > 1 or count(distinct r.return_coverage) > 1 or count(distinct cardinality(r.received_player_ids)) > 1) then
+             having (count(*) filter (where r.return_war_known is null) not in (0, count(*)) or count(distinct r.return_war_known) > 1)
+                 or (count(*) filter (where r.return_coverage is null) not in (0, count(*)) or count(distinct r.return_coverage) > 1)
+                 or (count(*) filter (where r.received_player_ids is null) not in (0, count(*)) or count(distinct cardinality(r.received_player_ids)) > 1)) then
     raise exception 'analytics.trade_returns gives one club different club-level figures within a transaction';
   end if;
   insert into public.rm_transaction_returns (transaction_id, club_key, provider, packages_sent, players_sent, players_received, return_war_known, evidence)
