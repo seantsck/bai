@@ -1,0 +1,36 @@
+# Runs `npm run check` (lint, typecheck, app/history/database tests, production build, whitespace, credential scan, publication check) on every
+# pull request and on main. It is deliberately inert toward every real system:
+#   * no secrets and no hosted credentials are referenced, and none are set in the environment: the database tests start their own
+#     disposable PostgreSQL 17 (embedded-postgres) inside the job and nothing here can reach the hosted BAI database;
+#   * `pull_request` (never `pull_request_target`), read-only token, credentials not persisted;
+#   * it does not deploy, publish, import or migrate anything. Production releases stay manual (vercel.json ignoreCommand).
+name: check
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: check-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      LANG: C.UTF-8   # the database tests start PostgreSQL with the process locale; UTF-8 keeps accented names intact
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run check
