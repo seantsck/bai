@@ -96,7 +96,7 @@ before(async () => {
   // node_modules: only `pg` (a symlink to the real package) and a FAKE supabase binary that records its arguments and answers a dry run with the three pending files
   fs.mkdirSync(path.join(repo, 'node_modules/.bin'), { recursive: true }); fs.symlinkSync(path.join(root, 'node_modules/pg'), path.join(repo, 'node_modules/pg'))
   fs.writeFileSync(path.join(repo, 'node_modules/.bin/supabase'), `#!/usr/bin/env bash\necho "$*" >> "${path.join(tmp, 'cli-calls.log')}"\nif [[ "$*" == *"--dry-run"* ]]; then echo '{"upToDate":false,"dryRun":true,"migrations":'"$FAKE_DRY_RUN"',"seeds":[],"roles":[]}'; fi\n`, { mode: 0o755 })
-  git(repo, 'init', '-q', '-b', 'main'); git(repo, 'config', 'user.email', 't@example.invalid'); git(repo, 'config', 'user.name', 't')
+  git(repo, 'init', '-q', '-b', 'main'); git(repo, 'config', 'user.email', 't@example.test'); git(repo, 'config', 'user.name', 't')
   git(repo, 'add', '-A'); git(repo, 'commit', '-q', '-m', 'all migrations'); commit = git(repo, 'rev-parse', 'HEAD')
   git(repo, 'update-ref', 'refs/remotes/origin/main', commit)
   gateFile = path.join(tmp, 'g1.gate.json')

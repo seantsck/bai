@@ -15,7 +15,7 @@ if [ -e "$out" ] && [ -n "$(ls -A "$out" 2>/dev/null)" ]; then echo "refusing: $
 : "${BAI_SUPABASE_PROJECT_REF:?set BAI_SUPABASE_PROJECT_REF (source .env.hosted.local)}" "${BAI_SUPABASE_DB_PASSWORD:?set BAI_SUPABASE_DB_PASSWORD}"
 mkdir -p -m 700 "$out"
 root="$(cd "$(dirname "$0")/../.." && pwd)"
-placeholder='postgresql://postgres:placeholder@db.example.invalid:5432/postgres' # credential-scan:allow (a placeholder host and password; the real connection comes from the environment)
+placeholder='postgresql://postgres:x@db.placeholder.supabase.co:5432/postgres' # credential-scan:allow (a placeholder host and password; the real connection comes from the environment)
 for kind in roles schema data; do
   case "$kind" in roles) flags=(--role-only) ;; schema) flags=() ;; data) flags=(--data-only --use-copy) ;; esac
   # the generated script, with the connection lines removed (they are supplied by the environment below)

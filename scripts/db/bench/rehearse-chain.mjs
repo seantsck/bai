@@ -1,5 +1,7 @@
 // Stepwise rehearsal of the pending migration chain on a clone of the hosted snapshot (a disposable local database, never hosted):
-//   node scripts/db/bench/rehearse-chain.mjs [--from bai_base] [--to bai_rehearsal]
+//   node scripts/db/bench/rehearse-chain.mjs [--to bai_rehearsal] [--through 030] [--snapshot-dir <dir>]
+// --through stops after that migration (a gate rehearsal: 028 for G1); --snapshot-dir defaults to the benchmark snapshot. The result is compared with the snapshot by
+// scripts/db/hosted-preflight.mjs --after <through>: every table's original columns and rows unchanged, only the registries gaining rows.
 // Built from the fixed hosted snapshot (checksummed local files; hosted is not contacted): migrations 001-027 plus the snapshot rows, i.e. hosted's state.
 // 027 -> 028 -> 029 -> 030, one version at a time, with the object counts each step adds, the base data compared afterwards, then the repository security audit.
 import fs from 'node:fs'
@@ -12,8 +14,8 @@ import { migrationProblems } from '../../history/lib/release.mjs'
 
 const argv = process.argv.slice(2)
 const opt = (k, d) => { const i = argv.indexOf(`--${k}`); return i >= 0 ? argv[i + 1] : d }
-const to = opt('to', 'bai_rehearsal')
-const snap = path.join(benchDir, 'snapshot')
+const to = opt('to', 'bai_rehearsal'); const THROUGH = opt('through', '030')
+const snap = path.resolve(opt('snapshot-dir') ?? path.join(benchDir, 'snapshot'))
 const manifest = JSON.parse(fs.readFileSync(path.join(snap, 'manifest.json'), 'utf8'))
 const c = await startCluster()
 let failed = false
@@ -51,7 +53,7 @@ try {
   // The historical-release guard (the pending 2025 draft release goes through it) must accept hosted's state at every step, with all of 028-030 committed.
   const guard = async (label) => { const p = await migrationProblems(db); console.log(`  release migration guard at ${label}: ${p.length ? 'PROBLEMS ' + p.join('; ') : 'ok'}`); if (p.length) throw new Error('release guard refused the database') }
   await guard('027 (hosted today, 028-030 committed but unapplied)')
-  for (const v of ['028', '029', '030']) {
+  for (const v of ['028', '029', '030'].filter((x) => x <= THROUGH)) {
     const b = await objects(); const t0 = Date.now()
     await applyMigrations(db, { through: v })
     const a = await objects()
@@ -59,9 +61,9 @@ try {
     if ((await version()) !== v) throw new Error(`expected version ${v}`)
     await guard(v)
   }
-  await applyMigrations(db)   // idempotent: nothing further to apply
+  await applyMigrations(db, { through: THROUGH })   // idempotent: nothing further to apply
   console.log(`re-apply: version ${await version()} (no change)`)
-  const counts = (await db.query(`select (select count(*) from public.transactions)::int tx, (select count(*) from public.organizations)::int orgs, (select count(*) from public.players)::int players, (select count(*) from public.draft_selections)::int draft_selections, (select count(*) from public.international_signings)::int intl, (select count(*) from public.rm_transactions)::int published`)).rows[0]
+  const counts = (await db.query(`select (select count(*) from public.transactions)::int tx, (select count(*) from public.organizations)::int orgs, (select count(*) from public.players)::int players, (select count(*) from public.draft_selections)::int draft_selections, (select count(*) from public.international_signings)::int intl`)).rows[0]
   console.log('after:', JSON.stringify(counts))
   if (counts.tx !== before.tx || counts.draft_selections !== before.draft_selections || counts.intl !== before.intl) throw new Error('migrations 028-030 changed existing record counts')
   const fpAfter = await fp()
@@ -72,5 +74,9 @@ try {
   const { port } = { port: 54329 }
   const r = spawnSync(process.execPath, ['scripts/db/security.mjs'], { encoding: 'utf8', env: { PATH: process.env.PATH, HOME: process.env.HOME, TMPDIR: process.env.TMPDIR, BAI_DATABASE_URL: c.url(to) } })
   console.log(r.stdout.split('\n').slice(-3).join('\n').trim() || r.stderr.slice(-300)); if (r.status !== 0) failed = true
+  // the rehearsed database against the snapshot it was built from: every original column and row unchanged (draft, international, release audits included)
+  const pre = spawnSync(process.execPath, [path.join(path.dirname(new URL(import.meta.url).pathname), '../hosted-preflight.mjs'), '--snapshot-dir', snap, ...(THROUGH === '027' ? ['--expect-level', '027'] : ['--after', THROUGH])],
+    { encoding: 'utf8', env: { PATH: process.env.PATH, HOME: process.env.HOME, TMPDIR: process.env.TMPDIR, BAI_DATABASE_URL: c.url(to) } })
+  console.log(pre.stdout.split('\n').filter((l) => /^(ok  |FAIL|PREFLIGHT)/.test(l) && !/snapshot file/.test(l)).join('\n')); if (pre.status !== 0) failed = true
 } catch (e) { failed = true; console.error(e.message) } finally { await c.stop() }
 process.exit(failed ? 1 : 0)

@@ -93,7 +93,7 @@ test('the command: a non-local database without --read-only is refused before an
   const local = `postgresql://postgres:postgres@127.0.0.1:${port}/${database}`
   const base = { PATH: process.env.PATH, HOME: process.env.HOME, TMPDIR: process.env.TMPDIR ?? '/tmp' }
   const t0 = Date.now()
-  const hostedUrl = 'postgresql://postgres:not-a-password@db.dbnmktidheefoxaztivm.supabase.co:5432/postgres' // credential-scan:allow (a deliberately fake password: the command must refuse before it connects)
+  const hostedUrl = 'postgresql://postgres:x@db.dbnmktidheefoxaztivm.supabase.co:5432/postgres' // credential-scan:allow (a deliberately fake password: the command must refuse before it connects)
   const refused = spawnSync(process.execPath, ['scripts/db/security.mjs'], { cwd: root, encoding: 'utf8', env: { ...base, BAI_DATABASE_URL: hostedUrl, BAI_ALLOW_REMOTE_DB: '1', BAI_SUPABASE_PROJECT_REF: 'dbnmktidheefoxaztivm' } })
   assert.equal(refused.status, 2); assert.match(refused.stderr, /refusing: this is not a local database/); assert.match(refused.stderr, /--read-only/)
   assert.ok(Date.now() - t0 < 5000, 'refused without trying to reach the host')
