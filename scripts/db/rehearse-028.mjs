@@ -21,7 +21,8 @@ import { ownerDatabaseUrl, isLocalUrl, supabaseProjectRef } from './lib/connecti
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 const outFile = process.argv.includes('--out') ? path.resolve(root, process.argv[process.argv.indexOf('--out') + 1]) : null
 const SCHEMAS = ['public', 'ingest', 'research']
-const VIEWS = ['analytics.trade_returns', 'analytics.acquisition_value', 'analytics.class_value', 'analytics.player_war_coverage', 'analytics.organization_value_by_class', 'analytics.organization_realized_value', 'analytics.player_acquisitions']
+// analytics.class_value is left out: it is derived from acquisition_value (compared) and takes tens of minutes at hosted size.
+const VIEWS = ['analytics.trade_returns', 'analytics.acquisition_value', 'analytics.player_war_coverage', 'analytics.organization_value_by_class', 'analytics.organization_realized_value', 'analytics.player_acquisitions']
 const q = async (db, sql, p) => (await db.query(sql, p)).rows
 const report = { started_at: new Date().toISOString(), steps: [] }
 const step = (name, ok, detail) => { report.steps.push({ name, ok, detail }); console.log(`${ok ? 'ok  ' : 'FAIL'} ${name}${detail ? `: ${detail}` : ''}`) }
