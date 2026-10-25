@@ -4,6 +4,6 @@ Three drafts, written 2026-10-25. **None has been sent.** The owner reviews, edi
 
 | Draft | Purpose |
 |---|---|
-| [mlbam.md](mlbam.md) | written authorization (or refusal) for public, non-individual use of MLB transaction data |
-| [sportsdataio.md](sportsdataio.md) | quote and license terms for historical transactions, contracts and salaries |
-| [retrosheet.md](retrosheet.md) | confirm terms of use and ask about post-2020 transaction coverage |
+| [mlbam.md](mlbam.md) | licensing route; storage, automated use, backfill, public display and derived-analytics rights |
+| [sportsdataio.md](sportsdataio.md) | written commercial quote; both sides of multi-party trades, PTBNLs, cash, point-in-time history, contracts separately; display, retention, derived rights |
+| [retrosheet.md](retrosheet.md) | attribution wording, publication clarification, post-2020 successor coverage |

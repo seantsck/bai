@@ -1,25 +1,29 @@
-# DRAFT, NOT SENT: SportsDataIO, quote and license terms request
+# DRAFT, NOT SENT: SportsDataIO, written commercial quote and license terms request
 
 To: [SportsDataIO sales contact, from their site]
 From: [owner name, project, contact]
-Subject: Quote request: MLB historical transactions, contracts and salaries, for a public research site
+Subject: Written quote: MLB transactions history and contracts, for a public research project
 
 Hello,
 
-BAI is a baseball research project that publishes evidence-backed analysis of MLB roster transactions and the organizations behind them. We are evaluating licensed sources and would like a quote and the license terms for:
+BAI is an independent baseball research project that publishes evidence-backed analysis of how MLB organizations make roster transactions. We are evaluating licensed data and would like a **written commercial quote**. Please include any option for a low-revenue research project.
 
-- MLB transactions (trades, free agency, waivers, releases, Rule 5, purchases): history back to [2015 / earliest available], with a stable transaction identifier, all parties and assets, cash, and player-to-be-named resolutions
-- player contracts and salaries with years, options, buyouts and deferrals
-- player identifiers and a crosswalk to MLBAM and other public ids
+**Transactions**
+1. Does the data describe **both sides of multi-party trades** (every club, every package, every player, in each direction)?
+2. How are **conditional assets, cash (amount known, undisclosed or unknown) and players to be named** represented, and how is a PTBNL's later resolution recorded and dated?
+3. Is there a stable transaction identifier, and what is the **historical coverage** (start date, gaps, known errors) for trades, waivers, releases, Rule 5 and purchases?
+4. Is **point-in-time history** available (what was known on a given date), with **revision or correction records** when a transaction is amended?
 
-Please tell us in writing:
-1. Coverage, start date and known gaps of each dataset, how updates and corrections are delivered, and whether transaction history is complete per club and date
-2. Price for a historical backfill and for ongoing access, and what tiers exist for a small non-commercial or low-revenue project
-3. Whether we may publish derived analysis and per-transaction pages on a public website, display the underlying fields (and which), store them in our own database, and keep them after the subscription ends
-4. Attribution requirements, redistribution limits and rate limits
-5. Whether the upstream league data rights are covered by your license or must be obtained separately
+**Contracts and salaries** (please answer separately from transactions)
+5. Are contract and salary datasets available (years, options, buyouts, deferrals, incentives), with what coverage and history, and are they priced separately?
 
-We will not use trial data on the public site unless the trial terms say we may.
+**Rights, in writing**
+6. May we **display** individual records and fields on a public website, and which fields?
+7. May we **retain** the data in our own database, and for how long after a subscription ends?
+8. May we publish **derived analysis**, and keep it after the licence ends?
+9. Attribution, redistribution limits and rate limits; and whether upstream league rights are covered by your licence or need separate authorization.
+
+We will not use trial data on the public site unless the trial terms say we may, and we have not purchased anything.
 
 Thank you,
 [name]
