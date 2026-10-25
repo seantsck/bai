@@ -111,7 +111,7 @@ try {
   }
 
   // --- apply 028 -----------------------------------------------------------------------------------------------------------
-  await applyMigrations(copy)
+  await applyMigrations(copy, { through: '028' })   // 028 only: later migrations (029) have their own rehearsal
   const applied = (await q(copy, 'select max(version) v, count(*)::int n from bai_meta.schema_migrations'))[0]
   step('028 applied to the copy', applied.v === '028' && applied.n === 28, `${applied.n} migrations`)
   const changed = []
