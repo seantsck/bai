@@ -1,5 +1,6 @@
 // Research import file format (bai-research-import/1) and its record-level validation rules.
 // The file is the raw source of a batch: sources + records. Nothing in here touches the database.
+import { validateTradeV2 } from './transactions.mjs'
 export const FORMAT = 'bai-research-import/1'
 
 export const SOURCE_AUTHORITIES = ['OFFICIAL', 'PRIMARY_PUBLIC', 'REPUTABLE_SECONDARY', 'AGGREGATOR', 'ARCHIVE', 'OTHER']
@@ -252,6 +253,9 @@ function validateWar (list, label, fallbackSource, errors, needSource) {
  * a party to the trade.
  */
 function validateTrade (r, errors, warnings, needSource) {
+  // Version 2 (migration 028): external identity, sources by independence group, package and asset provenance, PTBNL, cash disclosure.
+  if (r.schema !== undefined) { validateTradeV2(r, errors, warnings, needSource); return }
+  warnings.push('LEGACY_TRADE_SHAPE: no external identity; a same-day trade between the same two clubs is merged into one transaction (use schema 2)')
   if (r.type !== 'TRADE') errors.push('TRADES batches hold TRADE records')
   if (!r.organization) errors.push('organization (franchise key) required')
   if (!/^[a-z0-9][a-z0-9_.-]*$/.test(r.ref ?? '')) errors.push('ref required (lowercase key)')

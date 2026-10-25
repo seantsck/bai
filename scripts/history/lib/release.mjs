@@ -186,9 +186,15 @@ export function verifyReleaseContent (rel, { root }) {
 
 const rowsOf = async (db, sql, params) => (await db.query(sql, params)).rows
 
-/** The migration history must be exactly the committed files 001..REQUIRED, with their checksums. */
+/**
+ * The migration history must contain the committed files 001..REQUIRED with their checksums. A LATER committed migration
+ * may also be applied (028 adds transaction tables, which a draft release never reads or writes): it must still match its
+ * committed file. A migration the repository does not have at all is refused. Every release is rehearsed on a copy of the
+ * target first, which is what proves a later migration changed nothing a release touches.
+ */
 export async function migrationProblems (db) {
-  const files = listMigrations().filter((m) => m.version <= REQUIRED_MIGRATION)
+  const committed = listMigrations()
+  const files = committed.filter((m) => m.version <= REQUIRED_MIGRATION)
   const have = new Map((await rowsOf(db, 'select version, file, checksum from bai_meta.schema_migrations')).map((r) => [r.version, r]))
   const problems = []
   for (const f of files) {
@@ -196,7 +202,12 @@ export async function migrationProblems (db) {
     if (!h) problems.push(`migration ${f.file} is not applied`)
     else if (h.checksum !== f.checksum || h.file !== f.file) problems.push(`migration ${f.file} differs from the committed file`)
   }
-  const known = new Set(files.map((f) => f.version))
+  const later = new Map(committed.filter((m) => m.version > REQUIRED_MIGRATION).map((m) => [m.version, m]))
+  for (const [v, h] of have) {
+    const f = later.get(v)
+    if (f && (h.checksum !== f.checksum || h.file !== f.file)) problems.push(`migration ${f.file} differs from the committed file`)
+  }
+  const known = new Set(committed.map((f) => f.version))
   const extra = [...have.keys()].filter((v) => !known.has(v))
   if (extra.length) problems.push(`target has migrations the repository does not: ${extra.join(', ')}`)
   return problems
