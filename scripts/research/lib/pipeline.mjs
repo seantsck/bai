@@ -15,6 +15,7 @@ import { validateEnvelope, validateRecordShape, roundStructure, slugify, EVIDENC
 import { loadCatalog, requireHostedPublication } from '../../history/lib/permissions.mjs'
 import * as txn from './txn.mjs'
 import * as T from './transactions.mjs'
+import * as A from './acquisitions.mjs'
 
 const SAFE_STATES = new Set(['EXACT_EXTERNAL_ID', 'EXACT_COMPOSITE', 'NO_MATCH'])
 const ACTION_RANK = { HELD: 6, CONFLICT: 5, INSERT: 4, UPDATE_UNKNOWN: 3, CORROBORATE: 2, NO_CHANGE: 1 }
@@ -125,6 +126,9 @@ export async function validateBatch (db, ref) {
   const v2 = records.filter((x) => x.record_type === 'TRADE' && x.payload?.schema === T.TRADE_SCHEMA)
   const v2problems = new Map()
   if (batch.channel === 'TRADES' && v2.length) for (const [i, ps] of T.batchProblemsV2(v2.map((x) => x.payload)).entries()) v2problems.set(v2[i].record_index, ps)
+  const acq = records.filter((x) => x.record_type === 'ACQUISITION')
+  const acqProblems = new Map()
+  if (batch.channel === 'ACQUISITIONS' && acq.length) for (const [i, ps] of A.batchProblemsAcquisitions(acq.map((x) => x.payload)).entries()) acqProblems.set(acq[i].record_index, ps)
   const seenPicks = new Map()
 
   await txn.begin(db)
@@ -161,6 +165,14 @@ export async function validateBatch (db, ref) {
         }
       }
       errors.push(...(v2problems.get(rec.record_index) ?? []))
+      errors.push(...(acqProblems.get(rec.record_index) ?? []))
+      if (batch.channel === 'ACQUISITIONS') {
+        for (const k of [r.move?.to_organization, r.move?.from_organization]) if (k && !orgs.has(k)) errors.push(`unknown organization ${k}`)
+        if (r.move?.player?.full_name) {
+          const id = (await db.query('select * from ingest.resolve_identity($1)', [identityInput(r.move.player)])).rows[0]
+          if (!['EXACT_EXTERNAL_ID', 'NO_MATCH'].includes(id.state)) errors.push(`player ${r.move.player.full_name}: identity ${id.state}; decide it before importing`)
+        }
+      }
       if (errors.length === 0 && batchProblems.length) errors.push(...batchProblems)
 
       if (batch.channel === 'OUTCOMES') {
@@ -817,6 +829,12 @@ export async function applyBatch (db, ref, { write = false, allowPartial = false
     const sourcesAdded = await a.registerSources()
     for (const rec of records) {
       const recConflicts = []
+      if (rec.record_type === 'ACQUISITION') {
+        const res = await A.applyAcquisition(a, rec, { identityInput, PipelineError, conflicts: recConflicts })
+        results.push({ rec, action: res.action, reason: res.reason, canonical: res.canonical, playerAction: res.newPlayers ? 'INSERT' : null })
+        conflicts.push(...recConflicts.map((c) => ({ record_index: rec.record_index, ...c })))
+        continue
+      }
       if (rec.record_type === 'TRADE') {
         const res = await a.applyTrade(rec, recConflicts)
         results.push({ rec, action: res.action === 'HELD' ? 'HELD' : strongest(res.action, recConflicts.length ? 'CONFLICT' : 'NO_CHANGE'), reason: res.reason, canonical: res.canonical, playerAction: res.newPlayers ? 'INSERT' : null })

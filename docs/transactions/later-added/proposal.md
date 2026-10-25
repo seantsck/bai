@@ -1,6 +1,6 @@
 # Later-added trade assets: study and schema proposal (not implemented)
 
-Status: a **separately reviewable proposal**. The DDL is `proposed-030-later-added-assets.sql` in this directory. It is **not** a migration, is not in `database/migrations`, and is applied nowhere except a disposable database by `tests/db/later-added-proposal.test.mjs`. Fixtures: `fixtures.json` (fictional rows in the archive's format, with the expected label for each). Nothing existing is reinterpreted: with the new tables empty every existing view row is identical (tested), and the existing PTBNL records (migration 028) stay exactly what they are.
+Status: a **separately reviewable proposal**. The DDL is `proposed-031-later-added-assets.sql` in this directory. It is **not** a migration, is not in `database/migrations`, and is applied nowhere except a disposable database by `tests/db/later-added-proposal.test.mjs`. Fixtures: `fixtures.json` (fictional rows in the archive's format, with the expected label for each). Nothing existing is reinterpreted: with the new tables empty every existing view row is identical (tested), and the existing PTBNL records (migration 028) stay exactly what they are.
 
 ## 1. The study: what the later-dated members actually are
 A Retrosheet trade is a group of rows sharing an id; some groups carry rows dated after the trade. Counted from the archive with `scripts/research/lib/retrosheet-later-members.mjs` (labels only, from what the source states):

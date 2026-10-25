@@ -10,7 +10,9 @@ try {
   const a = await c.connect(before); const b = await c.connect(after)
   const q = async (db, s) => (await db.query(s)).rows
   const tables = (await q(a, `select table_schema s, table_name t from information_schema.tables where table_schema in ('public','ingest','research','bai_meta') and table_type = 'BASE TABLE' order by 1, 2`)).filter((r) => `${r.s}.${r.t}` !== 'bai_meta.schema_migrations')
-  const fp = async (db, t) => (await q(db, `select count(*)::int n, coalesce(md5(string_agg(x::text, '|' order by x::text)), '') h from ${t} x`))[0]
+  // The one registry a migration may add rows to: internal_objects (object names this migration registers), compared without them.
+  const ADDED = { 'public.internal_objects': (process.env.BAI_ADDED_INTERNAL ?? '').split(',').filter(Boolean) }
+  const fp = async (db, t) => { const skip = ADDED[t] ?? []; return (await q(db, `select count(*)::int n, coalesce(md5(string_agg(x::text, '|' order by x::text)), '') h from ${t} x${skip.length ? ` where object_name <> all ('{${skip.join(',')}}')` : ''}`))[0] }
   const changed = []
   for (const { s, t } of tables) { const [x, y] = [await fp(a, `${s}.${t}`), await fp(b, `${s}.${t}`)]; if (x.n !== y.n || x.h !== y.h) changed.push(`${s}.${t}`) }
   console.log(`${tables.length} tables compared: ${changed.length ? `CHANGED ${changed.join(', ')}` : 'identical'}`)

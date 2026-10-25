@@ -4,6 +4,7 @@
 // Nothing here touches analytics.* (the public role cannot) or builds nested analytical graphs.
 import { publicQuery } from './db.ts'
 import { buildExplorerQuery, type ExplorerFilters } from './search.ts'
+import { buildTransactionQuery, type TransactionFilters } from './transactions.ts'
 
 export const LIST_LIMIT = 200
 
@@ -138,3 +139,49 @@ export const getSourceAttribution = () =>
 // Attribution groups of the selections on one explorer page (025). Bounded by the page size; ids are integers.
 export const getSelectionAttribution = (ids: number[]) =>
   ids.length ? publicQuery('select selection_id, selection_source_category, signing_source_category from v_selection_attribution where selection_id = any ($1::bigint[]) limit 100', [ids.filter((n) => Number.isInteger(n)).slice(0, 100)]) : Promise.resolve([])
+
+// ---------------------------------------------------------------------------------------------------------------
+// Historical transactions (030). Only rm_transaction_* tables, which hold a transaction only while every source it cites is authorized for display.
+// Every query is bounded (a page of 51 rows, or rows keyed by one transaction); nothing here reads analytics.* or research.*.
+// ---------------------------------------------------------------------------------------------------------------
+
+export const getTransactionOverview = async (): Promise<Row | null> => (await publicQuery('select * from rm_transaction_overview limit 1'))[0] ?? null
+
+// Statements a source group requires wherever its records are shown (e.g. Retrosheet's), verbatim.
+export const getAttributionStatements = () =>
+  publicQuery('select attribution_category, statement, notice_url, condition_text from source_attribution_statements order by attribution_category limit 20')
+
+export const getTransactionPage = (f: TransactionFilters) => {
+  const { sql, params } = buildTransactionQuery(f)
+  return publicQuery(sql, params)
+}
+
+export const getTransaction = async (id: number): Promise<Row | null> =>
+  (await publicQuery('select * from rm_transactions where transaction_id = $1', [id]))[0] ?? null
+
+export const getTransactionAssets = (id: number) =>
+  publicQuery(`select position, from_key, from_club_text, to_key, asset_kind, player_slug, player_name, detail, conditional, condition_text, amount_status, amount_usd,
+      resolution_kind, resolved_player_slug, resolved_player_name, resolved_on, source_event_code
+    from rm_transaction_assets where transaction_id = $1 order by position limit 200`, [id])
+
+export const getTransactionSources = (id: number) =>
+  publicQuery('select position, title, publisher, url, attribution_category, role, independence_group, locator from rm_transaction_sources where transaction_id = $1 order by position limit 50', [id])
+
+export const getTransactionFollowups = (id: number) =>
+  publicQuery(`select f.player_id, p.player_slug, p.player_name, f.step, f.later_transaction_id, f.later_date, f.later_category, f.later_club_keys
+    from rm_transaction_followups f join rm_transaction_players p on p.transaction_id = f.transaction_id and p.player_id = f.player_id
+    where f.transaction_id = $1 order by p.player_name, f.step limit 100`, [id])
+
+export const getTransactionReturns = (id: number) =>
+  publicQuery('select club_key, counterparty_key, provider, players_sent, players_received, return_war_known, evidence from rm_transaction_returns where transaction_id = $1 order by club_key, counterparty_key, provider limit 20', [id])
+
+export const getTransactionClubSeasons = () =>
+  publicQuery('select season, club_key, records, coverage_state, expected_count from rm_transaction_club_seasons order by season desc, club_key limit 2000')
+
+export const getTransactionCoverage = () =>
+  publicQuery('select season, club_key, category, records, unverified, partial, verified_complete, with_unresolved_assets from rm_transaction_coverage order by season desc, club_key, category limit 6000')
+
+export const getTransactionSeasonTotals = () =>
+  publicQuery(`select season, count(*)::int as records, (count(*) filter (where status = 'PARTIAL'))::int as partial, (count(*) filter (where status = 'UNVERIFIED'))::int as unverified,
+      (count(*) filter (where status = 'VERIFIED_COMPLETE'))::int as verified_complete
+    from rm_transactions group by season order by season desc limit 200`)
