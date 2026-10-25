@@ -454,3 +454,73 @@ test('source permissions: a batch citing a source without a publication grant is
   assert.throws(() => P.requirePublishable(hosted, doc), /publish_site|permission|PENDING|not permitted|refus/i)
   assert.equal(P.requirePublishable({ host: '127.0.0.1' }, doc), null, 'local databases are not gated')
 })
+
+// ---------------------------------------------------------------------------------------------------------------
+// The fingerprint itself, separate from trigger-based revocation: every material input changes it
+// ---------------------------------------------------------------------------------------------------------------
+
+test('fingerprint: every material input changes it (checked with the revoking triggers off), immaterial bookkeeping does not', async () => {
+  const fpRec = rec('fp1', '2031-09-20', [pk('SEA', 'TEX', [pl(150)], [{ asset_type: 'CASH', description: 'cash', amount_usd: 1000 }, { asset_type: 'PLAYER_TO_BE_NAMED', description: 'named later', condition_text: 'by season end',
+    resolution: { kind: 'CASH', amount_usd: 500, resolved_on: '2031-12-01', source_key: 't:wire', notes: 'settled in cash' } }]), pk('TEX', 'SEA', [pl(151)])], { external_ids: [{ scheme: 'MLB_TXN', id: 'FIX-FP' }] })
+  await run(mk('t-fp', [fpRec]))
+  const tx = await txOf('MLB_TXN', 'FIX-FP')
+  await assert.rejects(db.query("insert into transaction_conflicts (transaction_id, field_path, incoming_sha256, status, resolved_by, resolved_at, resolution_note) values ($1, 'date', 'abc', 'RESOLVED', 'Txn Reviewer', now(), 'kept canonical')", [tx]), /recorded open/)
+  const fp = async () => (await h.one(db, 'select research.transaction_fingerprint($1) f', [tx])).f
+  const base = await fp()
+  assert.equal(base, await fp(), 'deterministic')
+  const asset = (type) => `(select a.id from trade_package_assets a join trade_packages k on k.id = a.trade_package_id where k.transaction_id = ${tx} and a.asset_type = '${type}')`
+  const mutations = {
+    'transaction date': `update transactions set transaction_date = transaction_date + 1 where id = ${tx}`,
+    'transaction date precision': `update transactions set date_precision = 'MONTH' where id = ${tx}`,
+    'transaction description': `update transactions set description = 'changed' where id = ${tx}`,
+    'external id value': `update transaction_external_ids set external_id = 'OTHER' where transaction_id = ${tx}`,
+    'external id source': `update transaction_external_ids set source_id = (select id from sources where source_key = 't:echo') where transaction_id = ${tx}`,
+    'source role': `update transaction_sources set role = 'REFERENCE' where transaction_id = ${tx} and role = 'CORROBORATION'`,
+    'source independence group': `update transaction_sources set independence_group = 'another-group' where transaction_id = ${tx} and role = 'CORROBORATION'`,
+    'source locator': `update transaction_sources set locator = 'p. 9' where transaction_id = ${tx} and role = 'CORROBORATION'`,
+    'source retrieved date': `update transaction_sources set retrieved_on = '2031-09-21' where transaction_id = ${tx} and role = 'CORROBORATION'`,
+    'source url': "update sources set url = 'https://example.org/moved' where source_key = 't:wire'",
+    'link locator': `update transaction_source_links set locator = 'para 2' where id = (select min(l.id) from transaction_source_links l join transaction_sources s on s.id = l.transaction_source_id where s.transaction_id = ${tx})`,
+    'link removed': `delete from transaction_source_links where id = (select min(l.id) from transaction_source_links l join transaction_sources s on s.id = l.transaction_source_id where s.transaction_id = ${tx})`,
+    'package removed': `delete from trade_packages where transaction_id = ${tx} and from_organization_id = (select id from organizations where franchise_key = 'TEX')`,
+    'cash amount': `update trade_package_assets set amount_usd = 1001 where id = ${asset('CASH')}`,
+    'asset condition': `update trade_package_assets set condition_text = 'later' where id = ${asset('PLAYER_TO_BE_NAMED')}`,
+    'asset description': `update trade_package_assets set description = 'renamed' where id = ${asset('PLAYER_TO_BE_NAMED')}`,
+    'PTBNL resolution amount': `update ptbnl_resolutions set amount_usd = 501 where trade_package_asset_id = ${asset('PLAYER_TO_BE_NAMED')}`,
+    'PTBNL resolution date': `update ptbnl_resolutions set resolved_on = '2031-12-02' where trade_package_asset_id = ${asset('PLAYER_TO_BE_NAMED')}`,
+    'PTBNL resolution date precision': `update ptbnl_resolutions set resolved_on_precision = 'MONTH' where trade_package_asset_id = ${asset('PLAYER_TO_BE_NAMED')}`,
+    'PTBNL resolution provenance (source)': `update ptbnl_resolutions set source_id = (select id from sources where source_key = 't:club') where trade_package_asset_id = ${asset('PLAYER_TO_BE_NAMED')}`,
+    'PTBNL resolution notes': `update ptbnl_resolutions set notes = 'different note' where trade_package_asset_id = ${asset('PLAYER_TO_BE_NAMED')}`,
+    'PTBNL resolution removed': `delete from ptbnl_resolutions where trade_package_asset_id = ${asset('PLAYER_TO_BE_NAMED')}`,
+    'conflict recorded': `insert into transaction_conflicts (transaction_id, field_path, incoming_sha256) values (${tx}, 'new-field', 'zzz')`,
+    'conflict resolution evidence (note)': `update transaction_conflicts set resolution_note = 'rewritten evidence' where transaction_id = ${tx} and status = 'RESOLVED'`,
+    'conflict resolution evidence (resolver)': `update transaction_conflicts set resolved_by = 'Someone Else' where transaction_id = ${tx} and status = 'RESOLVED'`,
+    'conflict values': `update transaction_conflicts set incoming_value = 'x' where transaction_id = ${tx} and status = 'RESOLVED'`
+  }
+  const unchanged = []
+  for (const [name, sql] of Object.entries(mutations)) {
+    await db.query('begin')
+    try {
+      await db.query('set local session_replication_role = replica')   // the revoking triggers and guards are off: only the fingerprint can notice
+      if (name.startsWith('conflict resolution') || name === 'conflict values') {
+        await db.query("insert into transaction_conflicts (transaction_id, field_path, existing_value, incoming_value, incoming_sha256, status, resolved_by, resolved_at, resolution_note) values ($1, 'date', 'a', 'b', 'abc', 'RESOLVED', 'Txn Reviewer', now(), 'kept canonical')", [tx])
+      }
+      const before = await fp()
+      const r = await db.query(sql)
+      const after = await fp()
+      if (before === after || (r.rowCount === 0)) unchanged.push(`${name} (${r.rowCount} rows)`)
+    } finally { await db.query('rollback') }
+  }
+  assert.deepEqual(unchanged, [], 'each of these edits must change the fingerprint')
+  // immaterial bookkeeping does not
+  await db.query('begin')
+  try {
+    await db.query('set local session_replication_role = replica')
+    const before = await fp()
+    await db.query(`update transaction_sources set created_at = created_at - interval '1 day' where transaction_id = ${tx}`)
+    await db.query(`update transaction_external_ids set created_at = created_at - interval '1 day' where transaction_id = ${tx}`)
+    await db.query(`update transactions set created_at = created_at - interval '1 day' where id = ${tx}`)
+    assert.equal(await fp(), before)
+  } finally { await db.query('rollback') }
+  assert.equal(await fp(), base, 'everything rolled back')
+})

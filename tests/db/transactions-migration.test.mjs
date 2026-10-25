@@ -137,6 +137,29 @@ test('the release tooling accepts a later committed migration (028) but still re
   assert.deepEqual(await migrationProblems(db), [])
 })
 
+test('migration guard: no gaps between successive committed migrations, no unknown or renamed ones', async () => {
+  const { migrationProblems } = await import('../../scripts/history/lib/release.mjs')
+  const { listMigrations } = await import('../../scripts/db/lib/migrations.mjs')
+  const real = listMigrations()
+  const fake = (v) => ({ version: v, file: `${v}_future.sql`, checksum: `sum-${v}` })
+  const committed = [...real, fake('029'), fake('030')]
+  const put = (v) => db.query("insert into bai_meta.schema_migrations (version, file, checksum) values ($1, $2, $3)", [v, `${v}_future.sql`, `sum-${v}`])
+  assert.deepEqual(await migrationProblems(db, { committed }), [], 'a database at 028 is fine while 029 and 030 are merely not applied yet')
+  await put('030')
+  const gap = await migrationProblems(db, { committed })
+  assert.equal(gap.length, 1)
+  assert.match(gap[0], /029_future\.sql is not applied .*030.*in order/, 'a missing intermediate migration is refused')
+  await put('029')
+  assert.deepEqual(await migrationProblems(db, { committed }), [])
+  await db.query("update bai_meta.schema_migrations set checksum = 'changed' where version = '029'")
+  assert.deepEqual(await migrationProblems(db, { committed }), ['migration 029_future.sql differs from the committed file'])
+  await db.query("update bai_meta.schema_migrations set checksum = 'sum-029', file = 'renamed.sql' where version = '029'")
+  assert.deepEqual(await migrationProblems(db, { committed }), ['migration 029_future.sql differs from the committed file'])
+  await db.query("delete from bai_meta.schema_migrations where version in ('029', '030')")
+  await db.query("delete from bai_meta.schema_migrations where version = '027'")
+  assert.deepEqual(await migrationProblems(db), ['migration 027_wikidata_attribution.sql is not applied (a later migration, 028, is: migrations must be applied in order)'.replace(' (a later migration, 028, is: migrations must be applied in order)', '')], 'a missing required migration is refused')
+})
+
 test('the repository security audit (RLS, grants, SECURITY DEFINER allowlist, reviewer boundary) passes with 028 applied', async () => {
   const { port, database } = db.connectionParameters
   const r = spawnSync(process.execPath, ['scripts/db/security.mjs'], { cwd: path.resolve(import.meta.dirname, '../..'), encoding: 'utf8',

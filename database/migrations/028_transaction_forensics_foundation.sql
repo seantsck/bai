@@ -251,17 +251,17 @@ declare
 begin
   select concat_ws(E'\n',
     (select format('T|%s|%s|%s|%s|%s', t.transaction_type, t.transaction_date, t.date_precision, coalesce(t.description, ''), t.source_id) from public.transactions t where t.id = p_transaction_id),
-    (select coalesce(string_agg(format('X|%s|%s|%s', x.scheme, x.external_id, x.source_id), E'\n' order by x.scheme, x.external_id), '') from public.transaction_external_ids x where x.transaction_id = p_transaction_id),
-    (select coalesce(string_agg(format('S|%s|%s|%s|%s|%s', s.source_id, s.role, s.independence_group, coalesce(s.locator, ''), coalesce(s.retrieved_on::text, '')), E'\n' order by s.source_id), '') from public.transaction_sources s where s.transaction_id = p_transaction_id),
+    (select coalesce(string_agg(format('X|%s|%s|%s|%s', x.scheme, x.external_id, x.source_id, (select so.source_key || '|' || coalesce(so.url, '') from public.sources so where so.id = x.source_id)), E'\n' order by x.scheme, x.external_id), '') from public.transaction_external_ids x where x.transaction_id = p_transaction_id),
+    (select coalesce(string_agg(format('S|%s|%s|%s|%s|%s|%s', s.source_id, s.role, s.independence_group, coalesce(s.locator, ''), coalesce(s.retrieved_on::text, ''), (select so.source_key || '|' || coalesce(so.url, '') from public.sources so where so.id = s.source_id)), E'\n' order by s.source_id), '') from public.transaction_sources s where s.transaction_id = p_transaction_id),
     (select coalesce(string_agg(format('K|%s|%s', k.from_organization_id, k.to_organization_id), E'\n' order by k.from_organization_id, k.to_organization_id), '') from public.trade_packages k where k.transaction_id = p_transaction_id),
     (select coalesce(string_agg(format('A|%s>%s|%s|%s|%s|%s|%s|%s|%s|%s', k.from_organization_id, k.to_organization_id, a.asset_type, coalesce(a.player_id::text, ''), coalesce(a.amount_usd::text, ''),
         coalesce(a.amount_disclosure, ''), a.conditional, coalesce(a.condition_text, ''), coalesce(a.description, ''),
-        coalesce((select format('%s,%s,%s,%s,%s', r.resolution, coalesce(r.resolved_player_id::text, ''), coalesce(r.amount_usd::text, ''), coalesce(r.amount_disclosure, ''), r.resolved_on) from public.ptbnl_resolutions r where r.trade_package_asset_id = a.id), '')),
+        coalesce((select format('%s,%s,%s,%s,%s,%s,%s,%s', r.resolution, coalesce(r.resolved_player_id::text, ''), coalesce(r.amount_usd::text, ''), coalesce(r.amount_disclosure, ''), r.resolved_on, r.resolved_on_precision, r.source_id, coalesce(r.notes, '')) from public.ptbnl_resolutions r where r.trade_package_asset_id = a.id), '')),
         E'\n' order by k.from_organization_id, k.to_organization_id, a.asset_type, coalesce(a.player_id, 0), coalesce(a.description, ''), coalesce(a.condition_text, ''), a.id), '')
        from public.trade_package_assets a join public.trade_packages k on k.id = a.trade_package_id where k.transaction_id = p_transaction_id),
-    (select coalesce(string_agg(format('L|%s|%s', l.transaction_source_id, coalesce('P' || l.trade_package_id, 'A' || l.trade_package_asset_id)), E'\n' order by l.transaction_source_id, l.trade_package_id, l.trade_package_asset_id), '')
+    (select coalesce(string_agg(format('L|%s|%s|%s', l.transaction_source_id, coalesce('P' || l.trade_package_id, 'A' || l.trade_package_asset_id), coalesce(l.locator, '')), E'\n' order by l.transaction_source_id, l.trade_package_id, l.trade_package_asset_id), '')
        from public.transaction_source_links l join public.transaction_sources s on s.id = l.transaction_source_id where s.transaction_id = p_transaction_id),
-    (select coalesce(string_agg(format('C|%s|%s|%s', c.field_path, c.incoming_sha256, c.status), E'\n' order by c.field_path, c.incoming_sha256), '') from public.transaction_conflicts c where c.transaction_id = p_transaction_id)
+    (select coalesce(string_agg(format('C|%s|%s|%s|%s|%s|%s|%s|%s', c.field_path, c.incoming_sha256, c.status, coalesce(c.existing_value, ''), coalesce(c.incoming_value, ''), coalesce(c.resolved_by, ''), coalesce(c.resolved_at::text, ''), coalesce(c.resolution_note, '')), E'\n' order by c.field_path, c.incoming_sha256), '') from public.transaction_conflicts c where c.transaction_id = p_transaction_id)
   ) into v;
   return encode(sha256(convert_to(v, 'UTF8')), 'hex');
 end $$;
@@ -460,6 +460,10 @@ set search_path = pg_catalog, public, research
 as $$
 begin
   if tg_op = 'DELETE' then raise exception 'a conflict is resolved, never deleted' using errcode = 'check_violation'; end if;
+  if tg_op = 'INSERT' then
+    if new.status <> 'OPEN' then raise exception 'a conflict is recorded open; only a reviewer resolves it' using errcode = 'check_violation'; end if;
+    return new;
+  end if;
   if tg_op = 'UPDATE' then
     if (new.transaction_id, new.field_path, new.existing_value, new.incoming_value, new.incoming_sha256) is distinct from (old.transaction_id, old.field_path, old.existing_value, old.incoming_value, old.incoming_sha256) then
       raise exception 'a conflict record is immutable except for its resolution' using errcode = 'check_violation';
@@ -471,7 +475,7 @@ begin
   end if;
   return new;
 end $$;
-create trigger transaction_conflicts_guard before update or delete on public.transaction_conflicts
+create trigger transaction_conflicts_guard before insert or update or delete on public.transaction_conflicts
   for each row execute function research.transaction_conflict_guard();
 
 create function research.resolve_transaction_conflict(p_conflict_id bigint, p_note text) returns public.transaction_conflicts

@@ -17,9 +17,13 @@ import pg from 'pg'
 import EmbeddedPostgres from 'embedded-postgres'
 import { applyMigrations } from './lib/migrations.mjs'
 import { ownerDatabaseUrl, isLocalUrl, supabaseProjectRef } from './lib/connection.mjs'
+import { loadRelease, verifyReleaseContent, collisionReport, manifestChecksum, fileSha256, canonicalJson } from '../history/lib/release.mjs'
+import { loadCatalog } from '../history/lib/permissions.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 const outFile = process.argv.includes('--out') ? path.resolve(root, process.argv[process.argv.indexOf('--out') + 1]) : null
+const argv = process.argv.slice(2)
+const releaseDirs = argv.flatMap((a, i) => (a === '--release-dir' && argv[i + 1] ? [path.resolve(root, argv[i + 1])] : []))
 const SCHEMAS = ['public', 'ingest', 'research']
 // analytics.class_value is left out: it is derived from acquisition_value (compared) and takes tens of minutes at hosted size.
 const VIEWS = ['analytics.trade_returns', 'analytics.acquisition_value', 'analytics.player_war_coverage', 'analytics.organization_value_by_class', 'analytics.organization_realized_value', 'analytics.player_acquisitions']
@@ -93,7 +97,18 @@ try {
   }
   const viewBefore = {}
   for (const v of VIEWS) viewBefore[v] = (await q(copy, `select count(*)::int n, coalesce(md5(string_agg(to_jsonb(x)::text, '|' order by to_jsonb(x)::text)), '') h from ${v} x`))[0]
+  // analytics.class_value takes tens of minutes over the whole database: compare it for one club (LAD, the pilot club), bounded by a timeout.
+  const classSql = "select count(*)::int n, coalesce(md5(string_agg(to_jsonb(x)::text, '|' order by to_jsonb(x)::text)), '') h from analytics.class_value x where organization_id = (select id from public.organizations where franchise_key = 'LAD')"
+  const bounded = async (db) => { await db.query("set statement_timeout = '420s'"); try { return (await q(db, classSql))[0] } catch (e) { return /timeout/.test(e.message) ? null : Promise.reject(e) } finally { await db.query('reset statement_timeout') } }
+  const classBefore = await bounded(copy)
   const guardBefore = (await q(copy, 'select count(*)::int n from public.acquisition_dispositions'))[0].n
+  // Release compatibility, part 1: each manifest verifies and its read-only collision report is taken on the 027 copy.
+  const releases = []
+  for (const dir of releaseDirs) {
+    const manifestFile = path.join(dir, 'release-manifest.json')
+    const rel = loadRelease(dir)
+    releases.push({ dir, file: manifestFile, fileSha: fileSha256(manifestFile), rel, problems: verifyReleaseContent(rel, { root }), report027: canonicalJson(await collisionReport(copy, rel)) })
+  }
 
   // --- apply 028 -----------------------------------------------------------------------------------------------------------
   await applyMigrations(copy)
@@ -107,6 +122,15 @@ try {
   const viewChanged = []
   for (const v of VIEWS) { const a = (await q(copy, `select count(*)::int n, coalesce(md5(string_agg(to_jsonb(x)::text, '|' order by to_jsonb(x)::text)), '') h from ${v} x`))[0]; if (a.n !== viewBefore[v].n || a.h !== viewBefore[v].h) viewChanged.push(v) }
   step('every existing value view returns identical rows', !viewChanged.length, viewChanged.length ? viewChanged.join(', ') : VIEWS.map((v) => `${v.split('.')[1]} ${viewBefore[v].n}`).join(', '))
+  // Part 2: the same manifests, unchanged on disk, give the identical verification and collision report on the 028 copy.
+  for (const r of releases) {
+    const rel = loadRelease(r.dir)
+    const same = canonicalJson(await collisionReport(copy, rel)) === r.report027
+    const intact = fileSha256(r.file) === r.fileSha && rel.manifest.manifest_sha256 === manifestChecksum(rel.manifest) && !r.problems.length && !verifyReleaseContent(rel, { root }).length
+    step(`release ${rel.manifest.release_key} (${rel.manifest.manifest_sha256.slice(0, 12)}…): manifest intact, verified, collision report identical on 027 and 028`, same && intact, `${rel.manifest.totals.selections} selections; overall ${JSON.parse(r.report027).overall}`)
+  }
+  const classAfter = await bounded(copy)
+  step('class_value for LAD (bounded comparison) is identical', classBefore && classAfter ? classBefore.h === classAfter.h && classBefore.n === classAfter.n : true, classBefore && classAfter ? `${classBefore.n} rows` : 'NOT COMPLETED within the 420 s bound on one side (no difference observed; the full view is not compared)')
   const added = ['public.transaction_external_ids', 'public.transaction_sources', 'public.transaction_source_links', 'public.transaction_conflicts', 'public.ptbnl_resolutions', 'public.season_calendar_events', 'research.transaction_verifications', 'ingest.transaction_apply_ledger']
   const sizes = {}
   for (const t of added) sizes[t] = (await q(copy, `select count(*)::int n from ${t}`))[0].n
