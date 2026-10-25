@@ -326,6 +326,10 @@ test('verification is human-only: closed gate, owner session, automation login a
   await assert.rejects(bot.query(direct, [tx, BASIS, INDEP]), /needs an enrolled human reviewer in their own authenticated session/)
   await assert.rejects(db.query(direct, [tx, BASIS, INDEP]), /needs an enrolled human reviewer in their own authenticated session/)
   assert.equal((await status(tx)).completeness, 'PARTIAL')
+  // an automation login with data privileges can still write the records (the revoking triggers fire for it) but never verify
+  const probe = await txOf('MLB_TXN', 'FIX-PTBNL-CASH')
+  await bot.query('update public.transactions set description = description where id = $1', [probe])
+  await bot.query("insert into public.transaction_conflicts (transaction_id, field_path, incoming_sha256) values ($1, 'probe', 'probe')", [probe])
 })
 
 test('a record with gaps cannot be verified: every reason is named, including a single independence group', async () => {
