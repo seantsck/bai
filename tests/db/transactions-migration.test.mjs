@@ -7,6 +7,7 @@ import assert from 'node:assert/strict'
 import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
+import { spawnSync } from 'node:child_process'
 import * as h from './harness.mjs'
 import { applyMigrations } from '../../scripts/db/lib/migrations.mjs'
 import * as P from '../../scripts/research/lib/pipeline.mjs'
@@ -134,4 +135,11 @@ test('the release tooling accepts a later committed migration (028) but still re
   assert.deepEqual(await migrationProblems(db), ['target has migrations the repository does not: 099'])
   await db.query("delete from bai_meta.schema_migrations where version = '099'")
   assert.deepEqual(await migrationProblems(db), [])
+})
+
+test('the repository security audit (RLS, grants, SECURITY DEFINER allowlist, reviewer boundary) passes with 028 applied', async () => {
+  const { port, database } = db.connectionParameters
+  const r = spawnSync(process.execPath, ['scripts/db/security.mjs'], { cwd: path.resolve(import.meta.dirname, '../..'), encoding: 'utf8',
+    env: { PATH: process.env.PATH, HOME: process.env.HOME, TMPDIR: os.tmpdir(), BAI_DATABASE_URL: `postgresql://postgres:postgres@127.0.0.1:${port}/${database}` } })
+  assert.equal(r.status, 0, `${r.stdout}\n${r.stderr}`)
 })
