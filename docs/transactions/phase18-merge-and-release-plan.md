@@ -127,4 +127,13 @@ The `check` workflow (PR #42, merged) runs on a fresh clone, which has none of t
 | `tests/db/transaction-read-model.test.mjs` the Retrosheet notice comparison | passes **without checking** (guarded by `existsSync`) | `.local/retrosheet/notice.txt` |
 | `tests/history/wikipedia-draft.test.mjs` cached-article loop | passes **without checking** | the cached Wikipedia articles |
 
-**Every release gate (G1–G7) additionally requires** `npm run check` on a checkout that has those local caches, with the local run showing no skip of the first two rows (the full run reports `0` skipped in the history suite and a single database-suite skip, the hosted-only test), plus the checksum comparisons in section 6. A CI skip or pass-without-check must never be read as complete historical-data validation.
+**Every release gate (G1–G7) additionally requires** the four rows above to be run for real: in a checkout of the release commit, place the gitignored caches (`.local/history` with the 2020 and 2021 release directories, `.local/retrosheet` with the archive and `notice.txt`) and run the named tests, which must report `0` skipped:
+
+```
+node --import ./tests/support/register-ts.mjs --test --test-name-pattern="the real archive, when cached locally" tests/history/retrosheet-transactions.test.mjs
+node --test --test-name-pattern="three immutable historical manifests|Retrosheet attribution statement is the notice" tests/db/release.test.mjs tests/db/transaction-read-model.test.mjs
+```
+
+Note that an ordinary worktree does not have these caches (a plain local `npm run check` in one shows the same skip as CI); they live in the main checkout (`.local/history`) and in the Phase 17 worktree (`.local/retrosheet`).
+
+**Run on 2026-10-25 against the merged code (`main` @ `190b5e6` plus docs), with a scratch copy of `.local/history` so the real release directories were not touched (their tree hash `9c91844b0e73981e` is unchanged):** the real archive matches its recorded checksum and parses with no malformed row; the three immutable historical manifests replay in order on a clean database, spend their verified observation counts and replay idempotently; the Retrosheet attribution statement equals the cached notice, verbatim. All three passed, none skipped. A CI skip or pass-without-check must never be read as complete historical-data validation.
