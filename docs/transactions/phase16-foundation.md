@@ -48,10 +48,28 @@ Verification (`npm run transactions -- verify`) is human-only on the reviewer's 
 Limits worth knowing: verification certifies one transaction, not that a club's list of trades is complete; the database cannot judge whether two groups are truly independent, so the verifier records why (`independence_note`) and is accountable; class certification (021) is not revoked by a PTBNL-resolution edit (resolutions are dated facts like trades and are not class evidence).
 
 ## 4. Tests and results
-See the PR description for the exact run. New files: `tests/db/transactions-migration.test.mjs` (028 against a database built through 027 with legacy trades: identical views and rows; boundary), `tests/db/transactions-import.test.mjs` (importer, verification, revocation), `tests/history/transactions-format.test.mjs` (deterministic staging, shape rules). All fixtures are fictional (2031-2032 dates, MLBAM ids 988xxxx, `TEST_FIXTURE` sources).
+`npm run check` passes (38 app, 75 history, 212 database tests with 1 skipped; build, credential scan and publication check clean). New files: `tests/db/transactions-migration.test.mjs` (028 against a database built through 027 with legacy trades: identical views and rows; boundary), `tests/db/transactions-import.test.mjs` (importer, verification, revocation), `tests/history/transactions-format.test.mjs` (deterministic staging, shape rules). All fixtures are fictional (2031-2032 dates, MLBAM ids 988xxxx, `TEST_FIXTURE` sources).
 
 ## 5. Rehearsal of 028 on a disposable copy of hosted data
-REHEARSAL_PLACEHOLDER
+Run 2026-10-25 with `npm run hosted:rehearse-028` (`scripts/db/rehearse-028.mjs`). Hosted was **only read**, through a read-only transaction; nothing was written to it and no migration was run on it (it stays at 027). A throwaway PostgreSQL 17 was built from migrations 001-027, the hosted data was copied in, 028 was applied, and then:
+
+| Check | Result |
+|---|---|
+| Hosted at migration 027; same 93 tables as the disposable build | ok |
+| Data copied, equal table by table | 30,604 rows in 92 tables |
+| 028 applied | 28 migrations |
+| Every existing table byte-identical by its pre-028 columns | ok (the two registries, `internal_objects` and `provenance_fact_tables`, only gain the 6 and 2 rows 028 registers) |
+| Every existing value view returns identical rows | `trade_returns` 166, `acquisition_value` 3,176, `player_war_coverage` 3,224, `organization_value_by_class` 0, `organization_realized_value` 0, `player_acquisitions` 1,588 |
+| The eight new tables exist and are empty | ok |
+| No existing asset was given a disclosure or a condition | 111 assets untouched |
+| Every existing transaction reads UNVERIFIED | 65 of 65 (none claimed partial or complete) |
+| Acquisition-disposition guard still rejects a contradiction | ok (163 dispositions) |
+| `anon` and `authenticated` cannot read any new table or view | ok |
+| Repository security audit (RLS, grants, SECURITY DEFINER allowlist, reviewer boundary) on the migrated copy | SECURITY OK |
+
+Two things the first, failed run taught: the security audit's allowlist had to name the three new reviewer functions (fixed in `scripts/db/security.mjs`, and a test now runs the audit with 028 applied), and `analytics.class_value` (derived from `acquisition_value`, which is compared) takes tens of minutes at hosted size, so the rehearsal compares the directly affected views instead. `npm run hosted:parity` will report one pending migration (27 of 28) until 028 is separately authorized for hosted, as it did for 027 before its deployment.
+
+Release tooling: `migrationProblems` in `scripts/history/lib/release.mjs` accepted only 001-027; it now also accepts a later **committed** migration whose checksum matches (so the pending 2025 draft release is not blocked once 028 is applied), still refuses a changed checksum or a migration the repository lacks, and `rehearse-release.mjs` builds its copy through whatever the target has. Manifests, `REQUIRED_MIGRATION`, and release audits are untouched.
 
 ## 6. Remaining rights blockers (unchanged by this phase)
 Nothing built here ingests, or may ingest, a restricted source. Before any real transaction is imported:
