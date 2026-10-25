@@ -15,7 +15,7 @@ const sec = (q) => (q ? (q.status === 'COMPLETED' ? `${q.median_seconds} s` : q.
 const PARITY = [
   ['scale-full-vs-reference', 'Full views, 401 trades, versus the reference'],
   ['scale-class-full-direct', 'Whole `class_value`, 401 trades, old view run per club vs new'],
-  ['scale-sample-direct', 'OLD views run directly on the bounded sample (15 players; LAD), 401 trades'],
+  ['scale-sample-direct', 'OLD views run directly, 401 trades (full `trade_returns`; `acquisition_value` bounded to the 15-player sample)'],
   ['base-full-direct', 'Full `trade_returns` and `acquisition_value`, 65 trades, old view run directly'],
   ['base-class-full-direct', 'Whole `class_value`, 65 trades, old view run per club vs new']
 ]

@@ -9,8 +9,8 @@
 --      trade_returns row evaluated it for ALL players (about 3.5 million inner index lookups for 1,518 rows).
 --   2. analytics.acquisition_value joins trade_returns as the inner side of a nested loop. The planner re-evaluated the whole
 --      trade_returns view (select-list subplans included) for every acquisition row.
---   3. analytics.class_value referenced acquisition_value and trade_returns again inside correlated subqueries, once per group, and its
---      shared-package test re-evaluated analytics.acquisition_economics for every sent player of every package of every group.
+--   3. analytics.class_value evaluated trade_returns again inside two correlated subqueries, once per group, so cause 1 ran once per group
+--      (the shared-package test also re-read acquisition_economics for every sent player of every package).
 --
 -- Changes (set-based aggregation, each expensive input evaluated once):
 --   * trade_returns: the coverage of every received player is joined ONCE and aggregated per (transaction, organization, provider)
@@ -133,7 +133,6 @@ left join tr_all tr on e.credited and e.disposition = 'TRADED' and tr.transactio
   and tr.organization_id = e.organization_id and e.player_id = any (tr.sent_player_ids) and tr.war_system = s.war_system;;
 
 -- class_value: the 023 aggregation, with its inputs evaluated once and its two per-group subqueries computed as grouped joins
--- (the old per-group subquery over acquisition_economics ran 29,000 times on a database of BAI's current size)
 create or replace view analytics.class_value with (security_invoker = true) as
 with av as materialized (select * from analytics.acquisition_value),
 trm as materialized (select package_id, war_system, return_war_known, sent_player_ids from analytics.trade_returns),
