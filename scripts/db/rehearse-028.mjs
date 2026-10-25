@@ -75,9 +75,15 @@ try {
 
   // --- fingerprints before 028 -----------------------------------------------------------------------------------------
   const columns = {}
-  const fingerprint = async (db, t) => {
+  // The two registries gain the rows 028 registers; every row they held before must be unchanged.
+  const REGISTRY_ADDED = {
+    'public.internal_objects': { where: "object_name not in ('transaction_external_ids', 'transaction_sources', 'transaction_source_links', 'transaction_conflicts', 'ptbnl_resolutions', 'season_calendar_events')", added: 6 },
+    'public.provenance_fact_tables': { where: "table_name not in ('ptbnl_resolutions', 'season_calendar_events')", added: 2 }
+  }
+  const fingerprint = async (db, t, afterMigration = false) => {
     const cols = columns[t].map((c) => `"${c}"`).join(', ')
-    return (await q(db, `select count(*)::int n, coalesce(md5(string_agg(x::text, '|' order by x::text)), '') h from (select ${cols} from ${t}) x`))[0]
+    const where = afterMigration && REGISTRY_ADDED[t] ? ` where ${REGISTRY_ADDED[t].where}` : ''
+    return (await q(db, `select count(*)::int n, coalesce(md5(string_agg(x::text, '|' order by x::text)), '') h from (select ${cols} from ${t}${where}) x`))[0]
   }
   const before = {}
   for (const t of data) {
@@ -94,8 +100,10 @@ try {
   const applied = (await q(copy, 'select max(version) v, count(*)::int n from bai_meta.schema_migrations'))[0]
   step('028 applied to the copy', applied.v === '028' && applied.n === 28, `${applied.n} migrations`)
   const changed = []
-  for (const t of data) { const a = await fingerprint(copy, t); if (a.n !== before[t].n || a.h !== before[t].h) changed.push(t) }
-  step('every existing table is byte-identical by its pre-028 columns', !changed.length, changed.length ? changed.join(', ') : `${data.length} tables, ${rowsTotal} rows`)
+  for (const t of data) { const a = await fingerprint(copy, t, true); if (a.n !== before[t].n || a.h !== before[t].h) changed.push(t) }
+  const registryOk = []
+  for (const [t, r] of Object.entries(REGISTRY_ADDED)) registryOk.push((await q(copy, `select count(*)::int n from ${t}`))[0].n === before[t].n + r.added)
+  step('every existing table is byte-identical by its pre-028 columns (the two registries only gain the rows 028 registers)', !changed.length && registryOk.every(Boolean), changed.length ? changed.join(', ') : `${data.length} tables, ${rowsTotal} rows; registries +6 and +2`)
   const viewChanged = []
   for (const v of VIEWS) { const a = (await q(copy, `select count(*)::int n, coalesce(md5(string_agg(to_jsonb(x)::text, '|' order by to_jsonb(x)::text)), '') h from ${v} x`))[0]; if (a.n !== viewBefore[v].n || a.h !== viewBefore[v].h) viewChanged.push(v) }
   step('every existing value view returns identical rows', !viewChanged.length, viewChanged.length ? viewChanged.join(', ') : VIEWS.map((v) => `${v.split('.')[1]} ${viewBefore[v].n}`).join(', '))
