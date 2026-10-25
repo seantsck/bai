@@ -5,6 +5,7 @@ export const NAV_ITEMS: NavItem[] = [
   { href: '/international', label: 'International' },
   { href: '/draft', label: 'Draft' },
   { href: '/organizations', label: 'Organizations' },
+  { href: '/transactions', label: 'Transactions' },
   { href: '/players', label: 'Players' },
   { href: '/compare', label: 'Compare' },
   { href: '/research', label: 'Research' },
@@ -18,6 +19,7 @@ export const PLANNED_ROUTES = [
   '/draft', '/draft/picks', '/draft/explorer', '/draft/years', '/draft/schools',
   '/organizations', '/organizations/[slug]',
   '/players', '/players/[slug]',
+  '/transactions', '/transactions/[id]', '/transactions/coverage',
   '/compare', '/research', '/sources'
 ]
 
@@ -37,4 +39,9 @@ export const DRAFT_NAV: NavItem[] = [
   { href: '/draft/explorer', label: 'Historical explorer' },
   { href: '/draft/years', label: 'Draft years & coverage' },
   { href: '/draft/schools', label: 'Schools & programs' }
+]
+
+export const TRANSACTION_NAV: NavItem[] = [
+  { href: '/transactions', label: 'Ledger' },
+  { href: '/transactions/coverage', label: 'Coverage & limitations' }
 ]

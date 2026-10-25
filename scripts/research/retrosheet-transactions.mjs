@@ -14,6 +14,8 @@ import { reconcileTrades } from './lib/retrosheet-reconcile.mjs'
 import { buildCandidates, sourceDeclarations, sourceKeys } from './lib/retrosheet-adapter.mjs'
 import { renderReport } from './lib/retrosheet-report.mjs'
 import { prepareToText } from './lib/transactions.mjs'
+import { prepareAcquisitionText } from './lib/acquisitions.mjs'
+import { buildAcquisitionCandidates } from './lib/retrosheet-acquisitions.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 const [command, ...rest] = process.argv.slice(2)
@@ -158,8 +160,36 @@ async function main () {
       console.log(JSON.stringify(JSON.parse(fs.readFileSync(path.join(outDir, 'run-summary.json'), 'utf8')), null, 1))
       return 0
     }
+    case 'acquisitions': {
+      // Non-trade acquisitions (free agent, amateur free agent, waiver, purchase, Rule 5) for one period: candidates, holds and an inventory that also
+      // counts what is NOT an acquisition (departures, voids, returns, roster status, draft selections). Local files only.
+      const from = Number(args.from ?? 2015); const to = Number(args.to ?? 2015)
+      const a = archiveFacts()
+      const archiveSha = sha(a.zip)
+      if (a.recorded?.sha256 !== archiveSha) throw new Error('the archive does not match its recorded checksum; refusing to process')
+      const groups = R.groupRows(a.rows)
+      const snapFile = path.resolve(root, args['bai-snapshot'] ?? path.join(outDir, 'bai-snapshot.json'))
+      const snap = fs.existsSync(snapFile) ? JSON.parse(fs.readFileSync(snapFile, 'utf8')) : { players: [] }
+      const bai = { byMlbam: new Map(snap.players.filter((p) => p.mlbam).map((p) => [p.mlbam, { id: p.id, retro: p.retro }])), byRetro: new Map(snap.players.filter((p) => p.retro).map((p) => [p.retro, { id: p.id, mlbam: p.mlbam }])) }
+      const periodRows = R.inSeasons(a.rows, from, to)
+      const wanted = new Set(periodRows.filter((r) => r.player.kind === 'RETROSHEET_ID').map((r) => r.player.retro_id))
+      const regDir = path.resolve(root, need('register-dir'))
+      const resolved = resolveAll(periodRows, indexRegisterByRetro(regDir, wanted), bai)
+      const registerCommit = path.basename(regDir)
+      const catalog = JSON.parse(fs.readFileSync(path.join(root, 'research/history/sources.json'), 'utf8'))
+      const manifest = JSON.parse(fs.readFileSync(path.join(root, 'research/history/manifest.json'), 'utf8'))
+      const chadRetrieved = Object.entries(manifest.entries).find(([k]) => k.startsWith('chadwick/'))?.[1]?.retrieved_at?.slice(0, 10) ?? '2026-10-21'
+      const keys = sourceKeys(archiveSha, registerCommit)
+      const declarations = sourceDeclarations({ archiveSha256: archiveSha, retrievedOn: a.recorded.retrieved_at.slice(0, 10), registerCommit, registerCommitFull: catalog.sources.find((x) => x.id === 'chadwick-register').pinned_commit, registerRetrievedOn: chadRetrieved })
+      const out = buildAcquisitionCandidates(groups, resolved, { from, to, declarations, keys, batchKey: `retrosheet-acquisitions-${from}-${to}-${archiveSha.slice(0, 8)}` })
+      write('acquisitions-batch.json', prepareAcquisitionText(out.doc))
+      write('acquisition-holds.json', { attribution: R.RETROSHEET_ATTRIBUTION, holds: out.holds })
+      write('acquisitions-summary.json', { attribution: R.RETROSHEET_ATTRIBUTION, from, to, archive_sha256: archiveSha, candidates: out.candidates, holds: out.holds.length, ...out.inventory })
+      console.log(JSON.stringify({ from, to, candidates: out.candidates, holds: out.holds.length, by_class: out.inventory.by_class, hold_reasons: out.inventory.hold_reasons, record_kinds: out.inventory.record_kinds }, null, 1))
+      return 0
+    }
     default:
-      console.error('usage: retrosheet-transactions <archive|snapshot-bai|run> (see the header of this file)')
+      console.error('usage: retrosheet-transactions <archive|snapshot-bai|run|acquisitions> (see the header of this file)')
       return 1
   }
 }

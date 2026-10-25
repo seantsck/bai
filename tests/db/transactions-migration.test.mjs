@@ -93,7 +93,7 @@ test('new rows: cash is explicit, a PTBNL is conditional, and the table checks r
   await db.query('delete from trade_package_assets where description in ($1, $2, $3)', ['stated zero', 'unknown cash', 'another PTBNL'])
 })
 
-test('internal by default: the new tables, the research tables and the analytics views are closed to public roles; legacy tables keep their grants', async () => {
+test('internal by default: the new tables, the research tables and the analytics views are closed to public roles; other legacy tables keep their grants; the raw transaction tables are closed (030)', async () => {
   const internal = ['transaction_external_ids', 'transaction_sources', 'transaction_source_links', 'transaction_conflicts', 'ptbnl_resolutions', 'season_calendar_events']
   for (const role of ['anon', 'authenticated']) {
     for (const t of internal) await assert.rejects(h.asRole(db, role, () => db.query(`select * from ${t}`)), /permission denied/, `${role}.${t}`)
@@ -101,7 +101,8 @@ test('internal by default: the new tables, the research tables and the analytics
       'select research.transaction_gaps(1)', "select * from research.verify_transaction(1, 'x', 'y')"]) {
       await assert.rejects(h.asRole(db, role, () => db.query(s)), /permission denied/, `${role}: ${s}`)
     }
-    await h.asRole(db, role, async () => { assert.equal((await h.one(db, 'select count(*)::int n from transactions')).n, 1) })
+    // 030 closed the raw record tables (they hold records no refresh has published); the public reads rm_transactions
+    for (const t of ['transactions', 'trade_packages', 'trade_package_assets']) await assert.rejects(h.asRole(db, role, () => db.query(`select * from ${t}`)), /permission denied/, `${role}.${t}`)
     for (const t of [...internal, 'transactions']) await assert.rejects(h.asRole(db, role, () => db.query(`delete from ${t}`)), /permission denied/, `${role} delete ${t}`)
   }
   const noRls = await h.rows(db, "select c.relname from pg_class c join pg_namespace n on n.oid = c.relnamespace where n.nspname in ('public', 'research') and c.relkind = 'r' and not c.relrowsecurity")
@@ -142,20 +143,20 @@ test('migration guard: no gaps between successive committed migrations, no unkno
   const { listMigrations } = await import('../../scripts/db/lib/migrations.mjs')
   const real = listMigrations()
   const fake = (v) => ({ version: v, file: `${v}_future.sql`, checksum: `sum-${v}` })
-  const committed = [...real, fake('030'), fake('031')]
+  const committed = [...real, fake('031'), fake('032')]
   const put = (v) => db.query("insert into bai_meta.schema_migrations (version, file, checksum) values ($1, $2, $3)", [v, `${v}_future.sql`, `sum-${v}`])
-  assert.deepEqual(await migrationProblems(db, { committed }), [], 'a database at 028 is fine while 030 and 031 are merely not applied yet')
-  await put('031')
+  assert.deepEqual(await migrationProblems(db, { committed }), [], 'a database at 028 is fine while 031 and 032 are merely not applied yet')
+  await put('032')
   const gap = await migrationProblems(db, { committed })
   assert.equal(gap.length, 1)
-  assert.match(gap[0], /030_future\.sql is not applied .*031.*in order/, 'a missing intermediate migration is refused')
-  await put('030')
+  assert.match(gap[0], /031_future\.sql is not applied .*032.*in order/, 'a missing intermediate migration is refused')
+  await put('031')
   assert.deepEqual(await migrationProblems(db, { committed }), [])
-  await db.query("update bai_meta.schema_migrations set checksum = 'changed' where version = '030'")
-  assert.deepEqual(await migrationProblems(db, { committed }), ['migration 030_future.sql differs from the committed file'])
-  await db.query("update bai_meta.schema_migrations set checksum = 'sum-030', file = 'renamed.sql' where version = '030'")
-  assert.deepEqual(await migrationProblems(db, { committed }), ['migration 030_future.sql differs from the committed file'])
-  await db.query("delete from bai_meta.schema_migrations where version in ('030', '031')")
+  await db.query("update bai_meta.schema_migrations set checksum = 'changed' where version = '031'")
+  assert.deepEqual(await migrationProblems(db, { committed }), ['migration 031_future.sql differs from the committed file'])
+  await db.query("update bai_meta.schema_migrations set checksum = 'sum-031', file = 'renamed.sql' where version = '031'")
+  assert.deepEqual(await migrationProblems(db, { committed }), ['migration 031_future.sql differs from the committed file'])
+  await db.query("delete from bai_meta.schema_migrations where version in ('031', '032')")
   await db.query("delete from bai_meta.schema_migrations where version = '027'")
   assert.match((await migrationProblems(db))[0], /^migration 027_wikidata_attribution\.sql is not applied/, 'a missing required migration is refused')
 })

@@ -1,4 +1,4 @@
-// The later-added-assets PROPOSAL (docs/transactions/later-added/proposed-030-later-added-assets.sql) applied to a disposable database at 029:
+// The later-added-assets PROPOSAL (docs/transactions/later-added/proposed-031-later-added-assets.sql) applied to a disposable database at 029:
 // it must change nothing while its tables are empty, keep PTBNL resolutions, additions and amendments distinguishable, count an added player once
 // from the day he was added, refuse contradictions, and move the verification fingerprint. FICTIONAL data. The proposal is not a migration.
 import { test, before, after } from 'node:test'
@@ -12,7 +12,7 @@ import * as P from '../../scripts/research/lib/pipeline.mjs'
 import * as T from '../../scripts/research/lib/transactions.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
-const proposal = fs.readFileSync(path.join(root, 'docs/transactions/later-added/proposed-030-later-added-assets.sql'), 'utf8')
+const proposal = fs.readFileSync(path.join(root, 'docs/transactions/later-added/proposed-031-later-added-assets.sql'), 'utf8')
 let db
 const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'bai-later-'))
 before(async () => { await h.startServer(); db = await h.freshDatabase() }, { timeout: 120000 })

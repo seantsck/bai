@@ -37,6 +37,11 @@ const GROUPS: { key: string, uses: string, credit: string }[] = [
     credit: 'Wikidata contributors. Structured data released under CC0 1.0; no permission or attribution is required, credited as a courtesy.'
   },
   {
+    key: 'RETROSHEET',
+    uses: 'The Retrosheet transactions archive: historical trades, free-agent signings, waiver claims, purchases and Rule 5 selections, with Retrosheet player ids matched to players only through the Chadwick Register. One archive is one source; a record that cites only it is shown as partial.',
+    credit: RETROSHEET_CREDIT
+  },
+  {
     key: 'BAI_RESEARCH',
     uses: 'Independent researcher observations: BAI\'s own reference compilations (franchise histories, calendars) and research determinations, each citing the public evidence it rests on.',
     credit: 'BAI research.'

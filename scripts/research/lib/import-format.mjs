@@ -1,6 +1,7 @@
 // Research import file format (bai-research-import/1) and its record-level validation rules.
 // The file is the raw source of a batch: sources + records. Nothing in here touches the database.
 import { validateTradeV2 } from './transactions.mjs'
+import { validateAcquisition } from './acquisitions.mjs'
 export const FORMAT = 'bai-research-import/1'
 
 export const SOURCE_AUTHORITIES = ['OFFICIAL', 'PRIMARY_PUBLIC', 'REPUTABLE_SECONDARY', 'AGGREGATOR', 'ARCHIVE', 'OTHER']
@@ -17,7 +18,7 @@ export const CURRENT_STATUSES = ['WITH_ACQUIRING_ORGANIZATION', 'WITH_OTHER_ORGA
 export const DISPOSITIONS = ['RETAINED', 'TRADED', 'RELEASED', 'LOST_RULE_5', 'LOST_WAIVERS', 'LEFT_AS_FREE_AGENT', 'RETIRED', 'UNSIGNED', 'OTHER', 'UNKNOWN']
 export const WAR_SYSTEMS = ['BREF', 'FANGRAPHS', 'OTHER']
 export const WAR_SCOPES = ['CAREER', 'SEASON', 'ORGANIZATION_TENURE']
-export const CHANNEL_RECORD_TYPES = { DRAFT: 'DRAFT_SELECTION', INTERNATIONAL: 'INTERNATIONAL_SIGNING', OUTCOMES: 'OUTCOME_AUDIT', TRADES: 'TRADE' }
+export const CHANNEL_RECORD_TYPES = { DRAFT: 'DRAFT_SELECTION', INTERNATIONAL: 'INTERNATIONAL_SIGNING', OUTCOMES: 'OUTCOME_AUDIT', TRADES: 'TRADE', ACQUISITIONS: 'ACQUISITION' }
 export const TRADE_ASSET_TYPES = ['CASH', 'PLAYER_TO_BE_NAMED', 'DRAFT_PICK', 'INTERNATIONAL_POOL_SPACE', 'OTHER']
 export const EVIDENCE_SUBJECTS = { player: 'players', selection: 'draft_selections', draft_signing: 'draft_signings', signing: 'international_signings', slot: 'slot_values' }
 
@@ -55,7 +56,7 @@ export function validateEnvelope (doc) {
   if (!doc || typeof doc !== 'object') return ['file is not a JSON object']
   if (doc.format !== FORMAT) errors.push(`format must be "${FORMAT}"`)
   if (typeof doc.batch_key !== 'string' || !KEY.test(doc.batch_key)) errors.push('batch_key must match ' + KEY)
-  if (!CHANNEL_RECORD_TYPES[doc.channel]) errors.push('channel must be DRAFT, INTERNATIONAL, OUTCOMES or TRADES')
+  if (!CHANNEL_RECORD_TYPES[doc.channel]) errors.push('channel must be DRAFT, INTERNATIONAL, OUTCOMES, TRADES or ACQUISITIONS')
   if (!Array.isArray(doc.sources)) errors.push('sources must be an array')
   if (!Array.isArray(doc.records) || doc.records.length === 0) errors.push('records must be a non-empty array')
   for (const c of doc.coverage_claims ?? []) {
@@ -110,6 +111,7 @@ export function validateRecordShape (r, channel, declared) {
   const needSource = (k, label) => { if (!k) errors.push(`${label}: source_key required`); else if (!declared.has(k)) errors.push(`${label}: source_key ${k} is not declared in the batch or registered`) }
   needSource(r.source_key, 'record')
   if (channel === 'TRADES') { validateTrade(r, errors, warnings, needSource); return { errors, warnings } }
+  if (channel === 'ACQUISITIONS') { validateAcquisition(r, errors, warnings, needSource); return { errors, warnings } }
   validatePlayer(r.player, errors)
   if (!r.organization) errors.push('organization (franchise key) required')
   for (const [f, k] of Object.entries(r.field_sources ?? {})) needSource(k, `field_sources.${f}`)

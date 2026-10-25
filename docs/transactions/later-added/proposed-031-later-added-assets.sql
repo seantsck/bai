@@ -1,5 +1,5 @@
 -- PROPOSAL, NOT A MIGRATION: later-added trade assets and transaction amendments (docs/transactions/later-added/proposal.md).
--- It is a separately reviewable draft for a future migration 030 on top of 028 (transaction foundation) and 029 (value view scale). It is
+-- It is a separately reviewable draft for a future migration 031 on top of 028, 029 and 030 (the public read model). It is
 -- NOT in database/migrations, is not applied anywhere, and tests/db/later-added-proposal.test.mjs applies it to a disposable database to prove
 -- it behaves as described. Nothing here reinterprets an existing record: with both new tables empty, every existing view returns the same rows.
 --
