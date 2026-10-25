@@ -33,4 +33,7 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npm run check
+      # The research tooling refuses an outbound header containing the value of any environment variable whose name suggests a secret (OWNER, KEY, TOKEN, ...).
+      # Actions sets GITHUB_REPOSITORY_OWNER (a public value, also in the project URL that identifies BAI), which would trip that guard in a test. The guard is
+      # unchanged; the two runner variables are simply not passed to the check.
+      - run: env -u GITHUB_REPOSITORY_OWNER -u GITHUB_REPOSITORY_OWNER_ID npm run check
