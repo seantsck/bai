@@ -64,7 +64,7 @@ test('setup on migrations 001-027: a draft class, an outcome audit with a trade,
 
 test('applying 028 changes no existing row and no existing view result (010, 022, 023 semantics preserved)', async () => {
   await applyMigrations(db)
-  assert.equal((await h.one(db, 'select count(*)::int n from bai_meta.schema_migrations')).n, 28)
+  assert.equal((await h.one(db, 'select count(*)::int n from bai_meta.schema_migrations')).n, (await import('../../scripts/db/lib/migrations.mjs')).listMigrations().length)
   assert.deepEqual(await snapshot(), before027)
   // existing assets: no disclosure recorded before 028, nothing conditional, and the PTBNL is not claimed resolved
   const r = await h.rows(db, 'select asset_type, amount_disclosure, conditional from trade_package_assets where asset_type <> $1 order by id', ['PLAYER'])
@@ -142,22 +142,22 @@ test('migration guard: no gaps between successive committed migrations, no unkno
   const { listMigrations } = await import('../../scripts/db/lib/migrations.mjs')
   const real = listMigrations()
   const fake = (v) => ({ version: v, file: `${v}_future.sql`, checksum: `sum-${v}` })
-  const committed = [...real, fake('029'), fake('030')]
+  const committed = [...real, fake('030'), fake('031')]
   const put = (v) => db.query("insert into bai_meta.schema_migrations (version, file, checksum) values ($1, $2, $3)", [v, `${v}_future.sql`, `sum-${v}`])
-  assert.deepEqual(await migrationProblems(db, { committed }), [], 'a database at 028 is fine while 029 and 030 are merely not applied yet')
-  await put('030')
+  assert.deepEqual(await migrationProblems(db, { committed }), [], 'a database at 028 is fine while 030 and 031 are merely not applied yet')
+  await put('031')
   const gap = await migrationProblems(db, { committed })
   assert.equal(gap.length, 1)
-  assert.match(gap[0], /029_future\.sql is not applied .*030.*in order/, 'a missing intermediate migration is refused')
-  await put('029')
+  assert.match(gap[0], /030_future\.sql is not applied .*031.*in order/, 'a missing intermediate migration is refused')
+  await put('030')
   assert.deepEqual(await migrationProblems(db, { committed }), [])
-  await db.query("update bai_meta.schema_migrations set checksum = 'changed' where version = '029'")
-  assert.deepEqual(await migrationProblems(db, { committed }), ['migration 029_future.sql differs from the committed file'])
-  await db.query("update bai_meta.schema_migrations set checksum = 'sum-029', file = 'renamed.sql' where version = '029'")
-  assert.deepEqual(await migrationProblems(db, { committed }), ['migration 029_future.sql differs from the committed file'])
-  await db.query("delete from bai_meta.schema_migrations where version in ('029', '030')")
+  await db.query("update bai_meta.schema_migrations set checksum = 'changed' where version = '030'")
+  assert.deepEqual(await migrationProblems(db, { committed }), ['migration 030_future.sql differs from the committed file'])
+  await db.query("update bai_meta.schema_migrations set checksum = 'sum-030', file = 'renamed.sql' where version = '030'")
+  assert.deepEqual(await migrationProblems(db, { committed }), ['migration 030_future.sql differs from the committed file'])
+  await db.query("delete from bai_meta.schema_migrations where version in ('030', '031')")
   await db.query("delete from bai_meta.schema_migrations where version = '027'")
-  assert.deepEqual(await migrationProblems(db), ['migration 027_wikidata_attribution.sql is not applied (a later migration, 028, is: migrations must be applied in order)'.replace(' (a later migration, 028, is: migrations must be applied in order)', '')], 'a missing required migration is refused')
+  assert.match((await migrationProblems(db))[0], /^migration 027_wikidata_attribution\.sql is not applied/, 'a missing required migration is refused')
 })
 
 test('the repository security audit (RLS, grants, SECURITY DEFINER allowlist, reviewer boundary) passes with 028 applied', async () => {

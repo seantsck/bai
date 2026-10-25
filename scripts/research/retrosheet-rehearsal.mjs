@@ -55,7 +55,7 @@ try {
   await copy.query('reset session_replication_role')
   await hosted.query('rollback'); await hosted.end()
   step('hosted data copied through a read-only transaction', true, `${total} rows in ${data.length} tables`)
-  await applyMigrations(copy)
+  await applyMigrations(copy, { through: '028' })   // the 028 views, as the Phase 17 rehearsal measured them (029 optimizes them: scripts/db/bench)
   step('migration 028 applied to the copy', (await q(copy, 'select max(version) v from bai_meta.schema_migrations'))[0].v === '028')
   // BAI baseline: the rows and view results that must not change
   const old = { tx: Number((await q(copy, 'select max(id) m from public.transactions'))[0].m), players: Number((await q(copy, 'select max(id) m from public.players'))[0].m) }

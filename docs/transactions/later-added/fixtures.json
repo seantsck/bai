@@ -1,0 +1,113 @@
+{
+ "note": "FICTIONAL rows in the archive's documented format. expected_later gives the deterministic classifier label for each later-dated row (line numbers are 1-based within the case).",
+ "cases": [
+  {
+   "name": "ptbnl_formally_named",
+   "explains": "a placeholder row exists in the same direction and exactly one later player follows: a formal PTBNL resolution (migration 028 already models it; it is NOT an addition)",
+   "rows": [
+    "\"20300601\",\"\",\"\",\"\",\"\",\"9001\",\"smitj001\",\"T \",\"LAN\",\"NL\",\"SEA\",\"AL\",\"\",\"\",\"\",\"\"",
+    "\"20300601\",\"\",\"\",\"\",\"\",\"9001\",\"jonea001\",\"T \",\"SEA\",\"AL\",\"LAN\",\"NL\",\"\",\"\",\"\",\"\"",
+    "\"20300601\",\"\",\"\",\"\",\"\",\"9001\",\"\",\"T \",\"SEA\",\"AL\",\"LAN\",\"NL\",\"\",\"\",\"\",\"player to be named or cash\"",
+    "\"20300915\",\"\",\"\",\"\",\"\",\"9001\",\"nix-j001\",\"T \",\"SEA\",\"AL\",\"LAN\",\"NL\",\"\",\"\",\"\",\"\""
+   ],
+   "expected_later": [
+    {
+     "line": 4,
+     "kind": "PTBNL_NAMED"
+    }
+   ],
+   "canonical": "ptbnl_resolutions row on the SEA>LAD placeholder asset; no trade_asset_additions row"
+  },
+  {
+   "name": "added_later_unstated",
+   "explains": "a player row under the trade id dated later with no placeholder: the source does not say why; kept as an addition, never called a PTBNL",
+   "rows": [
+    "\"20300601\",\"\",\"\",\"\",\"\",\"9002\",\"smitj001\",\"T \",\"LAN\",\"NL\",\"SEA\",\"AL\",\"\",\"\",\"\",\"\"",
+    "\"20300601\",\"\",\"\",\"\",\"\",\"9002\",\"jonea001\",\"T \",\"SEA\",\"AL\",\"LAN\",\"NL\",\"\",\"\",\"\",\"\"",
+    "\"20300720\",\"\",\"\",\"\",\"\",\"9002\",\"nix-j001\",\"T \",\"SEA\",\"AL\",\"LAN\",\"NL\",\"\",\"\",\"\",\"\""
+   ],
+   "expected_later": [
+    {
+     "line": 3,
+     "kind": "ADDED_LATER_UNSTATED"
+    }
+   ],
+   "canonical": "trade_asset_additions row, addition_kind ADDED_LATER_UNSTATED, added_on 2030-07-20 on the SEA>LAD package"
+  },
+  {
+   "name": "added_to_trade_by_source",
+   "explains": "the source types the later row Tp (added to a trade, usually because an original player refused to report or retired): an amendment-like addition stated by the source",
+   "rows": [
+    "\"20300601\",\"\",\"\",\"\",\"\",\"9003\",\"smitj001\",\"T \",\"LAN\",\"NL\",\"SEA\",\"AL\",\"\",\"\",\"\",\"\"",
+    "\"20300601\",\"\",\"\",\"\",\"\",\"9003\",\"jonea001\",\"T \",\"SEA\",\"AL\",\"LAN\",\"NL\",\"\",\"\",\"\",\"\"",
+    "\"20300710\",\"\",\"\",\"\",\"\",\"9003\",\"nix-j001\",\"Tp\",\"SEA\",\"AL\",\"LAN\",\"NL\",\"\",\"\",\"\",\"\""
+   ],
+   "expected_later": [
+    {
+     "line": 3,
+     "kind": "ADDED_TO_TRADE"
+    }
+   ],
+   "canonical": "trade_asset_additions row, addition_kind ADDED_TO_TRADE"
+  },
+  {
+   "name": "ambiguous_placeholders",
+   "explains": "two placeholders in one direction and one later player: which PTBNL was named is not stated, so a person decides; nothing is paired automatically",
+   "rows": [
+    "\"20300601\",\"\",\"\",\"\",\"\",\"9004\",\"smitj001\",\"T \",\"LAN\",\"NL\",\"SEA\",\"AL\",\"\",\"\",\"\",\"\"",
+    "\"20300601\",\"\",\"\",\"\",\"\",\"9004\",\"\",\"T \",\"SEA\",\"AL\",\"LAN\",\"NL\",\"\",\"\",\"\",\"player to be named\"",
+    "\"20300601\",\"\",\"\",\"\",\"\",\"9004\",\"\",\"T \",\"SEA\",\"AL\",\"LAN\",\"NL\",\"\",\"\",\"\",\"player to be named\"",
+    "\"20300801\",\"\",\"\",\"\",\"\",\"9004\",\"nix-j001\",\"T \",\"SEA\",\"AL\",\"LAN\",\"NL\",\"\",\"\",\"\",\"\""
+   ],
+   "expected_later": [
+    {
+     "line": 4,
+     "kind": "PTBNL_AMBIGUOUS"
+    }
+   ],
+   "canonical": "none until a person pairs it (then a ptbnl_resolutions row)"
+  },
+  {
+   "name": "later_cash_row",
+   "explains": "a later row with no player is a cash or text row, not a player",
+   "rows": [
+    "\"20300601\",\"\",\"\",\"\",\"\",\"9005\",\"smitj001\",\"T \",\"LAN\",\"NL\",\"SEA\",\"AL\",\"\",\"\",\"\",\"\"",
+    "\"20300601\",\"\",\"\",\"\",\"\",\"9005\",\"jonea001\",\"T \",\"SEA\",\"AL\",\"LAN\",\"NL\",\"\",\"\",\"\",\"\"",
+    "\"20300901\",\"\",\"\",\"\",\"\",\"9005\",\"\",\"T \",\"SEA\",\"AL\",\"LAN\",\"NL\",\"\",\"\",\"\",\"$\""
+   ],
+   "expected_later": [
+    {
+     "line": 3,
+     "kind": "LATER_NON_PLAYER_ROW"
+    }
+   ],
+   "canonical": "held: cash of unknown amount added later has no representation without an amendment/asset effective date"
+  },
+  {
+   "name": "later_void",
+   "explains": "a later void row is an amendment of the whole transaction",
+   "rows": [
+    "\"20300601\",\"\",\"\",\"\",\"\",\"9006\",\"smitj001\",\"T \",\"LAN\",\"NL\",\"SEA\",\"AL\",\"\",\"\",\"\",\"\"",
+    "\"20300601\",\"\",\"\",\"\",\"\",\"9006\",\"jonea001\",\"T \",\"SEA\",\"AL\",\"LAN\",\"NL\",\"\",\"\",\"\",\"\"",
+    "\"20300605\",\"\",\"\",\"\",\"\",\"9006\",\"smitj001\",\"Tv\",\"LAN\",\"NL\",\"SEA\",\"AL\",\"\",\"\",\"\",\"\""
+   ],
+   "expected_later": [
+    {
+     "line": 3,
+     "kind": "LATER_VOID_OR_RETURN"
+    }
+   ],
+   "canonical": "transaction_amendments row, amendment_kind TRADE_VOIDED, effective_on 2030-06-05"
+  },
+  {
+   "name": "ids_reused_across_unrelated_rows",
+   "explains": "a repeated id on non-trade rows is not a trade group: no later member, nothing merged",
+   "rows": [
+    "\"19790130\",\"\",\"\",\"\",\"\",\"9007\",\"ddddd001\",\"F \",\"\",\"\",\"BAL\",\"\",\"\",\"\",\"\",\"\"",
+    "\"20131117\",\"\",\"\",\"\",\"\",\"9007\",\"eeeee001\",\"F \",\"\",\"\",\"KCA\",\"\",\"\",\"\",\"\",\"\""
+   ],
+   "expected_later": [],
+   "canonical": "two unrelated free-agent records"
+  }
+ ]
+}
