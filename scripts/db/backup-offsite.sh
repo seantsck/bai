@@ -16,21 +16,20 @@ cmd="${1:-}"; shift || true
 args=(); pfile=()
 while [ $# -gt 0 ]; do case "$1" in --passphrase-file) pfile=(--passphrase-file "$2"); shift 2 ;; --expect-sha256) exp_sha="$2"; shift 2 ;; --expect-tree) exp_tree="$2"; shift 2 ;; *) args+=("$1"); shift ;; esac; done
 here="$(cd "$(dirname "$0")" && pwd)"; root="$(cd "$here/../.." && pwd)"
-for t in gpg sha256sum; do command -v "$t" >/dev/null || { echo "missing tool: $t" >&2; exit 2; }; done
+for t in gpg node sha256sum; do command -v "$t" >/dev/null || { echo "missing tool: $t" >&2; exit 2; }; done
 GPG_TTY="$(tty 2>/dev/null || true)"; export GPG_TTY
 die() { echo "$*" >&2; exit "${2:-1}"; }
 hash_of() { sha256sum "$1" | cut -d' ' -f1; }
 
-# the file must be GnuPG symmetric AES-256 (symmetric-key packet, algorithm 9) followed by encrypted data; a plaintext archive, an export or a database file is refused
+# The file must be exactly GnuPG's symmetric AES-256 output: one session-key packet (tag 3: version 4, AES-256, iterated+salted) and one integrity-protected data
+# packet (tag 18), to the last byte. This reads the OUTER packet headers from the bytes (scripts/db/lib/openpgp-outer.mjs): it never decrypts, never calls gpg and
+# never touches gpg-agent, so it cannot be fooled by a cached passphrase (which makes `gpg --list-packets` print the inner packets) and can never ask for one.
+# A plaintext archive, an export, SQL/NDJSON, an armored, signed, public-key-encrypted, unprotected or damaged file is refused, whatever it is called.
 require_encrypted() {
-  local f="$1" packets
+  local f="$1" why
   [ -f "$f" ] || die "not a file: $f" 2
   case "$f" in *.gpg) ;; *) die "refusing $f: only a .gpg file made by backup-pack.sh is ever transferred" 2 ;; esac
-  packets="$(gpg --batch --list-packets "$f" 2>&1 || true)"
-  echo "$packets" | grep -q ':symkey enc packet:' || die "refusing $f: it is not an OpenPGP symmetric-encrypted file" 2
-  echo "$packets" | grep -qE 'cipher 9|algo 9' || die "refusing $f: the cipher is not AES-256" 2
-  echo "$packets" | grep -q ':encrypted data packet:' || die "refusing $f: no encrypted data packet" 2
-  echo "$packets" | grep -q ':literal data packet:' && die "refusing $f: it contains a plaintext literal packet" 2
+  if ! why="$(node "$here/lib/openpgp-outer.mjs" "$f" 2>&1 >/dev/null)"; then die "refusing $f: it is not an OpenPGP symmetric-encrypted file made by backup-pack.sh ($why)" 2; fi
   return 0
 }
 require_companions() {
