@@ -39,8 +39,23 @@ So every gate must run in this order, from the restricted worktree:
 
 **If `hosted-preflight --after NNN` is run between steps 1 and 2, it fails with exactly one failing check, "the recorded migration level is NNN" (`recorded` ends one version earlier), while "the Supabase history holds exactly versions up to NNN" and "every pushed migration equals its committed file" pass.** That is the ledger lag, not damage: run step 2 and repeat step 3. Any other failing check, or a failure that persists after step 2, is a real failure: stop, do not repair, report. (Seen on 2026-10-28; resolved by step 2 without any other action.)
 
-## Not run — recorded honestly
-The G1 row of `phase18-merge-and-release-plan.md` also lists `hosted:security` (read-only mode) and `hosted:parity` as post-checks. They were **not run** during this release (no hosted access was in scope after the preflight). They are read-only and can be run as a separate, explicitly authorized closing check before G2.
+## Post-release read-only verification (2026-10-28, after the release) — both PASS
+The G1 row of `phase18-merge-and-release-plan.md` lists `hosted:security` (read-only mode) and `hosted:parity` as post-checks. **They were not run at the time of the release or when this record was first merged (PR #50)**; the owner authorized them separately afterwards and they were run read-only, from the existing restricted worktree `~/tmp-bai/g1-release-v2` (`8d742f3`, migrations 001–028), against project `dbnmktidheefoxaztivm` at level 028. The execution paths were inspected first: `security.mjs --read-only` uses one `begin read only` transaction, a plain-SELECT statement guard and HTTP GET/HEAD only; `parity.mjs` builds its reference on a throwaway local PostgreSQL and reads the hosted catalog and migration history with SELECTs. Nothing was written, repaired or changed.
+
+**Hosted security audit (`hosted:security`): PASS** — "SECURITY OK (read-only audit)".
+* Correct project `dbnmktidheefoxaztivm`; hosted migration level 028.
+* 80 functions audited, 25 of them SECURITY DEFINER; none executable by PUBLIC, anon or authenticated; none with an unset `search_path`.
+* No warnings or failures (informational notes only, e.g. `public.rls_auto_enable()` is Supabase's own).
+* 14 of 30 probes (the plain-SELECT ones) executed; the 16 that write, run DDL or call functions were skipped in read-only mode (their privileges are verified from the catalog). Data API probes were GET only; the public positive control returned 200 and the private objects were refused.
+* Certification gate disabled; no reviewers enrolled.
+
+**Hosted parity (`hosted:parity`): PASS** — "PARITY OK".
+* 3,074 BAI-owned objects compared against a reference built from migrations 001–028: **0 differences**.
+* All 28 migration versions match (the Supabase history matches the committed files).
+* Only the documented platform difference: Supabase's `postgres` USAGE grant on schema `public` (grants nothing new).
+* **Seed-data parity was NOT PERFORMED**: the tool skips it when the target holds import batches, and hosted holds 198.
+
+Evidence logs: `~/tmp-bai/postg1-20261028T212335Z/` (`security.log`, `parity.log`; kept outside the repository).
 
 ## Preserved evidence (do not delete)
 * Backup `~/bai-backups/g1-20261028T193747Z/` (`snapshot/`, `export/`), its encrypted archive and companions, the owner's returned copy `returned-g1-20261028T193747Z/`, and the fresh comparison export `g1-20261028T193747Z.final-20261028T204810Z/`.

@@ -18,7 +18,7 @@ It matters because the 023/028 definitions do not scale: with 401 trades `acquis
 3. A fresh protocol-v2 backup (≤ 6 h), the owner's independent off-site verification, `final-parity` and the backup-specific authorization, in the same order as G1.
 4. The scale rehearsal reviewed (`scale-full-vs-reference` IDENTICAL).
 5. After: the three views return identical rows before and after on hosted (smoke-tested read-only), then `migrate.mjs` and `--after 029` in the documented order ([g1-release-record.md](g1-release-record.md)).
-6. Recommended before G2: run the read-only G1 closing checks that were not run (`hosted:security` read-only mode, `hosted:parity` from the restricted directory).
+6. The read-only G1 closing checks (`hosted:security` read-only mode, `hosted:parity` from the restricted directory) were run on 2026-10-28 after the release and **both passed** at level 028 ([g1-release-record.md](g1-release-record.md#post-release-read-only-verification-2026-10-28-after-the-release--both-pass)); seed-data parity was not performed (hosted holds import batches).
 
 ## Recommendation: the smallest next step
 **Do not bundle; do G2 (029) next, as the same ceremony G1 just proved, and in parallel start the one human task that has no engineering cost: the G4 Retrosheet publication-grant review.**
