@@ -84,3 +84,21 @@ The rehearsal used the real hosted data of `g1-20261025T224416Z` (snapshot taken
 **A defect the rehearsal found, now fixed.** `backup-offsite.sh` decided that a file was ciphertext with `gpg --list-packets`. That command does not only read headers: it tries to decrypt, so when gpg-agent holds a cached passphrase (as it does right after the owner has typed it) it prints the INNER compressed and literal-data packets, and the check refused the valid archive as "plaintext". The same call could also prompt for a passphrase. It is replaced by the byte-level outer-packet check above; `tests/db/openpgp-outer.test.mjs` reproduces the false positive (giving gpg the session key makes it list the inner literal packet), shows the new check accepts the archive regardless, and refuses 50+ malformed, wrong-cipher, wrong-structure, plaintext, truncated, extended and armored inputs.
 
 **What the rehearsal does not establish:** anything about the day-of copy. G1 still needs a new backup on the day, within 30 minutes of the push, encrypted, uploaded, downloaded fresh and checked (§2–§5), and the owner's message "off-site copy verified".
+
+## 7. G1 release log — day-of backup `g1-20261027T235441Z` (recorded 2026-10-28)
+
+**Status: off-site copy verified by the owner; backup EXPIRED for G1. Migration 028 was NOT applied. Hosted remains at migration 027.**
+
+| | |
+| --- | --- |
+| Snapshot | transaction began 2026-10-27T23:54:41Z (conservative window start), finished 23:55:05Z; 92 tables / 30,604 rows, level 027, `REPEATABLE READ` read-only; `manifest_sha256` `b7f8858c845232f86a63416890b354d0ab6c23094a59db8e1469b2ef215b17a1` (identical to the 2026-10-25 snapshot: hosted unchanged) |
+| Window | the 30 minutes ended **2026-10-28T00:24:41Z**; the owner's confirmation arrived after that, so the backup may not be used to push 028 |
+| Checks the assistant ran (all passed) | `verify-snapshot`; logical-export restore into a throwaway PostgreSQL 17 (rows equal the snapshot, 2,818 catalog objects, 0 unexplained differences); snapshot restore + strict preflight; read-only hosted preflight at level 027 (every table byte-identical); `gate check --dry-run` in the restricted worktree listing exactly `028_transaction_forensics_foundation.sql` |
+| Encrypted-file SHA-256 | `2936287a8f5b5f0bf3db894489d0f5a1a9a48ad1ab38384dac0e9c20d48a59a1` |
+| Content-tree SHA-256 | `6c9da73e1a28fac6a61b631a09e5041f6b1c7e1019f6afdc4feb47384a8d9701` |
+
+**Verified by the assistant, read-only:** `~/bai-backups/g1-20261027T235441Z.tar.zst.gpg` is 1,121,531 bytes, mode 600; its SHA-256 equals the value above and the `.sha256` companion; the `.tree-sha256` companion equals the value above and the hash recomputed from the plaintext backup directory; the outer packets are `[3, 18]` (AES-256, S2K iterated+salted SHA-512, 65,011,712 iterations, integrity-protected), nothing else. The assistant did not decrypt it and never saw the passphrase.
+
+**Reported by the owner (not observable by the assistant):** the fresh Google Drive download was verified independently; the downloaded archive passed decryption, content comparison and its internal `SHA256SUMS` verification; the owner's confirmation "Off-site copy verified." for this backup.
+
+**Preserved:** the backup directory, the encrypted archive and its companions are kept unmodified. The next release attempt needs a NEW backup window (§2–§5) and a new authorization naming it; this evidence does not carry over.
