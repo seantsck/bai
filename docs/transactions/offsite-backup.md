@@ -137,3 +137,21 @@ The helper `~/bai-gates/g1-offsite.ps1` (kept outside the repository; Windows Po
 | push | assistant | only if everything above is true: `BAI_GATE_FILE=<gate> npm run hosted:supabase -- db push`, then `hosted:migrate`, then `hosted-preflight --after 028` — then STOP; no import, publication change, read-model refresh or deployment |
 
 **Stop conditions (no push; retake the backup if time or parity is lost):** any check fails or a hash differs; the deadline passes; `main`, the commit or either hash differs; the worktree is dirty or holds anything beyond 001–028; the dry run lists anything but 028; hosted is not at 027 or any table differs from the snapshot; the owner's verification or authorization is missing or names a different backup; the 2026-10-25 and 2026-10-27 backups are never reused. Unmeasured and likely to decide the deadline: the Drive upload and download and the `Check` run.
+
+## 10. G1 attempt 2 — backup `g1-20261028T040939Z` (recorded 2026-10-28): window expired, 028 NOT applied
+
+**Status: expired. Migration 028 was not applied; hosted was not changed and remains at migration 027. No new window is authorized.**
+
+| | |
+| --- | --- |
+| T0 (snapshot start) / deadline | 2026-10-28 04:09:39Z / 04:39:39Z |
+| Measured (assistant) | snapshot finished 04:10:04Z (25 s); export and `verify-snapshot` finished 04:11:48Z; READY announced and all restore and hosted checks passed by 04:12:30Z (about 2 min 50 s after T0). Hosted preflight: level 027, every table byte-identical to this snapshot, `manifest_sha256` `b7f8858c…17a1`; gate dry-run listed exactly 028 |
+| Measured (file times) | `.tree-sha256` written 04:38:47Z, archive and `.sha256` 04:39:04Z — the encrypted file existed **35 seconds before the deadline**, roughly 26½ minutes after READY. When the owner started `Pack` is not recorded; the Drive upload, fresh download, `Return` and `Check` had not yet happened |
+| Encrypted-file SHA-256 | `fe838df9ded2609aaeb7cba9be5072eda7f0476d0cb7bf95ac171afda8382668` |
+| Content-tree SHA-256 | `93c454733f6048844ae1d45f834910905531b61cfeb6562b57dc621f5b8c2c73` |
+
+**Verified by the assistant, read-only (no decryption):** the archive is 1,117,390 bytes, mode 600; its SHA-256 equals the `.sha256` companion and the owner's value; the `.tree-sha256` companion equals the owner's value and the hash recomputed from the plaintext backup directory; outer OpenPGP packets `[3, 18]`, AES-256, SHA-512 iterated 65,011,712, integrity-protected. **Reported by the owner:** the Windows v3 `Pack` step succeeded (first real run). Off-site upload, fresh download and recovery verification of this backup are not reported and are not claimed.
+
+**Finding:** the manual owner path from READY to an encrypted file consumed almost the whole 30-minute window, so the rest (upload, fresh download, check, authorization) could not fit. The 30-minute rule cannot be met by this sequence unless the owner's steps are far faster or the sequence changes. A change of the freshness rule is a decision for the owner (for example: keep the time limit but start `Pack` the moment READY appears and pre-stage everything; or accept a strict read-only preflight proving byte parity with the snapshot at push time, which replaces the time limit and therefore needs the owner's explicit written approval). Neither is in effect.
+
+**Preserved, never to be reused to authorize 028:** `g1-20261025T224416Z` (rehearsal), `g1-20261027T235441Z` (rehearsal), `g1-20261028T040939Z` (expired attempt) — directories, archives and companions unmodified.
