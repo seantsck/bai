@@ -7,6 +7,7 @@ import path from 'node:path'
 import crypto from 'node:crypto'
 import { verifySnapshot } from './snapshot.mjs'
 import { validateGateShape } from './gate.mjs'
+import { inspectFile } from './openpgp-outer.mjs'
 
 /** The reviewed switch that makes the record MANDATORY for `db push`. It stays false until the owner approves activation of protocol v2 (a code change). */
 export const PROTOCOL_V2_ENFORCED = false
@@ -54,6 +55,29 @@ export function verifyBackupDir (backupDir) {
     if (!fs.existsSync(file) || fs.statSync(file).size === 0) { p.push(`export/${f} is missing or empty`); continue }
   }
   for (const [name, h] of byName) { const file = path.join(exp, name); if (!fs.existsSync(file) || sha256(fs.readFileSync(file)) !== h) p.push(`export/${name} does not match SHA256SUMS`) }
+  return p
+}
+
+/**
+ * What the code CAN check about the off-site evidence (the rest is the owner's own verified report): the encrypted archive beside the backup
+ * (<dir>.tar.zst.gpg) is an AES-256 OpenPGP file whose SHA-256 is the reported one and whose companions agree, its recorded content hash is this backup
+ * directory's, and the copy that came back from the owner's machine (returned-<name>/<name>.tar.zst.gpg) is byte-identical. Decryption of the returned
+ * copy needs the passphrase, so it is attested by the owner (`backup-offsite.sh check`, Windows helper Check), never inferred from these hashes.
+ */
+export function verifyOffsiteEvidence (backupDir, encrypted, tree) {
+  const p = []
+  const dir = path.resolve(backupDir); const name = path.basename(dir)
+  const archive = `${dir}.tar.zst.gpg`; const returned = path.join(path.dirname(dir), `returned-${name}`, `${name}.tar.zst.gpg`)
+  if (!HEX64.test(encrypted ?? '') || !HEX64.test(tree ?? '')) return ['the off-site hashes are not 64 hex characters']
+  if (!fs.existsSync(archive)) return [`the encrypted archive ${archive} is missing`]
+  try { inspectFile(archive) } catch (e) { p.push(`the encrypted archive is not the AES-256 OpenPGP file backup-pack.sh makes (${e.message})`) }
+  if (sha256(fs.readFileSync(archive)) !== encrypted) p.push('the reported encrypted SHA-256 is not the archive\'s')
+  const comp = (ext) => { try { return fs.readFileSync(archive + ext, 'utf8').trim() } catch { return null } }
+  if (comp('.sha256') !== encrypted) p.push('the archive\'s .sha256 companion does not equal the reported encrypted SHA-256')
+  if (comp('.tree-sha256') !== tree) p.push('the archive\'s .tree-sha256 companion does not equal the reported content hash')
+  if (contentTreeHash(dir) !== tree) p.push('the reported content hash is not this backup directory\'s')
+  if (!fs.existsSync(returned)) p.push(`the copy returned from the off-site round trip is missing (${returned})`)
+  else if (sha256(fs.readFileSync(returned)) !== encrypted) p.push('the returned copy is not byte-identical to the archive')
   return p
 }
 
@@ -119,6 +143,7 @@ export function verifyRecordFile (file, { gate, now = Date.now() }) {
   if (tree !== rec.backup.tree_sha256) p.push('the backup directory content changed since the record was written')
   if (![rec.offsite?.encrypted_sha256, rec.offsite?.tree_sha256].every((h) => HEX64.test(h ?? ''))) p.push('the record has no off-site verification hashes')
   if (rec.offsite?.tree_sha256 !== tree) p.push('the off-site verified content hash is not this backup\'s content hash')
+  else for (const x of verifyOffsiteEvidence(dir, rec.offsite?.encrypted_sha256, rec.offsite?.tree_sha256)) p.push(`off-site evidence: ${x}`)
   if (!String(rec.offsite?.authorization_ref ?? '').trim()) p.push('the record has no owner authorization reference')
   const started = backupStartedAt(dir)
   if (started == null) p.push('the backup start time cannot be determined')

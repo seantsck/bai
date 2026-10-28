@@ -1,7 +1,8 @@
 // Phase C of G1 release protocol v2 (docs/transactions/g1-protocol-v2-proposal.md): the FINAL READ-ONLY comparison, run immediately before the push.
 //   node --env-file=<env file> scripts/db/final-parity.mjs --backup-dir <~/bai-backups/g1-…> --gate <gate.json> --record <new file>
 //        --offsite-sha256 <hex> --offsite-tree <hex> --authorization-ref "<owner message, date/time>"
-// 1. the backup is sound (snapshot and export checksums), at most SIX hours old, and its content hash equals the off-site verified one;
+// 1. the backup is sound (snapshot and export checksums), at most SIX hours old, its content hash equals the off-site verified one, and the encrypted archive
+//    beside it and the copy that came back from the owner's round trip match the reported hashes (decryption itself is the owner's attested Check);
 // 2. the strict hosted preflight passes (migration level, 028 checksum, every table byte-identical to the backup's snapshot);
 // 3. a FRESH logical export (scripts/db/logical-export.sh, read-only) into a NEW directory equals the backup's export (roles, schema, data, migration history)
 //    once pg_dump's random \restrict lines are ignored;
@@ -12,7 +13,7 @@ import { spawnSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 import { ownerDatabaseUrl, isLocalUrl } from './lib/connection.mjs'
 import { validateGateShape } from './lib/gate.mjs'
-import { MAX_BACKUP_AGE_MS, backupStartedAt, buildRecord, compareExports, contentTreeHash, verifyBackupDir } from './lib/final-parity.mjs'
+import { MAX_BACKUP_AGE_MS, backupStartedAt, buildRecord, compareExports, contentTreeHash, verifyBackupDir, verifyOffsiteEvidence } from './lib/final-parity.mjs'
 
 const here = path.dirname(fileURLToPath(import.meta.url))
 const argv = process.argv.slice(2)
@@ -46,6 +47,7 @@ if (Date.now() - started > MAX_BACKUP_AGE_MS) fail(`the backup is ${ageH.toFixed
 const manifest = JSON.parse(fs.readFileSync(path.join(absBackup, 'snapshot/manifest.json'), 'utf8'))
 if (manifest.migrations?.v !== gate.from_level) fail(`the backup is at migration ${manifest.migrations?.v}; the gate starts from ${gate.from_level}`)
 if (contentTreeHash(absBackup) !== tree) fail('--offsite-tree is not the content hash of this backup directory (the off-site verified copy is not this backup, or the directory changed)')
+const oe = verifyOffsiteEvidence(absBackup, encrypted, tree); if (oe.length) fail(`off-site evidence: ${oe.join('; ')}`)
 console.log(`backup ok: ${path.basename(absBackup)}, ${ageH.toFixed(2)} h old (limit 6), content hash equals the off-site verified one`)
 
 // 2. strict hosted preflight (read-only)

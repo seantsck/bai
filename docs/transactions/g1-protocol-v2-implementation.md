@@ -14,14 +14,29 @@ Implements the minimum of the design approved in principle on PR #47 (`189d47088
 ## Checked against the real backups (read-only, offline)
 `contentTreeHash` of `g1-20261028T040939Z` equals the value `backup-pack.sh` recorded (`93c45473…2c73`); `verifyBackupDir` passes on it; the three real exports (2026-10-25, -27, -28) compare **identical** under the precise normalization. (Correction to the proposal: the first offline check used `grep -v restrict`, which is too broad; the precise filter gives the same result, and in `data.sql` the lines are `-- \restrict …` comments.)
 
+## Execution path, and why the gate must be re-pinned (security review, 2026-10-28)
+
+The push is `node scripts/db/supabase-hosted.mjs db push` run **inside the restricted checkout**. Every piece is that checkout's own: the entry point and the guard it imports, `gate.mjs check` (spawned from the checkout, `repoRoot` = the checkout), the Supabase CLI (`node_modules/.bin/supabase`, a symlink to main's installed packages) run with the checkout as working directory, and the migration files (`supabase/migrations` → `../database/migrations`, 001–028 only). **Main's guard never runs.** The current restricted checkout is at `41cb3da7`, which has no `final-parity` code: flipping `PROTOCOL_V2_ENFORCED` on main would not protect a push from it (verified: its `supabase-hosted.mjs` contains no parity check).
+
+Correction (this PR): a gate can only pin, and `gate check` can only pass on, a commit whose OWN `scripts/db/lib/final-parity.mjs` sets `PROTOCOL_V2_ENFORCED = true` (`gate.mjs create` refuses otherwise — it refuses `41cb3da7` today; `gate check` reports "does not enforce release protocol v2"). So the release must be re-pinned to the reviewed activation commit on main: **the migration files are unchanged** (001–028 are identical between `41cb3da7` and main; the 028 checksum `7598519f…b501` and the `migrations_hash` stay the same), but the gate's commit and the gate file's SHA-256 change, and the owner's authorization must name the new ones. The old gate file and the `41cb3da7` checkout must be retired (their old code cannot know about protocol v2; that is the one path code cannot close).
+
+The guard has no protocol-v1 fallback once enforced: the constant makes the record mandatory, `BAI_REQUIRE_PARITY_RECORD` can only add the requirement, and a missing library aborts before the CLI. Tested end to end with the exact command, a fake CLI and a disposable database: no record, a missing file, an expired, altered or FAIL record, a record for another gate, another backup, another archive hash or another content hash, a backup changed afterwards, and a vanished round-trip copy are all refused with no push; a valid record gives exactly one `db push --linked`.
+
+## Off-site evidence and owner authorization: what is checked, what is attested
+* **Checked by code** (wrapper and push guard): the encrypted archive beside the backup (`<dir>.tar.zst.gpg`) exists, is an AES-256 OpenPGP file by its outer packets, and its SHA-256 and both companions equal the reported hashes; the reported content hash equals the backup directory's recomputed hash; the copy that came back from the owner's round trip (`returned-<name>/<name>.tar.zst.gpg`) exists and is byte-identical. A typed hash alone is not accepted as proof of anything.
+* **Attested by the owner, not provable by code:** that the round trip went through the private Restricted Google Drive folder, and that the returned copy **decrypted** with the content hash and internal `SHA256SUMS` passing (`backup-offsite.sh check` / Windows `Check`; decryption needs the passphrase, which the tools never see). Likewise the separate backup-specific authorization: the record only carries its reference text; whether it exists, names this backup and is in force is checked by the operator against the owner's message before running the push.
+
 ## Operating it (after activation is approved)
 ```
 E=/home/prismadmin/projects/bai/.env.hosted.local           # the one mode-600 original; no copy inside any worktree
-cd ~/projects/bai-ci && node --env-file=$E scripts/db/final-parity.mjs --backup-dir ~/bai-backups/g1-<UTC> --gate ~/bai-gates/g1.gate.json \
+# once: re-pin to the activation commit A on main (same migration files), then make the restricted checkout from it
+node scripts/db/gate.mjs create --gate G1 --commit <A> --through 028 --project-ref dbnmktidheefoxaztivm --out ~/bai-gates/g1-v2.gate.json
+node scripts/db/gate.mjs workdir --gate ~/bai-gates/g1-v2.gate.json --dir ~/tmp-bai/g1-release-v2
+# Phase C, within six hours of the snapshot start
+cd ~/projects/bai-ci && node --env-file=$E scripts/db/final-parity.mjs --backup-dir ~/bai-backups/g1-<UTC> --gate ~/bai-gates/g1-v2.gate.json \
     --record ~/bai-gates/parity-<UTC>.json --offsite-sha256 <encrypted hash> --offsite-tree <tree hash> --authorization-ref "<owner message and time>"
-cd ~/tmp-bai/g1-release && BAI_GATE_FILE=~/bai-gates/g1.gate.json BAI_PARITY_RECORD=~/bai-gates/parity-<UTC>.json node --env-file=$E scripts/db/supabase-hosted.mjs db push
+cd ~/tmp-bai/g1-release-v2 && BAI_GATE_FILE=~/bai-gates/g1-v2.gate.json BAI_PARITY_RECORD=~/bai-gates/parity-<UTC>.json node --env-file=$E scripts/db/supabase-hosted.mjs db push
 ```
-The push is only authorized by the owner's separate, backup-specific written authorization; the wrapper does not check it beyond requiring its reference.
 
 ## Limits (unchanged from the proposal; not implemented here)
 Role passwords, project settings, Vault secrets and storage files remain outside any database comparison (owner attestation). Transaction-counter and settings monitoring are deferred. The record is a local file: the guard re-derives everything from the backup directory and the gate, but a person with shell access could forge a record by hand; the controls are procedural as well as technical. The restore of a backup onto Supabase itself remains unrehearsed.

@@ -7,6 +7,7 @@ import os from 'node:os'
 import path from 'node:path'
 import { spawnSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
+import crypto from 'node:crypto'
 import * as h from './harness.mjs'
 import { buildGate } from '../../scripts/db/lib/gate.mjs'
 import { listMigrations, applyMigrations } from '../../scripts/db/lib/migrations.mjs'
@@ -26,12 +27,18 @@ async function backup (ageMs = 0) {
   const named = path.join(tmp, `b${n}`, `g1-${stamp(Date.now() - ageMs)}`)
   fs.mkdirSync(path.dirname(named), { recursive: true })
   await takeSnapshot(db, path.join(named, 'snapshot')); exportTo(path.join(named, 'export'))
+  // the encrypted archive beside it (an AES-256 OpenPGP-shaped stand-in: [SKESK v4 AES-256 iterated+salted, SEIPD v1]), its companions, and the returned copy
+  const arc = Buffer.concat([Buffer.from([0x8c, 13, 4, 9, 3, 10]), crypto.randomBytes(8), Buffer.from([0xff, 0xd2, 60, 1]), crypto.randomBytes(59)])
+  fs.writeFileSync(`${named}.tar.zst.gpg`, arc); fs.writeFileSync(`${named}.tar.zst.gpg.sha256`, sha(arc) + '\n'); fs.writeFileSync(`${named}.tar.zst.gpg.tree-sha256`, fp.contentTreeHash(named) + '\n')
+  const ret = path.join(path.dirname(named), `returned-${path.basename(named)}`); fs.mkdirSync(ret); fs.writeFileSync(path.join(ret, `${path.basename(named)}.tar.zst.gpg`), arc)
   return named
 }
+const sha = (b) => crypto.createHash('sha256').update(b).digest('hex')
+const arcSha = (b) => (fs.existsSync(`${b}.tar.zst.gpg`) ? sha(fs.readFileSync(`${b}.tar.zst.gpg`)) : hex('0'))
 const treeOf = (dir) => fp.contentTreeHash(dir)
 const run = (b, extra = [], over = {}) => {
   const rec = path.join(tmp, `rec-${++n}.json`)
-  const args = ['scripts/db/final-parity.mjs', '--backup-dir', b, '--gate', gateFile, '--record', rec, '--offsite-sha256', hex('a'), '--offsite-tree', treeOf(b), '--authorization-ref', 'owner message test', '--export-script', exporter, ...extra]
+  const args = ['scripts/db/final-parity.mjs', '--backup-dir', b, '--gate', gateFile, '--record', rec, '--offsite-sha256', arcSha(b), '--offsite-tree', treeOf(b), '--authorization-ref', 'owner message test', '--export-script', exporter, ...extra]
   for (let i = 0; i < extra.length; i += 2) { const j = args.indexOf(extra[i]); if (j >= 0 && j < args.length - extra.length) args.splice(j, 2) }   // an extra flag replaces the default one
   const r = spawnSync(process.execPath, args, { cwd: root, encoding: 'utf8', env: { ...env, ...over } })
   return { ...r, rec, out: r.stdout + r.stderr }
@@ -105,10 +112,20 @@ test('fails closed on a damaged or inconsistent backup, an old backup, a wrong o
   r = run(b); assert.equal(r.status, 1, r.out); assert.match(r.out, /supabase_migrations_history\.json/); fs.writeFileSync(hist, ho)
   // the off-site verified content hash is not this backup's
   r = run(b, ['--offsite-tree', hex('b')]); assert.equal(r.status, 1, r.out); assert.match(r.out, /not the content hash of this backup/)
-  r = run(b, ['--offsite-sha256', 'zz']); assert.equal(r.status, 1)
+  r = run(b, ['--offsite-sha256', 'zz']); assert.equal(r.status, 1, r.out)
+  // the reported hashes are bound to the real archive and to the copy that came back; a typed hash alone proves nothing
+  r = run(b, ['--offsite-sha256', hex('a')]); assert.equal(r.status, 1, r.out); assert.match(r.out, /not the archive's/)
+  const arc = `${b}.tar.zst.gpg`; const ao = fs.readFileSync(arc); const ret = path.join(path.dirname(b), `returned-${path.basename(b)}`, `${path.basename(b)}.tar.zst.gpg`)
+  fs.renameSync(ret, ret + '.x'); r = run(b); assert.equal(r.status, 1, r.out); assert.match(r.out, /returned from the off-site round trip is missing/); fs.renameSync(ret + '.x', ret)
+  fs.writeFileSync(ret, Buffer.concat([ao.subarray(0, -1), Buffer.from([ao.at(-1) ^ 1])])); r = run(b); assert.equal(r.status, 1, r.out); assert.match(r.out, /not byte-identical/); fs.writeFileSync(ret, ao)
+  fs.writeFileSync(arc + '.tree-sha256', hex('d') + '\n'); r = run(b); assert.equal(r.status, 1, r.out); assert.match(r.out, /tree-sha256 companion/); fs.writeFileSync(arc + '.tree-sha256', treeOf(b) + '\n')
+  const plain = Buffer.from('plaintext archive, not encrypted '.repeat(4)); fs.writeFileSync(arc, plain); fs.writeFileSync(ret, plain); fs.writeFileSync(arc + '.sha256', sha(plain) + '\n')
+  r = run(b, ['--offsite-sha256', sha(plain)]); assert.equal(r.status, 1, r.out); assert.match(r.out, /not the AES-256 OpenPGP file/); fs.writeFileSync(arc, ao); fs.writeFileSync(ret, ao); fs.writeFileSync(arc + '.sha256', sha(ao) + '\n')
+  fs.renameSync(arc, arc + '.x'); r = run(b); assert.equal(r.status, 1, r.out); assert.match(r.out, /encrypted archive .* is missing/); fs.renameSync(arc + '.x', arc)
+  r = run(b); assert.equal(r.status, 0, r.out)
   // a record is never overwritten; a record or the fresh export inside the backup directory is refused
   const rec = path.join(tmp, 'exists.json'); fs.writeFileSync(rec, '{}')
-  r = spawnSync(process.execPath, ['scripts/db/final-parity.mjs', '--backup-dir', b, '--gate', gateFile, '--record', rec, '--offsite-sha256', hex('a'), '--offsite-tree', treeOf(b), '--authorization-ref', 'x', '--export-script', exporter], { cwd: root, encoding: 'utf8', env }); assert.equal(r.status, 1, r.out); assert.match(r.stderr, /never overwritten/)
+  r = spawnSync(process.execPath, ['scripts/db/final-parity.mjs', '--backup-dir', b, '--gate', gateFile, '--record', rec, '--offsite-sha256', arcSha(b), '--offsite-tree', treeOf(b), '--authorization-ref', 'x', '--export-script', exporter], { cwd: root, encoding: 'utf8', env }); assert.equal(r.status, 1, r.out); assert.match(r.stderr, /never overwritten/)
   r = run(b, ['--export-dir', path.join(b, 'inner')]); assert.equal(r.status, 1, r.out); assert.match(r.out, /OUTSIDE the backup directory/)
   r = spawnSync(process.execPath, ['scripts/db/final-parity.mjs', '--backup-dir', b, '--gate', gateFile, '--record', path.join(b, 'rec.json'), '--offsite-sha256', hex('a'), '--offsite-tree', treeOf(b), '--authorization-ref', 'x', '--export-script', exporter], { cwd: root, encoding: 'utf8', env }); assert.equal(r.status, 1, r.out); assert.match(r.stderr, /outside the backup directory/)
   // a backup older than six hours (by its own name) is refused even though everything else is identical
@@ -146,10 +163,11 @@ test('the record is re-verified from the files: altered, expired, for another ga
   assert.ok(probs(write((x) => { x.offsite.tree_sha256 = hex('c') })).some((p) => /not this backup's content hash/.test(p)))
   assert.ok(probs(write((x) => { x.offsite.authorization_ref = ' ' })).some((p) => /authorization reference/.test(p)))
   assert.ok(probs(write((x) => { x.offsite.encrypted_sha256 = 'nothex' })).some((p) => /off-site verification hashes/.test(p)))
+  assert.ok(probs(write((x) => { x.offsite.encrypted_sha256 = hex('e') })).some((p) => /off-site evidence: .*not the archive's/.test(p)), 'a resealed record with another archive hash is refused')
   assert.ok(probs(write((x) => { x.backup.dir = path.join(tmp, 'nowhere') })).some((p) => /not found/.test(p)))
   // too old AT PUSH TIME: a record made six hours and a second after the backup started
   const started = fp.backupStartedAt(b)
-  const late = fp.buildRecord({ backupDir: b, gate, offsite: { encrypted: hex('a'), tree: treeOf(b), authorizationRef: 'x' }, preflight: true, exportHashes: {}, now: started + 6 * 3600e3 + 1000 })
+  const late = fp.buildRecord({ backupDir: b, gate, offsite: { encrypted: arcSha(b), tree: treeOf(b), authorizationRef: 'x' }, preflight: true, exportHashes: {}, now: started + 6 * 3600e3 + 1000 })
   const lf = path.join(tmp, 'late.json'); fs.writeFileSync(lf, JSON.stringify(late))
   assert.ok(fp.verifyRecordFile(lf, { gate, now: started + 6 * 3600e3 + 2000 }).some((p) => /hours old; the maximum is 6/.test(p)))
   // the backup changed after the record was written
