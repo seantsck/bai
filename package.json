@@ -81,6 +81,7 @@
     "hosted:parity": "node --env-file=.env.hosted.local scripts/db/parity.mjs",
     "hosted:provenance": "node --env-file=.env.hosted.local scripts/db/provenance-report.mjs",
     "hosted:security": "node --env-file=.env.hosted.local scripts/db/security.mjs --read-only",
+    "hosted:final-parity": "node --env-file=.env.hosted.local scripts/db/final-parity.mjs",
     "hosted:preflight": "node --env-file=.env.hosted.local scripts/db/hosted-preflight.mjs",
     "hosted:verify": "BAI_VERIFY_TARGET=hosted node --env-file=.env.hosted.local --test tests/db/hosted-readonly.test.mjs",
     "hosted:web-role": "node --env-file=.env.hosted.local scripts/db/set-web-password.mjs",

@@ -8,8 +8,11 @@ import path from 'node:path'
 import { spawnSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 import * as h from './harness.mjs'
-import { buildGate, evaluateGate, parseDryRun, migrationsHash, validateGateShape } from '../../scripts/db/lib/gate.mjs'
+import { buildGate, evaluateGate, parseDryRun, migrationsHash, validateGateShape, protocolV2Enforced } from '../../scripts/db/lib/gate.mjs'
 import { listMigrations, applyMigrations } from '../../scripts/db/lib/migrations.mjs'
+import { takeSnapshot } from '../../scripts/db/lib/snapshot.mjs'
+import * as fp from '../../scripts/db/lib/final-parity.mjs'
+import crypto from 'node:crypto'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 const REF = 'dbnmktidheefoxaztivm'
@@ -18,7 +21,7 @@ const all = listMigrations().map((m) => ({ version: m.version, file: m.file, che
 const gate = buildGate({ gate: 'G1', commit: COMMIT, through: '028', projectRef: REF, migrations: all })
 const upTo = (v) => all.filter((m) => m.version <= v)
 const goodFacts = () => ({
-  head: COMMIT, status: all.filter((m) => m.version > '028').map((m) => ` D database/migrations/${m.file}`), migrations: upTo('028'),
+  head: COMMIT, protocolV2: true, status: all.filter((m) => m.version > '028').map((m) => ` D database/migrations/${m.file}`), migrations: upTo('028'),
   env: { BAI_SUPABASE_PROJECT_REF: REF }, linkedRef: REF, urlRef: REF,
   hosted: { level: '027', recorded: upTo('027'), pushed: upTo('027').map((m) => m.version) }, dryRun: [gate.migration_file]
 })
@@ -38,6 +41,11 @@ test('every check passes for the authorized state, and each of the guard\'s refu
   bad((f) => { f.head = 'b'.repeat(40) }, /HEAD is bbbbbbbbbbbb/)
   bad((f) => { f.status.push(' M database/migrations/028_transaction_forensics_foundation.sql') }, /unexpected change .*028_transaction/)
   bad((f) => { f.status.push(' M scripts/db/migrate.mjs') }, /unexpected change/)
+  // 1b. the checkout's OWN push guard must enforce release protocol v2 (main's guard never runs for a push from the restricted checkout)
+  bad((f) => { f.protocolV2 = false }, /does not enforce release protocol v2/)
+  bad((f) => { delete f.protocolV2 }, /does not enforce release protocol v2/)
+  assert.equal(protocolV2Enforced('export const PROTOCOL_V2_ENFORCED = true\n'), true); assert.equal(protocolV2Enforced('export const PROTOCOL_V2_ENFORCED = false\n'), false)
+  assert.equal(protocolV2Enforced('// export const PROTOCOL_V2_ENFORCED = true'), false); assert.equal(protocolV2Enforced(undefined), false)
   bad((f) => { f.status.push('?? database/migrations/031_extra.sql') }, /unexpected change/)
   bad((f) => { f.status.push(' D database/migrations/027_wikidata_attribution.sql') }, /unexpected change .*027/)
   // 2. migrations 001..028 and nothing later, unchanged
@@ -84,7 +92,7 @@ let tmp, repo, work, db
 const run = (cwd, script, args, env = {}) => spawnSync(process.execPath, [path.join(cwd, script), ...args], { cwd, encoding: 'utf8', env: { PATH: process.env.PATH, HOME: process.env.HOME, TMPDIR: os.tmpdir(), ...env } })
 const git = (cwd, ...a) => { const r = spawnSync('git', a, { cwd, encoding: 'utf8' }); assert.equal(r.status, 0, `${a.join(' ')}: ${r.stderr}`); return r.stdout.trim() }
 const marker = () => (fs.existsSync(path.join(tmp, 'cli-calls.log')) ? fs.readFileSync(path.join(tmp, 'cli-calls.log'), 'utf8').trim().split('\n') : [])
-let gateFile, commit
+let gateFile, commit, preActivation
 
 before(async () => {
   await h.startServer()
@@ -97,7 +105,10 @@ before(async () => {
   fs.mkdirSync(path.join(repo, 'node_modules/.bin'), { recursive: true }); fs.symlinkSync(path.join(root, 'node_modules/pg'), path.join(repo, 'node_modules/pg'))
   fs.writeFileSync(path.join(repo, 'node_modules/.bin/supabase'), `#!/usr/bin/env bash\necho "$*" >> "${path.join(tmp, 'cli-calls.log')}"\nif [[ "$*" == *"--dry-run"* ]]; then echo '{"upToDate":false,"dryRun":true,"migrations":'"$FAKE_DRY_RUN"',"seeds":[],"roles":[]}'; fi\n`, { mode: 0o755 })
   git(repo, 'init', '-q', '-b', 'main'); git(repo, 'config', 'user.email', 't@example.test'); git(repo, 'config', 'user.name', 't')
-  git(repo, 'add', '-A'); git(repo, 'commit', '-q', '-m', 'all migrations'); commit = git(repo, 'rev-parse', 'HEAD')
+  git(repo, 'add', '-A'); git(repo, 'commit', '-q', '-m', 'all migrations (protocol v2 not enforced)'); preActivation = git(repo, 'rev-parse', 'HEAD')
+  const fpFile = path.join(repo, 'scripts/db/lib/final-parity.mjs')
+  fs.writeFileSync(fpFile, fs.readFileSync(fpFile, 'utf8').replace('export const PROTOCOL_V2_ENFORCED = false', 'export const PROTOCOL_V2_ENFORCED = true'))
+  git(repo, 'commit', '-q', '-am', 'activate release protocol v2'); commit = git(repo, 'rev-parse', 'HEAD')
   git(repo, 'update-ref', 'refs/remotes/origin/main', commit)
   gateFile = path.join(tmp, 'g1.gate.json')
   db = await h.freshDatabase({ migrate: false })
@@ -112,6 +123,9 @@ test('create: only a reviewed (origin/main) commit can be a gate, and the gate f
   let r = run(repo, 'scripts/db/gate.mjs', ['create', '--gate', 'G1', '--commit', commit, '--through', '028', '--project-ref', REF, '--out', gateFile])
   assert.notEqual(r.status, 0); assert.match(r.stderr, /not an ancestor of origin\/main/)
   git(repo, 'update-ref', 'refs/remotes/origin/main', commit)
+  // a reviewed commit whose own guard does not enforce protocol v2 cannot be a gate: a push from it would skip the final parity record
+  r = run(repo, 'scripts/db/gate.mjs', ['create', '--gate', 'G1', '--commit', preActivation, '--through', '028', '--project-ref', REF, '--out', gateFile])
+  assert.notEqual(r.status, 0); assert.match(r.stderr, /does not enforce release protocol v2/); assert.ok(!fs.existsSync(gateFile))
   r = run(repo, 'scripts/db/gate.mjs', ['create', '--gate', 'G1', '--commit', commit, '--through', '028', '--project-ref', REF, '--out', gateFile])
   assert.equal(r.status, 0, r.stderr); assert.match(r.stdout, /028_transaction_forensics_foundation\.sql/); assert.match(r.stdout, /gate file SHA-256 [0-9a-f]{64}/)
   assert.deepEqual(JSON.parse(fs.readFileSync(gateFile, 'utf8')).checksums['028'], gate.checksums['028'], 'checksums come from the committed files')
@@ -171,7 +185,55 @@ test('db push is refused without a passing gate and never reaches the CLI; with 
   r = push(work, ['db', 'push'], { ...base, BAI_GATE_FILE: gateFile }); assert.equal(r.status, 1); assert.match(r.stdout, /Supabase migration history has unexpected versions/)
   await db.query("delete from supabase_migrations.schema_migrations where version = '028'")
   assert.deepEqual(marker().filter((l) => /push(?!.*--dry-run)/.test(l)), [], 'the CLI was never asked to push in any refused case')
-  // the authorized case: the gate passes (its own dry run is the only CLI call before the push)
-  r = push(work, ['db', 'push'], { ...base, BAI_GATE_FILE: gateFile }); assert.equal(r.status, 0, r.stdout + r.stderr); assert.match(r.stdout, /GATE CHECK OK/)
-  const calls = marker(); assert.deepEqual(calls.filter((l) => !/--dry-run/.test(l)), ['db push --linked'], 'exactly one real push, with no widening flag')
+  // the gate passes, but the checkout's own guard ENFORCES protocol v2: without a parity record there is no protocol-v1 fallback
+  r = push(work, ['db', 'push'], { ...base, BAI_GATE_FILE: gateFile }); assert.equal(r.status, 1, r.stdout + r.stderr); assert.match(r.stdout, /GATE CHECK OK/); assert.match(r.stderr, /needs BAI_PARITY_RECORD/)
+  assert.deepEqual(marker().filter((l) => !/--dry-run/.test(l)), [], 'no real push without the final parity record')
+})
+
+test('protocol v2, the EXACT release command (the restricted checkout\'s own scripts/db/supabase-hosted.mjs, no extra switches): refuses missing, expired, altered and mismatched evidence, and pushes exactly once with a valid record', async () => {
+  const { port, database } = db.connectionParameters
+  const env = { BAI_SUPABASE_PROJECT_REF: REF, BAI_SUPABASE_DB_PASSWORD: 'x', BAI_DATABASE_URL: `postgresql://postgres:postgres@127.0.0.1:${port}/${database}`, FAKE_DRY_RUN: '["028_transaction_forensics_foundation.sql"]', BAI_GATE_FILE: gateFile }
+  const gateObj = JSON.parse(fs.readFileSync(gateFile, 'utf8'))
+  assert.match(fs.readFileSync(path.join(work, 'scripts/db/lib/final-parity.mjs'), 'utf8'), /^export const PROTOCOL_V2_ENFORCED = true$/m, 'the restricted checkout carries its own, enforced guard')
+  // a sound backup directory for the current (level 027) stand-in database, its encrypted archive and the copy returned from the off-site round trip
+  const holder = path.join(tmp, 'backups'); fs.mkdirSync(holder)
+  const dir = path.join(holder, `g1-${new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d+Z$/, 'Z')}`)
+  await takeSnapshot(db, path.join(dir, 'snapshot')); fs.mkdirSync(path.join(dir, 'export'))
+  const sha = (b) => crypto.createHash('sha256').update(b).digest('hex')
+  const sums = []
+  for (const f of fp.EXPORT_FILES) { fs.writeFileSync(path.join(dir, 'export', f), `-- ${f}\ncontent\n`); sums.push(`${sha(fs.readFileSync(path.join(dir, 'export', f)))}  ${f}`) }
+  fs.writeFileSync(path.join(dir, 'export/SHA256SUMS'), sums.join('\n') + '\n')
+  const arc = Buffer.concat([Buffer.from([0x8c, 13, 4, 9, 3, 10]), crypto.randomBytes(8), Buffer.from([0xff, 0xd2, 60, 1]), crypto.randomBytes(59)])
+  const tree = fp.contentTreeHash(dir)
+  fs.writeFileSync(`${dir}.tar.zst.gpg`, arc); fs.writeFileSync(`${dir}.tar.zst.gpg.sha256`, sha(arc) + '\n'); fs.writeFileSync(`${dir}.tar.zst.gpg.tree-sha256`, tree + '\n')
+  const ret = path.join(holder, `returned-${path.basename(dir)}`); fs.mkdirSync(ret); fs.writeFileSync(path.join(ret, `${path.basename(dir)}.tar.zst.gpg`), arc)
+  const mk = (name, { now = Date.now(), mutate = (r) => r, reseal = true } = {}) => {
+    const rec = mutate(fp.buildRecord({ backupDir: dir, gate: gateObj, offsite: { encrypted: sha(arc), tree, authorizationRef: 'owner authorization (test)' }, exportHashes: {}, now }))
+    if (reseal) rec.record_sha256 = fp.recordHash(rec)
+    const f = path.join(tmp, name); fs.writeFileSync(f, JSON.stringify(rec)); return f
+  }
+  const push = (e) => run(work, 'scripts/db/supabase-hosted.mjs', ['db', 'push'], { ...env, ...e })   // exactly what the operator runs from the restricted checkout
+  const realPushes = () => marker().filter((l) => !/--dry-run/.test(l)).length
+  fs.rmSync(path.join(tmp, 'cli-calls.log'), { force: true })
+  const refusals = {
+    'no record at all': {},
+    'a record file that does not exist': { BAI_PARITY_RECORD: path.join(tmp, 'no-such-record.json') },
+    'an expired record (11 minutes old)': { BAI_PARITY_RECORD: mk('expired.json', { now: Date.now() - 11 * 60 * 1000 }) },
+    'an altered record (not resealed)': { BAI_PARITY_RECORD: mk('altered.json', { mutate: (x) => ({ ...x, expires_at: new Date(Date.now() + 3600e3).toISOString() }), reseal: false }) },
+    'a FAIL record': { BAI_PARITY_RECORD: mk('failed.json', { mutate: (x) => ({ ...x, result: 'FAIL' }) }) },
+    'a record for another gate commit': { BAI_PARITY_RECORD: mk('other-gate.json', { mutate: (x) => ({ ...x, gate: { ...x.gate, commit: 'b'.repeat(40) } }) }) },
+    'a record whose off-site content hash is not this backup\'s': { BAI_PARITY_RECORD: mk('other-tree.json', { mutate: (x) => ({ ...x, offsite: { ...x.offsite, tree_sha256: 'c'.repeat(64) } }) }) },
+    'a record whose encrypted hash is not the archive\'s': { BAI_PARITY_RECORD: mk('other-archive.json', { mutate: (x) => ({ ...x, offsite: { ...x.offsite, encrypted_sha256: 'd'.repeat(64) } }) }) },
+    'a record for another backup directory': { BAI_PARITY_RECORD: mk('other-backup.json', { mutate: (x) => ({ ...x, backup: { ...x.backup, dir: path.join(holder, 'g1-20200101T000000Z') } }) }) }
+  }
+  for (const [what, e] of Object.entries(refusals)) { const r = push(e); assert.equal(r.status, 1, `${what}: ${r.stdout}${r.stderr}`); assert.match(r.stderr, /needs BAI_PARITY_RECORD|does not authorize this push/, what) }
+  // the round-trip copy disappears after a valid record was written
+  const good = mk('good.json')
+  fs.renameSync(ret, ret + '.gone'); let r = push({ BAI_PARITY_RECORD: good }); assert.equal(r.status, 1); assert.match(r.stderr, /returned from the off-site round trip is missing/); fs.renameSync(ret + '.gone', ret)
+  // the backup changed after the record was written
+  fs.writeFileSync(path.join(dir, 'export/extra.txt'), 'x'); r = push({ BAI_PARITY_RECORD: good }); assert.equal(r.status, 1); fs.rmSync(path.join(dir, 'export/extra.txt'))
+  assert.equal(realPushes(), 0, 'the CLI was never asked to push in any refused case')
+  // a valid record: gate check, record verified, exactly one real push without widening flags
+  r = push({ BAI_PARITY_RECORD: good }); assert.equal(r.status, 0, r.stdout + r.stderr); assert.match(r.stdout, /GATE CHECK OK/); assert.match(r.stdout, /final parity record verified/)
+  assert.deepEqual(marker().filter((l) => !/--dry-run/.test(l)), ['db push --linked'])
 })

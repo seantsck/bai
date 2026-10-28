@@ -8,6 +8,9 @@ import crypto from 'node:crypto'
 
 export const SHA40 = /^[0-9a-f]{40}$/
 export const migrationsHash = (checksums) => crypto.createHash('sha256').update(Object.keys(checksums).sort().map((v) => `${v}:${checksums[v]}`).join('\n')).digest('hex')
+/** Release protocol v2 is enforced by a checkout only when ITS OWN source says so; the push guard that runs is always the checked-out one, never main's. */
+export const PROTOCOL_V2_FILE = 'scripts/db/lib/final-parity.mjs'
+export const protocolV2Enforced = (source) => typeof source === 'string' && /^export const PROTOCOL_V2_ENFORCED = true$/m.test(source)
 export const fileSha256 = (file) => crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex')
 
 /** Builds a gate from the migrations of a checkout at `commit`: the checksums of 001..through, the project and the level it starts from. */
@@ -41,7 +44,7 @@ const ALLOWED_DELETION = (through) => new RegExp(`^ D database/migrations/(\\d{3
 
 /**
  * @param {object} f facts about the working directory and (optionally) hosted, all gathered read-only:
- *   head, status (git status --porcelain lines), migrations ([{version,file,checksum}] as the runner sees them), env, linkedRef, urlRef,
+ *   head, status (git status --porcelain lines), protocolV2 (the checkout enforces release protocol v2), migrations ([{version,file,checksum}] as the runner sees them), env, linkedRef, urlRef,
  *   hosted ({level, recorded:[{version,file,checksum}], pushed:[versions]}), dryRun (migration file names the CLI would push)
  * @returns {string[]} problems; empty means every check passed
  */
@@ -56,6 +59,7 @@ export function evaluateGate (g, f) {
     if (m && m[1] > thr) continue
     problems.push(`unexpected change in the working directory: ${line.trim()}`)
   }
+  if (f.protocolV2 !== true) problems.push('this checkout does not enforce release protocol v2 (PROTOCOL_V2_ENFORCED is not true in scripts/db/lib/final-parity.mjs at the gate commit): its push guard would not demand the final parity record')
   // 2. migrations 001..through, and nothing later, unchanged
   const versions = f.migrations.map((m) => m.version)
   const later = versions.filter((v) => v > thr)

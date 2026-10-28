@@ -13,7 +13,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { spawnSync } from 'node:child_process'
 import pg from 'pg'
-import { buildGate, evaluateGate, parseDryRun, fileSha256, validateGateShape } from './lib/gate.mjs'
+import { buildGate, evaluateGate, parseDryRun, fileSha256, validateGateShape, protocolV2Enforced, PROTOCOL_V2_FILE } from './lib/gate.mjs'
 import { checksum, listMigrations, repoRoot } from './lib/migrations.mjs'
 import { ownerDatabaseUrl, supabaseProjectRef, isLocalUrl } from './lib/connection.mjs'
 
@@ -29,6 +29,9 @@ if (cmd === 'create') {
   git(repo, 'cat-file', '-e', `${commit}^{commit}`)
   const onMain = spawnSync('git', ['merge-base', '--is-ancestor', commit, 'origin/main'], { cwd: repo }).status === 0
   if (!onMain) die(`commit ${commit.slice(0, 12)} is not an ancestor of origin/main: only reviewed (merged) code can be a gate's commit`)
+  // the push guard that will run is the one AT this commit (the restricted checkout's own scripts), so it must enforce release protocol v2
+  const v2 = spawnSync('git', ['show', `${commit}:${PROTOCOL_V2_FILE}`], { cwd: repo, encoding: 'utf8' })
+  if (v2.status !== 0 || !protocolV2Enforced(v2.stdout)) die(`commit ${commit.slice(0, 12)} does not enforce release protocol v2 (${PROTOCOL_V2_FILE} must set PROTOCOL_V2_ENFORCED = true): a push from it would not demand the final parity record`)
   const names = git(repo, 'ls-tree', '--name-only', commit, 'database/migrations/').split('\n').filter((n) => /\/\d{3}_[a-z0-9_]+\.sql$/.test(n))
   const migrations = names.map((n) => { const f = path.basename(n); return { version: f.slice(0, 3), file: f, checksum: checksum(git(repo, 'show', `${commit}:${n}`)) } })
   const gate = buildGate({ gate: opt('gate') ?? '', commit, through: opt('through'), projectRef: opt('project-ref'), migrations })
@@ -53,6 +56,7 @@ if (cmd === 'create') {
   const gateFile = opt('gate'); if (!gateFile) die('usage: check --gate <gate.json> [--offline] [--dry-run]', 2)
   const g = JSON.parse(fs.readFileSync(gateFile, 'utf8'))
   const facts = {
+    protocolV2: fs.existsSync(path.join(repoRoot, PROTOCOL_V2_FILE)) && protocolV2Enforced(fs.readFileSync(path.join(repoRoot, PROTOCOL_V2_FILE), 'utf8')),
     head: git(repoRoot, 'rev-parse', 'HEAD').trim(),
     status: git(repoRoot, 'status', '--porcelain').split('\n').filter(Boolean),
     migrations: listMigrations().map((m) => ({ version: m.version, file: m.file, checksum: m.checksum })),
@@ -81,7 +85,7 @@ if (cmd === 'create') {
   }
   const problems = evaluateGate(g, facts)
   console.log(`gate ${g.gate || '(unnamed)'}: ${g.migration_file}, commit ${g.commit.slice(0, 12)}, project ${g.project_ref.slice(0, 4)}…`)
-  console.log(`checked: ${['commit and working directory', 'migration files and checksums', 'project reference', facts.hosted ? 'hosted migration history (read-only)' : null, facts.dryRun !== undefined ? 'dry run lists exactly the gate migration' : null].filter(Boolean).join('; ')}`)
+  console.log(`checked: ${['commit and working directory', 'release protocol v2 enforced', 'migration files and checksums', 'project reference', facts.hosted ? 'hosted migration history (read-only)' : null, facts.dryRun !== undefined ? 'dry run lists exactly the gate migration' : null].filter(Boolean).join('; ')}`)
   console.log(problems.length ? `GATE CHECK FAILED\n  ${problems.join('\n  ')}` : 'GATE CHECK OK')
   process.exit(problems.length ? 1 : 0)
 } else die('usage: gate.mjs create|workdir|check (see the header of this file)', 2)
