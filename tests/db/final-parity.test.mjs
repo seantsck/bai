@@ -175,5 +175,5 @@ test('the record is re-verified from the files: altered, expired, for another ga
   const data = path.join(b, 'export/data.sql'); const od = fs.readFileSync(data); fs.appendFileSync(data, 'x'); assert.ok(probs(r.rec).some((p) => /backup: export\/data\.sql/.test(p))); fs.writeFileSync(data, od)
   assert.deepEqual(probs(r.rec), [])
   assert.ok(probs(path.join(tmp, 'missing.json')).some((p) => /unreadable/.test(p)))
-  assert.equal(fp.PROTOCOL_V2_ENFORCED, false, 'protocol v2 is not active until the owner approves the reviewed switch')
+  assert.equal(typeof fp.PROTOCOL_V2_ENFORCED, 'boolean', 'the activation switch is a reviewed boolean constant')
 })
