@@ -114,3 +114,26 @@ The helper `~/bai-gates/g1-offsite.ps1` (kept outside the repository; Windows Po
 **Assistant checks of the helper:** no PowerShell exists on the assistant's machine, so Windows execution is evidenced only by the owner's rehearsal; the assistant inspected the script (bracket balance, 5.1 syntax such as `${Name}:` variable references, exit-code handling) and ran the exact remote refusal command read-only against the real October 27 archive (it exits 1, i.e. refuses; the archive's hash is unchanged).
 
 **Not yet rehearsed:** `Pack` against a real new window (it needs a fresh, complete backup directory), the timing of a full pass, and anything on the day. The October 27 archive remains a rehearsal backup and must not be used to authorize migration 028.
+
+## 9. Windows helper v3 test results and the execution checklist for the next G1 window (recorded 2026-10-28)
+
+**Owner-reported tests of `g1-offsite.ps1` (SHA-256 `ff598b5ecca52cf434d963ef821dfeea45ea18243987a4f5f6938f577612a825`, equal to the assistant-verified file):** Windows PowerShell 5.1 syntax PASS; `Config` PASS; `PackRefusalTest` against the existing 2026-10-27 archive PASS; the earlier v2 `Pull`, `Return` and full recovery `Check` PASS. **Not yet tested: the v3 `Pack` and the full end-to-end flow** — the first real run is the G1 window itself, so the owner should expect to watch each step.
+
+**Fixed identity (must still match on the day):** `main` `076b68b…` or a later reviewed docs-only commit; release commit `41cb3da70a8daef2b4792d1053c982a7e9fad349`; gate file SHA-256 `5d6103348404f162def5402d0c7eb5d7ef9e955897c85cdd4335368656f6a0bb`; migration 028 SHA-256 `7598519f104c779868a3edcf89fdd7d4a9afd5ade26b2ea784c810806165b501`; restricted worktree `~/tmp-bai/g1-release` with migrations 001–028 only (029, 030 absent).
+
+| T | Who | Step |
+| --- | --- | --- |
+| before | owner | password manager, Google Drive and Windows PowerShell open; passphrase stored; says "start the G1 window" |
+| before | assistant | re-verify `main`, release commit, gate and 028 hashes, restricted worktree (28 migrations, `git status` = the two removed files), offline gate check |
+| 0:00 | assistant | snapshot (`snapshot-hosted.mjs`) into a new `~/bai-backups/g1-<UTC>`; **T0 = the snapshot start time; the push must BEGIN before T0 + 30:00** |
+| ~0:30 | assistant | logical export; `verify-snapshot`; logs written OUTSIDE the backup directory; both directories complete |
+| ~2:30 | assistant | posts READY: name, T0, deadline, `manifest_sha256`; the owner may now start `Pack` |
+| 2:30+ | owner | `.\g1-offsite.ps1 -Step Pack -Name <name>` (passphrase twice; `prepare` runs) |
+| concurrent | assistant | restore checks (throwaway PostgreSQL 17, outside the backup directory) and the read-only hosted preflight against the new snapshot (strict byte parity at level 027, 028 checksum) — never writes into the backup directory |
+| after Pack | owner | `-Step Pull`; upload the three files to the private Restricted Drive folder; download the `.gpg` again from the Drive web page into the `-fresh` folder |
+| | owner | `-Step Return -DownloadedFreshFromDrive`; then `-Step Check` (passphrase once) |
+| | owner | sends "Off-site copy verified for backup <name>." with both hashes, and the signed authorization naming that backup, T0 and the deadline (`~/bai-gates/g1-authorization-template.md`) |
+| before the deadline | assistant | re-verify identity; `gate check --dry-run` (must list exactly `028_transaction_forensics_foundation.sql`); strict hosted preflight again; confirm the time is before the deadline |
+| push | assistant | only if everything above is true: `BAI_GATE_FILE=<gate> npm run hosted:supabase -- db push`, then `hosted:migrate`, then `hosted-preflight --after 028` — then STOP; no import, publication change, read-model refresh or deployment |
+
+**Stop conditions (no push; retake the backup if time or parity is lost):** any check fails or a hash differs; the deadline passes; `main`, the commit or either hash differs; the worktree is dirty or holds anything beyond 001–028; the dry run lists anything but 028; hosted is not at 027 or any table differs from the snapshot; the owner's verification or authorization is missing or names a different backup; the 2026-10-25 and 2026-10-27 backups are never reused. Unmeasured and likely to decide the deadline: the Drive upload and download and the `Check` run.
