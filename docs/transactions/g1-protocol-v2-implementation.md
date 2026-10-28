@@ -1,4 +1,4 @@
-# G1 release protocol v2 — implementation (ACTIVE once the activation commit is merged; before that it was inactive)
+# G1 release protocol v2 — implementation (ACTIVE since PR #49, `8d742f3`; used for the G1 release of 2026-10-28)
 
 Implements the minimum of the design approved in principle on PR #47 (`189d4708888cc1bdaa97ae323446ad26c7aa67a2`): a six-hour backup age, off-site evidence tied to the backup's content, and a final read-only comparison immediately before the push. **The active G1 gate (30-minute) is replaced by protocol v2 only for gates pinned to the activation commit or later.** Nothing here applies a migration, starts a window or touches hosted by itself.
 
@@ -36,7 +36,11 @@ node scripts/db/gate.mjs workdir --gate ~/bai-gates/g1-v2.gate.json --dir ~/tmp-
 cd ~/projects/bai-ci && node --env-file=$E scripts/db/final-parity.mjs --backup-dir ~/bai-backups/g1-<UTC> --gate ~/bai-gates/g1-v2.gate.json \
     --record ~/bai-gates/parity-<UTC>.json --offsite-sha256 <encrypted hash> --offsite-tree <tree hash> --authorization-ref "<owner message and time>"
 cd ~/tmp-bai/g1-release-v2 && BAI_GATE_FILE=~/bai-gates/g1-v2.gate.json BAI_PARITY_RECORD=~/bai-gates/parity-<UTC>.json node --env-file=$E scripts/db/supabase-hosted.mjs db push
+# then, from the SAME restricted checkout (records the pushed migration in BAI's own ledger), and only then the final check:
+node --env-file=$E scripts/db/migrate.mjs --confirm-hosted dbnmktidheefoxaztivm
+node --env-file=$E scripts/db/hosted-preflight.mjs --snapshot-dir ~/bai-backups/g1-<UTC>/snapshot --after <NNN>
 ```
+**Order matters:** `db push` writes only Supabase's history; until `migrate.mjs` runs, `--after` fails exactly one check ("recorded migration level"). That is expected, not a production failure — see [g1-release-record.md](g1-release-record.md#expected-order-of-operations--and-the-temporary-ledger-mismatch).
 
 ## Limits (unchanged from the proposal; not implemented here)
 Role passwords, project settings, Vault secrets and storage files remain outside any database comparison (owner attestation). Transaction-counter and settings monitoring are deferred. The record is a local file: the guard re-derives everything from the backup directory and the gate, but a person with shell access could forge a record by hand; the controls are procedural as well as technical. The restore of a backup onto Supabase itself remains unrehearsed.

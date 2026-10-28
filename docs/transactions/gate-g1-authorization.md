@@ -1,6 +1,6 @@
 # Gate G1 — hosted migration 028: preflight, hardening and authorization handoff
 
-**Status: READY FOR YOUR SIGNATURE, with two remaining conditions (section 6). G1 has not been executed. Nothing in this document, and nothing run to produce it, wrote to the hosted database. PR #43 is merged; the commit and gate hash below are real.**
+**Status: COMPLETE — migration 028 was applied to hosted BAI on 2026-10-28 under release protocol v2; see [g1-release-record.md](g1-release-record.md). The text below is the historical preflight and the 30-minute-window handoff of 2026-10-25 and no longer describes the active procedure.**
 
 First preflight 2026-10-25 ≈ 18:40–19:30 UTC; backup, audit and isolation hardening 2026-10-25 ≈ 19:00–21:00 UTC. Hosted was read through read-only transactions, read-only dumps and GET requests only, with disposable local PostgreSQL 17 for every rehearsal.
 

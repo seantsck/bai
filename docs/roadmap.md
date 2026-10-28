@@ -113,6 +113,11 @@
 - **Next batch (2006–2010):** prepared and blocked on permissions ([history/batch-h1a-2006-2010.md](history/batch-h1a-2006-2010.md)).
 - **Public explorer:** `/draft/explorer` and `/draft/years`.
 
+## Done: Gate G1 (2026-10-28): migration 028 on hosted
+
+- **Migration 028 (transaction forensics foundation) applied to hosted BAI** under release protocol v2 (six-hour backup, independent off-site verification, final parity check, backup-specific authorization). Hosted is at level 028; 029/030 are not applied. Record: [g1-release-record.md](transactions/g1-release-record.md).
+- **Next:** the Historical Acquisition Explorer gates G2–G7, starting with migration 029 ([next-milestone.md](transactions/next-milestone.md)).
+
 ## Next
 
 ### Phase 2b: hardening before scale (small)
