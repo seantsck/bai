@@ -10,7 +10,7 @@ import { validateGateShape } from './gate.mjs'
 import { inspectFile } from './openpgp-outer.mjs'
 
 /** The reviewed switch that makes the record MANDATORY for `db push`. It stays false until the owner approves activation of protocol v2 (a code change). */
-export const PROTOCOL_V2_ENFORCED = false
+export const PROTOCOL_V2_ENFORCED = true
 export const MAX_BACKUP_AGE_MS = 6 * 3600 * 1000
 export const RECORD_VALIDITY_MS = 10 * 60 * 1000
 export const EXPORT_FILES = ['roles.sql', 'schema.sql', 'data.sql', 'supabase_migrations_history.json']
