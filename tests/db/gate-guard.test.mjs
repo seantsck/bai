@@ -10,6 +10,9 @@ import { fileURLToPath } from 'node:url'
 import * as h from './harness.mjs'
 import { buildGate, evaluateGate, parseDryRun, migrationsHash, validateGateShape } from '../../scripts/db/lib/gate.mjs'
 import { listMigrations, applyMigrations } from '../../scripts/db/lib/migrations.mjs'
+import { takeSnapshot } from '../../scripts/db/lib/snapshot.mjs'
+import * as fp from '../../scripts/db/lib/final-parity.mjs'
+import crypto from 'node:crypto'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 const REF = 'dbnmktidheefoxaztivm'
@@ -174,4 +177,37 @@ test('db push is refused without a passing gate and never reaches the CLI; with 
   // the authorized case: the gate passes (its own dry run is the only CLI call before the push)
   r = push(work, ['db', 'push'], { ...base, BAI_GATE_FILE: gateFile }); assert.equal(r.status, 0, r.stdout + r.stderr); assert.match(r.stdout, /GATE CHECK OK/)
   const calls = marker(); assert.deepEqual(calls.filter((l) => !/--dry-run/.test(l)), ['db push --linked'], 'exactly one real push, with no widening flag')
+})
+
+test('protocol v2: a push that requires a parity record is refused without a valid one (nothing reaches the CLI) and runs exactly one push with one', async () => {
+  const { port, database } = db.connectionParameters
+  const env = { BAI_SUPABASE_PROJECT_REF: REF, BAI_SUPABASE_DB_PASSWORD: 'x', BAI_DATABASE_URL: `postgresql://postgres:postgres@127.0.0.1:${port}/${database}`, FAKE_DRY_RUN: '["028_transaction_forensics_foundation.sql"]', BAI_GATE_FILE: gateFile }
+  const gateObj = JSON.parse(fs.readFileSync(gateFile, 'utf8'))
+  // a sound backup directory for the current (level 027) stand-in database
+  const dir = path.join(tmp, `g1-${new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d+Z$/, 'Z')}`)
+  await takeSnapshot(db, path.join(dir, 'snapshot')); fs.mkdirSync(path.join(dir, 'export'))
+  const sums = []
+  for (const f of fp.EXPORT_FILES) { fs.writeFileSync(path.join(dir, 'export', f), `-- ${f}\ncontent\n`); sums.push(`${crypto.createHash('sha256').update(fs.readFileSync(path.join(dir, 'export', f))).digest('hex')}  ${f}`) }
+  fs.writeFileSync(path.join(dir, 'export/SHA256SUMS'), sums.join('\n') + '\n')
+  const mk = (name, now = Date.now(), mutate = (r) => r) => {
+    const rec = fp.buildRecord({ backupDir: dir, gate: gateObj, offsite: { encrypted: 'a'.repeat(64), tree: fp.contentTreeHash(dir), authorizationRef: 'test' }, exportHashes: {}, now })
+    const m = mutate(rec); m.record_sha256 = fp.recordHash(m); const f = path.join(tmp, name); fs.writeFileSync(f, JSON.stringify(m)); return f
+  }
+  const push = (e) => run(work, 'scripts/db/supabase-hosted.mjs', ['db', 'push'], { ...env, ...e })
+  const pushes = () => marker().filter((l) => l === 'db push --linked').length
+  fs.rmSync(path.join(tmp, 'cli-calls.log'), { force: true })
+  // required but not offered
+  let r = push({ BAI_REQUIRE_PARITY_RECORD: '1' }); assert.equal(r.status, 1); assert.match(r.stderr, /needs BAI_PARITY_RECORD/)
+  // offered records that must be refused, whether or not they are required
+  const bad = { expired: mk('expired.json', Date.now() - 11 * 60 * 1000), altered: (() => { const f = mk('altered.json'); const x = JSON.parse(fs.readFileSync(f, 'utf8')); x.checked_at = new Date(Date.now() + 1).toISOString(); fs.writeFileSync(f, JSON.stringify(x)); return f })(),
+    failed: mk('failed.json', Date.now(), (x) => ({ ...x, result: 'FAIL' })), missing: path.join(tmp, 'no-such-record.json') }
+  for (const [what, f] of Object.entries(bad)) { for (const req of [{ BAI_REQUIRE_PARITY_RECORD: '1' }, {}]) { r = push({ ...req, BAI_PARITY_RECORD: f }); assert.equal(r.status, 1, `${what}: ${r.stdout}${r.stderr}`); assert.match(r.stderr, /does not authorize this push/) } }
+  assert.equal(pushes(), 0, 'the CLI was never asked to push in any refused case')
+  // a backup that changed after the record was written
+  const good = mk('good.json'); fs.writeFileSync(path.join(dir, 'export/extra.txt'), 'x')
+  r = push({ BAI_REQUIRE_PARITY_RECORD: '1', BAI_PARITY_RECORD: good }); assert.equal(r.status, 1); assert.match(r.stderr, /backup/); fs.rmSync(path.join(dir, 'export/extra.txt'))
+  assert.equal(pushes(), 0)
+  // a valid record: the gate passes, the record verifies, exactly one real push without widening flags
+  r = push({ BAI_REQUIRE_PARITY_RECORD: '1', BAI_PARITY_RECORD: good }); assert.equal(r.status, 0, r.stdout + r.stderr); assert.match(r.stdout, /final parity record verified/)
+  assert.equal(pushes(), 1); assert.deepEqual(marker().filter((l) => !/--dry-run/.test(l)), ['db push --linked'])
 })
