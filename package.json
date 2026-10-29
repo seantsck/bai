@@ -73,6 +73,7 @@
     "retrosheet:rehearse": "node --env-file=.env.hosted.local scripts/research/retrosheet-rehearsal.mjs",
     "transactions": "node --env-file-if-exists=.env.local scripts/research/transactions.mjs",
     "research:verify-pilot": "node --env-file-if-exists=.env.local scripts/research/pilot-verify.mjs --compare research/baselines/pilot-2015-lad.local.json",
+    "hosted:backup": "node --env-file=.env.hosted.local scripts/db/backup-run.mjs",
     "hosted:supabase": "node --env-file=.env.hosted.local scripts/db/supabase-hosted.mjs",
     "hosted:gate": "node --env-file=.env.hosted.local scripts/db/gate.mjs",
     "hosted:migrate": "node --env-file=.env.hosted.local scripts/db/migrate.mjs",
