@@ -13,6 +13,8 @@ import { applyMigrations } from '../../scripts/db/lib/migrations.mjs'
 import { takeSnapshot } from '../../scripts/db/lib/snapshot.mjs'
 import * as fp from '../../scripts/db/lib/final-parity.mjs'
 import * as oa from '../../scripts/db/lib/offsite-auto.mjs'
+import { buildGate } from '../../scripts/db/lib/gate.mjs'
+import { listMigrations } from '../../scripts/db/lib/migrations.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 const have = (t) => spawnSync('sh', ['-c', `command -v ${t}`]).status === 0
@@ -222,3 +224,72 @@ test('CLI: capture (read-only snapshot + export, verified, restored into a dispo
   const hostedGuard = spawnSync(process.execPath, ['scripts/db/backup-run.mjs', 'capture', '--root', out, '--expect-level', '027', '--log-dir', path.join(tmp, 'guard-logs')], { cwd: root, encoding: 'utf8', env: { ...cenv, BAI_CAPTURE_ALLOW_LOCAL: '' } }); assert.equal(hostedGuard.status, 1); assert.match(hostedGuard.stdout + hostedGuard.stderr, /CAPTURE STOPPED at snapshot/)
   assert.match(fs.readFileSync(path.join(tmp, 'guard-logs/snapshot.log'), 'utf8'), /point this at the hosted/, 'a local database is refused as a capture source unless the test override is set')
 }, { timeout: 300000 })
+
+// ---------------------------------------------------------------------------------------------------- the record as release evidence (final-parity --offsite-record)
+const rewrite = (file, edit) => { const r = JSON.parse(fs.readFileSync(file, 'utf8')); edit(r); r.record_sha256 = oa.recordHash(r); fs.writeFileSync(file, JSON.stringify(r, null, 1) + '\n') }
+async function verified () {
+  const dir = await backup(); const rm = remote(); const out = go(dir, rm.rc); assert.equal(out.result, 'PASS', JSON.stringify(out.problems))
+  return { dir, f: oa.recordPaths(path.dirname(dir), path.basename(dir)), out }
+}
+const forRelease = (dir, f, over = {}) => oa.verifyRecordForRelease(f.record, { backupDir: dir, fingerprint: fpr, gnupgHome: hostHome, ...over })
+
+test('release evidence: a verified record yields exactly the archive and content hashes, after being re-derived from the files', { skip }, async () => {
+  const { dir, f, out } = await verified(); const v = forRelease(dir, f)
+  assert.deepEqual(v.problems, []); assert.equal(v.encrypted, out.record.archive.sha256); assert.equal(v.tree, fp.contentTreeHash(dir)); assert.equal(v.recordSha256, out.record.record_sha256)
+})
+
+test('release evidence: every missing, stale, mismatched or tampered record is rejected', { skip }, async () => {
+  const { dir, f } = await verified(); const orig = fs.readFileSync(f.record, 'utf8'); const reset = () => fs.writeFileSync(f.record, orig)
+  const bad = (re, v = forRelease(dir, f)) => { assert.ok(v.problems.length, 'must be rejected'); assert.match(v.problems.join(' '), re); assert.equal(v.encrypted, null, 'no hashes are handed out'); reset() }
+  assert.match(oa.verifyRecordForRelease(path.join(tmp, 'no-such-record.json'), { backupDir: dir, fingerprint: fpr, gnupgHome: hostHome }).problems.join(' '), /unreadable/)
+  bad(/altered/, (rewriteRaw(f.record, (r) => { r.result = 'PASS'; r.archive.sha256 = 'a'.repeat(64) }), forRelease(dir, f)))
+  rewrite(f.record, (r) => { r.result = 'FAIL' }); bad(/not a PASS/)
+  rewrite(f.record, (r) => { r.steps = r.steps.filter((x) => x.name !== 'decrypt') }); bad(/"decrypt" is not recorded/)
+  rewrite(f.record, (r) => { r.remote.md5_checked = false }); bad(/provider checksum/)
+  rewrite(f.record, (r) => { r.backup.kind = 'selftest' }); bad(/self-test/)
+  rewrite(f.record, (r) => { r.archive.sha256 = 'b'.repeat(64) }); bad(/differs from the verified one|not byte-identical/)
+  bad(/different backup directory/, forRelease(path.join(path.dirname(dir), 'g1-20200101T000000Z'), f))
+  bad(/stale|hours old/, oa.verifyRecordForRelease(f.record, { backupDir: dir, fingerprint: fpr, gnupgHome: hostHome, now: Date.now() + 7 * 3600e3 }))
+  bad(/different owner key/, forRelease(dir, f, { fingerprint: 'A'.repeat(40) }))
+  bad(/named/, forRelease(dir, f, { fingerprint: 'zz' }))
+  const ret = path.join(f.returnedDir, `${path.basename(dir)}.tar.zst.gpg`); const keep = fs.readFileSync(ret); fs.rmSync(ret); bad(/downloaded copy is missing/); fs.writeFileSync(ret, keep)
+  fs.appendFileSync(path.join(dir, 'export', 'schema.sql'), '-- changed\n'); bad(/changed since|backup:/); fs.writeFileSync(path.join(dir, 'export', 'schema.sql'), fs.readFileSync(path.join(dir, 'export', 'schema.sql'), 'utf8').replace('-- changed\n', ''))
+  assert.deepEqual(forRelease(dir, f).problems, [], 'after every rejection the untouched evidence is still accepted')
+})
+function rewriteRaw (file, edit) { const r = JSON.parse(fs.readFileSync(file, 'utf8')); edit(r); fs.writeFileSync(file, JSON.stringify(r, null, 1) + '\n') }
+
+test('release evidence: a self-test record is never release evidence, and the wrapped key must be addressed to the named owner key and a public-only keyring', { skip }, async () => {
+  const d = path.join(tmp, `selftest-${stamp(Date.now())}`); fs.mkdirSync(d); fs.writeFileSync(path.join(d, 'a.bin'), crypto.randomBytes(512))
+  const st = go(d, remote().rc, { kind: 'selftest' }); assert.equal(st.result, 'PASS', JSON.stringify(st.problems))
+  const sf = oa.recordPaths(path.dirname(d), path.basename(d)); assert.match(oa.verifyRecordForRelease(sf.record, { backupDir: d, fingerprint: fpr, gnupgHome: hostHome }).problems.join(' '), /self-test|not a valid backup|names no valid/)
+  const { dir, f } = await verified()
+  // another owner key B: the record (re-hashed) claims B, but the wrapped key is still addressed to A
+  const homeB = path.join(tmp, 'ownerB'); const hostB = path.join(tmp, 'hostB'); for (const x of [homeB, hostB]) fs.mkdirSync(x, { mode: 0o700 })
+  assert.equal(gpg(homeB, '--passphrase', '', '--pinentry-mode', 'loopback', '--quick-generate-key', 'Owner B <b@example.test>', 'ed25519', 'cert', 'never').status, 0)
+  const fprB = gpg(homeB, '--list-keys', '--with-colons').stdout.split('\n').find((l) => l.startsWith('fpr:')).split(':')[9]
+  assert.equal(gpg(homeB, '--passphrase', '', '--pinentry-mode', 'loopback', '--quick-add-key', fprB, 'cv25519', 'encr', 'never').status, 0)
+  fs.writeFileSync(path.join(tmp, 'b.pub'), spawnSync('gpg', ['--batch', '--homedir', homeB, '--export', fprB], { env: { PATH: process.env.PATH, HOME: process.env.HOME } }).stdout); assert.equal(gpg(hostB, '--import', path.join(tmp, 'b.pub')).status, 0)
+  rewrite(f.record, (r) => { r.key_wrap.recipient_fingerprint = fprB })
+  assert.match(oa.verifyRecordForRelease(f.record, { backupDir: dir, fingerprint: fprB, gnupgHome: hostB }).problems.join(' '), /addressed to/)
+  for (const x of [homeB, hostB]) spawnSync('gpgconf', ['--homedir', x, '--kill', 'gpg-agent'])
+  // a keyring that holds a SECRET key is refused
+  assert.match(oa.verifyRecordForRelease(f.record, { backupDir: dir, fingerprint: fpr, gnupgHome: ownerHome }).problems.join(' '), /SECRET key|different owner key/)
+})
+
+test('final-parity --offsite-record: takes the hashes from a re-derived record, still needs the owner authorization reference, and writes a record the push guard accepts', { skip }, async () => {
+  const gate = buildGate({ gate: 'G1', commit: 'a'.repeat(40), through: '028', projectRef: 'dbnmktidheefoxaztivm', migrations: listMigrations().map((m) => ({ version: m.version, file: m.file, checksum: m.checksum })) })
+  const gateFile = path.join(tmp, `gate${++n}.json`); fs.writeFileSync(gateFile, JSON.stringify(gate))
+  const { dir, f, out } = await verified()
+  const cli = (extra, rec = path.join(tmp, `parity-${++n}.json`)) => ({ rec, ...spawnSync(process.execPath, ['scripts/db/final-parity.mjs', '--backup-dir', dir, '--gate', gateFile, '--record', rec, '--authorization-ref', 'owner message test', '--export-script', exporter, ...extra], { cwd: root, encoding: 'utf8', env }) })
+  const good = ['--offsite-record', f.record, '--offsite-recipient', fpr, '--offsite-gnupg-home', hostHome]
+  let r = cli(['--offsite-sha256', 'a'.repeat(64), ...good]); assert.equal(r.status, 2, 'both forms at once are refused')
+  r = cli(good.slice(0, 2)); assert.equal(r.status, 2, 'the owner key must be named')
+  r = cli(good.filter((x) => x !== '--authorization-ref')); assert.equal(r.status, 0, r.stdout + r.stderr)
+  const rec = JSON.parse(fs.readFileSync(r.rec, 'utf8')); assert.equal(rec.offsite.method, 'automated-record'); assert.equal(rec.offsite.verification_record_sha256, out.record.record_sha256); assert.equal(rec.offsite.encrypted_sha256, out.record.archive.sha256)
+  assert.deepEqual(fp.verifyRecordFile(r.rec, { gate }), [], 'the unchanged push-guard verification accepts it')
+  const orig = fs.readFileSync(f.record, 'utf8')
+  rewrite(f.record, (x) => { x.steps = x.steps.filter((s) => s.name !== 'decrypt') }); r = cli(good); assert.equal(r.status, 1); assert.match(r.stderr, /"decrypt" is not recorded/); assert.ok(!fs.existsSync(r.rec), 'nothing is written')
+  fs.writeFileSync(f.record, orig)
+  const bare = spawnSync(process.execPath, ['scripts/db/final-parity.mjs', '--backup-dir', dir, '--gate', gateFile, '--record', path.join(tmp, `p${++n}.json`), '--offsite-record', f.record, '--offsite-recipient', fpr, '--offsite-gnupg-home', hostHome, '--export-script', exporter], { cwd: root, encoding: 'utf8', env })
+  assert.equal(bare.status, 2, bare.stderr + 'without the owner authorization reference nothing proceeds')
+})

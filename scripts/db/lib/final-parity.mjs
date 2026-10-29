@@ -108,7 +108,7 @@ export function buildRecord ({ backupDir, gate, offsite, preflight, exportHashes
     kind: 'g1-final-parity', version: 1, result: 'PASS',
     gate: { commit: gate.commit, through: gate.through, from_level: gate.from_level, project_ref: gate.project_ref, migrations_hash: gate.migrations_hash },
     backup: { dir: path.resolve(backupDir), started_at: new Date(backupStartedAt(backupDir)).toISOString(), manifest_sha256: manifest.manifest_sha256, tree_sha256: contentTreeHash(backupDir) },
-    offsite: { encrypted_sha256: offsite.encrypted, tree_sha256: offsite.tree, authorization_ref: offsite.authorizationRef },
+    offsite: { encrypted_sha256: offsite.encrypted, tree_sha256: offsite.tree, authorization_ref: offsite.authorizationRef, ...(offsite.recordSha256 ? { method: 'automated-record', verification_record_sha256: offsite.recordSha256 } : {}) },
     preflight: { ok: true, expect_level: gate.from_level, expect_checksum: `${gate.through}:${gate.checksums[gate.through]}` },
     export_compare: { identical: true, files: exportHashes },
     max_age_ms: MAX_BACKUP_AGE_MS, checked_at: new Date(now).toISOString(), expires_at: new Date(now + RECORD_VALIDITY_MS).toISOString()
