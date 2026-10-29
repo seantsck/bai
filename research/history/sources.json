@@ -453,11 +453,11 @@
     "url": "https://www.retrosheet.org/notice.txt",
     "attribution": "The information used here was obtained free of charge from and is copyrighted by Retrosheet. Interested parties may contact Retrosheet at \"www.retrosheet.org\"."
    },
-   "terms": "https://www.retrosheet.org/notice.txt (read 2026-10-21): recipients may make any desired use, including selling the data or building a commercial product, if the attribution statement appears prominently. No accuracy guarantee. Fetch only /transactions/tranDB.zip and /transactions/readme.txt (one file, about 1.2 MB, last modified 2022-05-09); never crawl the site.",
+   "terms": "https://www.retrosheet.org/notice.txt (read 2026-10-21; re-read live 2026-10-29, byte-identical): recipients may make any desired use, including selling the data or building a commercial product, if the attribution statement appears prominently. No accuracy guarantee. Fetch only /transactions/tranDB.zip and /transactions/readme.txt (one file, about 1.2 MB, last modified 2022-05-09); never crawl the site.",
    "review": {
-    "reviewed_on": "2026-10-22",
+    "reviewed_on": "2026-10-29",
     "review_due": "2027-01-22",
-    "reviewed_by": "BAI maintainer (Phase 10.1 spec: Retrosheet and Wikidata integration; terms read from the published notice and Wikidata's CC0 statement)"
+    "reviewed_by": "BAI maintainer (Phase 10.1 spec; G4-A: live notice re-read 2026-10-29, byte-identical to the cached copy)"
    },
    "uses": {
     "fetch_targeted": {
@@ -477,11 +477,34 @@
      "basis": "Facts attached to BAI's own records, with the attribution statement. The raw file stays in the gitignored cache."
     },
     "publish_site": {
-     "state": "PENDING",
-     "basis": "The licence permits it, but its condition (the attribution statement shown prominently) has no public surface yet and hosted has no Retrosheet attribution category (the 025 guard would refuse these records). A person grants this after the /sources credit and a migration exist."
+     "state": "AUTHORIZED",
+     "basis": "The notice (byte-identical on 2026-10-29, sha256 2218abe6…105d) permits any use, including commercial, if its attribution statement appears prominently. Authorized by the BAI owner for the RETROSHEET category (category-wide) on the conditions in docs/transactions/g4-retrosheet-authorization.md: the statement shown prominently on every page that shows Retrosheet-derived records, and no read-model refresh including Retrosheet-derived transactions until the Transactions pages carrying it are live in production. The authorization lapses on the review date."
     }
    },
-   "authorization": null,
+   "authorization": {
+    "reference": "G4-B owner authorization (the owner's message citing the document's SHA-256)",
+    "granted_by": "BAI owner (GitHub: seantsck)",
+    "granted_on": "2026-10-30",
+    "expires_on": "2027-01-22",
+    "uses": [
+     "publish_site"
+    ],
+    "scope": {
+     "category": "RETROSHEET",
+     "category_wide": true
+    },
+    "document": "docs/transactions/g4-retrosheet-authorization.md",
+    "document_sha256": "50b09e88d1447f8e87927c574656c5458790841d647b51592702ca248eb3c406",
+    "evidence_url": "https://www.retrosheet.org/notice.txt",
+    "evidence_sha256": "2218abe680e21d3308de06352c394baefbffc7618d36a821d38ed6e97c24105d",
+    "evidence_retrieved_at": "2026-10-29T23:09:58Z",
+    "conditions": [
+     "The attribution statement appears verbatim and prominently on every page that shows Retrosheet-derived records.",
+     "Public Retrosheet data must not become accessible (read-model refresh) before compliant attribution is live in production.",
+     "Category-wide for RETROSHEET only; no MLB, BASEBALL_REFERENCE or OTHER_PUBLICATION grant is implied.",
+     "Retrosheet's accuracy disclaimer applies; records are shown as PARTIAL, never verified complete."
+    ]
+   },
    "permission_notes": "Attribution statement is mandatory wherever Retrosheet-derived records are shown (see license.attribution). A Retrosheet record is evidence that a person was drafted; its absence is not evidence that a person was not. Never treat it as the draft population."
   },
   {
