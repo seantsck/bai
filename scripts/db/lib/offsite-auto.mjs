@@ -282,7 +282,7 @@ export function runOffsite ({ backupDir, rclone, gnupgHome, fingerprint, kind = 
     try { inspectFile(dlGpg) } catch (e) { fail('decrypt', `the downloaded archive is not AES-256 symmetric OpenPGP (${e.message})`) }
     if (fs.readFileSync(`${dlGpg}.tree-sha256`, 'utf8').trim() !== tree) fail('decrypt', 'the downloaded content-tree companion is not this backup\'s')
     r = sh('bash', [PACK, 'verify', dlGpg, dir, '--passphrase-file', sfile])
-    if (r.status !== 0) fail('decrypt', scrub(r.err, known).trim().split('\n').slice(-1)[0] || 'decryption of the downloaded copy failed')
+    if (r.status !== 0) fail('decrypt', `decryption or verification of the downloaded copy failed: ${scrub(r.err, known).trim().split('\n').slice(-1)[0] || 'no detail'}`)
     step('decrypt', 'downloaded copy decrypts; content hash and internal SHA256SUMS match; equals the backup directory')
     // 7. evidence in the layout final-parity checks, then the same check final-parity will run
     move(dl, f.returnedDir); created.splice(created.indexOf(dl), 1, f.returnedDir)

@@ -2,9 +2,13 @@
 // A stand-in for `rclone` that stores "remote" files in a local directory (RCLONE_FAKE_RCLONE_ROOT) and can be told to misbehave. It records every call in RCLONE_FAKE_RCLONE_LOG.
 // Remote syntax: "fake:some/path" -> $RCLONE_FAKE_RCLONE_ROOT/some/path. Failure injection (environment): RCLONE_FAKE_FAIL_UPLOAD=<name substring|1>, RCLONE_FAKE_FAIL_DOWNLOAD, RCLONE_FAKE_CORRUPT=<substring>,
 // RCLONE_FAKE_TRUNC=<substring> (stores half a file), RCLONE_FAKE_NO_DOWNLOAD=<substring> (exit 0, writes nothing), RCLONE_FAKE_HIDE=<substring> (omit from lsjson), RCLONE_FAKE_WRONG_MD5=1, RCLONE_FAKE_NO_HASH=1, RCLONE_FAKE_LS_FAIL=1.
+// Faults that pass every outer check (size, provider MD5, byte-identical download) and only show at the decrypt/verify step: RCLONE_FAKE_SWAP_ARCHIVE=1 (before the first upload, replace the local
+// archive and its .sha256 companion by a well-formed AES-256 OpenPGP file under ANOTHER passphrase), RCLONE_FAKE_MUTATE_DIR=<backup dir> (before the first upload, add a file to that backup).
 import fs from 'node:fs'
 import path from 'node:path'
 import crypto from 'node:crypto'
+import { spawnSync } from 'node:child_process'
+import os from 'node:os'
 const a = process.argv.slice(2)
 if (a[0] === '--config') a.splice(0, 2)
 const root = process.env.RCLONE_FAKE_RCLONE_ROOT
@@ -28,6 +32,14 @@ if (cmd === 'copyto') {
   const up = dst.startsWith('fake:'); const name = path.basename(up ? dst : src)
   if (up) {
     if (hit(process.env.RCLONE_FAKE_FAIL_UPLOAD, name)) { console.error('Failed to copy: googleapi: Error 503: backendError token=ya29.FAKE-SECRET-TOKEN-123456'); process.exit(1) }
+    if (process.env.RCLONE_FAKE_SWAP_ARCHIVE && name.endsWith('.tar.zst.gpg')) {
+      const home = fs.mkdtempSync(path.join(os.tmpdir(), 'fake-gpg-')); fs.chmodSync(home, 0o700)
+      const g = spawnSync('gpg', ['--batch', '--homedir', home, '--pinentry-mode', 'loopback', '--passphrase', 'not-the-session-key', '--symmetric', '--cipher-algo', 'AES256', '--output', `${src}.new`], { input: crypto.randomBytes(2048) })
+      spawnSync('gpgconf', ['--homedir', home, '--kill', 'gpg-agent']); fs.rmSync(home, { recursive: true, force: true })
+      if (g.status !== 0) { console.error('fake: gpg failed'); process.exit(2) }
+      fs.renameSync(`${src}.new`, src); fs.writeFileSync(`${src}.sha256`, crypto.createHash('sha256').update(fs.readFileSync(src)).digest('hex') + '\n')
+    }
+    if (process.env.RCLONE_FAKE_MUTATE_DIR && name.endsWith('.tar.zst.gpg')) fs.writeFileSync(path.join(process.env.RCLONE_FAKE_MUTATE_DIR, 'export', 'added-after-pack.txt'), 'x\n')
     const target = real(dst); fs.mkdirSync(path.dirname(target), { recursive: true })
     if (fs.existsSync(target) && flags.includes('--immutable')) { console.error('immutable file modified'); process.exit(9) }
     let buf = fs.readFileSync(src); if (hit(process.env.RCLONE_FAKE_TRUNC, name)) buf = buf.subarray(0, Math.floor(buf.length / 2))

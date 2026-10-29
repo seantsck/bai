@@ -120,6 +120,23 @@ for (const [what, inject, atStep, re] of failing) {
   })
 }
 
+test('FAIL closed when the archive passes every outer check (size, provider MD5, identical download) but cannot be decrypted with the session key', { skip }, async () => {
+  const dir = await backup(); const rm = remote({ RCLONE_FAKE_SWAP_ARCHIVE: '1' }); const before = sessionDirs().length
+  const out = go(dir, rm.rc); assert.equal(out.result, 'FAIL'); assert.deepEqual(out.record.steps.filter((s) => s.ok).map((s) => s.name), ['backup', 'pack', 'wrap', 'upload', 'download'], 'the outer checks all passed')
+  assert.equal(out.record.steps.at(-1).name, 'decrypt'); assert.match(out.problems.join(' '), /decrypt/i)
+  const f = oa.recordPaths(path.dirname(dir), path.basename(dir))
+  for (const p of [f.record, f.archive, f.key, f.returnedDir]) assert.ok(!fs.existsSync(p), `${path.basename(p)} must not exist after a failure`)
+  assert.ok(fs.existsSync(path.join(out.record.quarantined_in, 'WHY.txt')), 'the failed attempt is kept'); assert.equal(sessionDirs().length, before)
+  assert.ok(fp.verifyOffsiteEvidence(dir, sha('x'), sha('y')).length > 0)
+})
+
+test('FAIL closed when the archive decrypts but its content is not the backup directory (internal verification)', { skip }, async () => {
+  const dir = await backup(); const rm = remote({ RCLONE_FAKE_MUTATE_DIR: dir })
+  const out = go(dir, rm.rc); assert.equal(out.result, 'FAIL'); assert.equal(out.record.steps.at(-1).name, 'decrypt')
+  const f = oa.recordPaths(path.dirname(dir), path.basename(dir)); for (const p of [f.record, f.returnedDir]) assert.ok(!fs.existsSync(p))
+  assert.ok(fs.existsSync(path.join(out.record.quarantined_in, 'WHY.txt')))
+})
+
 test('a retry after a failure succeeds in a NEW remote attempt; the failed attempt and its remote objects are kept, nothing is overwritten', { skip }, async () => {
   const dir = await backup(); const rm = remote({ RCLONE_FAKE_FAIL_UPLOAD: 'tree-sha256' })
   const first = go(dir, rm.rc, { now: Date.now() }); assert.equal(first.result, 'FAIL'); const leftovers = rm.objects().length; assert.ok(leftovers > 0, 'a partial upload exists remotely')

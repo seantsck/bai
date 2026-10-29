@@ -64,6 +64,11 @@ PASS is only ever written after the download has been decrypted and compared; up
 
 **Manual steps that remain:** the one-time setup; the owner's authorization message; the periodic recovery drill; renewing the Drive token if Google expires it. The Windows Pack/Pull/Return/Check ceremony and the manual Drive upload and download are gone.
 
+## Authorization boundary (unchanged by this change)
+* **Owner authorization stays mandatory.** This tooling produces evidence; it never authorizes or applies a migration. The backup-specific owner authorization, `final-parity`, the gate and the push guard are untouched, and `final-parity.mjs` was not modified.
+* **Not yet a substitute for owner-attested evidence.** Until the owner explicitly decides otherwise, the existing owner-attested protocol-v2 off-site evidence remains the required evidence; this workflow's record is additional evidence only.
+* **Before activation, both are required:** a real Google Drive `selftest` PASS, and an independent recovery drill on the owner's Windows machine (private key only there; fetch from Drive, `recover`, matching content-tree hash). The same-host verification above cannot prove the owner can unwrap the session key, so the drill is not optional.
+
 ## What is required to activate safely
 1. Review and approve this PR (it adds files only; no gate, `final-parity`, migration or existing script changes).
 2. **An explicit owner decision** that machine verification (decrypt of the downloaded copy with a transient session key, plus Drive's MD5, plus a periodic recovery drill) replaces the owner-attested Drive round trip and decrypt of protocol v2. Until you decide, release authorization can keep using the manual flow; the evidence layout is identical, so either path satisfies `final-parity`.
