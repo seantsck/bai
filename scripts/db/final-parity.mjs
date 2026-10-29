@@ -1,6 +1,8 @@
 // Phase C of G1 release protocol v2 (docs/transactions/g1-protocol-v2-proposal.md): the FINAL READ-ONLY comparison, run immediately before the push.
 //   node --env-file=<env file> scripts/db/final-parity.mjs --backup-dir <~/bai-backups/g1-…> --gate <gate.json> --record <new file>
-//        --offsite-sha256 <hex> --offsite-tree <hex> --authorization-ref "<owner message, date/time>"
+//        (--offsite-sha256 <hex> --offsite-tree <hex> | --offsite-record <backup-run record> --offsite-recipient <owner key fingerprint>) --authorization-ref "<owner message, date/time>"
+//   The second form takes the two hashes from an automated off-site verification record (scripts/db/backup-run.mjs) AFTER re-deriving it from the files, and requires
+//   its wrapped key to be addressed to the owner key named; the owner's authorization reference is required either way.
 // 1. the backup is sound (snapshot and export checksums), at most SIX hours old, its content hash equals the off-site verified one, and the encrypted archive
 //    beside it and the copy that came back from the owner's round trip match the reported hashes (decryption itself is the owner's attested Check);
 // 2. the strict hosted preflight passes (migration level, 028 checksum, every table byte-identical to the backup's snapshot);
@@ -13,15 +15,25 @@ import { spawnSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 import { ownerDatabaseUrl, isLocalUrl } from './lib/connection.mjs'
 import { validateGateShape } from './lib/gate.mjs'
+import os from 'node:os'
+import { verifyRecordForRelease } from './lib/offsite-auto.mjs'
 import { MAX_BACKUP_AGE_MS, backupStartedAt, buildRecord, compareExports, contentTreeHash, verifyBackupDir, verifyOffsiteEvidence } from './lib/final-parity.mjs'
 
 const here = path.dirname(fileURLToPath(import.meta.url))
 const argv = process.argv.slice(2)
 const opt = (k) => { const i = argv.indexOf(`--${k}`); return i >= 0 ? argv[i + 1] : null }
 const fail = (m) => { console.error(`FINAL PARITY FAILED: ${m}\nNothing was written; do not push.`); process.exit(1) }
-const usage = 'usage: final-parity.mjs --backup-dir <dir> --gate <gate.json> --record <new file> --offsite-sha256 <hex> --offsite-tree <hex> --authorization-ref <text> [--export-dir <new dir>]'
+const usage = 'usage: final-parity.mjs --backup-dir <dir> --gate <gate.json> --record <new file> (--offsite-sha256 <hex> --offsite-tree <hex> | --offsite-record <file> --offsite-recipient <40 hex> [--offsite-gnupg-home <dir>]) --authorization-ref <text> [--export-dir <new dir>]'
 const backupDir = opt('backup-dir'); const gateFile = opt('gate'); const recordFile = opt('record')
-const encrypted = opt('offsite-sha256'); const tree = opt('offsite-tree'); const authRef = opt('authorization-ref')
+let encrypted = opt('offsite-sha256'); let tree = opt('offsite-tree'); const authRef = opt('authorization-ref')
+const offsiteRecord = opt('offsite-record'); let offsiteRecordSha = null
+if (offsiteRecord && (encrypted || tree)) { console.error('give EITHER --offsite-record OR --offsite-sha256/--offsite-tree, not both'); process.exit(2) }
+if (offsiteRecord) {
+  if (!backupDir || !opt('offsite-recipient')) { console.error(usage); process.exit(2) }
+  const v = verifyRecordForRelease(offsiteRecord, { backupDir, fingerprint: opt('offsite-recipient'), gnupgHome: opt('offsite-gnupg-home') ?? path.join(os.homedir(), '.config/bai-backup/gnupg') })
+  if (v.problems.length) fail(`off-site verification record: ${v.problems.join('; ')}`)
+  encrypted = v.encrypted; tree = v.tree; offsiteRecordSha = v.recordSha256
+}
 if (!backupDir || !gateFile || !recordFile || !encrypted || !tree || !authRef) { console.error(usage); process.exit(2) }
 if (!/^[0-9a-f]{64}$/.test(encrypted) || !/^[0-9a-f]{64}$/.test(tree)) fail('--offsite-sha256 and --offsite-tree must be 64 hex characters')
 const absBackup = path.resolve(backupDir)
@@ -63,6 +75,6 @@ if (!cmp.ok) fail(`the fresh export differs from the backup's:\n  ${cmp.problems
 console.log(`export ok: ${Object.keys(cmp.hashes).join(', ')} identical to the backup's (fresh export kept in ${exportDir})`)
 
 // 4. the record
-const rec = buildRecord({ backupDir: absBackup, gate, offsite: { encrypted, tree, authorizationRef: authRef }, exportHashes: cmp.hashes })
+const rec = buildRecord({ backupDir: absBackup, gate, offsite: { encrypted, tree, authorizationRef: authRef, recordSha256: offsiteRecordSha }, exportHashes: cmp.hashes })
 fs.writeFileSync(recordFile, JSON.stringify(rec, null, 1) + '\n', { flag: 'wx', mode: 0o600 })
 console.log(`FINAL PARITY OK. Record ${recordFile} valid until ${rec.expires_at} (10 minutes). Push now: BAI_GATE_FILE=${gateFile} BAI_PARITY_RECORD=${recordFile} npm run hosted:supabase -- db push`)

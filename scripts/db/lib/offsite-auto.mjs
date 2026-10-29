@@ -165,6 +165,32 @@ export function verifyRecord (recordFile, { now = Date.now(), maxAgeMs = MAX_BAC
   return p
 }
 
+/**
+ * What the release check accepts INSTEAD of two typed hashes plus the owner's attested Drive round trip. Nothing here trusts the record's own claims:
+ * the record must be a PASS for a real backup (never a self-test) whose directory is the one being released, fresh (six hours), re-derived from the files
+ * (archive, downloaded copy, content tree, wrapped key), its wrapped key must be addressed to the owner's PINNED key (the fingerprint the owner named, read
+ * from a public-only keyring), and the provider checksum and decrypt steps must be recorded as passed. The decrypt step itself cannot be re-run without the
+ * session key (which no longer exists); it is the record's claim, backed by the independent recovery drill that is the activation evidence.
+ * Returns { problems, encrypted, tree, recordSha256 }.
+ */
+export function verifyRecordForRelease (recordFile, { backupDir, fingerprint, gnupgHome, now = Date.now() }) {
+  const none = (problems) => ({ problems, encrypted: null, tree: null, recordSha256: null })
+  const p = verifyRecord(recordFile, { now }); if (p.length) return none(p)
+  const rec = JSON.parse(fs.readFileSync(recordFile, 'utf8')); const q = []
+  if ((rec.backup?.kind ?? 'backup') !== 'backup') q.push('the record is not for a backup (a self-test record is never release evidence)')
+  if (!backupDir || path.resolve(rec.backup.dir) !== path.resolve(backupDir)) q.push('the record is for a different backup directory')
+  for (const s of ['backup', 'pack', 'wrap', 'upload', 'download', 'decrypt', 'evidence']) if (!(rec.steps ?? []).some((x) => x.name === s && x.ok === true)) q.push(`step "${s}" is not recorded as passed`)
+  if (rec.remote?.md5_checked !== true) q.push('the provider checksum was not compared')
+  if (!/^[0-9A-Fa-f]{40}$/.test(fingerprint ?? '')) q.push('the owner key fingerprint (40 hex characters) must be named')
+  else {
+    if (String(rec.key_wrap?.recipient_fingerprint).toUpperCase() !== fingerprint.toUpperCase()) q.push('the record\'s wrapped key is for a different owner key than the one named')
+    const kr = keyring(gnupgHome, fingerprint.toUpperCase()); q.push(...kr.problems)
+    if (!kr.problems.length) q.push(...inspectWrapped(recordPathsFor(rec).key, kr.keyids))
+  }
+  return q.length ? none(q) : { problems: [], encrypted: rec.archive.sha256, tree: rec.backup.tree_sha256, recordSha256: rec.record_sha256 }
+}
+const recordPathsFor = (rec) => recordPaths(path.dirname(rec.backup.dir), rec.backup.name)
+
 export function renderReport (rec, problems = []) {
   const L = []
   L.push(`BAI off-site backup verification: ${rec.result}`)
