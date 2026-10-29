@@ -5,7 +5,7 @@ import { BackupNav, BackupFooter, BACKUP_APP_NAME } from '../../components/Backu
 export const metadata: Metadata = {
   title: BACKUP_APP_NAME,
   description: 'BAI Automated Backups is a privately operated utility that makes encrypted backups of the BAI database and stores them in the operator’s own Google Drive.',
-  alternates: { canonical: '/backup' }
+  alternates: { canonical: 'https://www.baibaseball.app/backup' }
 }
 
 export default function BackupPage () {

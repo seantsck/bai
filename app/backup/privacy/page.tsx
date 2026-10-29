@@ -5,7 +5,7 @@ import { BackupNav, BackupFooter, BACKUP_APP_NAME } from '../../../components/Ba
 export const metadata: Metadata = {
   title: `Privacy policy · ${BACKUP_APP_NAME}`,
   description: 'How BAI Automated Backups uses its Google Drive access (drive.file): what is uploaded, how credentials are kept, retention, sharing and how to revoke access.',
-  alternates: { canonical: '/backup/privacy' }
+  alternates: { canonical: 'https://www.baibaseball.app/backup/privacy' }
 }
 
 export default function BackupPrivacyPage () {
@@ -34,10 +34,12 @@ export default function BackupPrivacyPage () {
         <li><strong>Downloads</strong> those same files again to check they are identical to what was uploaded and that they can be decrypted.</li>
         <li>Uploads small synthetic test files, containing no real data, when the operator runs a connection self-test.</li>
       </ul>
-      <p>
-        The backup contents are encrypted before they leave the operator’s server. The key that opens them is not stored in Google Drive or on the server, so
-        the files in Drive cannot be read by the application’s own credentials, by Google, or by anyone who gets only the Drive files.
-      </p>
+      <h2>Encryption keys</h2>
+      <ul>
+        <li>Each backup is encrypted on the operator’s server (AES-256) with a random, single-use session passphrase. That passphrase exists temporarily on the server, in an owner-only temporary location, while the backup is encrypted and while the downloaded copy is checked. When the run ends the tool overwrites the file and removes it. This cleanup is best-effort: it is not a guarantee of secure erasure, because the operating system or storage hardware may retain traces.</li>
+        <li>The session passphrase is also encrypted (“wrapped”) to the operator’s public key, and that wrapped key file is stored in Google Drive next to the backup.</li>
+        <li>The operator’s long-term private recovery key is never on the server. Only it can unwrap the session passphrase, so the files in Google Drive cannot be decrypted by Google, by the application’s Drive credentials, or by anyone who has only the Drive files.</li>
+      </ul>
 
       <h2>How credentials are stored</h2>
       <p>

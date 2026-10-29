@@ -42,3 +42,13 @@ test('nothing secret or internal is exposed: no keys, fingerprints, tokens, host
   for (const re of [/[0-9A-F]{40}/, /ya29\.|GOCSPX|1\/\/0/, /BEGIN [A-Z ]*KEY/, /\b\d{1,3}(\.\d{1,3}){3}\b/, /[\w.+-]+@[\w-]+\.[\w.]+/, /\/home\/|\.config\/|rclone\.conf|\.env/, /supabase\.co|dbnmktid/, /postgres(ql)?:\/\//])
     assert.doesNotMatch(t, re, String(re))
 })
+
+test('canonical URLs are the www production addresses', () => {
+  for (const r of ROUTES) assert.match(src(r), new RegExp(`canonical: 'https://www\\.baibaseball\\.app${r}'`), r)
+})
+
+test('the privacy policy describes the session passphrase, the wrapped key in Drive and the off-server private key without promising secure erasure', () => {
+  const s = src('/backup/privacy')
+  for (const re of [/single-use session passphrase/, /exists temporarily on the server/, /wrapped key file is stored in Google Drive/, /private recovery key is never on the server/, /best-effort/, /not a guarantee of secure erasure/]) assert.match(s, re)
+  assert.doesNotMatch(s, /not stored in Google Drive or on the server/)
+})

@@ -5,7 +5,7 @@ import { BackupNav, BackupFooter, BACKUP_APP_NAME } from '../../../components/Ba
 export const metadata: Metadata = {
   title: `Terms of use · ${BACKUP_APP_NAME}`,
   description: 'Terms for BAI Automated Backups: a privately operated, non-public backup utility for the BAI database.',
-  alternates: { canonical: '/backup/terms' }
+  alternates: { canonical: 'https://www.baibaseball.app/backup/terms' }
 }
 
 export default function BackupTermsPage () {
