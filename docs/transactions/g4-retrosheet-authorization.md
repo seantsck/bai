@@ -27,13 +27,30 @@ The notice's operative text (verbatim; the attribution block is indented in the 
 ## 2. Wording comparisons
 * **Migration 030 (`public.source_attribution_statements`, `RETROSHEET`)** and **the Sources page** (`app/sources/page.tsx`, `RETROSHEET_CREDIT`) and **`RETROSHEET_ATTRIBUTION`** in `scripts/history/lib/retrosheet.mjs`: all carry the identical statement. It equals the notice's attribution block exactly once the original's line breaks and its double space after "Retrosheet." are collapsed to single spaces (the notice text is unchanged and no wording was altered). The hosted row was read on 2026-10-29: statement, `notice_url` and `verified_on` 2026-10-25 as in the migration. The row's `condition_text` is a paraphrase of the notice, not a quotation, and is not what the pages render as Retrosheet's wording.
 * **Production today** serves the statement on `/sources` (the deployed baseline carries it, HTML-escaped quotes aside).
-* **Other forms on Retrosheet's site (open ambiguity).** A web search (search-result summaries only; those pages were *not* fetched, to keep to one request to the site) reports that some Retrosheet dataset pages carry the same statement with a postal address in place of the website as the contact (for example the CSV-downloads and some other pages), while the game-logs page and `notice.txt` use the website form. The archive's own `readme.txt` contains no attribution statement. Which form Retrosheet intends for the *transactions* dataset specifically is therefore not established by the archive; the form used here is the one in `notice.txt`, the file the catalog designates for this source. The wording has **not** been altered. If the owner wants this settled before G4-B, one further bounded read of `https://www.retrosheet.org/transactions/` (inside the catalog's allowed prefixes) would show what that page requires.
+* **Other forms on Retrosheet's site (resolved by the owner's check).** An earlier web search (search-result summaries only; not fetched by this project) reported that some other Retrosheet dataset pages carry the statement with a postal address as the contact. The owner then read the official Transactions page (`https://www.retrosheet.org/transactions/`) and reports that it contains **no competing, dataset-specific postal-address attribution requirement**, and that `notice.txt` remains the governing attribution wording. This project did not fetch that page; the finding is the owner's and is recorded as such. The wording used here is `notice.txt`'s and has not been altered.
+
+### 2a. Source stewardship and date discrepancy (recorded; neither side is assumed wrong)
+The owner reports that the official Transactions page states that **Retrosheet no longer maintains the transactions database**, that **responsibility has passed to Baseball-Reference**, and that the page's downloadable database was **uploaded November 26, 2021**. BAI's cached copy differs in what it records about its own date:
+
+| Fact | Value | Where it comes from |
+| --- | --- | --- |
+| Download | `tranDB.zip`, SHA-256 `c5cd539f89991afa9a74fdc67b0f71e29413383792404013a2c69fdd450fd932`, 1,203,773 bytes, retrieved from retrosheet.org 2026-10-22T01:10:07Z | `research/history/manifest.json` |
+| `tran.txt` entry date inside the zip | 2022-05-09 18:03:40 | the zip's own metadata (also the catalog's "last modified 2022-05-09") |
+| `readme.txt` entry date inside the zip | 2022-03-06 | the zip's own metadata |
+| Latest transaction date in the data | 2022-02-27 (101,594 records; 61 dated 2022) | the cached `tran.txt` |
+
+The cached file contains records dated after November 26, 2021, so it was assembled after the date the page gives; the file's embedded dates are consistent with each other, and the checksum is the one recorded when BAI downloaded it. **This does not show that the cached file is wrong:** the page text may be stale, may describe a different upload, or may refer to a different file, and this project has not determined which. It is recorded as an open provenance question, not as a defect.
+
+What the stewardship statement does and does not change, as far as this record can say:
+* The attribution requirement used by BAI is the statement in Retrosheet's `notice.txt`, which the owner confirms remains governing; it is unchanged and still names Retrosheet.
+* Nothing found so far shows that Baseball-Reference or Sports Reference terms apply to this file. BAI treats Baseball-Reference as a separate, restricted attribution category (`BASEBALL_REFERENCE`), and **this authorization does not extend to it**. Whether a future Baseball-Reference-maintained version of the data would carry different terms is not decided here.
+* The catalog's description of the source ("Retrosheet transactions database") and the displayed credit to Retrosheet are unchanged; any change to the credit would need a new, separate review.
 
 ## 3. Licensing assessment
 * The published terms permit **any use, including commercial**, if the statement **appears prominently**. That covers a public site that may later be monetized. The permitted uses in the catalog (`fetch_*`, `process_local`, `publish_repository`) were already CLEARED on that basis.
 * **There is no formal signed licence.** The permission is a published notice. It does not define "prominently", does not address derived or aggregated data in terms, and can be changed by Retrosheet; the notice was last modified 2023-12-03. This record does not claim otherwise.
 * Retrosheet disclaims accuracy and responsibility. BAI shows these records as PARTIAL (never "verified complete") and states they are Retrosheet's recorded transactions; the pages' attribution component renders the statement only, so an explicit accuracy note is a recommended addition at G7 (the notice does not require one).
-* The archive is not a complete census of transactions and was last updated 2022-05-09 (records run to 2022-02-27).
+* The archive is not a complete census of transactions and carries embedded dates of 2022-05-09 (records run to 2022-02-27); the official page gives a different upload date and says Retrosheet no longer maintains the file (see 2a).
 
 ## 4. Where public data could appear before the credit pages are live
 * Migration 030 made the read-model tables (`rm_transaction_*`), `source_attribution_statements` and `v_source_attribution` readable by `anon`. Supabase's Data API exposes the `public` schema, so **once `rm_*` holds Retrosheet-derived rows they are readable at `/rest/v1/rm_transactions` (and the other `rm_*` tables) with the published key whether or not the website shows them.**
@@ -51,5 +68,13 @@ The notice's operative text (verbatim; the attribution block is indented in the 
 * **Withdrawal:** deleting the `RETROSHEET` grant row withdraws all Retrosheet-derived rows from the public tables in the same transaction (migration 030); reverting the catalog entry to PENDING stops further hosted writes.
 * **Next review deadline:** 2027-01-22.
 
-## 6. What this does not decide
+## 6. Follow-up requirement for G6: direct REST API consumers
+Before any read-model refresh that can publish Retrosheet-derived rows (G6), the G6 authorization must include an examination of **attribution for direct Supabase REST API consumers**, because `rm_*` rows are readable at `/rest/v1/…` with the published key without ever passing through a BAI page. The examination must cover at least:
+* what such a consumer receives for a Retrosheet-derived row (each row's source category, publisher and URL are present in `rm_transaction_sources`; the statement itself is in `source_attribution_statements`; nothing ties the statement to a row in a REST response);
+* whether that is sufficient for the notice's "appear prominently" requirement as applied to a direct API consumer, or whether a change is needed first (for example how the statement is surfaced through the API, restricting direct API exposure of the `rm_*` tables by a separate, separately gated migration, or documentation of the API's terms), and the owner's decision on it;
+* the evidence of the result, cited in the G6 authorization.
+
+This follow-up is a condition on G6, not on recording the G4-B grant, and nothing in this document decides it.
+
+## 7. What this does not decide
 Creating the database grant (G4-B), importing (G5), refreshing (G6), deploying (G7), the 65 MLB-sourced trades (they stay withheld without a separate `MLB` grant), and Baseball-Reference or other sources.

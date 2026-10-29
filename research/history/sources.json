@@ -494,7 +494,7 @@
      "category_wide": true
     },
     "document": "docs/transactions/g4-retrosheet-authorization.md",
-    "document_sha256": "50b09e88d1447f8e87927c574656c5458790841d647b51592702ca248eb3c406",
+    "document_sha256": "63077bdd767547a2c456f4298cdd6c6d9ef0d32047427e6e133e2606e7083b82",
     "evidence_url": "https://www.retrosheet.org/notice.txt",
     "evidence_sha256": "2218abe680e21d3308de06352c394baefbffc7618d36a821d38ed6e97c24105d",
     "evidence_retrieved_at": "2026-10-29T23:09:58Z",
