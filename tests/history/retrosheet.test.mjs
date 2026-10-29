@@ -106,13 +106,29 @@ test('the cross-check proposes findings and never concludes', () => {
   assert.equal(absent.outcome, 'NO_RETROSHEET_RECORD', 'no Retrosheet record is not evidence of anything')
 })
 
-test('the catalog records Retrosheet (no site publication yet) and Wikidata (CC0, identity-bound publication)', () => {
+test('the catalog records Retrosheet (site publication authorized only by a documented, dated authorization) and Wikidata (CC0, identity-bound publication)', () => {
   const catalog = loadCatalog(root)
   assert.deepEqual(validateCatalog(catalog), [])
   const ctx = { now: new Date('2026-10-22T12:00:00Z') }
   const ok = (id, use) => checkUse(catalog, id, use, ctx, { root }).ok
   for (const use of ['fetch_targeted', 'fetch_bulk', 'process_local', 'publish_repository']) assert.equal(ok('retrosheet-transactions', use), true, use)
-  assert.equal(ok('retrosheet-transactions', 'publish_site'), false, 'hosted publication waits for the attribution surface and a person')
+  // Retrosheet publish_site is AUTHORIZED by a documented, dated, expiring authorization (docs/transactions/g4-retrosheet-authorization.md); it is refused before it starts, after it lapses and if its document changes.
+  assert.equal(ok('retrosheet-transactions', 'publish_site'), false, 'not yet effective on 2026-10-22: the authorization starts on 2026-10-30')
+  const at = (iso, cat = catalog, o = { root }) => checkUse(cat, 'retrosheet-transactions', 'publish_site', { now: new Date(iso) }, o)
+  assert.equal(catalog.sources.find((s) => s.id === 'retrosheet-transactions').uses.publish_site.state, 'AUTHORIZED')
+  assert.equal(at('2026-10-30T00:00:00Z').ok, true)
+  assert.equal(at('2027-01-22T12:00:00Z').ok, true, 'valid through its review date')
+  assert.equal(at('2027-01-23T00:00:00Z').ok, false, 'lapses after the review date')
+  const auth = catalog.sources.find((s) => s.id === 'retrosheet-transactions').authorization
+  assert.deepEqual(auth.uses, ['publish_site']); assert.equal(auth.scope.category, 'RETROSHEET'); assert.equal(auth.scope.category_wide, true)
+  assert.equal(auth.evidence_sha256, '2218abe680e21d3308de06352c394baefbffc7618d36a821d38ed6e97c24105d')
+  assert.ok(auth.conditions.some((c) => /before compliant attribution is live/.test(c)))
+  const doc = fs.readFileSync(path.join(root, auth.document), 'utf8')
+  assert.ok(doc.includes(RETROSHEET_ATTRIBUTION), 'the authorization document quotes the attribution verbatim')
+  assert.ok(doc.includes(auth.evidence_sha256))
+  const tampered = structuredClone(catalog); tampered.sources.find((s) => s.id === 'retrosheet-transactions').authorization.document_sha256 = 'f'.repeat(64)
+  assert.equal(at('2026-11-01T00:00:00Z', tampered).ok, false, 'a changed authorization document is refused')
+  assert.equal(at('2026-11-01T00:00:00Z', catalog, {}).ok, false, 'without a repository root the document cannot be checked')
   for (const use of ['fetch_targeted', 'process_local', 'publish_repository', 'publish_site']) assert.equal(ok('wikidata', use), true, use)
   const retro = catalog.sources.find((s) => s.id === 'retrosheet-transactions')
   assert.equal(retro.license.attribution, RETROSHEET_ATTRIBUTION)
