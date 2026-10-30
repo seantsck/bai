@@ -317,7 +317,7 @@ test('EMERGENCY (close the endpoints): the stricter mode closes the readable tab
 
 test('the command line is local-only: a hosted URL and --hosted are refused, a package verifies offline', () => {
   const run = (args, env) => spawnSync(process.execPath, ['scripts/db/promotion.mjs', ...args], { cwd: root, encoding: 'utf8', env: { PATH: process.env.PATH, HOME: os.homedir(), ...env } })
-  const hosted = run(['status', '--manifest', 'a'.repeat(64)], { BAI_DATABASE_URL: 'postgresql://postgres@db.abcdefghijklmnopqrst.supabase.co:5432/postgres' })
+  const hosted = run(['status', '--manifest', 'a'.repeat(64)], { BAI_DATABASE_URL: 'postgresql://db.abcdefghijklmnopqrst.supabase.co:5432/postgres' })
   assert.equal(hosted.status, 2); assert.match(hosted.stderr, /refusing non-local database host/, 'the connection layer refuses a remote host first')
   const forced = run(['status', '--manifest', 'a'.repeat(64)], { BAI_SUPABASE_PROJECT_REF: 'abcdefghijklmnopqrst', BAI_SUPABASE_DB_PASSWORD: 'not-a-real-password', BAI_ALLOW_REMOTE_DB: '1' })
   assert.equal(forced.status, 2); assert.match(forced.stderr, /NOT AUTHORIZED/, 'and even with the remote override this build refuses a hosted promotion')
