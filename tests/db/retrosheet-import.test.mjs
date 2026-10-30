@@ -13,8 +13,9 @@ import * as R from '../../scripts/research/lib/retrosheet-transactions.mjs'
 import { indexRegisterByRetro, resolveAll } from '../../scripts/research/lib/retrosheet-identity.mjs'
 import { buildCandidates, sourceDeclarations, sourceKeys } from '../../scripts/research/lib/retrosheet-adapter.mjs'
 import { integrityViolations } from '../../scripts/research/lib/integrity.mjs'
-import { PermissionDenied } from '../../scripts/history/lib/permissions.mjs'
+import { PermissionDenied, loadCatalog, requireHostedPublication } from '../../scripts/history/lib/permissions.mjs'
 
+const REPO_ROOT = path.resolve(import.meta.dirname, '../..')
 let db
 const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'bai-retro-'))
 before(async () => { await h.startServer(); db = await h.freshDatabase() }, { timeout: 120000 })
@@ -175,9 +176,42 @@ test('semantics: BAI\'s existing trade returns and acquisition values are identi
   assert.equal((await h.one(db, 'select count(*)::int n from war_observations')).n, 1, 'no WAR was created from Retrosheet')
 })
 
-test('source permissions: Retrosheet records are refused for a hosted database (publish_site is PENDING) and need no override locally', async () => {
+test('source permissions: the hosted guard follows the dated Retrosheet authorization, and local databases need no override', () => {
+  const HOSTED = { host: 'db.projectref000000000000.supabase.co' }
+  const catalog = loadCatalog(REPO_ROOT)
+  const gate = (iso, { doc = cand.doc, cat = catalog, root = REPO_ROOT } = {}) => requireHostedPublication(cat, doc, { now: new Date(iso) }, { root })
+  const refused = (fn, re) => assert.throws(fn, (e) => e instanceof PermissionDenied && re.test(e.message))
+
+  // Local: never gated. Hosted, on the real clock: exactly what the catalog says today (this assertion does not go stale as the dates pass).
   assert.equal(P.requirePublishable({ host: '127.0.0.1' }, cand.doc), null)
-  assert.throws(() => P.requirePublishable({ host: 'db.projectref000000000000.supabase.co' }, cand.doc), (e) => e instanceof PermissionDenied && /retrosheet|publish_site|PENDING/i.test(e.message))
+  let today = null
+  try { gate(new Date().toISOString()) } catch (e) { today = e.message }
+  if (today === null) assert.doesNotThrow(() => P.requirePublishable(HOSTED, cand.doc))
+  else refused(() => P.requirePublishable(HOSTED, cand.doc), /./)
+
+  // The effective period. The batch also cites Chadwick, whose own review is due first, so the Retrosheet boundary is tested on the Retrosheet source alone.
+  refused(() => gate('2026-10-29T23:59:59Z'), /retrosheet.*starts on 2026-10-30/i)
+  assert.doesNotThrow(() => gate('2026-10-30T00:00:00Z'))
+  assert.doesNotThrow(() => gate('2027-01-21T23:59:59Z'))
+  const retrosheetOnly = { ...cand.doc, sources: cand.doc.sources.filter((s) => /^hist:retrosheet-/.test(s.source_key)) }
+  assert.equal(retrosheetOnly.sources.length, 1)
+  assert.doesNotThrow(() => gate('2027-01-22T23:59:59Z', { doc: retrosheetOnly }))
+  refused(() => gate('2027-01-23T00:00:00Z', { doc: retrosheetOnly }), /retrosheet/i)
+  refused(() => gate('2027-01-22T00:00:00Z'), /chadwick.*review was due on 2027-01-21/i) // a whole batch stops one day earlier unless Chadwick is re-reviewed
+
+  // An invalid document or pin is refused inside the effective period.
+  const valid = '2026-11-01T00:00:00Z'
+  const auth = (c) => c.sources.find((s) => s.id === 'retrosheet-transactions').authorization
+  const wrongPin = structuredClone(catalog); auth(wrongPin).document_sha256 = 'f'.repeat(64)
+  refused(() => gate(valid, { cat: wrongPin }), /does not match its checksum/)
+  const noAuth = structuredClone(catalog); delete noAuth.sources.find((s) => s.id === 'retrosheet-transactions').authorization
+  refused(() => gate(valid, { cat: noAuth }), /no authorization is on file/)
+  const otherRoot = fs.mkdtempSync(path.join(dir, 'root-'))
+  refused(() => gate(valid, { root: otherRoot }), /is missing/)
+  const doc = path.join(otherRoot, auth(catalog).document)
+  fs.mkdirSync(path.dirname(doc), { recursive: true }); fs.writeFileSync(doc, fs.readFileSync(path.join(REPO_ROOT, auth(catalog).document), 'utf8') + 'changed\n')
+  refused(() => gate(valid, { root: otherRoot }), /does not match its checksum/)
+  refused(() => gate(valid, { root: null }), /cannot be checked/)
 })
 
 test('preview of the batch against the imported state is exact and read-only', async () => {
