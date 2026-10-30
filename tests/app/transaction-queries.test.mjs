@@ -1,4 +1,4 @@
-// The explorer's page queries against a real PostgreSQL 17 through the same anon-role wrapper the app uses (migration 030 read model).
+// The explorer's page queries against a real PostgreSQL 17 through the same role wrapper the app uses, as the website role bai_site (migration 030 read model, 032 role split).
 // FICTIONAL: 130 free-agent signings and a few trades, a Retrosheet-category source whose display a person authorizes by recording a grant.
 import { test, before, after } from 'node:test'
 import assert from 'node:assert/strict'
@@ -15,6 +15,7 @@ const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'bai-txq-'))
 const RETRO = { source_key: 'hist:retrosheet-0123456789', source_type: 'REFERENCE_DATABASE', authority_level: 'REPUTABLE_SECONDARY', title: 'Retrosheet transactions database (fixture)', publisher: 'Retrosheet', url: 'https://www.retrosheet.org/transactions/tranDB.zip', retrieved_date: '2026-10-22' }
 const CLUBS = ['LAD', 'SEA', 'NYY', 'BOS', 'HOU']
 before(async () => {
+  process.env.BAI_PUBLIC_ROLE = 'bai_site'   // 032: the website role reads the transaction read models; anon and authenticated (the Data API roles) cannot
   ;({ publicQuery, closePool } = await import('../../lib/db.ts'))
   ;({ parseTransactionParams: parse } = await import('../../lib/transactions.ts'))
   await h.startServer()
@@ -37,7 +38,8 @@ before(async () => {
 after(async () => { await closePool?.(); await h.stopServer(); fs.rmSync(dir, { recursive: true, force: true }) })
 
 test('page queries run as anon, read-only, and the overview states the three separate facts', async () => {
-  assert.deepEqual(await publicQuery('select current_user as u'), [{ u: 'anon' }])
+  assert.deepEqual(await publicQuery('select current_user as u'), [{ u: 'bai_site' }])
+  for (const role of ['anon', 'authenticated']) await assert.rejects(h.asRole(db, role, () => db.query('select count(*) from rm_transactions')), /permission denied/, `${role} cannot read the read model`)
   const o = await q.getTransactionOverview()
   assert.equal(o.transactions, 131)
   assert.equal(o.verified_complete, 0)
