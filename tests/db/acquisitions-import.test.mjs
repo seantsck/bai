@@ -98,6 +98,16 @@ test('replay inserts nothing, in the same batch or a new one; a duplicate acquis
   assert.equal((await h.one(db, "select to_char(transaction_date, 'YYYY-MM-DD') d from transactions t join transaction_external_ids x on x.transaction_id = t.id where x.external_id like '%110%' or x.external_id like '1@%'")).d, '2030-01-10')
 })
 
+test('replay under a new batch key leaves the coverage rows untouched', async () => {
+  const cov = () => h.rows(db, "select id, tracked_count, assessed_on::text a, updated_at::text u from coverage_assessments where domain::text = 'TRANSACTIONS' order by id")
+  const before = await cov()
+  assert.ok(before.length > 0)
+  const s = await stage({ ...cand.doc, batch_key: 'acq-batch-coverage-replay' })
+  const r = await P.applyBatch(db, s.batch.id, { write: true })
+  assert.equal(r.report.actions.INSERT ?? 0, 0)
+  assert.deepEqual(await cov(), before)
+})
+
 test('status: PARTIAL at best, never complete; verification has no rule for non-trade acquisitions; coverage is a partial reconstruction, never a census', async () => {
   const st = await h.rows(db, 'select completeness, gaps from analytics.transaction_completeness c join transaction_player_moves m on m.transaction_id = c.transaction_id')
   assert.ok(st.every((x) => x.completeness === 'PARTIAL' && x.gaps.join() === 'NON_TRADE_VERIFICATION_NOT_DEFINED'))
