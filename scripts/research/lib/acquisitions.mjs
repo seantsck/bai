@@ -189,7 +189,8 @@ export async function applyAcquisition (a, rec, { identityInput, PipelineError, 
 }
 
 // Coverage follows the data and states only what is true: the club-season is a PARTIAL_RECONSTRUCTION of one source lineage; the tracked count is
-// recounted from the transactions BAI holds for that club and season. A club-season already assessed as anything else is left as it is.
+// recounted from the transactions BAI holds for that club and season. A club-season already assessed as anything else is left as it is, and a count that did not
+// change writes nothing: a replay must not touch assessed_on or updated_at, or fire the evidence triggers.
 async function recordCoverage (a, r, orgIds) {
   const season = r.date.slice(0, 4)
   const source = await a.sourceId(r.source_key)
@@ -202,7 +203,7 @@ async function recordCoverage (a, r, orgIds) {
       await a.q(`insert into public.coverage_assessments (domain, scope_key, organization_id, coverage_state, tracked_count, expected_count, sample_basis, gap_notes, source_id, assessed_on)
         values ('TRANSACTIONS', $1, $2, 'PARTIAL_RECONSTRUCTION', $3, null, 'Retrosheet transactions archive: one source lineage, reconstructed rows only; not a census of the club-season', 'The archive does not say which transactions it omits; contracts and amounts are not recorded.', $4, current_date)`, [season, org, tracked, source])
     } else if (ex.s === 'PARTIAL_RECONSTRUCTION') {
-      await a.q('update public.coverage_assessments set tracked_count = $2, assessed_on = current_date where id = $1', [ex.id, tracked])
+      await a.q('update public.coverage_assessments set tracked_count = $2, assessed_on = current_date where id = $1 and tracked_count is distinct from $2', [ex.id, tracked])
     }
   }
 }
