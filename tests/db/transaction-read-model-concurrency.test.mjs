@@ -63,7 +63,7 @@ async function verify (tx) {
 async function publishVerified () {
   // a verified, published transaction (the Retrosheet grant present)
   await db.query("delete from ingest.source_publication_grants where attribution_category = 'RETROSHEET'")
-  await db.query(GRANT)
+  await db.query(GRANT); await h.releaseRetrosheet(db)
   if (await h.one(db, "select 1 ok from research.transaction_verifications where transaction_id = $1 and state = 'ACTIVE'", [tVer])) await rv.query('select * from research.revoke_transaction_verification($1, $2)', [tVer, 'reset'])
   await verify(tVer)
   await db.query(REFRESH)
@@ -76,11 +76,11 @@ test('setup: a Retrosheet trade and a trade verified against two independent sou
     [{ source_key: RETRO.source_key, role: 'PRIMARY_ANNOUNCEMENT', independence_group: 'g-retro' }, { source_key: SECOND.source_key, role: 'CORROBORATION', independence_group: 'g-wire' }])
   await rv.query("select * from research.enroll_reviewer('Concurrency Reviewer')")
   await rv.query("select * from research.set_certification_gate(true, 'isolated test database')")
-  await db.query(GRANT)
+  await db.query(GRANT); await h.releaseRetrosheet(db)
 })
 
 test('grant withdrawal, refresh FIRST: the withdrawal waits for the refresh to commit, then removes everything the refresh published', async () => {
-  await db.query("delete from ingest.source_publication_grants where attribution_category = 'RETROSHEET'"); await db.query(GRANT); await db.query(REFRESH)
+  await db.query("delete from ingest.source_publication_grants where attribution_category = 'RETROSHEET'"); await db.query(GRANT); await h.releaseRetrosheet(db); await db.query(REFRESH)
   await db.query("update ingest.source_publication_grants set scope_note = scope_note where false")
   await R.query('begin'); await R.query(REFRESH)                                                    // published inside R, uncommitted
   const w = await startBlocked(W, "delete from ingest.source_publication_grants where attribution_category = 'RETROSHEET'")
@@ -91,7 +91,7 @@ test('grant withdrawal, refresh FIRST: the withdrawal waits for the refresh to c
 })
 
 test('grant withdrawal, writer FIRST: the refresh fails at once with 55P03 and publishes nothing; after the commit it publishes none of the withdrawn rows', async () => {
-  await db.query(GRANT); await db.query(REFRESH)
+  await db.query(GRANT); await h.releaseRetrosheet(db); await db.query(REFRESH)
   await W.query('begin'); await W.query("delete from ingest.source_publication_grants where attribution_category = 'RETROSHEET'")   // uncommitted
   assert.ok((await published('anon')).n >= 2, 'while the withdrawal is uncommitted, the committed grant still stands')
   await R.query('begin')
@@ -104,7 +104,7 @@ test('grant withdrawal, writer FIRST: the refresh fails at once with 55P03 and p
   await db.query(REFRESH)                                                                           // no grant: still nothing
   await nothingPublished()
   // the writer rolls back instead: the grant stands and the refresh publishes
-  await db.query(GRANT)
+  await db.query(GRANT); await h.releaseRetrosheet(db)
   await W.query('begin'); await W.query("delete from ingest.source_publication_grants where attribution_category = 'RETROSHEET'"); await W.query('rollback')
   await db.query(REFRESH)
   assert.ok((await published('anon')).n >= 2)
@@ -171,7 +171,7 @@ test('lock orderings that could deadlock do not: a writer holding one locked tab
   await W.query('commit')
   await nothingPublished()
   // the reverse: the refresh holds everything; the writer's FIRST statement waits, it holds nothing the refresh needs
-  await db.query(GRANT)
+  await db.query(GRANT); await h.releaseRetrosheet(db)
   await R.query('begin'); await R.query(REFRESH)
   const w = await startBlocked(W, "delete from ingest.source_publication_grants where attribution_category = 'RETROSHEET'")
   assert.equal(w.state, 'waiting')
@@ -182,7 +182,7 @@ test('lock orderings that could deadlock do not: a writer holding one locked tab
 })
 
 test('the operational refresh retries a lock that is not available and succeeds once the writer commits; other errors are not retried', async () => {
-  await db.query(GRANT)
+  await db.query(GRANT); await h.releaseRetrosheet(db)
   const logs = []
   await W.query('begin'); await W.query("update ingest.source_publication_grants set scope_note = 'touched' where attribution_category = 'RETROSHEET'")   // a writer mid-transaction (fires the withdrawal)
   setTimeout(() => W.query('commit'), 1200)

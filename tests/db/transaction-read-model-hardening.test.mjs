@@ -50,6 +50,7 @@ test('setup: a three-club trade (one club sends two packages), a two-club trade,
   await war(await playerId(104), 'FANGRAPHS', kc, 4.0, fg)                                                      // FanGraphs has only one of them
   await war(await playerId(112), 'BREF', lad, 0.5, bref); await war(await playerId(111), 'BREF', sea, 1.0, bref)
   await db.query("insert into ingest.source_publication_grants (attribution_category, basis_reference, scope_note) values ('RETROSHEET', 'fixture: a person recorded the basis', 'fixture scope'), ('BASEBALL_REFERENCE', 'fixture', 'fixture')")
+  await h.releaseRetrosheet(db)
   await refresh()
 })
 
@@ -102,13 +103,15 @@ test('A. a publication grant withdrawn without a refresh leaves nothing readable
   })
   assert.ok((await withdrawals()).n > before.n, 'the withdrawal is logged (internal)')
   await db.query("insert into ingest.source_publication_grants (attribution_category, basis_reference, scope_note) values ('RETROSHEET', 'fixture: granted again', 'fixture scope')")
+  await h.releaseRetrosheet(db)
   await asBoth(async () => { assert.equal((await h.one(db, 'select count(*)::int n from rm_transactions')).n, 0, 'a new grant publishes nothing until the owner refreshes') })
   await refresh()
   await asBoth(async () => { assert.ok((await h.one(db, 'select count(*)::int n from rm_transactions')).n >= 2); assert.ok((await h.one(db, 'select count(*)::int n from v_source_attribution where domain = $1', ['TRANSACTION'])).n >= 1) })
   // truncating the grants withdraws as well
-  await db.query('truncate ingest.source_publication_grants')
+  await db.query('truncate ingest.source_publication_grants cascade')
   await asBoth(async () => { assert.equal((await h.one(db, 'select count(*)::int n from rm_transactions')).n, 0) })
   await db.query("insert into ingest.source_publication_grants (attribution_category, basis_reference, scope_note) values ('RETROSHEET', 'fixture', 'fixture'), ('BASEBALL_REFERENCE', 'fixture', 'fixture')")
+  await h.releaseRetrosheet(db)
   await refresh()
 })
 
@@ -138,8 +141,10 @@ async function verify (tx) {
 }
 let vt
 test('B. a verification revoked without a refresh leaves no obsolete VERIFIED_COMPLETE claim', async () => {
+  await h.withdrawRetrosheet(db)   // a batch citing a released source is applied only with the release withdrawn; recorded again right after
   vt = await trade('tv', '2030-08-01', [RETRO, SECOND], [pk('SD', 'SF', [pl(121)], [RETRO.source_key, SECOND.source_key]), pk('SF', 'SD', [pl(122)], [RETRO.source_key, SECOND.source_key])], 'H-V',
     [{ source_key: RETRO.source_key, role: 'PRIMARY_ANNOUNCEMENT', independence_group: 'g-retro' }, { source_key: SECOND.source_key, role: 'CORROBORATION', independence_group: 'g-wire' }])
+  await h.releaseRetrosheet(db)
   await rv.query("select * from research.enroll_reviewer('Hardening Reviewer')")
   await rv.query("select * from research.set_certification_gate(true, 'isolated test database')")
   await verify(vt)
@@ -157,10 +162,11 @@ test('B. a verification revoked without a refresh leaves no obsolete VERIFIED_CO
 })
 
 test('importing a new transaction costs no withdrawal; a record nobody can see is not "withdrawn"', async () => {
+  await h.withdrawRetrosheet(db)   // the release is withdrawn for the import (a batch citing a released source is refused); what is measured is the import itself
   const before = await withdrawals()
   await trade('t4', '2030-09-01', [RETRO], [pk('HOU', 'TEX', [pl(131)], [RETRO.source_key]), pk('TEX', 'HOU', [pl(132)], [RETRO.source_key])], 'H-4', [rg(RETRO.source_key)])
   assert.equal((await withdrawals()).n, before.n, 'adding a transaction withdraws nothing already published')
-  await refresh()
+  await h.releaseRetrosheet(db); await refresh()
 })
 
 test('C. a verified record whose assets, sources or provenance change is withdrawn before any refresh', async () => {

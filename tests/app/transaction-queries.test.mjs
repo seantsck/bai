@@ -28,6 +28,7 @@ before(async () => {
   await stage(T.prepareTradeDoc({ format: 'bai-research-import/1', batch_key: 'trades', channel: 'TRADES', sources: [RETRO], records: [{ type: 'TRADE', schema: 2, ref: 'tr1', organization: 'LAD', date: '2031-07-04', source_key: RETRO.source_key,
     sources: [{ source_key: RETRO.source_key, role: 'REFERENCE', independence_group: 'retrosheet-archive' }], external_ids: [{ scheme: 'RETROSHEET_TXN', id: 'tr1' }], packages: [pk('LAD', 'SEA', [1]), pk('SEA', 'LAD', [2])] }] }))
   await db.query("insert into ingest.source_publication_grants (attribution_category, basis_reference, scope_note) values ('RETROSHEET', 'fixture', 'fixture')")
+  await h.releaseRetrosheet(db)
   await db.query('select public.refresh_transaction_read_models()')
   delete process.env.BAI_PUBLIC_DATABASE_URL
   process.env.BAI_DATABASE_URL = `postgres://postgres:postgres@127.0.0.1:${db.port}/${db.database}`

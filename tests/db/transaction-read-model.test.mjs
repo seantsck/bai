@@ -52,12 +52,20 @@ test('no grant, no display: the read model is empty, and says how many transacti
   await refresh()
   assert.equal((await h.one(db, 'select count(*)::int n from rm_transactions')).n, 0)
   const o = await h.one(db, 'select * from rm_transaction_overview')
-  assert.deepEqual([o.transactions, o.withheld_unauthorized], [0, 4]); assert.ok(!o.display_authorized_categories.includes('RETROSHEET') && !o.display_authorized_categories.includes('MLB'), 'only openly licensed groups before any grant')
+  // The count of withheld transactions must not disclose how many HELD transactions exist (032): the three that cite the unreleased Retrosheet source (the Retrosheet-only trade, the
+  // mixed trade, the corroborated trade) are left out of it, and the MLB-only trade, which was never held by a release, is still counted as withheld for want of a grant.
+  assert.equal((await h.one(db, 'select count(*)::int n from transactions')).n, 4, 'four transactions exist')
+  const citing = (await rm("select distinct ts.transaction_id::text id from transaction_sources ts join sources s on s.id = ts.source_id where s.attribution_category = 'RETROSHEET' order by 1")).map((x) => Number(x.id)).sort((a, b) => a - b)
+  assert.deepEqual(citing, [txRetro, txMixed, txVerified].sort((a, b) => a - b), 'exactly those three cite the held source')
+  assert.deepEqual([o.transactions, o.withheld_unauthorized], [0, 1], 'HELD: 4 transactions, 3 held and not counted, 1 MLB-only withheld')
+  assert.equal((await h.one(db, 'select withheld_unauthorized w from rm_transaction_refreshes order by generation_id desc limit 1')).w, 1, 'the refresh log says the same')
+  assert.ok(!o.display_authorized_categories.includes('RETROSHEET') && !o.display_authorized_categories.includes('MLB'), 'only openly licensed groups before any grant')
   for (const t of ['rm_transaction_assets', 'rm_transaction_sources', 'rm_transaction_players', 'rm_transaction_returns', 'rm_transaction_coverage']) assert.equal((await h.one(db, `select count(*)::int n from ${t}`)).n, 0, t)
 })
 
 test('the grants table accepts the RETROSHEET category, and a person\'s grant (not code) opens display for exactly that source group', async () => {
   await db.query("insert into ingest.source_publication_grants (attribution_category, basis_reference, scope_note) values ('RETROSHEET', 'fixture: a person recorded the basis', 'fixture scope')")
+  await h.releaseRetrosheet(db)
   await refresh()
   const t = await rm('select transaction_id, status, category, source_categories, attribution_required from rm_transactions order by transaction_id')
   assert.deepEqual(t.map((x) => Number(x.transaction_id)), [txRetro, txVerified], 'the MLB-sourced trade and the mixed trade stay withheld')
@@ -65,6 +73,19 @@ test('the grants table accepts the RETROSHEET category, and a person\'s grant (n
   const o = await h.one(db, 'select * from rm_transaction_overview')
   assert.deepEqual([o.transactions, o.withheld_unauthorized, o.verified_complete], [2, 2, 0]); assert.ok(o.display_authorized_categories.includes('RETROSHEET') && !o.display_authorized_categories.includes('MLB'))
   assert.equal((await h.one(db, 'select count(*)::int n from rm_transactions where transaction_id = any ($1)', [[txMixed, txMlb]])).n, 0)
+  assert.equal((await h.one(db, 'select withheld_unauthorized w from rm_transaction_refreshes order by generation_id desc limit 1')).w, 2, 'RELEASED: the MLB-only trade and the mixed trade (its MLB source has no grant) are withheld; the two Retrosheet trades are shown')
+})
+
+test('WITHDRAWN: deleting the release hides the Retrosheet transactions again at the commit, with no refresh, and the withheld count returns to what HELD says', async () => {
+  await h.withdrawRetrosheet(db)    // no refresh follows
+  assert.equal((await h.one(db, 'select count(*)::int n from rm_transactions')).n, 0)
+  assert.equal((await h.one(db, 'select count(*)::int n from rm_transaction_overview')).n, 0, 'the withdrawal removes the cached overview, so no stale count (of shown or of withheld trades) can be read')
+  await refresh()
+  const o = await h.one(db, 'select * from rm_transaction_overview')
+  assert.deepEqual([o.transactions, o.withheld_unauthorized, o.verified_complete], [0, 1, 0], 'and the next refresh counts only the MLB-only trade as withheld, as HELD does')
+  for (const t of ['rm_transaction_assets', 'rm_transaction_sources', 'rm_transaction_players', 'rm_transaction_returns', 'rm_transaction_coverage']) assert.equal((await h.one(db, `select count(*)::int n from ${t}`)).n, 0, t)
+  await h.releaseRetrosheet(db); await refresh()
+  assert.deepEqual((await rm('select transaction_id from rm_transactions order by transaction_id')).map((x) => Number(x.transaction_id)), [txRetro, txVerified], 'released again: the same two are shown')
 })
 
 test('three separate states: licensed for display is not verified, and verified is not a complete census', async () => {
@@ -96,8 +117,9 @@ test('three separate states: licensed for display is not verified, and verified 
 test('a club-season COMPLETE_CENSUS is a separate fact from every transaction status', async () => {
   const org = (await h.one(db, "select id from organizations where franchise_key = 'LAD'")).id
   const src = (await h.one(db, "select id from sources where source_key = $1", [RETRO.source_key])).id
+  await h.withdrawRetrosheet(db)   // a coverage row citing a released source is written with the release withdrawn, then the source is released again
   await db.query("insert into coverage_assessments (domain, scope_key, organization_id, coverage_state, tracked_count, expected_count, source_id, assessed_on) values ('TRANSACTIONS', '2030', $1, 'COMPLETE_CENSUS', 1, 1, $2, current_date)", [org, src])
-  await refresh()
+  await h.releaseRetrosheet(db); await refresh()
   const cs = await rm("select club_key, coverage_state, expected_count from rm_transaction_club_seasons where season = 2030 order by club_key")
   assert.deepEqual(cs.find((x) => x.club_key === 'LAD'), { club_key: 'LAD', coverage_state: 'COMPLETE_CENSUS', expected_count: 1 })
   assert.ok(cs.filter((x) => x.club_key !== 'LAD').every((x) => x.coverage_state === 'NOT_ASSESSED'))
@@ -116,8 +138,9 @@ test('assets, unknowns, sources and later movement are shown as the database kno
   const s = await rm('select title, attribution_category, role, independence_group from rm_transaction_sources where transaction_id = $1 order by position', [txRetro])
   assert.ok(s.every((x) => x.attribution_category === 'RETROSHEET'))
   // a later transaction of the same player is established by the ledger itself
+  await h.withdrawRetrosheet(db)   // a batch citing a released source is applied only with the release withdrawn; it is recorded again below
   const later = await trade('r2', '2030-09-01', [RETRO], [pk('SEA', 'NYY', [pl(2)], [RETRO.source_key]), pk('NYY', 'SEA', [pl(9)], [RETRO.source_key])], 'RM-5', [rg(RETRO.source_key)])
-  await refresh()
+  await h.releaseRetrosheet(db); await refresh()
   const f = await rm('select later_transaction_id, step, later_club_keys from rm_transaction_followups where transaction_id = $1 and later_transaction_id = $2', [txRetro, later])
   assert.deepEqual(f.map((x) => [Number(x.later_transaction_id), x.step, x.later_club_keys]), [[later, 1, ['NYY', 'SEA']]])
 })

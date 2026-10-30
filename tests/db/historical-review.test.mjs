@@ -39,6 +39,7 @@ test('attribution: each source is grouped by origin; the public summary and expl
   // The 2019 draft comes from the reference calendar (015).
   await db.query(`insert into draft_rounds (draft_id, round_code, round_order, phase) select id, '1', 10, 'REGULAR' from drafts where draft_key = '2019-JUNE_AMATEUR' on conflict do nothing`)
   await db.query(`insert into players (slug, full_name, display_name) values ('fixture-attribution', 'Fixture Attribution', 'Fixture Attribution')`)
+  await h.nameObservation(db, 'fixture-attribution', 'fx:mlb-api')
   const sel = await h.one(db, `insert into draft_selections (draft_id, round_id, overall_pick, round_pick, organization_id, player_id, source_id)
     select d.id, r.id, 1, 1, (select id from organizations where franchise_key = 'KC'), (select id from players where slug = 'fixture-attribution'), (select id from sources where source_key = 'fx:mlb-api')
     from drafts d join draft_rounds r on r.draft_id = d.id and r.round_code = '1' where d.draft_key = '2019-JUNE_AMATEUR' returning id`)
@@ -56,7 +57,7 @@ test('attribution: each source is grouped by origin; the public summary and expl
 
 // Internal until the transaction detail view (docs/transactions/phase16-foundation.md): the public summary cannot read them, so it does not count them yet.
 // 030 closed `transactions` to the public roles: the summary counts the transactions the read model publishes (rm_transaction_sources) instead.
-const EXCLUDED = ['coverage_assessments', 'fact_resolutions', 'ptbnl_resolutions', 'season_calendar_events', 'transaction_external_ids', 'transaction_sources', 'transactions']
+const EXCLUDED = ['coverage_assessments', 'source_display_releases', 'fact_resolutions', 'ptbnl_resolutions', 'season_calendar_events', 'transaction_external_ids', 'transaction_sources', 'transactions']
 test('attribution summary covers every public table that cites a source', async () => {
   const def = (await h.one(db, `select pg_get_viewdef('public.v_source_attribution'::regclass) as d`)).d
   const tables = (await h.rows(db, `select c.table_name from information_schema.columns c join information_schema.tables t using (table_schema, table_name)

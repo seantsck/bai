@@ -111,6 +111,33 @@ export async function runSecurityAudit (rawDb, { readOnly = false, localDb = fal
     if (r.u && r.s !== 'public') fail(`${r.role} has USAGE on private schema ${r.s}`)
   }
 
+  // ---- The Data API pre-request guard (032). The one schema outside public and the private schemas that the public roles may use, and only for the one function that refuses
+  // planner-based counts. The audit fails when it is present but anything about it is off, or (where an authenticator role exists) when PostgREST is not told to run it.
+  const guardSchema = (await q(db, "select to_regnamespace('bai_guard') is not null ok"))[0].ok
+  if (guardSchema) {
+    const gf = await q(db, `select p.oid::regprocedure::text sig, p.proname, p.prosecdef secdef, p.proconfig cfg,
+        has_function_privilege('anon', p.oid, 'EXECUTE') anon_x, has_function_privilege('authenticated', p.oid, 'EXECUTE') auth_x,
+        exists (select 1 from aclexplode(coalesce(p.proacl, acldefault('f', p.proowner))) a where a.grantee = 0 and a.privilege_type = 'EXECUTE') public_x
+      from pg_proc p where p.pronamespace = 'bai_guard'::regnamespace`)
+    if (gf.length !== 1 || gf[0].proname !== 'reject_planner_counts') fail(`schema bai_guard must hold exactly bai_guard.reject_planner_counts(), found ${gf.map((f) => f.sig).join(', ') || 'nothing'}`)
+    for (const f of gf) {
+      if (f.secdef) fail(`${f.sig} must not be SECURITY DEFINER`)
+      if (f.public_x) fail(`${f.sig} is executable by PUBLIC`)
+      if (!f.anon_x || !f.auth_x) fail(`${f.sig} must be executable by anon and authenticated, or every Data API request fails`)
+      if (!(f.cfg ?? []).some((c) => c.startsWith('search_path='))) fail(`${f.sig} does not pin search_path`)
+    }
+    for (const r of await q(db, `select r.rolname role, has_schema_privilege(r.oid, 'bai_guard', 'USAGE') u, has_schema_privilege(r.oid, 'bai_guard', 'CREATE') c from pg_roles r where r.rolname = any($1)`, [PUBLIC_ROLES])) {
+      if (r.c) fail(`${r.role} can CREATE in schema bai_guard`)
+      if (!r.u) fail(`${r.role} lacks USAGE on bai_guard, so the pre-request guard would fail every request`)
+    }
+    if (exposed.includes('bai_guard')) fail('schema bai_guard is exposed through the Data API')
+    if (auth) {
+      const set = auth.rolconfig?.find((c) => c.startsWith('pgrst.db_pre_request='))
+      if (set !== 'pgrst.db_pre_request=bai_guard.reject_planner_counts') fail(`authenticator does not run the count guard (pgrst.db_pre_request is ${set ? set.split('=')[1] : 'not set'}); planner-based counts would reach the Data API`)
+      else notes.push('Data API pre-request guard bai_guard.reject_planner_counts is configured on authenticator')
+    } else notes.push('Data API pre-request guard exists (plain PostgreSQL: no authenticator role to configure)')
+  }
+
   // ---- RLS policies: read-only, for public roles only
   for (const r of await q(db, "select schemaname s, tablename t, policyname p, cmd, roles::text[] roles from pg_policies where schemaname = any($1)", [['public', ...PRIVATE_SCHEMAS]])) {
     if (r.cmd !== 'SELECT') fail(`policy ${r.s}.${r.t}.${r.p} allows ${r.cmd}`)

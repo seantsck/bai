@@ -23,6 +23,9 @@ try {
     console.log(d, f, JSON.stringify(r.report.actions), `${((Date.now() - t0) / 1000).toFixed(0)}s`)
   }
   await db.query("insert into ingest.source_publication_grants (attribution_category, basis_reference, scope_note) values ('RETROSHEET', 'load test in a disposable database only', 'never on hosted')")
+  await db.query(`insert into public.source_display_releases (source_id, attribution_category, approved_batch_sha256, basis_reference)
+    select s.id, 'RETROSHEET', (select array_agg(distinct b.file_sha256) from ingest.import_batches b join ingest.staged_sources ss on ss.batch_id = b.id where ss.source_key = s.source_key and b.status = 'APPLIED'), 'load test in a disposable database only'
+    from public.sources s where s.attribution_category = 'RETROSHEET'`)
   await db.query('analyze')
   const t0 = Date.now()
   await db.query('select public.refresh_transaction_read_models()')

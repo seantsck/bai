@@ -21,6 +21,10 @@ insert into players (slug, full_name, display_name, birth_date, birth_date_preci
   ('fixture-two-time-draftee', 'Fixture Two-Time Draftee', 'Fixture Two-Time Draftee', date '2000-01-15', 'DAY', 'USA', 'OF'),
   ('fixture-trade-return', 'Fixture Trade Return', 'Fixture Trade Return', date '1997-09-09', 'DAY', 'USA', 'C');
 
+-- A player is public only with a visible name observation (032).
+insert into source_observations (source_id, subject_table, subject_id, field_name, observed_value)
+select (select id from sources where source_key = 'fixture:foundation'), 'players', p.id, 'full_name', to_jsonb(p.full_name) from players p where p.slug like 'fixture-%';
+
 insert into player_aliases (player_id, alias, alias_type, source_id)
 select id, 'Fixture A. Signee', 'NAME_ORDER_VARIANT', (select id from sources where source_key = 'fixture:foundation')
 from players where slug = 'fixture-amateur-signee';

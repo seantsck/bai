@@ -84,3 +84,16 @@ export async function rejects (db, sql, params, re) {
 }
 
 export const id = async (db, sql, params) => Number((await one(db, sql, params)).id)
+
+/** Records the display release (032) of every RETROSHEET source on this database, approving exactly the batches applied from it. Fixture use only. */
+export const releaseRetrosheet = (db) => db.query(`insert into public.source_display_releases (source_id, attribution_category, approved_batch_sha256, basis_reference)
+  select s.id, 'RETROSHEET', (select array_agg(distinct b.file_sha256) from ingest.import_batches b join ingest.staged_sources ss on ss.batch_id = b.id where ss.source_key = s.source_key and b.status = 'APPLIED'), 'fixture release'
+  from public.sources s where s.attribution_category = 'RETROSHEET' and not exists (select 1 from public.source_display_releases r where r.source_id = s.id)
+    and exists (select 1 from ingest.import_batches b join ingest.staged_sources ss on ss.batch_id = b.id where ss.source_key = s.source_key and b.status = 'APPLIED')`)
+
+/** Withdraws every display release (032). A batch citing a released source can only be applied with the release withdrawn; record it again afterwards. Fixture use only. */
+export const withdrawRetrosheet = (db) => db.query('delete from public.source_display_releases')
+
+/** A fixture player's name observation: a player is public only with a visible one (032). */
+export const nameObservation = (db, slug, sourceKey) => db.query(`insert into source_observations (source_id, subject_table, subject_id, field_name, observed_value)
+  select (select id from sources where source_key = $2), 'players', p.id, 'full_name', to_jsonb(p.full_name) from players p where p.slug = $1 on conflict do nothing`, [slug, sourceKey])
