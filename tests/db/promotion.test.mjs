@@ -2,6 +2,7 @@
 // the verbatim statement is in the source metadata, the emergency procedure). One disposable cluster; a small fictional sample stands in for the hosted database and the six pinned batches.
 import { test, before, after } from 'node:test'
 import assert from 'node:assert/strict'
+import crypto from 'node:crypto'
 import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
@@ -80,6 +81,16 @@ test('032 on the baseline: the site role reads the transaction read models; anon
   const broken = diffKeys(W0, W1a); assert.ok(broken.length > 0 && broken.every((k) => /^getTransaction/.test(k) && String(W1a[k]).startsWith('ERR')), `the old role cannot read the transaction pages: ${broken}`)
   const dep = await rows(main, `select distinct v.relname from pg_depend d join pg_rewrite r on r.oid = d.objid join pg_class v on v.oid = r.ev_class join pg_class t on t.oid = d.refobjid where d.classid = 'pg_rewrite'::regclass and t.relname like 'rm\\_transaction%' and v.relkind = 'v'`)
   assert.deepEqual(dep.map((r) => r.relname), ['v_transaction_record_sources'], 'no other public view depends on the closed tables')
+})
+
+test('the fingerprint is independent of the database collation: it equals a byte-order recomputation outside the database', async () => {
+  for (const t of ['public.players', 'public.sources', 'ingest.import_batches']) {
+    const hs = (await rows(main, `select md5(x::text) h from ${t} x`)).map((r) => r.h).sort()   // code-unit order = the "C" collation for hex digits
+    const fp = (await rows(main, 'select ingest.promotion_fingerprint($1) f', [t]))[0].f
+    assert.equal(fp.md5, crypto.createHash('md5').update(hs.join('')).digest('hex'), t); assert.equal(fp.n, hs.length)
+  }
+  const scope = (await rows(main, 'select unnest(ingest.promotion_scope()) t')).map((r) => r.t)
+  assert.deepEqual(scope, [...scope].sort(), 'the scope list is in byte order as well')
 })
 
 test('the site role is a read-only member of anon: no login, no bypass, no write, nothing private; bai_web can only SET ROLE to it', async () => {
@@ -306,7 +317,7 @@ test('EMERGENCY (close the endpoints): the stricter mode closes the readable tab
 
 test('the command line is local-only: a hosted URL and --hosted are refused, a package verifies offline', () => {
   const run = (args, env) => spawnSync(process.execPath, ['scripts/db/promotion.mjs', ...args], { cwd: root, encoding: 'utf8', env: { PATH: process.env.PATH, HOME: os.homedir(), ...env } })
-  const hosted = run(['status', '--manifest', 'a'.repeat(64)], { BAI_DATABASE_URL: 'postgresql://postgres:x@db.abcdefghijklmnopqrst.supabase.co:5432/postgres' })
+  const hosted = run(['status', '--manifest', 'a'.repeat(64)], { BAI_DATABASE_URL: 'postgresql://postgres@db.abcdefghijklmnopqrst.supabase.co:5432/postgres' })
   assert.equal(hosted.status, 2); assert.match(hosted.stderr, /refusing non-local database host/, 'the connection layer refuses a remote host first')
   const forced = run(['status', '--manifest', 'a'.repeat(64)], { BAI_SUPABASE_PROJECT_REF: 'abcdefghijklmnopqrst', BAI_SUPABASE_DB_PASSWORD: 'not-a-real-password', BAI_ALLOW_REMOTE_DB: '1' })
   assert.equal(forced.status, 2); assert.match(forced.stderr, /NOT AUTHORIZED/, 'and even with the remote override this build refuses a hosted promotion')

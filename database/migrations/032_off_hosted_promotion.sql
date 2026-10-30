@@ -77,14 +77,14 @@ $$;
 
 -- The tables whose content must be identical to the staged baseline: every base table of the three data schemas except the promotion records and the refresh caches.
 create function ingest.promotion_scope() returns text[] language sql stable set search_path = pg_catalog as $$
-  select coalesce(array_agg(n.nspname || '.' || c.relname order by n.nspname, c.relname), '{}')
+  select coalesce(array_agg(n.nspname || '.' || c.relname order by n.nspname collate "C", c.relname collate "C"), '{}')
   from pg_class c join pg_namespace n on n.oid = c.relnamespace
   where c.relkind in ('r', 'p') and n.nspname in ('public', 'ingest', 'research')
     and not (n.nspname = 'ingest' and c.relname like 'promotion\_%')
     and not (n.nspname = 'public' and (c.relname like 'rm\_%' or c.relname = 'read_model_refreshes'))
 $$;
 
--- Row-content fingerprint, independent of session settings, physical order and the server it runs on (a local restore and the hosted database give the same value for the same rows).
+-- Row-content fingerprint, independent of session settings, physical order, collation and the server it runs on (a local restore and the hosted database give the same value for the same rows).
 create function ingest.promotion_fingerprint(p_table text) returns jsonb
 language plpgsql stable
 set search_path = pg_catalog, public, ingest
@@ -92,7 +92,7 @@ set timezone = 'UTC' set datestyle = 'ISO, YMD' set extra_float_digits = 1 set b
 as $$
 declare r record;
 begin
-  execute format('select count(*)::bigint as n, md5(coalesce(string_agg(h, '''' order by h), '''')) as d from (select md5(t::text) as h from %s t) s', p_table::regclass) into r;
+  execute format('select count(*)::bigint as n, md5(coalesce(string_agg(h, '''' order by h collate "C"), '''')) as d from (select md5(t::text) as h from %s t) s', p_table::regclass) into r;
   return jsonb_build_object('n', r.n, 'md5', r.d);
 end $$;
 
@@ -146,7 +146,7 @@ begin
 
   -- no concurrent writer: every table in scope is locked against writes (readers are not blocked) before anything is compared
   v_scope := ingest.promotion_scope();
-  if (select array_agg(x order by x) from jsonb_array_elements_text(m #> '{baseline,scope}') x) is distinct from v_scope then raise exception 'DRIFT: the set of tables differs from the manifest'; end if;
+  if (select array_agg(x order by x collate "C") from jsonb_array_elements_text(m #> '{baseline,scope}') x) is distinct from (select array_agg(x order by x collate "C") from unnest(v_scope) x) then raise exception 'DRIFT: the set of tables differs from the manifest'; end if;
   perform set_config('lock_timeout', '15s', true);
   execute 'lock table ' || (select string_agg(x::regclass::text, ', ') from unnest(v_scope) x) || ' in share row exclusive mode';
   foreach t in array v_scope loop
@@ -226,8 +226,8 @@ begin
     want := coalesce(m #> array['after', t], m #> array['baseline', 'fingerprints', t]);
     if fp is distinct from want then raise exception 'PROMOTION_REFUSED: % does not match the staged state after loading (now %, staged %)', t, fp, want; end if;
   end loop;
-  select array_agg(b.file_sha256 order by b.file_sha256) into v_batches from ingest.import_batches b where b.id in (select (pk ->> 'id')::bigint from _promo_pk where table_name = 'ingest.import_batches');
-  select array_agg(x ->> 'sha256' order by x ->> 'sha256') into v_want from jsonb_array_elements(m -> 'batches') x;
+  select array_agg(b.file_sha256 order by b.file_sha256 collate "C") into v_batches from ingest.import_batches b where b.id in (select (pk ->> 'id')::bigint from _promo_pk where table_name = 'ingest.import_batches');
+  select array_agg(x ->> 'sha256' order by (x ->> 'sha256') collate "C") into v_want from jsonb_array_elements(m -> 'batches') x;
   if v_batches is distinct from v_want then raise exception 'PROMOTION_REFUSED: the promoted batches are not exactly the manifest''s batches'; end if;
   -- the attribution statement, verbatim, is in the metadata of every source of the category that this promotion adds
   select statement into v_stmt from public.source_attribution_statements where attribution_category = m ->> 'category';
