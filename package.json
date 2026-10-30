@@ -25,6 +25,7 @@
     "db:parity": "node --env-file-if-exists=.env.local scripts/db/parity.mjs",
     "db:provenance": "node --env-file-if-exists=.env.local scripts/db/provenance-report.mjs",
     "db:security": "node --env-file-if-exists=.env.local scripts/db/security.mjs",
+    "db:promotion": "node --env-file-if-exists=.env.local scripts/db/promotion.mjs",
     "scan:credentials": "node scripts/ci/credential-scan.mjs",
     "research:import": "node --env-file-if-exists=.env.local scripts/research/cli.mjs import",
     "research:validate": "node --env-file-if-exists=.env.local scripts/research/cli.mjs validate",

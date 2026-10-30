@@ -48,7 +48,7 @@ async function startBlocked (client, sql, params) {
   return { p, state, onLock: waits.n === 1 }
 }
 const published = async (role) => h.asRole(db, role, async () => (await h.one(db, "select count(*)::int n, count(*) filter (where status = 'VERIFIED_COMPLETE')::int v from rm_transactions")))
-const nothingPublished = async () => { for (const role of ['anon', 'authenticated']) assert.deepEqual(await published(role), { n: 0, v: 0 }, role) }
+const nothingPublished = async () => { for (const role of ['bai_site']) assert.deepEqual(await published(role), { n: 0, v: 0 }, role) }
 const rejectedWith = async (promise, code) => { try { await promise; assert.fail('expected a refusal') } catch (e) { assert.equal(e.code, code, e.message) } }
 let tRetro, tVer
 
@@ -93,7 +93,7 @@ test('grant withdrawal, refresh FIRST: the withdrawal waits for the refresh to c
 test('grant withdrawal, writer FIRST: the refresh fails at once with 55P03 and publishes nothing; after the commit it publishes none of the withdrawn rows', async () => {
   await db.query(GRANT); await db.query(REFRESH)
   await W.query('begin'); await W.query("delete from ingest.source_publication_grants where attribution_category = 'RETROSHEET'")   // uncommitted
-  assert.ok((await published('anon')).n >= 2, 'while the withdrawal is uncommitted, the committed grant still stands')
+  assert.ok((await published('bai_site')).n >= 2, 'while the withdrawal is uncommitted, the committed grant still stands')
   await R.query('begin')
   const t0 = Date.now()
   await rejectedWith(R.query(REFRESH), '55P03')
@@ -107,7 +107,7 @@ test('grant withdrawal, writer FIRST: the refresh fails at once with 55P03 and p
   await db.query(GRANT)
   await W.query('begin'); await W.query("delete from ingest.source_publication_grants where attribution_category = 'RETROSHEET'"); await W.query('rollback')
   await db.query(REFRESH)
-  assert.ok((await published('anon')).n >= 2)
+  assert.ok((await published('bai_site')).n >= 2)
 })
 
 test('verification revocation, refresh FIRST: the revocation waits, then no VERIFIED_COMPLETE claim remains committed', async () => {
@@ -117,17 +117,17 @@ test('verification revocation, refresh FIRST: the revocation waits, then no VERI
   assert.deepEqual([w.state, w.onLock], ['waiting', true])
   await R.query('commit')
   assert.deepEqual(await w.p, { ok: true })
-  for (const role of ['anon', 'authenticated']) assert.equal((await published(role)).v, 0, `${role}: no obsolete VERIFIED_COMPLETE`)
-  assert.equal(await h.asRole(db, 'anon', async () => (await h.one(db, 'select count(*)::int n from rm_transactions where transaction_id = $1', [tVer])).n), 0)
+  for (const role of ['bai_site']) assert.equal((await published(role)).v, 0, `${role}: no obsolete VERIFIED_COMPLETE`)
+  assert.equal(await h.asRole(db, 'bai_site', async () => (await h.one(db, 'select count(*)::int n from rm_transactions where transaction_id = $1', [tVer])).n), 0)
 })
 
 test('verification revocation, writer FIRST: the refresh fails at once; after the commit it publishes the transaction as what it now is', async () => {
   await publishVerified()
   await rv.query('begin'); await rv.query('select * from research.revoke_transaction_verification($1, $2)', [tVer, 'revoked first'])
   await R.query('begin'); await rejectedWith(R.query(REFRESH), '55P03'); await R.query('rollback')
-  assert.equal((await published('anon')).v, 1, 'uncommitted revocation: the committed verification still stands')
+  assert.equal((await published('bai_site')).v, 1, 'uncommitted revocation: the committed verification still stands')
   await rv.query('commit')
-  assert.equal((await published('anon')).v, 0, 'committed revocation: the claim is gone without any refresh')
+  assert.equal((await published('bai_site')).v, 0, 'committed revocation: the claim is gone without any refresh')
   await db.query(REFRESH)
   assert.equal((await h.one(db, 'select status from rm_transactions where transaction_id = $1', [tVer])).status, 'PARTIAL')
 })
@@ -146,8 +146,8 @@ for (const [name, [sql]] of Object.entries(edits)) {
     assert.deepEqual([w.state, w.onLock], ['waiting', true], 'the edit waits for the refresh')
     await R.query('commit')
     assert.deepEqual(await w.p, { ok: true })
-    assert.equal((await published('anon')).v, 0, 'the edit withdrew the claim the refresh had just published')
-    assert.equal(await h.asRole(db, 'anon', async () => (await h.one(db, 'select count(*)::int n from rm_transactions where transaction_id = $1', [tVer])).n), 0)
+    assert.equal((await published('bai_site')).v, 0, 'the edit withdrew the claim the refresh had just published')
+    assert.equal(await h.asRole(db, 'bai_site', async () => (await h.one(db, 'select count(*)::int n from rm_transactions where transaction_id = $1', [tVer])).n), 0)
     // writer first
     await db.query('select 1')
     await W.query('begin'); await W.query(sql, [tVer])
@@ -155,7 +155,7 @@ for (const [name, [sql]] of Object.entries(edits)) {
     await W.query('commit')
     await db.query(REFRESH)
     assert.notEqual((await h.one(db, 'select status from rm_transactions where transaction_id = $1', [tVer]))?.status, 'VERIFIED_COMPLETE', 'republished only as what it is now')
-    assert.equal((await published('anon')).v, 0)
+    assert.equal((await published('bai_site')).v, 0)
   })
 }
 
@@ -189,7 +189,7 @@ test('the operational refresh retries a lock that is not available and succeeds 
   const c = await h.connect(db.database)
   const r = await refreshWithRetry(c, { attempts: 6, backoffMs: 300, log: (m) => logs.push(m) })
   assert.ok(r.attempts >= 2, `retried (${r.attempts} attempts)`); assert.ok(logs.every((m) => /55P03/.test(m) && /read model is unchanged/.test(m)))
-  assert.ok((await published('anon')).n >= 2, 'published after the writer committed')
+  assert.ok((await published('bai_site')).n >= 2, 'published after the writer committed')
   // a real failure (wrong isolation level) is raised, not retried
   await c.query('begin isolation level repeatable read')
   await assert.rejects(c.query(REFRESH), /READ COMMITTED/)

@@ -3,14 +3,15 @@ import { test, before, after } from 'node:test'
 import assert from 'node:assert/strict'
 import * as h from './harness.mjs'
 import { applyMigrations, listMigrations } from '../../scripts/db/lib/migrations.mjs'
+import { numberingProblems } from '../../scripts/db/lib/migration-numbers.mjs'
 
 before(async () => { await h.startServer() }, { timeout: 120000 })
 after(async () => { await h.stopServer() })
 
-test('migrations are numbered from 001, contiguous, LF-only and wrapped by the runner', () => {
+test('migrations are numbered from 001, contiguous apart from the reserved 031, LF-only and wrapped by the runner', () => {
   const ms = listMigrations()
   assert.equal(ms[0].version, '001')
-  ms.forEach((m, i) => assert.equal(m.version, String(i + 1).padStart(3, '0'), m.file))
+  assert.deepEqual(numberingProblems(ms.map((m) => m.version)), [])
   for (const m of ms) {
     assert.ok(!m.sql.includes('\r'), `${m.file} has CRLF`)
     assert.ok(!/^\s*(begin|commit)\s*;/im.test(m.sql), `${m.file} must not manage its own transaction`)
