@@ -78,10 +78,13 @@ test('Data API after a promotion and a refresh: the identity rows are public wit
 test('Data API in an emergency (hide): exactly the promoted rows disappear from every public table and from the attribution summary; counts are exact; nothing is deleted', { skip: SKIP }, async () => {
   const player = Number((await rows(main, "select id from players where full_name like 'Stage Player%' order by id limit 1"))[0].id)
   await main.query("insert into player_aliases (player_id, alias, alias_type, source_id) select $1, 'Unrelated Alias', 'NICKNAME', s.id from sources s where s.source_key = 'g54:base'", [player])
+  const aliasesBefore = Number((await rows(main, "select count(*) n from player_aliases where alias <> 'Unrelated Alias'"))[0].n)
   await emergencyWithdraw(main, pkg.sha, 'drill: licence withdrawn')
   for (const auth of [false, true]) assert.deepEqual(await counts(auth), baseCounts, `exact counts equal the baseline (${auth ? 'authenticated' : 'anon'})`)
   assert.deepEqual(JSON.parse((await get("v_source_attribution?select=*&attribution_category=eq.RETROSHEET", false)).body), [])
   assert.deepEqual(JSON.parse((await get("sources?select=id&attribution_category=eq.RETROSHEET", false)).body), [])
+  // G5-5C: the alias is not part of the promotion but names a hidden player by id; it is hidden too (not deleted), by REST as well
+  for (const auth of [false, true]) { assert.deepEqual(JSON.parse((await get('player_aliases?select=*&alias=eq.Unrelated%20Alias', auth)).body), [], 'the alias of a hidden player is hidden'); assert.equal((await get('player_aliases?select=id&limit=1', auth)).total, String(aliasesBefore), 'the other aliases are public') }
   assert.equal(JSON.parse((await get("players?select=id&full_name=like.Stage*", false)).body).length, 0, 'a filter on the hidden rows finds nothing')
   for (const t of RM12) assert.ok([401, 403].includes((await get(`${t}?select=*&limit=1`, false)).status))
   assert.equal((await rows(main, "select count(*)::int n from players where full_name like 'Stage Player%'"))[0].n, 4, 'still physically present, owner-visible only')
@@ -97,10 +100,25 @@ test('Data API in an emergency (closed): the stricter mode answers 401/403 on ev
   const pkg2 = await buildPackage({ connect: open, admin, baseName: MAIN, stageName: 'g54r_stage', config: { category: 'RETROSHEET', authorization: { effective_from: '2026-10-30', expires_on: '2027-01-22' },
     attribution: { evidence_sha256: sha256('fixture evidence'), verified_at: new Date().toISOString(), max_age_hours: 72 }, archive: { name: 'fixture', sha256: sha256('a') }, expectBatches: batches } })
   assert.notEqual(pkg2.sha, pkg.sha, 'a withdrawn manifest is never reused: this is a new manifest from the same sample'); assert.equal((await promote({ connect: open, name: MAIN, pkg: pkg2 })).result, 'PROMOTED')
-  await emergencyWithdraw(main, pkg2.sha, 'drill: close the endpoints', { closeApi: true })
+  const readable = (await rows(main, "select c.relname r from pg_class c where c.relnamespace = 'public'::regnamespace and c.relkind in ('r', 'v') and c.relname !~ '^rm_transaction' and has_table_privilege('anon', c.oid, 'SELECT') order by 1")).map((x) => x.r)
+  const p2 = Number((await rows(main, "select id from players where full_name like 'Stage Player%' order by id limit 1"))[0].id)
+  await main.query("insert into player_aliases (player_id, alias, alias_type, source_id) select $1, 'Unrelated Alias', 'NICKNAME', s.id from sources s where s.source_key = 'g54:base'", [p2])
+  const e2 = await emergencyWithdraw(main, pkg2.sha, 'drill: close the endpoints', { closeApi: true }); assert.ok(e2.closed.some((x) => x.table === 'public.player_aliases' && x.indirect), 'the table holding the indirect reference is closed')
   for (const t of PUBLIC5) for (const auth of [false, true]) assert.ok([401, 403].includes((await get(`${t}?select=id&limit=1`, auth, 'count=planned')).status), `${t} is closed (${auth ? 'authenticated' : 'anon'})`)
+  // G5-5C: EVERY relation the Data API offered (tables and views) either answers 401/403 for exact, planned and estimated counts, or shows no promoted or indirect identity
+  const leaks = []; let closedRels = 0
+  for (const rel of readable) for (const auth of [false, true]) for (const mode of ['exact', 'planned', 'estimated']) {
+    const r = await get(`${rel}?select=*&limit=1000`, auth, `count=${mode}`)
+    if ([401, 403].includes(r.status)) { if (mode === 'exact' && !auth) closedRels++; continue }
+    if (/Stage Player|g54p[0-9]|Unrelated Alias|hist:retrosheet-g54/.test(r.body)) leaks.push(`${rel} ${mode} ${auth}`)
+  }
+  assert.deepEqual(leaks, [], 'no relation reveals a promoted or indirect identity while the endpoints are closed'); assert.ok(closedRels >= 9, `${closedRels} relations closed (the five tables, the indirect table, and the views over them)`)
+  assert.ok([401, 403].includes((await get('player_aliases?select=id&limit=1', false, 'count=estimated')).status))
+  await main.query("delete from player_aliases where alias = 'Unrelated Alias'")
   assert.ok([200, 206].includes((await get('organizations?select=id&limit=1', false)).status), 'unrelated public tables still answer')
   await finishWithdrawal(main, pkg2.sha, 'done')
   await main.query('insert into ingest.source_publication_grants select * from jsonb_populate_record(null::ingest.source_publication_grants, $1::jsonb)', [JSON.stringify(GRANT_ROW)])
   assert.deepEqual(await counts(false), baseCounts, 'reopened and back to the baseline')
+  // G5-5C: the endpoints reopen at the commit of the finish, whose ANALYZE ran in that transaction: even the planner's estimates are the withdrawn state from the first request
+  for (const t of PUBLIC5) for (const mode of ['planned', 'estimated']) assert.ok(Number((await get(`${t}?select=id&limit=1`, false, `count=${mode}`)).total) <= Number(baseCounts[t]) + 1, `${t} ${mode} after the finish`)
 })

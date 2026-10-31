@@ -225,8 +225,25 @@ export async function promote ({ connect, name, pkg, hooks = {}, attempts = 3 })
   throw new Error(`gave up after ${attempts} attempts: ${log.join(' | ')}`)
 }
 
-export const withdraw = async (c, sha, reason, { withdrawGrant = false } = {}) => (await q(c, 'select ingest.withdraw_promotion($1, $2, $3) r', [sha, reason, withdrawGrant]))[0].r
+// A withdrawal ANALYZEs inside its own transaction (ingest.promotion_analyze). reltuples is updated in place, so a withdrawal that then fails would leave count=planned too LOW until the
+// next ANALYZE; every call that can roll back repairs that straight away (best effort: a lost connection is reported by the caller's error, and `promotion.mjs analyze` repeats it).
+export const analyzeStatistics = async (c, sha) => (await q(c, 'select ingest.promotion_analyze($1) r', [sha]))[0].r
+const repairing = async (c, sha, f) => { try { return await f() } catch (e) { await analyzeStatistics(c, sha).catch(() => {}); throw e } }
+/**
+ * After a committed withdrawal (outside any transaction, VACUUM cannot run in one): vacuum and analyze the tables the promotion touched and the read-model tables. The withdrawal leaves
+ * them full of dead rows with statistics taken over the bloated heap; measured (G5-5C, 33,000 rows): the next transaction refresh took 3.4 s on those statistics and 0.4 s after this
+ * step. Best effort: a failure here changes no data and is reported in the result.
+ */
+export async function vacuumAfterWithdrawal (c, sha) {
+  try {
+    const tabs = (await q(c, `select table_name t from ingest.promotion_ledger where manifest_sha256 = $1
+      union select 'public.' || quote_ident(relname) from pg_class where relnamespace = 'public'::regnamespace and relkind = 'r' and relname like 'rm\_%' order by 1`, [sha])).map((r) => r.t)
+    await c.query(`vacuum (analyze) ${tabs.join(', ')}`); return { vacuumed: tabs.length }
+  } catch (e) { return { error: `vacuum failed (no data changed; run VACUUM (ANALYZE) on the promoted tables and the rm_* tables): ${e.message}` } }
+}
+const withMaintenance = async (c, sha, r) => ({ ...r, maintenance: await vacuumAfterWithdrawal(c, sha) })
+export const withdraw = async (c, sha, reason, { withdrawGrant = false } = {}) => withMaintenance(c, sha, await repairing(c, sha, async () => (await q(c, 'select ingest.withdraw_promotion($1, $2, $3) r', [sha, reason, withdrawGrant]))[0].r))
 export const emergencyWithdraw = async (c, sha, reason, { closeApi = false } = {}) => (await q(c, 'select ingest.emergency_withdraw($1, $2, $3) r', [sha, reason, closeApi]))[0].r
-export const finishWithdrawal = async (c, sha, reason) => (await q(c, 'select ingest.finish_withdrawal($1, $2) r', [sha, reason]))[0].r
+export const finishWithdrawal = async (c, sha, reason) => withMaintenance(c, sha, await repairing(c, sha, async () => (await q(c, 'select ingest.finish_withdrawal($1, $2) r', [sha, reason]))[0].r))
 export const revertEmergency = async (c, sha, reason) => (await q(c, 'select ingest.revert_emergency($1, $2) r', [sha, reason]))[0].r
 export const dependents = async (c, sha) => (await q(c, 'select ingest.promotion_dependents($1) r', [sha]))[0].r

@@ -6,7 +6,7 @@
 -- database. The six batches are imported and validated OFF-HOSTED, from a restored baseline backup; what is reviewed is an insert-only DELTA, described by an immutable MANIFEST; and the delta is
 -- PROMOTED into the hosted database in one transaction, by the owner, after the baseline has been proven identical. Withdrawal deletes exactly the promoted rows (the LEDGER), in one transaction.
 --
--- This migration changes no existing table, row, policy or function. It adds:
+-- This migration changes no existing table or row. It adds (and, in section 6, replaces two 030 functions and adds three indexes; see there):
 --   1. the promotion records (manifest, ledger, events, withheld evidence), all append-only, all private to the owner (the ingest schema is not exposed);
 --   2. the promotion protocol: promote_begin / promote_load / promote_withhold / promote_commit, which is ONE client transaction and commits everything or nothing;
 --   3. withdrawal: withdraw_promotion (atomic, refuses to touch anything another row depends on) and, for the case where physical deletion is blocked, an emergency procedure that
@@ -281,7 +281,9 @@ begin
        (select k.relnamespace::regnamespace::text || '.' || k.relname from pg_class k where k.oid = c.conrelid) as child,
        (select k.relnamespace::regnamespace::text || '.' || k.relname from pg_class k where k.oid = c.confrelid) as parent,
        (select string_agg('ch.' || quote_ident(a.attname), ', ' order by k.ord) from unnest(c.conkey) with ordinality k(attnum, ord) join pg_attribute a on a.attrelid = c.conrelid and a.attnum = k.attnum) as ccols,
-       (select string_agg('p.' || quote_ident(a.attname), ', ' order by k.ord) from unnest(c.confkey) with ordinality k(attnum, ord) join pg_attribute a on a.attrelid = c.confrelid and a.attnum = k.attnum) as pcols
+       (select string_agg('p.' || quote_ident(a.attname), ', ' order by k.ord) from unnest(c.confkey) with ordinality k(attnum, ord) join pg_attribute a on a.attrelid = c.confrelid and a.attnum = k.attnum) as pcols,
+       (select array_agg(a.attname::text order by k.ord) from unnest(c.conkey) with ordinality k(attnum, ord) join pg_attribute a on a.attrelid = c.conrelid and a.attnum = k.attnum) as cnames,
+       (select array_agg(a.attname::text order by k.ord) from unnest(c.confkey) with ordinality k(attnum, ord) join pg_attribute a on a.attrelid = c.confrelid and a.attnum = k.attnum) as pnames
      from pg_constraint c where c.contype = 'f') x
      where x.parent = any (v_tables) and x.child !~ '^public\.rm_' loop
     select pks into l from ingest.promotion_ledger where manifest_sha256 = p_sha and table_name = f.parent;
@@ -292,14 +294,14 @@ begin
       execute format('select count(*) from %s ch where exists (select 1 from jsonb_populate_recordset(null::%s, $1) p where (%s) = (%s)) and not exists (select 1 from jsonb_populate_recordset(null::%s, $2) cp where (%s) = (%s))',
         f.child, f.parent, f.ccols, f.pcols, f.child, v_child_pk, replace(v_child_pk, 'ch.', 'cp.')) into v_cnt using l.pks, v_child_ledger;
     end if;
-    if v_cnt > 0 then v_bad := v_bad || jsonb_build_object('table', f.child, 'references', f.parent, 'rows', v_cnt); end if;
+    if v_cnt > 0 then v_bad := v_bad || jsonb_build_object('table', f.child, 'references', f.parent, 'rows', v_cnt, 'columns', to_jsonb(f.cnames), 'parent_columns', to_jsonb(f.pnames)); end if;
   end loop;
   for f in select x.t from unnest(array['public.source_observations', 'public.fact_resolutions']) x(t) where to_regclass(x.t) is not null loop
     for l in select table_name, pks from ingest.promotion_ledger where manifest_sha256 = p_sha and table_name in ('public.players', 'public.transactions') loop
       execute format('select count(*) from %s o where o.subject_table = %L and exists (select 1 from jsonb_populate_recordset(null::%s, $1) p where p.id = o.subject_id) and not exists (select 1 from jsonb_populate_recordset(null::public.source_observations, $2) po where po.id = o.id)',
         f.t, substr(l.table_name, 8), l.table_name::regclass) into v_cnt using l.pks,
         case when f.t = 'public.source_observations' then coalesce((select pks from ingest.promotion_ledger where manifest_sha256 = p_sha and table_name = 'public.source_observations'), '[]'::jsonb) else '[]'::jsonb end;
-      if v_cnt > 0 then v_bad := v_bad || jsonb_build_object('table', f.t, 'references', l.table_name, 'rows', v_cnt, 'kind', 'by subject'); end if;
+      if v_cnt > 0 then v_bad := v_bad || jsonb_build_object('table', f.t, 'references', l.table_name, 'rows', v_cnt, 'kind', 'by subject', 'subject_table', substr(l.table_name, 8)); end if;
     end loop;
   end loop;
   return v_bad;
@@ -322,12 +324,53 @@ begin
   return v_total;
 end $$;
 
+-- Before a promotion's rows are deleted, the published read model must hold none of its transactions (withdraw_promotion and finish_withdrawal withdraw the category first). The row
+-- triggers that the deletes fire (rm_facts_changed and the like) would otherwise look for rows to withdraw once per deleted row; with the read model proven clean they are told so
+-- (bai.promotion_rm_clean), which skips that probe. Measured at full scale (G5-5C): the probe cost 0.01 ms per call on a freshly emptied table and 0.74 ms per call on one that had been
+-- emptied, analyzed and left bloated, because the planner then has no row estimate left to tell the primary key from a full index scan; 50,000 calls took 37 s of a 54 s finish.
+create function ingest.promotion_rm_assert_clean(p_sha text) returns void
+language plpgsql stable
+set search_path = pg_catalog, public, ingest
+as $$
+declare v_left bigint;
+begin
+  select count(*) into v_left from ingest.promotion_ledger l, jsonb_to_recordset(l.pks) as x(id bigint), public.rm_transactions r
+   where l.manifest_sha256 = p_sha and l.table_name = 'public.transactions' and r.transaction_id = x.id;
+  if v_left > 0 then raise exception 'WITHDRAWAL_REFUSED: % promoted transactions are still in the published read model; nothing was changed', v_left; end if;
+end $$;
+
+-- PLANNER STATISTICS. PostgREST answers Prefer: count=planned and count=estimated from the planner's estimate (pg_class.reltuples and the column statistics), and a DELETE leaves those
+-- at the pre-withdrawal size until ANALYZE: right after a withdrawal a client could read how many rows were withdrawn. So the withdrawal analyzes every table it changed (and the cached
+-- summaries that count them) IN ITS OWN TRANSACTION, last, and refuses (rolls back) if an estimate still overstates the live row count. Measured against a real PostgREST (G5-5C):
+-- the column statistics become visible at COMMIT with the deletes; reltuples is updated in place, so count=planned shows the new, SMALLER size slightly before the commit and, after a
+-- rolled-back withdrawal, keeps showing it until the next ANALYZE (an under-count, never an over-count: the tool repairs it with promotion_analyze). Hiding rows (emergency, no p_close_api)
+-- cannot be helped this way: the hidden rows are still live rows.
+create function ingest.promotion_analyze(p_sha text) returns jsonb
+language plpgsql
+set search_path = pg_catalog, public, ingest
+as $$
+declare v_tables text[]; t text; v_live bigint; v_est real; v_bad jsonb := '[]'::jsonb; v_n integer := 0;
+begin
+  select array_agg(x order by x) into v_tables from (
+    select table_name as x from ingest.promotion_ledger where manifest_sha256 = p_sha
+    union select unnest(array['public.rm_overview', 'public.rm_coverage_summary', 'public.rm_organization_summary', 'public.rm_research_queue_summary'])) y;
+  execute 'analyze ' || (select string_agg(x::regclass::text, ', ') from unnest(v_tables) x);
+  foreach t in array v_tables loop
+    execute format('select count(*) from %s', t::regclass) into v_live;
+    select c.reltuples into v_est from pg_class c where c.oid = t::regclass;
+    if v_est > v_live * 1.25 + 100 then v_bad := v_bad || jsonb_build_object('table', t, 'live_rows', v_live, 'estimate', v_est); end if;
+    v_n := v_n + 1;
+  end loop;
+  if jsonb_array_length(v_bad) > 0 then raise exception 'WITHDRAWAL_REFUSED: the planner statistics still overstate the table sizes (a count=planned request would show them): %', v_bad; end if;
+  return jsonb_build_object('tables_analyzed', v_n);
+end $$;
+
 -- The normal withdrawal: one transaction; refuses while anything unrelated depends on a promoted row; leaves the grant alone unless asked.
 create function ingest.withdraw_promotion(p_sha text, p_reason text, p_withdraw_grant boolean default false) returns jsonb
 language plpgsql
 set search_path = pg_catalog, public, ingest
 as $$
-declare v_state text; v_cat text; v_bad jsonb; v_total integer;
+declare v_state text; v_cat text; v_bad jsonb; v_total integer; v_stats jsonb;
 begin
   if coalesce(trim(p_reason), '') = '' then raise exception 'WITHDRAWAL_REFUSED: a reason is required'; end if;
   perform pg_advisory_xact_lock(hashtext('bai.promotion'));
@@ -341,13 +384,17 @@ begin
     raise exception 'WITHDRAWAL_REFUSED: unrelated rows reference the promoted data. Remove or re-point them, or use ingest.emergency_withdraw to stop public exposure now: %', v_bad;
   end if;
   perform set_config('bai.promotion_withdrawal', p_sha, true);
-  perform public.rm_withdraw_category(v_cat, p_reason);                 -- the published read model first, so the row triggers below find nothing to withdraw
+  perform public.rm_withdraw_category(v_cat, p_reason);                 -- the published read model first
+  perform ingest.promotion_rm_assert_clean(p_sha);
+  perform set_config('bai.promotion_rm_clean', p_sha, true);            -- ... so the row triggers below have nothing to withdraw
   v_total := ingest.promotion_delete_rows(p_sha);
+  perform set_config('bai.promotion_rm_clean', '', true);
   if p_withdraw_grant then delete from ingest.source_publication_grants where attribution_category = v_cat; end if;
   insert into ingest.promotion_events (manifest_sha256, event, detail) values (p_sha, 'WITHDRAWN', jsonb_build_object('reason', p_reason, 'rows', v_total, 'grant_withdrawn', p_withdraw_grant));
   perform public.refresh_read_models();                                 -- every cached summary recomputed from the withdrawn state, in this transaction
   perform public.refresh_transaction_read_models();
-  return jsonb_build_object('manifest_sha256', p_sha, 'rows_deleted', v_total, 'grant_withdrawn', p_withdraw_grant);
+  v_stats := ingest.promotion_analyze(p_sha);                           -- last: the planner estimates now describe the withdrawn state, and become visible with the commit
+  return jsonb_build_object('manifest_sha256', p_sha, 'rows_deleted', v_total, 'grant_withdrawn', p_withdraw_grant, 'statistics', v_stats);
 end $$;
 
 -- EMERGENCY. Public exposure must stop now, and physical deletion is blocked by rows that are not the promotion's. In ONE transaction this
@@ -355,6 +402,9 @@ end $$;
 --   * empties the cached summaries that count promoted rows, and makes every refresh fail until the emergency is resolved (a refresh would count them again);
 --   * hides every promoted row from the Data API roles and the website (anon, authenticated, and bai_site through anon) with a RESTRICTIVE row-level policy per readable table;
 --     with p_close_api the readable tables are instead closed to those roles altogether (the trade-off: those public endpoints stop answering until the emergency is resolved);
+--   * does the same for the INDIRECT references: a publicly readable row that is not part of the promotion but points at a promoted row (a foreign key, or an observation naming a
+--     promoted player or transaction by subject) would reveal the withdrawn identity, so it is hidden too (or, when it cannot be hidden by a policy on one column, or with p_close_api,
+--     its table is closed). The row is not deleted and not changed: it is simply not readable by the public roles until the emergency is resolved;
 --   * deletes nothing, and records exactly what it did, and the blockers, in the event.
 -- Known limit of hiding: the planner estimates of a hidden table still include the hidden rows (Prefer: count=planned|estimated); p_close_api removes even that.
 -- Resolve with finish_withdrawal (delete the rows once the blockers are cleared) or revert_emergency (a false alarm; the owner records the grant again separately).
@@ -363,8 +413,8 @@ language plpgsql
 set search_path = pg_catalog, public, ingest
 as $$
 declare
-  v_cat text; l record; v_pol text := 'emergency_hide_' || substr(p_sha, 1, 12); v_hidden jsonb := '[]'::jsonb; v_closed jsonb := '[]'::jsonb; v_ids text; v_pkt text;
-  v_rls boolean; v_exposed boolean; v_bad jsonb; v_close boolean;
+  v_cat text; l record; b jsonb; v_pol text := 'emergency_hide_' || substr(p_sha, 1, 12); v_hidden jsonb := '[]'::jsonb; v_closed jsonb := '[]'::jsonb; v_ids text; v_pkt text; v_ckt text; v_cname text;
+  v_rls boolean; v_bad jsonb; v_close boolean; v_roles text[]; v_n integer := 0; v_child regclass; v_cols text[]; v_pcols text[]; v_pl record; v_expr text; v_name text; v_by_subject boolean;
 begin
   if coalesce(trim(p_reason), '') = '' then raise exception 'EMERGENCY_REFUSED: a reason is required'; end if;
   perform pg_advisory_xact_lock(hashtext('bai.promotion'));
@@ -376,19 +426,48 @@ begin
   perform public.rm_withdraw_category(v_cat, p_reason);
   delete from ingest.source_publication_grants where attribution_category = v_cat;
   delete from public.rm_overview; delete from public.rm_coverage_summary; delete from public.rm_organization_summary; delete from public.rm_research_queue_summary;
+  -- 1. the promoted rows
   for l in select * from ingest.promotion_ledger where manifest_sha256 = p_sha order by load_order loop
-    v_exposed := has_table_privilege('anon', l.table_name::regclass, 'SELECT') or has_table_privilege('authenticated', l.table_name::regclass, 'SELECT') or has_table_privilege('bai_site', l.table_name::regclass, 'SELECT');
-    continue when not v_exposed;
+    v_roles := array(select r from unnest(array['anon', 'authenticated']) r where has_table_privilege(r, l.table_name::regclass, 'SELECT'));
+    continue when cardinality(v_roles) = 0 and not has_table_privilege('bai_site', l.table_name::regclass, 'SELECT');
     select c.relrowsecurity into v_rls from pg_class c where c.oid = l.table_name::regclass;
     select format_type(a.atttypid, null) into v_pkt from pg_attribute a where a.attrelid = l.table_name::regclass and a.attname = l.pk_cols[1];
     v_close := p_close_api or not v_rls or cardinality(l.pk_cols) <> 1 or v_pkt not in ('bigint', 'integer');
     if v_close then
       execute format('revoke select on %s from anon, authenticated', l.table_name::regclass);
-      v_closed := v_closed || jsonb_build_object('table', l.table_name);
+      v_closed := v_closed || jsonb_build_object('table', l.table_name, 'roles', to_jsonb(v_roles));
     else
       select string_agg((x ->> l.pk_cols[1]), ',') into v_ids from jsonb_array_elements(l.pks) x;
       execute format('create policy %I on %s as restrictive for select to anon, authenticated using (not (%I = any (%L::bigint[])))', v_pol, l.table_name::regclass, l.pk_cols[1], '{' || v_ids || '}');
       v_hidden := v_hidden || jsonb_build_object('table', l.table_name, 'policy', v_pol, 'rows', l.n);
+    end if;
+  end loop;
+  -- 2. the indirect references (rows that are not the promotion's but point at a promoted row)
+  for b in select x from jsonb_array_elements(v_bad) x loop
+    v_child := (b ->> 'table')::regclass; v_cname := b ->> 'table';
+    v_roles := array(select r from unnest(array['anon', 'authenticated']) r where has_table_privilege(r, v_child, 'SELECT'));
+    continue when cardinality(v_roles) = 0;                                  -- not readable by the public roles: nothing to protect
+    select * into v_pl from ingest.promotion_ledger where manifest_sha256 = p_sha and table_name = b ->> 'references';
+    select c.relrowsecurity into v_rls from pg_class c where c.oid = v_child;
+    v_by_subject := b ->> 'kind' = 'by subject';
+    v_cols := array(select jsonb_array_elements_text(coalesce(b -> 'columns', '[]'::jsonb))); v_pcols := array(select jsonb_array_elements_text(coalesce(b -> 'parent_columns', '[]'::jsonb)));
+    v_expr := null;
+    if not p_close_api and v_rls and cardinality(v_pl.pk_cols) = 1 then
+      select string_agg((x ->> v_pl.pk_cols[1]), ',') into v_ids from jsonb_array_elements(v_pl.pks) x;
+      if v_by_subject then
+        v_expr := format('not (subject_table = %L and subject_id = any (%L::bigint[]))', b ->> 'subject_table', '{' || v_ids || '}');
+      elsif cardinality(v_cols) = 1 and cardinality(v_pcols) = 1 and v_pcols[1] = v_pl.pk_cols[1] then
+        select format_type(a.atttypid, null) into v_ckt from pg_attribute a where a.attrelid = v_child and a.attname = v_cols[1];
+        if v_ckt in ('bigint', 'integer') then v_expr := format('coalesce(not (%I = any (%L::bigint[])), true)', v_cols[1], '{' || v_ids || '}'); end if;
+      end if;
+    end if;
+    if v_expr is not null then
+      v_n := v_n + 1; v_name := v_pol || '_ref' || v_n;
+      execute format('create policy %I on %s as restrictive for select to anon, authenticated using (%s)', v_name, v_child, v_expr);
+      v_hidden := v_hidden || jsonb_build_object('table', v_cname, 'policy', v_name, 'rows', (b ->> 'rows')::integer, 'indirect', true, 'references', b ->> 'references');
+    else
+      execute format('revoke select on %s from anon, authenticated', v_child);
+      v_closed := v_closed || jsonb_build_object('table', v_cname, 'roles', to_jsonb(v_roles), 'indirect', true, 'references', b ->> 'references');
     end if;
   end loop;
   insert into ingest.promotion_events (manifest_sha256, event, detail) values (p_sha, 'EMERGENCY_WITHDRAWN',
@@ -401,7 +480,7 @@ create function ingest.finish_withdrawal(p_sha text, p_reason text) returns json
 language plpgsql
 set search_path = pg_catalog, public, ingest
 as $$
-declare v_bad jsonb; v_total integer; d jsonb; x jsonb;
+declare v_bad jsonb; v_total integer; d jsonb; x jsonb; v_cat text; v_stats jsonb;
 begin
   if coalesce(trim(p_reason), '') = '' then raise exception 'WITHDRAWAL_REFUSED: a reason is required'; end if;
   perform pg_advisory_xact_lock(hashtext('bai.promotion'));
@@ -411,14 +490,33 @@ begin
   v_bad := ingest.promotion_dependents(p_sha);
   if jsonb_array_length(v_bad) > 0 then raise exception 'WITHDRAWAL_REFUSED: the blockers remain: %', v_bad; end if;
   select e.detail into d from ingest.promotion_events e where e.manifest_sha256 = p_sha and e.event = 'EMERGENCY_WITHDRAWN' order by e.id desc limit 1;
+  select category into v_cat from ingest.promotion_manifests where manifest_sha256 = p_sha;
   perform set_config('bai.promotion_withdrawal', p_sha, true);
+  perform public.rm_withdraw_category(v_cat, p_reason);                 -- already done by the emergency; repeated so that this function does not depend on it
+  perform ingest.promotion_rm_assert_clean(p_sha);
+  perform set_config('bai.promotion_rm_clean', p_sha, true);
   v_total := ingest.promotion_delete_rows(p_sha);
+  perform set_config('bai.promotion_rm_clean', '', true);
   for x in select * from jsonb_array_elements(d -> 'hidden') loop execute format('drop policy %I on %s', x ->> 'policy', (x ->> 'table')::regclass); end loop;
-  for x in select * from jsonb_array_elements(d -> 'closed') loop execute format('grant select on %s to anon, authenticated', (x ->> 'table')::regclass); end loop;
+  perform ingest.promotion_reopen(d);
   insert into ingest.promotion_events (manifest_sha256, event, detail) values (p_sha, 'WITHDRAWN', jsonb_build_object('reason', p_reason, 'rows', v_total, 'after_emergency', true, 'grant_withdrawn', true));
   perform public.refresh_read_models();
   perform public.refresh_transaction_read_models();
-  return jsonb_build_object('manifest_sha256', p_sha, 'rows_deleted', v_total);
+  v_stats := ingest.promotion_analyze(p_sha);
+  return jsonb_build_object('manifest_sha256', p_sha, 'rows_deleted', v_total, 'statistics', v_stats);
+end $$;
+
+-- Gives back exactly the privileges an emergency took away (the roles are recorded in the event; an event written before they were recorded means anon and authenticated).
+create function ingest.promotion_reopen(d jsonb) returns void
+language plpgsql
+set search_path = pg_catalog, ingest
+as $$
+declare x jsonb; v_roles text;
+begin
+  for x in select * from jsonb_array_elements(d -> 'closed') loop
+    select string_agg(quote_ident(r), ', ') into v_roles from jsonb_array_elements_text(coalesce(x -> 'roles', '["anon", "authenticated"]'::jsonb)) r;
+    if v_roles is not null then execute format('grant select on %s to %s', (x ->> 'table')::regclass, v_roles); end if;
+  end loop;
 end $$;
 
 -- A false alarm: lifts the hiding and the refresh block, publishes nothing by itself (the grant is gone; the owner records it again, deliberately, and refreshes).
@@ -433,7 +531,7 @@ begin
   if ingest.promotion_state(p_sha) is distinct from 'EMERGENCY' then raise exception 'EMERGENCY_REFUSED: % is not under emergency withdrawal', p_sha; end if;
   select e.detail into d from ingest.promotion_events e where e.manifest_sha256 = p_sha and e.event = 'EMERGENCY_WITHDRAWN' order by e.id desc limit 1;
   for x in select * from jsonb_array_elements(d -> 'hidden') loop execute format('drop policy %I on %s', x ->> 'policy', (x ->> 'table')::regclass); end loop;
-  for x in select * from jsonb_array_elements(d -> 'closed') loop execute format('grant select on %s to anon, authenticated', (x ->> 'table')::regclass); end loop;
+  perform ingest.promotion_reopen(d);
   insert into ingest.promotion_events (manifest_sha256, event, detail) values (p_sha, 'EMERGENCY_REVERTED', jsonb_build_object('reason', p_reason));
   return jsonb_build_object('manifest_sha256', p_sha, 'state', 'PROMOTED', 'note', 'record the publication grant again and refresh deliberately; nothing was republished');
 end $$;
@@ -468,7 +566,7 @@ create trigger rm_transaction_overview_emergency_block before insert on public.r
 revoke all on ingest.promotion_manifests, ingest.promotion_ledger, ingest.promotion_events, ingest.promotion_withheld_rows from public, anon, authenticated;
 revoke all on function ingest.promotion_append_only(), ingest.promotion_state(text), ingest.promotion_in_emergency(), ingest.promotion_scope(), ingest.promotion_fingerprint(text),
   ingest.promote_begin(text), ingest.promote_load(text, jsonb), ingest.promote_withhold(text, text), ingest.promote_commit(), ingest.promotion_status(text), ingest.promotion_dependents(text),
-  ingest.promotion_delete_rows(text), ingest.withdraw_promotion(text, text, boolean), ingest.emergency_withdraw(text, text, boolean), ingest.finish_withdrawal(text, text), ingest.revert_emergency(text, text),
+  ingest.promotion_delete_rows(text), ingest.promotion_rm_assert_clean(text), ingest.promotion_analyze(text), ingest.promotion_reopen(jsonb), ingest.withdraw_promotion(text, text, boolean), ingest.emergency_withdraw(text, text, boolean), ingest.finish_withdrawal(text, text), ingest.revert_emergency(text, text),
   ingest.promotion_grant_guard(), ingest.promotion_emergency_block() from public, anon, authenticated;
 
 -- ---------------------------------------------------------------------------------------------------------------
@@ -648,5 +746,257 @@ UNION ALL
     t.records,
     t.sources
    FROM public.v_transaction_record_sources t;
+
+-- ---------------------------------------------------------------------------------------------------------------
+-- 6. Corrections to the 030 read model, found by the G5-5B/G5-5C full-scale measurements (030 itself is already applied on the hosted database; these replace its objects)
+-- ---------------------------------------------------------------------------------------------------------------
+
+-- 6a. Three indexes. research.transaction_gaps (028), called once per displayable transaction by analytics.transaction_completeness, looks trade_package_assets up by package and
+--     transaction_source_links by asset and by package; none of those columns was indexed (the unique indexes lead with other columns), so each trade paid a full scan of both tables
+--     for each of a dozen EXISTS tests: 20.4 s of the 21 s refresh at full scale (11,257 calls). With the indexes the same refresh takes 1.9 s. They also serve the foreign-key checks
+--     of deletes in those tables (a withdrawal deletes trade_packages, trade_package_assets and links).
+create index if not exists trade_package_assets_package_idx on public.trade_package_assets (trade_package_id);
+create index if not exists transaction_source_links_asset_idx on public.transaction_source_links (trade_package_asset_id) where trade_package_asset_id is not null;
+create index if not exists transaction_source_links_package_idx on public.transaction_source_links (trade_package_id) where trade_package_id is not null;
+
+-- 6b. rm_withdraw_transactions: unchanged except for the first statement (the promotion withdrawal's clean-read-model flag; see ingest.promotion_rm_assert_clean).
+create or replace function public.rm_withdraw_transactions(p_ids bigint[], p_reason text) returns integer
+language plpgsql
+set search_path = pg_catalog, public
+as $$
+declare
+  n integer;
+begin
+  -- Inside a promotion withdrawal that has already emptied the read model of the promotion's transactions (ingest.promotion_rm_assert_clean), the row triggers have nothing to withdraw.
+  if coalesce(current_setting('bai.promotion_rm_clean', true), '') <> '' and current_setting('bai.promotion_rm_clean', true) = coalesce(current_setting('bai.promotion_withdrawal', true), '') then return 0; end if;
+  if p_ids is null or cardinality(p_ids) = 0 or not exists (select 1 from public.rm_transactions where transaction_id = any (p_ids)) then return 0; end if;
+  delete from public.rm_transaction_followups where transaction_id = any (p_ids) or later_transaction_id = any (p_ids);
+  delete from public.rm_transaction_returns where transaction_id = any (p_ids);
+  delete from public.rm_transaction_packages where transaction_id = any (p_ids);
+  delete from public.rm_transaction_sources where transaction_id = any (p_ids);
+  delete from public.rm_transaction_assets where transaction_id = any (p_ids);
+  delete from public.rm_transaction_players where transaction_id = any (p_ids);
+  with d as (delete from public.rm_transactions where transaction_id = any (p_ids) returning 1) select count(*) into n from d;
+  delete from public.rm_transaction_coverage;
+  delete from public.rm_transaction_club_seasons;
+  delete from public.rm_transaction_overview;
+  insert into public.rm_transaction_withdrawals (reason, withdrawn_transactions) values (p_reason, n);
+  return n;
+end $$;
+
+-- 6c. refresh_transaction_read_models: unchanged except for two ORDER BYs. rm_transactions.search_tsv is built from string_agg(player names) over rm_transaction_players WITHOUT an order,
+--     so the order of the names (and so the lexeme positions of the tsvector) followed the physical row order of that table, which differs from one refresh to the next (314 of 11,257 rows
+--     when only the physical order changed; the token sets were always identical). The names are now aggregated in a fixed order (normalized name, then player id, bytewise "C" collation
+--     so that two databases of different locales agree), and the club names in "C" order. Search results are unchanged (the same tokens); only the positions are now stable.
+create or replace function public.refresh_transaction_read_models() returns bigint
+language plpgsql
+set search_path = pg_catalog, public, analytics, ingest, research
+as $$
+declare
+  v_generation bigint;
+  v_displayable integer;
+  v_withheld integer;
+begin
+  lock table public.rm_transaction_refreshes in exclusive mode;
+  -- Every statement below must see the latest committed state: a snapshot taken before a revocation committed would publish it.
+  if current_setting('transaction_isolation') <> 'read committed' then
+    raise exception 'refresh_transaction_read_models must run in a READ COMMITTED transaction (it is %)', current_setting('transaction_isolation') using errcode = 'invalid_transaction_state';
+  end if;
+  -- Nothing the refresh reads may change while it runs (a grant revoked or a verification withdrawn after the refresh read it would otherwise be
+  -- published by the refresh's commit). The withdrawal triggers below fire in the writer's transaction; this lock orders them strictly before or after
+  -- the refresh. NOWAIT: the refresh never waits for a lock while holding another, so it cannot take part in a deadlock; if a writer is mid-transaction it
+  -- fails at once with SQLSTATE 55P03 (lock_not_available) and publishes nothing. scripts/db/refresh-transaction-read-models.mjs retries that and 40P01/40001.
+  lock table ingest.source_publication_grants, research.transaction_verifications, public.sources, public.transactions, public.trade_packages, public.trade_package_assets,
+             public.transaction_sources, public.transaction_source_links, public.transaction_external_ids, public.ptbnl_resolutions, public.transaction_conflicts,
+             public.transaction_player_moves in share mode nowait;
+  select coalesce(max(generation_id), 0) + 1 into v_generation from public.rm_transaction_refreshes;
+
+  -- sources authorized for public display: the openly licensed groups, or a category with a recorded grant on this database
+  create temporary table _src on commit drop as
+  select s.id, public.source_attribution_category(s.url, s.source_key, s.publisher, s.title, s.source_type) as category
+  from public.sources s;
+  create temporary table _auth on commit drop as
+  select s.id from _src s
+  where s.category in ('CHADWICK_REGISTER', 'WIKIPEDIA', 'BAI_RESEARCH', 'WIKIDATA')
+     or exists (select 1 from ingest.source_publication_grants g where g.attribution_category = s.category);
+
+  -- a transaction is shown only if every source it cites is authorized
+  create temporary table _tx on commit drop as
+  select t.id
+  from public.transactions t
+  where t.source_id in (select id from _auth)
+    and not exists (select 1 from public.transaction_sources ts where ts.transaction_id = t.id and ts.source_id not in (select id from _auth));
+  select count(*) into v_displayable from _tx;
+  select count(*) - v_displayable into v_withheld from public.transactions;
+
+  delete from public.rm_transaction_followups;
+  delete from public.rm_transaction_returns;
+  delete from public.rm_transaction_packages;
+  delete from public.rm_transaction_sources;
+  delete from public.rm_transaction_assets;
+  delete from public.rm_transaction_players;
+  delete from public.rm_transaction_coverage;
+  delete from public.rm_transaction_club_seasons;
+  delete from public.rm_transaction_overview;
+  delete from public.rm_transactions;
+
+  -- assets: trades from packages (a resolved PTBNL with its resolution), other acquisitions from moves
+  insert into public.rm_transaction_assets (transaction_id, position, from_key, from_club_text, to_key, asset_kind, player_id, player_slug, player_name, detail, conditional, condition_text,
+                                            amount_status, amount_usd, resolution_kind, resolved_player_slug, resolved_player_name, resolved_on, source_event_code)
+  select x.transaction_id, (row_number() over (partition by x.transaction_id order by x.from_key nulls first, x.to_key, x.asset_kind, x.player_name nulls last, x.detail nulls last, x.sort_id))::integer,
+         x.from_key, x.from_club_text, x.to_key, x.asset_kind, x.player_id, x.player_slug, x.player_name, x.detail, x.conditional, x.condition_text, x.amount_status, x.amount_usd,
+         x.resolution_kind, x.resolved_player_slug, x.resolved_player_name, x.resolved_on, x.source_event_code
+  from (
+    select k.transaction_id, fo.franchise_key as from_key, null::text as from_club_text, too.franchise_key as to_key, a.asset_type::text as asset_kind,
+           a.player_id, p.slug as player_slug, p.display_name as player_name, a.description as detail, a.conditional, a.condition_text,
+           case when a.asset_type in ('CASH', 'INTERNATIONAL_POOL_SPACE') then coalesce(a.amount_disclosure, case when a.amount_usd is not null then 'DISCLOSED' else 'UNKNOWN' end) end as amount_status,
+           case when a.asset_type in ('CASH', 'INTERNATIONAL_POOL_SPACE') and coalesce(a.amount_disclosure, case when a.amount_usd is not null then 'DISCLOSED' else 'UNKNOWN' end) = 'DISCLOSED' then a.amount_usd end as amount_usd,
+           r.resolution as resolution_kind, rp.slug as resolved_player_slug, rp.display_name as resolved_player_name, r.resolved_on, null::text as source_event_code, a.id as sort_id
+    from public.trade_package_assets a
+    join public.trade_packages k on k.id = a.trade_package_id and k.transaction_id in (select id from _tx)
+    join public.organizations fo on fo.id = k.from_organization_id
+    join public.organizations too on too.id = k.to_organization_id
+    left join public.players p on p.id = a.player_id
+    left join public.ptbnl_resolutions r on r.trade_package_asset_id = a.id
+    left join public.players rp on rp.id = r.resolved_player_id
+    union all
+    select m.transaction_id, fo.franchise_key, m.from_club_text, too.franchise_key, 'PLAYER', m.player_id, p.slug, p.display_name, m.source_info, false, null, null, null, null, null, null, null, m.source_event_code, m.id
+    from public.transaction_player_moves m
+    join public.organizations too on too.id = m.to_organization_id
+    left join public.organizations fo on fo.id = m.from_organization_id
+    join public.players p on p.id = m.player_id
+    where m.transaction_id in (select id from _tx)
+  ) x;
+
+  insert into public.rm_transaction_players (transaction_id, player_id, player_slug, player_name, role)
+  select transaction_id, player_id, player_slug, player_name, 'ASSET' from public.rm_transaction_assets where player_id is not null
+  group by transaction_id, player_id, player_slug, player_name;
+  insert into public.rm_transaction_players (transaction_id, player_id, player_slug, player_name, role)
+  select a.transaction_id, p.id, a.resolved_player_slug, a.resolved_player_name, 'NAMED_LATER'
+  from public.rm_transaction_assets a join public.players p on p.slug = a.resolved_player_slug
+  where a.resolved_player_slug is not null
+  on conflict (transaction_id, player_id) do nothing;
+
+  -- the transactions
+  insert into public.rm_transactions (transaction_id, season, transaction_date, date_precision, transaction_type, category, club_keys, parties, status, gaps, independent_source_groups, verified_on,
+                                      source_categories, attribution_required, asset_count, player_count, cash_unknown, has_unresolved_ptbnl, search_tsv, generation_id)
+  select t.id, extract(year from t.transaction_date)::integer, t.transaction_date, t.date_precision, t.transaction_type::text,
+         case t.transaction_type::text when 'TRADE' then 'TRADE' when 'FREE_AGENT_SIGNING' then 'FREE_AGENT' when 'AMATEUR_FREE_AGENT_SIGNING' then 'AMATEUR_FREE_AGENT'
+              when 'WAIVER_CLAIM' then 'WAIVER' when 'PURCHASE' then 'PURCHASE' when 'RULE_5' then 'RULE_5' else 'OTHER' end,
+         cl.keys, cl.parties, c.completeness, c.gaps, c.independent_source_groups,
+         case when c.completeness = 'VERIFIED_COMPLETE' then c.verified_at::date end,
+         src.categories, src.categories && array(select attribution_category from public.source_attribution_statements),
+         coalesce(ac.n, 0), coalesce(pc.n, 0), coalesce(ac.cash_unknown, false), coalesce(ac.pending_ptbnl, false),
+         to_tsvector('simple', coalesce(pn.names, '') || ' ' || array_to_string(cl.keys, ' ') || ' ' || coalesce(cl.club_names, '') || ' ' || t.transaction_type::text || ' ' || extract(year from t.transaction_date)::text),
+         v_generation
+  from public.transactions t
+  join _tx on _tx.id = t.id
+  join analytics.transaction_completeness c on c.transaction_id = t.id
+  cross join lateral (
+    select array_agg(distinct o.franchise_key order by o.franchise_key) as keys,
+           jsonb_agg(distinct jsonb_build_object('key', o.franchise_key, 'name', o.current_name, 'slug', o.slug)) as parties,
+           string_agg(distinct o.current_name collate "C", ' ' order by o.current_name collate "C") as club_names
+    from (select k.from_organization_id as org from public.trade_packages k where k.transaction_id = t.id
+          union select k.to_organization_id from public.trade_packages k where k.transaction_id = t.id
+          union select m.to_organization_id from public.transaction_player_moves m where m.transaction_id = t.id
+          union select m.from_organization_id from public.transaction_player_moves m where m.transaction_id = t.id and m.from_organization_id is not null) x
+    join public.organizations o on o.id = x.org
+  ) cl
+  cross join lateral (
+    select array_agg(distinct _src.category order by _src.category) as categories
+    from _src where _src.id = t.source_id or _src.id in (select ts.source_id from public.transaction_sources ts where ts.transaction_id = t.id)
+  ) src
+  left join lateral (
+    select count(*)::integer as n, bool_or(a.asset_kind in ('CASH', 'INTERNATIONAL_POOL_SPACE') and a.amount_status = 'UNKNOWN') as cash_unknown,
+           bool_or(a.asset_kind = 'PLAYER_TO_BE_NAMED' and a.resolution_kind is null) as pending_ptbnl
+    from public.rm_transaction_assets a where a.transaction_id = t.id
+  ) ac on true
+  left join lateral (select count(*)::integer as n from public.rm_transaction_players p where p.transaction_id = t.id) pc on true
+  left join lateral (select string_agg(public.normalize_name(p.player_name), ' ' order by public.normalize_name(p.player_name) collate "C", p.player_id) as names from public.rm_transaction_players p where p.transaction_id = t.id) pn on true;
+
+  -- later movement of the same player, as established by later transactions in this ledger
+  insert into public.rm_transaction_followups (transaction_id, player_id, step, later_transaction_id, later_date, later_category, later_club_keys)
+  with ev as (
+    select p.player_id, t.transaction_id, t.transaction_date, t.category, t.club_keys,
+           row_number() over (partition by p.player_id order by t.transaction_date, t.transaction_id) as rn
+    from public.rm_transaction_players p join public.rm_transactions t on t.transaction_id = p.transaction_id
+  )
+  select a.transaction_id, a.player_id, (b.rn - a.rn)::integer, b.transaction_id, b.transaction_date, b.category, b.club_keys
+  from ev a join ev b on b.player_id = a.player_id and b.rn > a.rn and b.rn <= a.rn + 3;
+
+  -- what each club received (WAR only where its provider's sources are authorized; never a score)
+  create temporary table _war_ok on commit drop as
+  select w.war_system::text as provider, bool_and(w.source_id in (select id from _auth)) as ok
+  from public.war_observations w group by w.war_system;
+  -- The club-level figure is identical on every package row of a club (same transaction, club, provider). Anything else is a defect, not a choice.
+  -- NULL-safe: count(distinct x) ignores NULL, so a NULL beside a number would pass; a column must be all NULL or all non-NULL, and single-valued.
+  if exists (select 1 from analytics.trade_returns r join public.rm_transactions t on t.transaction_id = r.transaction_id
+             group by r.transaction_id, r.organization_id, r.war_system
+             having (count(*) filter (where r.return_war_known is null) not in (0, count(*)) or count(distinct r.return_war_known) > 1)
+                 or (count(*) filter (where r.return_coverage is null) not in (0, count(*)) or count(distinct r.return_coverage) > 1)
+                 or (count(*) filter (where r.received_player_ids is null) not in (0, count(*)) or count(distinct cardinality(r.received_player_ids)) > 1)) then
+    raise exception 'analytics.trade_returns gives one club different club-level figures within a transaction';
+  end if;
+  insert into public.rm_transaction_returns (transaction_id, club_key, provider, packages_sent, players_sent, players_received, return_war_known, evidence)
+  select r.transaction_id, o.franchise_key, r.war_system::text, count(*)::integer, sum(r.players_sent)::integer, max(cardinality(r.received_player_ids)),
+         case when coalesce(bool_and(w.ok), true) then max(r.return_war_known) end,
+         case when not coalesce(bool_and(w.ok), true) and max(r.return_war_known) is not null then 'WITHHELD_PERMISSION'
+              when max(r.return_war_known) is null then 'NOT_OBSERVED'
+              when max(r.return_coverage) = 'COMPLETE' then 'OBSERVED_COMPLETE' else 'OBSERVED_PARTIAL' end
+  from analytics.trade_returns r
+  join public.rm_transactions t on t.transaction_id = r.transaction_id
+  join public.organizations o on o.id = r.organization_id
+  left join _war_ok w on w.provider = r.war_system::text
+  group by r.transaction_id, o.franchise_key, r.war_system;
+
+  insert into public.rm_transaction_packages (transaction_id, from_key, to_key, players_sent, other_assets_sent)
+  select k.transaction_id, fo.franchise_key, too.franchise_key, coalesce(sum(r.players_sent), 0)::integer, coalesce(sum(r.other_assets_sent), 0)::integer
+  from public.trade_packages k
+  join public.rm_transactions t on t.transaction_id = k.transaction_id
+  join public.organizations fo on fo.id = k.from_organization_id
+  join public.organizations too on too.id = k.to_organization_id
+  left join (select distinct package_id, players_sent, other_assets_sent from analytics.trade_returns) r on r.package_id = k.id
+  group by k.transaction_id, fo.franchise_key, too.franchise_key;
+
+  insert into public.rm_transaction_sources (transaction_id, position, source_id, title, publisher, url, attribution_category, role, independence_group, locator)
+  select x.transaction_id, (row_number() over (partition by x.transaction_id order by x.ord, x.title))::integer, x.source_id, x.title, x.publisher, x.url, x.category, x.role, x.grp, x.locator
+  from (
+    select t.id as transaction_id, 0 as ord, s.id as source_id, s.title, s.publisher, s.url, _src.category, 'RECORD' as role, null::text as grp, null::text as locator
+    from public.transactions t join _tx on _tx.id = t.id join public.sources s on s.id = t.source_id join _src on _src.id = s.id
+    union all
+    select ts.transaction_id, 1, s.id, s.title, s.publisher, s.url, _src.category, ts.role, ts.independence_group, ts.locator
+    from public.transaction_sources ts join _tx on _tx.id = ts.transaction_id join public.sources s on s.id = ts.source_id join _src on _src.id = s.id
+  ) x;
+
+  insert into public.rm_transaction_coverage (season, club_key, category, records, unverified, partial, verified_complete, with_unresolved_assets)
+  select t.season, k.key, t.category, count(*)::integer, (count(*) filter (where t.status = 'UNVERIFIED'))::integer, (count(*) filter (where t.status = 'PARTIAL'))::integer,
+         (count(*) filter (where t.status = 'VERIFIED_COMPLETE'))::integer, (count(*) filter (where t.cash_unknown or t.has_unresolved_ptbnl))::integer
+  from public.rm_transactions t cross join lateral unnest(t.club_keys) k(key)
+  group by t.season, k.key, t.category;
+
+  insert into public.rm_transaction_club_seasons (season, club_key, records, coverage_state, expected_count)
+  select c.season, c.club_key, c.records, coalesce(a.coverage_state::text, 'NOT_ASSESSED'), a.expected_count
+  from (select t.season, k.key as club_key, count(*)::integer as records from public.rm_transactions t cross join lateral unnest(t.club_keys) k(key) group by 1, 2) c
+  left join public.organizations o on o.franchise_key = c.club_key
+  left join public.coverage_assessments a on a.domain::text = 'TRANSACTIONS' and a.organization_id = o.id and a.scope_key = c.season::text;
+
+  insert into public.rm_transaction_overview (generation_id, refreshed_at, transactions, by_status, by_category, first_season, last_season, display_authorized_categories, withheld_unauthorized, verified_complete, complete_census_club_seasons)
+  select v_generation, now(), (select count(*) from public.rm_transactions)::integer,
+         coalesce((select jsonb_object_agg(status, n) from (select status, count(*) n from public.rm_transactions group by status) s), '{}'),
+         coalesce((select jsonb_object_agg(category, n) from (select category, count(*) n from public.rm_transactions group by category) s), '{}'),
+         (select min(season) from public.rm_transactions), (select max(season) from public.rm_transactions),
+         coalesce((select array_agg(distinct c.category order by c.category) from _src c where c.id in (select id from _auth) and c.category not in ('TEST_FIXTURE')), '{}'),
+         v_withheld, (select count(*) from public.rm_transactions where status = 'VERIFIED_COMPLETE')::integer,
+         (select count(*) from public.rm_transaction_club_seasons where coverage_state = 'COMPLETE_CENSUS')::integer;
+
+  -- validation: nothing unauthorized, nothing complete without a verification, every row has a party
+  if exists (select 1 from public.rm_transactions t where t.transaction_id not in (select id from _tx)) then raise exception 'read model holds a transaction that is not authorized for display'; end if;
+  if exists (select 1 from public.rm_transactions where status = 'VERIFIED_COMPLETE' and (verified_on is null or cardinality(gaps) > 0)) then raise exception 'read model marks a transaction complete without a verification and no gaps'; end if;
+  if exists (select 1 from public.rm_transactions where cardinality(club_keys) = 0) then raise exception 'read model holds a transaction with no club'; end if;
+  if (select count(*) from public.rm_transactions) <> v_displayable then raise exception 'read model transaction count differs from the authorized set'; end if;
+
+  insert into public.rm_transaction_refreshes (generation_id, transactions, withheld_unauthorized) values (v_generation, v_displayable, v_withheld);
+  return v_generation;
+end $$;
 
 select public.apply_public_boundary();

@@ -46,9 +46,12 @@ export async function buildBaseline (db, dir) {
 
 /** The stand-in for the pinned batches: an acquisitions batch (four new players and new ids on the existing one) and two trade batches, then Retrosheet transaction_date observations
  *  (the kind the owner excludes from the public delta). Returns the batches as the manifest must pin them. */
-export async function importSample (db, dir) {
+export async function importSample (db, dir, { bulk = 0 } = {}) {
   await stageAndApply(db, prepareAcquisitionDoc({ format: 'bai-research-import/1', batch_key: 'g54-sample-acq', channel: 'ACQUISITIONS', sources: [RETRO, CHADWICK], records: [rec(1, '2030-03-01'), rec(2, '2030-03-02'), rec(3, '2030-03-03'), rec(4, '2030-03-04'),
     rec(5, '2030-03-05', { full_name: 'Existing Player', external_ids: { MLBAM: '988100', RETROSHEET: 'g54x001', BBREF: 'existp01' }, external_id_sources: { MLBAM: CHADWICK.source_key, RETROSHEET: CHADWICK.source_key, BBREF: CHADWICK.source_key }, birth_date: undefined })] }), path.join(dir, 'sample', 'acq.json'))
+  // a bulk of further fictional free-agent signings (a scale at which the planner's table estimates are meaningful), as a separate pinned batch
+  if (bulk > 0) await stageAndApply(db, prepareAcquisitionDoc({ format: 'bai-research-import/1', batch_key: 'g54-sample-bulk', channel: 'ACQUISITIONS', sources: [RETRO, CHADWICK],
+    records: Array.from({ length: bulk }, (_, i) => rec(1000 + i, '2030-04-01')) }), path.join(dir, 'sample', 'bulk.json'))
   await stageAndApply(db, tradeDoc('g54-sample-trades-1', 'g54-t1', '2030-06-01', [RETRO], [pk('LAD', 'SEA', [pl(11)], [RETRO.source_key]), pk('SEA', 'LAD', [pl(12, 'Existing Player', { MLBAM: '988100' })], [RETRO.source_key])], 'G54-T1', [rg(RETRO.source_key)]), path.join(dir, 'sample', 'trades-1.json'))
   await stageAndApply(db, tradeDoc('g54-sample-trades-2', 'g54-t2', '2030-06-02', [RETRO], [pk('NYY', 'BOS', [pl(13)], [RETRO.source_key]), pk('BOS', 'NYY', [pl(14)], [RETRO.source_key])], 'G54-T2', [rg(RETRO.source_key)]), path.join(dir, 'sample', 'trades-2.json'))
   await db.query(`insert into source_observations (source_id, subject_table, subject_id, field_name, observed_value, locator)
