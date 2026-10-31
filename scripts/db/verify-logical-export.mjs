@@ -13,6 +13,7 @@ import pg from 'pg'
 import EmbeddedPostgres from 'embedded-postgres'
 import { applyMigrations } from './lib/migrations.mjs'
 import { catalogSnapshot, diffSnapshots } from './lib/catalog.mjs'
+import { PLATFORM_ONLY, explainCatalog } from './lib/export-restore.mjs'
 
 const argv = process.argv.slice(2)
 const opt = (k) => { const i = argv.indexOf(`--${k}`); return i >= 0 ? argv[i + 1] : null }
@@ -21,26 +22,6 @@ if (!exportDir || !snapDir) { console.error('usage: --export-dir <dir> --snapsho
 const repoRoot = path.resolve(path.dirname(new URL(import.meta.url).pathname), '../..')
 for (const f of ['roles.sql', 'schema.sql', 'data.sql']) if (!fs.existsSync(path.join(exportDir, f))) { console.error(`missing ${f}`); process.exit(2) }
 
-/** Errors that exist only because the target is not a Supabase project. Each class says why; anything unmatched fails the verification. */
-const PLATFORM_ONLY = [
-  [/extension "(pg_stat_statements|supabase_vault)" is not available|could not open extension control file.*(pg_stat_statements|supabase_vault)/, 'a Supabase-provided extension (pg_stat_statements, supabase_vault) is not installed on plain PostgreSQL'],
-  [/role "(supabase_[a-z_]+|dashboard_user|pgbouncer|cli_login[a-z_]*)" does not exist/, 'a Supabase platform role is absent'],
-  [/schema "(vault|extensions)" does not exist/, 'a Supabase platform schema is absent'],
-  [/parameter "log_min_messages"|GRANT SET ON PARAMETER/, 'a platform-role parameter grant (supabase_realtime_admin)'],
-  [/relation "vault\./, 'an object that depends on the supabase_vault extension'],
-  [/schema "(auth|storage)" does not exist|relation "(auth|storage)\.[a-z_]+" does not exist/, 'Supabase auth/storage platform tables in the data dump (BAI keeps nothing there)'],
-  [/publication "supabase_realtime" does not exist/, 'the Supabase realtime publication']
-]
-/** Catalog differences that the platform or pg_dump itself explains. Anything not matched here fails. */
-const explainCatalog = (d) => {
-  if (/^(function|execute)\|public\.rls_auto_enable\(\)$/.test(d.key)) return 'public.rls_auto_enable() is Supabase\'s event-trigger function; it exists on hosted and is not created by BAI\'s migrations'
-  if (d.key === 'schema|public' && String(d.target).replace(/postgres:USAGE ?/, '') === String(d.reference)) return 'Supabase grants postgres USAGE on schema public (the same platform difference scripts/db/parity.mjs explains)'
-  if (/^view\|/.test(d.key)) {
-    const norm = (t) => String(t).replace(/\s+AS\s+("?[?a-z_0-9]+"?)(?=[,\s]|$)/gi, '').replace(/\s+/g, ' ').trim()
-    if (norm(d.reference) === norm(d.target)) return 'pg_dump writes explicit aliases (AS text) for unnamed view columns; the definition is otherwise identical'
-  }
-  return null
-}
 const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'bai-lexp-'))
 const port = 20000 + Math.floor(Math.random() * 30000)
 const server = new EmbeddedPostgres({ databaseDir: path.join(dir, 'data'), user: 'postgres', password: 'postgres', port, persistent: false, onLog: () => {} })
