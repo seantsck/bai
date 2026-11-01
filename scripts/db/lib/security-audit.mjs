@@ -13,6 +13,8 @@ import { PLATFORM_FUNCTION_FILTER } from './catalog.mjs'
 
 const PUBLIC_ROLES = ['anon', 'authenticated']
 const PRIVATE_SCHEMAS = ['ingest', 'analytics', 'research', 'bai_meta']
+// Migration 032: views that run with their owner's rights, each with the exact tables it may read.
+const OWNER_RIGHTS_VIEWS = { 'public.v_transaction_record_sources': ['rm_transaction_sources', 'sources'] }
 // Human-only actions of migration 021: SECURITY DEFINER so that a reviewer's login role needs no table privilege; the
 // identity they act under is session_user, which a SECURITY DEFINER function does not change.
 const REVIEWER_FUNCTIONS = ['research.enroll_reviewer(text, text)', 'research.set_certification_gate(boolean, text)',
@@ -95,7 +97,14 @@ export async function runSecurityAudit (rawDb, { readOnly = false, localDb = fal
   for (const r of await q(db, `select n.nspname s, c.relname t, c.relkind k, c.relrowsecurity rls, c.reloptions opts
       from pg_class c join pg_namespace n on n.oid = c.relnamespace where n.nspname = any($1) and c.relkind in ('r','p','v','m')`, [['public', ...PRIVATE_SCHEMAS]])) {
     if ((r.k === 'r' || r.k === 'p') && exposed.includes(r.s) && !r.rls) fail(`table ${r.s}.${r.t} in exposed schema has RLS disabled`)
-    if (r.k === 'v' && !(r.opts ?? []).includes('security_invoker=true')) fail(`view ${r.s}.${r.t} is not security_invoker (would bypass RLS)`)
+    if (r.k === 'v' && !(r.opts ?? []).includes('security_invoker=true')) {
+      // The one declared exception (032): an aggregate over rm_transaction_sources alone, so that the public attribution summary does not need the closed table.
+      const deps = OWNER_RIGHTS_VIEWS[`${r.s}.${r.t}`]
+      const used = deps ? (await q(db, `select distinct t.relname from pg_depend d join pg_rewrite w on w.oid = d.objid join pg_class t on t.oid = d.refobjid where d.classid = 'pg_rewrite'::regclass and w.ev_class = $1::regclass and t.oid <> w.ev_class and t.relkind in ('r','p','v','m') order by 1`, [`${r.s}.${r.t}`])).map((x) => x.relname) : null
+      if (!deps) fail(`view ${r.s}.${r.t} is not security_invoker (would bypass RLS)`)
+      else if (JSON.stringify(used) !== JSON.stringify([...deps].sort())) fail(`owner-rights view ${r.s}.${r.t} must read exactly ${deps.join(', ')}, it reads ${used.join(', ')}`)
+      else notes.push(`owner-rights view ${r.s}.${r.t} reads only ${deps.join(', ')} (declared in 032)`)
+    }
     if (r.k === 'm' && exposed.includes(r.s)) fail(`materialized view ${r.s}.${r.t} in an exposed schema cannot enforce RLS`)
   }
   // Sequences: public roles never need them (they never insert).
@@ -114,7 +123,7 @@ export async function runSecurityAudit (rawDb, { readOnly = false, localDb = fal
   // ---- RLS policies: read-only, for public roles only
   for (const r of await q(db, "select schemaname s, tablename t, policyname p, cmd, roles::text[] roles from pg_policies where schemaname = any($1)", [['public', ...PRIVATE_SCHEMAS]])) {
     if (r.cmd !== 'SELECT') fail(`policy ${r.s}.${r.t}.${r.p} allows ${r.cmd}`)
-    if (internal.has(r.t)) fail(`internal table ${r.s}.${r.t} has a public policy ${r.p}`)
+    if (internal.has(r.t) && !(r.roles.length === 1 && r.roles[0] === 'bai_site')) fail(`internal table ${r.s}.${r.t} has a public policy ${r.p}`)   // 032: the website role's own policy is the one allowed kind
   }
 
   // ---- Functions
@@ -174,10 +183,27 @@ export async function runSecurityAudit (rawDb, { readOnly = false, localDb = fal
   if (!web) fail('role bai_web (016) is missing')
   else {
     if (web.rolinherit || web.rolsuper || web.rolbypassrls || web.rolcreaterole || web.rolcreatedb) fail('bai_web must be NOINHERIT with no elevated attributes')
-    if (JSON.stringify(web.member_of) !== JSON.stringify(['anon'])) fail(`bai_web must be a member of anon only, found ${web.member_of}`)
+    if (!['["anon"]', '["anon","bai_site"]'].includes(JSON.stringify(web.member_of))) fail(`bai_web must be a member of anon (and, from 032, bai_site) only, found ${web.member_of}`)
     for (const r of await q(db, `select n.nspname s, c.relname t from pg_class c join pg_namespace n on n.oid = c.relnamespace
         where n.nspname = any($1) and c.relkind in ('r','p','v','m') and has_table_privilege('bai_web', c.oid, 'SELECT')`, [['public', ...PRIVATE_SCHEMAS]])) fail(`bai_web can read ${r.s}.${r.t} without SET ROLE`)
     notes.push(`bai_web: login ${web.rolcanlogin}, NOINHERIT, member of ${web.member_of}`)
+  }
+
+  // ---- The website role (032): anon plus the transaction read models; no login, no write, no bypass, nothing private
+  const site = (await q(db, `select r.rolcanlogin, r.rolsuper, r.rolbypassrls, r.rolcreaterole, r.rolcreatedb, r.rolreplication,
+      (select array_agg(g.rolname::text order by g.rolname) from pg_auth_members m join pg_roles g on g.oid = m.roleid where m.member = r.oid) member_of
+    from pg_roles r where r.rolname = 'bai_site'`))[0]
+  if (site) {
+    if (site.rolcanlogin || site.rolsuper || site.rolbypassrls || site.rolcreaterole || site.rolcreatedb || site.rolreplication) fail('bai_site must be NOLOGIN with no elevated attributes')
+    if (JSON.stringify(site.member_of) !== JSON.stringify(['anon'])) fail(`bai_site must be a member of anon only, found ${site.member_of}`)
+    for (const r of await q(db, `select n.nspname s, c.relname t, has_table_privilege('bai_site', c.oid, 'INSERT') or has_table_privilege('bai_site', c.oid, 'UPDATE') or has_table_privilege('bai_site', c.oid, 'DELETE') or has_table_privilege('bai_site', c.oid, 'TRUNCATE') w,
+        has_table_privilege('bai_site', c.oid, 'SELECT') sel from pg_class c join pg_namespace n on n.oid = c.relnamespace where n.nspname = any($1) and c.relkind in ('r','p','v','m')`, [['public', ...PRIVATE_SCHEMAS]])) {
+      if (r.w) fail(`bai_site has a write privilege on ${r.s}.${r.t}`)
+      if (r.sel && r.s !== 'public') fail(`bai_site can read ${r.s}.${r.t}, in a private schema`)
+      if (r.sel && r.s === 'public' && internal.has(r.t) && !/^rm_transaction/.test(r.t)) fail(`bai_site can read ${r.t}, which is registered internal and is not a transaction read model`)
+    }
+    if (!(await q(db, "select pg_has_role('bai_web', 'bai_site', 'MEMBER') ok"))[0].ok) fail('bai_web cannot SET ROLE bai_site (the website would fail with BAI_PUBLIC_ROLE=bai_site)')
+    notes.push('bai_site: NOLOGIN, member of anon only, no write privilege, reads the transaction read models; anon and authenticated cannot')
   }
 
 

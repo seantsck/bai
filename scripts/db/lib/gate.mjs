@@ -5,6 +5,7 @@
 // gate file: { gate, commit, through, migration_file, from_level, project_ref, checksums: {NNN: sha256…}, migrations_hash }
 import fs from 'node:fs'
 import crypto from 'node:crypto'
+import { expectedMigrationVersions, RESERVED_MIGRATIONS } from './migration-numbers.mjs'
 
 export const SHA40 = /^[0-9a-f]{40}$/
 export const migrationsHash = (checksums) => crypto.createHash('sha256').update(Object.keys(checksums).sort().map((v) => `${v}:${checksums[v]}`).join('\n')).digest('hex')
@@ -35,8 +36,8 @@ export function validateGateShape (g) {
   if (!/^[a-z0-9]{20}$/.test(g.project_ref ?? '')) p.push('project_ref is malformed')
   if (!g.checksums || typeof g.checksums !== 'object' || !g.checksums[g.through]) p.push('checksums do not cover the gate migration')
   else if (g.migrations_hash !== migrationsHash(g.checksums)) p.push('migrations_hash does not match the checksum list')
-  const want = Array.from({ length: Number(g.through) }, (_, i) => String(i + 1).padStart(3, '0'))
-  if (g.checksums && Object.keys(g.checksums).sort().join() !== want.join()) p.push('checksums must cover exactly 001..through')
+  const want = expectedMigrationVersions(g.through)
+  if (g.checksums && Object.keys(g.checksums).sort().join() !== want.join()) p.push(`checksums must cover exactly 001..through, without the reserved ${RESERVED_MIGRATIONS.join(', ')}`)
   return p
 }
 

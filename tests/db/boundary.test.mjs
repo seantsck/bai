@@ -18,7 +18,11 @@ test('every table in public has row level security enabled', async () => {
 test('every public view is security_invoker', async () => {
   const r = await h.rows(db, `select c.relname from pg_class c join pg_namespace n on n.oid = c.relnamespace
     where n.nspname in ('public', 'analytics') and c.relkind = 'v' and not coalesce('security_invoker=true' = any(c.reloptions), false)`)
-  assert.deepEqual(r, [])
+  // 032: the one declared owner-rights view, an aggregate over rm_transaction_sources alone, so that the attribution summary works without access to the closed table
+  assert.deepEqual(r, [{ relname: 'v_transaction_record_sources' }])
+  const deps = await h.rows(db, `select distinct t.relname from pg_depend d join pg_rewrite w on w.oid = d.objid join pg_class t on t.oid = d.refobjid
+    where d.classid = 'pg_rewrite'::regclass and w.ev_class = 'public.v_transaction_record_sources'::regclass and t.oid <> w.ev_class and t.relkind in ('r', 'p', 'v', 'm') order by 1`)
+  assert.deepEqual(deps.map((x) => x.relname), ['rm_transaction_sources', 'sources'])
 })
 
 test('public roles hold only SELECT, and no table grants write privileges to them', async () => {

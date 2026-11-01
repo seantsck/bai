@@ -142,11 +142,13 @@ test('the refresh is convergent and the public boundary holds: readable facts, n
   const hash = async () => (await h.one(db, `select md5(string_agg(x, '|' order by x)) m from (select (to_jsonb(t) - 'generation_id')::text x from rm_transactions t union all select a::text from rm_transaction_assets a union all select s::text from rm_transaction_sources s union all select r::text from rm_transaction_returns r union all select f::text from rm_transaction_followups f) q`)).m
   await refresh(); const a = await hash(); await refresh(); const b = await hash()
   assert.equal(a, b)
+  await h.asRole(db, 'bai_site', async () => {   // the website role reads the read model (032); the Data API roles do not
+    assert.ok((await h.one(db, 'select count(*)::int n from rm_transactions')).n >= 2)
+    assert.ok((await h.one(db, 'select count(*)::int n from source_attribution_statements')).n === 1)
+  })
   for (const role of ['anon', 'authenticated']) {
-    await h.asRole(db, role, async () => {
-      assert.ok((await h.one(db, 'select count(*)::int n from rm_transactions')).n >= 2)
-      assert.ok((await h.one(db, 'select count(*)::int n from source_attribution_statements')).n === 1)
-    })
+    await assert.rejects(h.asRole(db, role, () => db.query('select count(*) from rm_transactions')), /permission denied/, `${role}: the read model is closed to the Data API roles`)
+    await h.asRole(db, role, async () => { assert.ok((await h.one(db, 'select count(*)::int n from source_attribution_statements')).n === 1) })
     for (const sql of ['select * from transaction_player_moves', 'select * from transaction_sources', 'select * from analytics.transaction_completeness', 'select * from research.transaction_verifications', 'select * from rm_transaction_refreshes',
       'select public.refresh_transaction_read_models()', 'insert into rm_transactions (transaction_id) values (1)', 'delete from rm_transactions', "update source_attribution_statements set statement = 'x'", 'select * from ingest.source_publication_grants']) {
       await assert.rejects(h.asRole(db, role, () => db.query(sql)), /permission denied/, `${role}: ${sql}`)

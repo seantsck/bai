@@ -16,8 +16,9 @@ const db = new pg.Client({ connectionString: url })
 await db.connect()
 try {
   await db.query('begin read only')
-  await db.query('set local role anon')
+  const role = (process.env.BAI_PUBLIC_ROLE || 'anon').replace(/[^a-z_]/g, '')   // the same role the website will use (lib/db.ts); bai_site from migration 032
+  await db.query(`set local role ${role}`)
   const { rows: [r] } = await db.query('select count(*)::int n from organizations')
   await db.query('rollback')
-  console.log(`hosted preflight: bai_web -> anon read OK on project ${ref} (${r.n} organizations)`)
+  console.log(`hosted preflight: bai_web -> ${role} read OK on project ${ref} (${r.n} organizations)`)
 } finally { await db.end() }

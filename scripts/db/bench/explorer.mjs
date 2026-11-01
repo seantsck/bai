@@ -2,6 +2,7 @@
 // on a benchmark database whose read model has been refreshed, with EXPLAIN (ANALYZE, BUFFERS) of the heaviest page queries and gates on the medians.
 //   node --import ./tests/support/register-ts.mjs scripts/db/bench/explorer.mjs --db bai_p18_all [--runs 20] [--tag explorer]
 // Gate: every page query median under 100 ms; the coverage page set under 250 ms in total. Failures exit non-zero and are never skipped.
+const SITE_ROLE = (process.env.BAI_PUBLIC_ROLE || 'bai_site').replace(/[^a-z_]/g, '')   // the website's role (032: bai_site reads the transaction read models; anon cannot)
 import fs from 'node:fs'
 import path from 'node:path'
 import { startCluster, benchDir, hardware } from './cluster.mjs'
@@ -18,7 +19,7 @@ try {
   const counts = (await db.query('select (select count(*) from public.rm_transactions)::int tx, (select count(*) from public.rm_transaction_assets)::int assets, (select count(*) from public.rm_transaction_players)::int players, (select count(*) from public.rm_transaction_followups)::int followups, (select count(*) from public.transactions)::int canonical')).rows[0]
   results.counts = counts
   const asAnon = async (sql, params = [], explain = false) => {
-    await db.query('begin read only'); await db.query('set local role anon'); await db.query("set local statement_timeout = '5s'")
+    await db.query('begin read only'); await db.query(`set local role ${SITE_ROLE}`); await db.query("set local statement_timeout = '5s'")
     try { const r = await db.query(`${explain ? 'explain (analyze, buffers, format json) ' : ''}${sql}`, params); return explain ? r.rows[0]['QUERY PLAN'][0] : r.rows } finally { await db.query('rollback') }
   }
   const sample = (await db.query("select transaction_id from public.rm_transactions where category = 'TRADE' order by transaction_date desc limit 1")).rows[0]?.transaction_id

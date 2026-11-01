@@ -157,7 +157,9 @@ test('research-ingestion schema: private staging area, lifecycle enums, identity
   // 027 adds the private release audit table.
   const with027 = (await one("select to_regclass('ingest.release_audits') is not null as ok")).ok
   const with028 = (await one("select to_regclass('ingest.transaction_apply_ledger') is not null as ok")).ok
-  assert.deepEqual(t.map((r) => r.table_name), [...(with025 ? ['historical_releases'] : []), 'import_batches', ...(with027 ? ['release_audits'] : []), ...(with025 ? ['source_publication_grants'] : []), 'staged_records', 'staged_sources', ...(with028 ? ['transaction_apply_ledger'] : [])])
+  // 032 adds the private promotion records.
+  const with032 = (await one("select to_regclass('ingest.promotion_manifests') is not null as ok")).ok
+  assert.deepEqual(t.map((r) => r.table_name), [...(with025 ? ['historical_releases'] : []), 'import_batches', ...(with032 ? ['promotion_events', 'promotion_ledger', 'promotion_manifests', 'promotion_withheld_rows'] : []), ...(with027 ? ['release_audits'] : []), ...(with025 ? ['source_publication_grants'] : []), 'staged_records', 'staged_sources', ...(with028 ? ['transaction_apply_ledger'] : [])])
   assert.equal((await one("select enum_range(null::ingest.identity_match_state)::text r")).r, '{EXACT_EXTERNAL_ID,EXACT_COMPOSITE,PROBABLE_MATCH,AMBIGUOUS,NO_MATCH,CONFLICT}')
   assert.equal((await one("select enum_range(null::ingest.apply_action)::text r")).r, '{INSERT,UPDATE_UNKNOWN,CORROBORATE,NO_CHANGE,CONFLICT,HELD}')
   assert.equal((await one("select count(*)::int n from conflict_rules")).n, 8)

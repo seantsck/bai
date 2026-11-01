@@ -56,13 +56,14 @@ test('attribution: each source is grouped by origin; the public summary and expl
 
 // Internal until the transaction detail view (docs/transactions/phase16-foundation.md): the public summary cannot read them, so it does not count them yet.
 // 030 closed `transactions` to the public roles: the summary counts the transactions the read model publishes (rm_transaction_sources) instead.
-const EXCLUDED = ['coverage_assessments', 'fact_resolutions', 'ptbnl_resolutions', 'season_calendar_events', 'transaction_external_ids', 'transaction_sources', 'transactions']
+const EXCLUDED = ['coverage_assessments', 'fact_resolutions', 'ptbnl_resolutions', 'rm_transaction_sources', 'season_calendar_events', 'transaction_external_ids', 'transaction_sources', 'transactions']   // rm_transaction_sources: counted through v_transaction_record_sources (032), asserted below
 test('attribution summary covers every public table that cites a source', async () => {
   const def = (await h.one(db, `select pg_get_viewdef('public.v_source_attribution'::regclass) as d`)).d
   const tables = (await h.rows(db, `select c.table_name from information_schema.columns c join information_schema.tables t using (table_schema, table_name)
     where c.table_schema = 'public' and c.column_name = 'source_id' and t.table_type = 'BASE TABLE' order by 1`)).map((r) => r.table_name)
   const missing = tables.filter((t) => !new RegExp(`\\b${t}\\b`).test(def) && !EXCLUDED.includes(t))
   assert.deepEqual(missing, [], 'add the table to v_source_attribution (or list why it is excluded here)')
+  assert.match(def, /v_transaction_record_sources/, 'the transaction part comes from the one owner-rights aggregate (032)')
 })
 
 test('historical lock: a selection in a year before 2015 needs that year released on the database', async () => {

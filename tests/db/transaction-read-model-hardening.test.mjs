@@ -32,7 +32,7 @@ async function trade (ref, date, decls, packages, ext, groups) {
 }
 const rg = (k, group) => ({ source_key: k, role: 'REFERENCE', independence_group: group ?? `g-${k}` })
 const refresh = () => db.query('select public.refresh_transaction_read_models() g')
-const asBoth = async (fn) => { for (const role of ['anon', 'authenticated']) await h.asRole(db, role, () => fn(role)) }
+const asBoth = async (fn) => { await h.asRole(db, 'bai_site', () => fn('bai_site')) }   // the website role reads the read model (032); anon and authenticated are denied (checked below)
 const PUBLIC_RM = ['rm_transactions', 'rm_transaction_assets', 'rm_transaction_sources', 'rm_transaction_players', 'rm_transaction_returns', 'rm_transaction_packages', 'rm_transaction_followups', 'rm_transaction_coverage', 'rm_transaction_club_seasons', 'rm_transaction_overview']
 const withdrawals = async () => (await h.one(db, 'select count(*)::int n, coalesce(sum(withdrawn_transactions), 0)::int t from rm_transaction_withdrawals')) // owner only
 const orgId = async (k) => Number((await h.one(db, 'select id from organizations where franchise_key = $1', [k])).id)
@@ -208,6 +208,11 @@ test('the raw transaction tables are not readable by anon or authenticated; the 
   await asBoth(async (role) => {
     for (const t of ['drafts', 'draft_selections', 'organizations', 'players', 'sources', 'international_signings', 'v_source_attribution', 'rm_transactions']) await db.query(`select * from ${t} limit 1`)
   })
+  for (const role of ['anon', 'authenticated']) {   // the Data API roles keep every unrelated public read and lose only the transaction read models
+    for (const t of ['drafts', 'draft_selections', 'organizations', 'players', 'sources', 'international_signings', 'v_source_attribution', 'v_transaction_record_sources']) await h.asRole(db, role, () => db.query(`select * from ${t} limit 1`))
+    for (const t of ['rm_transactions', 'rm_transaction_overview', 'rm_transaction_assets', 'rm_transaction_players', 'rm_transaction_sources', 'rm_transaction_returns', 'rm_transaction_followups', 'rm_transaction_packages', 'rm_transaction_coverage', 'rm_transaction_club_seasons'])
+      await denied(role, `select * from ${t} limit 1`)
+  }
 })
 
 // The club-level consistency guard of the refresh. analytics.trade_returns repeats one club figure on each package row the club sent; the refresh must refuse
