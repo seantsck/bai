@@ -32,6 +32,20 @@ jobs:
         with:
           node-version: 22
           cache: npm
+      # The restore tests (tests/db/restore-export.test.mjs) run pg_dump and psql against the embedded PostgreSQL 17 server. The embedded distribution ships no client tools and the
+      # runner image carries PostgreSQL 16 clients, which pg_dump refuses to use against a 17 server. Install the PostgreSQL 17 clients (client tools only, no server) from the
+      # PostgreSQL project's apt repository, put them first on PATH, and fail the job here if the major version is not 17.
+      - name: PostgreSQL 17 client tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-common
+          sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
+          sudo apt-get install -y postgresql-client-17
+          echo /usr/lib/postgresql/17/bin >> "$GITHUB_PATH"
+          export PATH=/usr/lib/postgresql/17/bin:$PATH
+          command -v pg_dump psql
+          pg_dump --version | grep -E ' 17\.'
+          psql --version | grep -E ' 17\.'
       - run: npm ci
       # The research tooling refuses an outbound header containing the value of any environment variable whose name suggests a secret (OWNER, KEY, TOKEN, ...).
       # Actions sets GITHUB_REPOSITORY_OWNER (a public value, also in the project URL that identifies BAI), which would trip that guard in a test. The guard is

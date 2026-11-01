@@ -35,6 +35,12 @@ const dump = (flags, out) => { const r = spawnSync('pg_dump', ['-h', '127.0.0.1'
 before(async () => {
   if (SKIP) return
   await h.startServer(); admin = await h.connect('postgres'); PORT = admin.port; SRC = 'g55e_src'
+  // fail (never skip) when the client tools are older than the server: pg_dump refuses, and the cause should be named before any test body runs
+  const major = (c) => Number(/(\d+)(?:\.\d+)?/.exec(spawnSync(c, ['--version'], { encoding: 'utf8' }).stdout.split(')')[1] || '')?.[1])
+  const serverMajor = Number(((await admin.query('show server_version_num')).rows[0].server_version_num) / 10000 | 0)
+  const bins = ['pg_dump', 'psql'].map((c) => `${c}=${spawnSync('sh', ['-c', `command -v ${c}`], { encoding: 'utf8' }).stdout.trim()} (${spawnSync(c, ['--version'], { encoding: 'utf8' }).stdout.trim()})`)
+  console.log(`# server major ${serverMajor}; ${bins.join('; ')}`)
+  assert.ok(major('pg_dump') >= serverMajor && major('psql') >= serverMajor, `PostgreSQL client tools are older than the server (${serverMajor}): ${bins.join('; ')}`)
   src = await newDb(SRC)
   await applyMigrations(src, { through: '030' }); await buildBaseline(src, dir)
   await src.query(RLS_FN)
