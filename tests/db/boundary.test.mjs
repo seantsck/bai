@@ -31,14 +31,28 @@ test('public roles hold only SELECT, and no table grants write privileges to the
   assert.deepEqual(r, [])
 })
 
+test('the website role reads the raw identities, evidence and their views (explicit grants + site_read policies)', async () => {
+  await h.asRole(db, 'bai_site', async () => {
+    assert.ok((await h.one(db, 'select count(*)::int n from players')).n >= 4)
+    for (const t of ['player_external_ids', 'source_observations', 'coverage_assessments', 'v_draft_explorer', 'v_player_outcome_status', 'v_source_attribution']) await h.one(db, `select count(*) n from public.${t}`)
+    assert.equal((await h.one(db, 'select count(*)::int n from organizations')).n, 30)
+  })
+})
+
 for (const role of ['anon', 'authenticated']) {
   test(`${role} reads public facts and read models`, async () => {
     await h.asRole(db, role, async () => {
       assert.equal((await h.one(db, 'select count(*)::int n from organizations')).n, 30)
-      assert.ok((await h.one(db, 'select count(*)::int n from players')).n >= 4)
       assert.ok((await h.one(db, 'select count(*)::int n from v_draft_picks')).n >= 3)
       assert.equal((await h.one(db, 'select count(*)::int n from rm_organization_summary')).n, 30)
     })
+  })
+
+  test(`${role} cannot read the raw identities and evidence, or the views over them (033): the website role does`, async () => {
+    for (const t of ['players', 'player_external_ids', 'source_observations', 'coverage_assessments', 'v_draft_explorer', 'v_player_outcome_status', 'v_source_attribution']) {
+      await assert.rejects(h.asRole(db, role, () => db.query(`select count(*) from public.${t}`)), /permission denied/, `${role}: ${t}`)
+    }
+    await h.asRole(db, role, async () => { for (const t of ['sources', 'source_attribution_statements']) assert.ok((await h.one(db, `select count(*)::int n from public.${t}`)).n >= 1, `${role} keeps ${t}`) })
   })
 
   test(`${role} cannot write, reach internals, analytics, or run the refresh`, async () => {

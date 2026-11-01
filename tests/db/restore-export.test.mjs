@@ -113,13 +113,23 @@ test('security audit strategy: the platform handler is skipped only because its 
 })
 
 test('after migration 032 on the restore: ten more internal_objects, no other baseline table changes, the audits pass; the platform trigger does not touch 032 (it creates no public table)', { skip: SKIP }, async () => {
-  const before = await collectBaseline(R.db); await applyMigrations(R.db)
+  const before = await collectBaseline(R.db); await applyMigrations(R.db, { through: '032' })
   const after = await collectBaseline(R.db)
   const changed = Object.keys(after.fingerprints).filter((t) => JSON.stringify(before.fingerprints[t]) !== JSON.stringify(after.fingerprints[t]))
   assert.deepEqual(changed, ['public.internal_objects']); assert.equal(after.fingerprints['public.internal_objects'].n - before.fingerprints['public.internal_objects'].n, 10)
   for (const o of [{ readOnly: false, localDb: true }, { readOnly: true, localDb: true }]) assert.deepEqual((await runSecurityAudit(R.db, o)).failures, [])
   assert.equal((await rows(R.db, "select count(*)::int n from pg_roles where rolname = 'bai_site' and not rolcanlogin and not rolsuper and not rolbypassrls"))[0].n, 1)
   assert.equal((await rows(R.db, "select count(*)::int n from pg_class c join pg_namespace n on n.oid = c.relnamespace where n.nspname = 'ingest' and c.relname like 'promotion\\_%' and c.relkind = 'r' and not c.relrowsecurity"))[0].n, 4, 'the four promotion tables are in ingest, outside ensure_rls')
+})
+
+test('after migration 033 on the restore: seven more internal_objects, no other baseline table changes, the audits pass, the Data API roles read none of the seven', { skip: SKIP }, async () => {
+  const before = await collectBaseline(R.db); await applyMigrations(R.db)   // 033
+  const after = await collectBaseline(R.db)
+  const changed = Object.keys(after.fingerprints).filter((t) => JSON.stringify(before.fingerprints[t]) !== JSON.stringify(after.fingerprints[t]))
+  assert.deepEqual(changed, ['public.internal_objects']); assert.equal(after.fingerprints['public.internal_objects'].n - before.fingerprints['public.internal_objects'].n, 7)
+  for (const o of [{ readOnly: false, localDb: true }, { readOnly: true, localDb: true }]) assert.deepEqual((await runSecurityAudit(R.db, o)).failures, [])
+  assert.equal((await rows(R.db, "select version from bai_meta.schema_migrations order by version desc limit 1"))[0].version, '033')
+  assert.equal((await rows(R.db, "select count(*)::int n from pg_class where relnamespace = 'public'::regnamespace and relname = any(array['players','player_external_ids','source_observations','coverage_assessments','v_draft_explorer','v_player_outcome_status','v_source_attribution']) and (has_table_privilege('anon', oid, 'SELECT') or has_table_privilege('authenticated', oid, 'SELECT'))"))[0].n, 0)
 })
 
 test('the command line is local-only and refuses a non-empty database', { skip: SKIP }, async () => {

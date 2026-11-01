@@ -1,3 +1,4 @@
+// NOTE (G6B): this file runs on the 032 stage (migrations through 032): it is the contract of the stage between 032 and 033. Migration 033 closes the identity tables to the Data API roles; see tests/db/rest-boundary.test.mjs.
 // The Data API boundary of migration 032, over real HTTP with a real PostgREST (a pinned local binary: BAI_POSTGREST_BIN, default ~/tmp-bai/g5-2-bin/postgrest). Skipped, loudly, when the
 // binary is absent. It checks: the 12 rm_transaction* tables are closed to anon and authenticated; every other public relation (and the attribution summary) still answers; a promotion
 // makes the identity rows public and leaves the transaction read models closed; an emergency hides exactly the promoted rows (and, closed, whole tables); nothing is deleted.
@@ -10,12 +11,11 @@ import os from 'node:os'
 import path from 'node:path'
 import { spawn } from 'node:child_process'
 import * as h from './harness.mjs'
+import { BIN, SKIP } from '../support/postgrest.mjs'
 import { applyMigrations } from '../../scripts/db/lib/migrations.mjs'
 import { SESSION_SQL, buildPackage, emergencyWithdraw, finishWithdrawal, promote, sha256 } from '../../scripts/db/lib/promotion.mjs'
 import { buildBaseline, importSample } from './promotion-fixture.mjs'
 
-const BIN = process.env.BAI_POSTGREST_BIN ?? `${os.homedir()}/tmp-bai/g5-2-bin/postgrest`
-const SKIP = fs.existsSync(BIN) ? false : `SKIPPED: no PostgREST binary at ${BIN} (set BAI_POSTGREST_BIN)`
 const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'bai-g54r-'))
 const MAIN = 'g54r_main'
 let admin, main, rest = null, port = 0, batches, pkg, GRANT_ROW
@@ -40,7 +40,8 @@ before(async () => {
   await h.startServer(); admin = await h.connect('postgres'); await admin.query(`create database ${MAIN}`)
   main = await open(MAIN)
   await applyMigrations(main, { through: '030' }); await main.query("create role authenticator login noinherit password 'local'")
-  await buildBaseline(main, dir); await applyMigrations(main); await main.query('grant anon, authenticated to authenticator')
+  await buildBaseline(main, dir); await applyMigrations(main, { through: '032' }); // the 032 stage: the identity tables are still readable by the Data API roles (033 closes them: tests/db/rest-boundary.test.mjs)
+  await main.query('grant anon, authenticated to authenticator')
   await main.end(); await admin.query(`create database g54r_stage template ${MAIN}`)
   const s = await open('g54r_stage'); batches = await importSample(s, dir); await s.end()
   main = await open(MAIN)

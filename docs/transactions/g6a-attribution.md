@@ -31,6 +31,8 @@ Row-level security alone is **not** a confidentiality boundary here: G5 tests sh
 
 Recommendation to evaluate: **A for `source_observations` and `coverage_assessments`** (the tables whose Retrosheet rows are source-attributed) if the owner accepts that those two tables leave the public REST surface, with `bai_site` granted explicitly; otherwise B. D is not to be used alone. Whichever is chosen is a migration plus a re-run of the G5 REST count tests (exact, planned, estimated, views).
 
+**Update (G6B):** the owner chose Option A for the raw identities and evidence; migration 033 and its tests are described in `g6b-rest-boundary.md`. The decisions below that 033 settles are marked.
+
 ## Unresolved owner decisions
 1. **The 3,643 Retrosheet-created player identities.** `players` has no source column, so no policy can single them out, and `players`/`player_external_ids` also hold the 1,612/3,318 baseline rows that public consumers use today. Either (i) accept that REST serves these identity rows (names and birth dates matched through the Chadwick Register), with the statement on every website page and in `sources.notes`; (ii) add a provenance marker (a migration) so that A/B can treat them separately; or (iii) close `players` and `player_external_ids` to the Data API as in A, with the baseline impact above. This is a rights decision, not a technical one.
 2. Which of A, B, C the project adopts for `source_observations` and `coverage_assessments`, and whether the Data API remains a supported public interface at all.

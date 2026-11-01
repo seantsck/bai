@@ -11,6 +11,10 @@
 // The mode is chosen by the caller; neither mode ever falls back to the other.
 import { PLATFORM_FUNCTION_FILTER } from './catalog.mjs'
 
+// Migration 033: the relations only the website role (bai_site) may read among the registered-internal ones, besides the transaction read models. anon and authenticated are held to the
+// ordinary rule for internal relations (no SELECT, no public policy) by the checks above, so this only declares which internal relations the website role is allowed to hold.
+const SITE_ONLY_033 = new Set(['players', 'player_external_ids', 'source_observations', 'coverage_assessments', 'v_draft_explorer', 'v_player_outcome_status', 'v_source_attribution'])
+
 const PUBLIC_ROLES = ['anon', 'authenticated']
 const PRIVATE_SCHEMAS = ['ingest', 'analytics', 'research', 'bai_meta']
 // Migration 032: views that run with their owner's rights, each with the exact tables it may read.
@@ -200,7 +204,7 @@ export async function runSecurityAudit (rawDb, { readOnly = false, localDb = fal
         has_table_privilege('bai_site', c.oid, 'SELECT') sel from pg_class c join pg_namespace n on n.oid = c.relnamespace where n.nspname = any($1) and c.relkind in ('r','p','v','m')`, [['public', ...PRIVATE_SCHEMAS]])) {
       if (r.w) fail(`bai_site has a write privilege on ${r.s}.${r.t}`)
       if (r.sel && r.s !== 'public') fail(`bai_site can read ${r.s}.${r.t}, in a private schema`)
-      if (r.sel && r.s === 'public' && internal.has(r.t) && !/^rm_transaction/.test(r.t)) fail(`bai_site can read ${r.t}, which is registered internal and is not a transaction read model`)
+      if (r.sel && r.s === 'public' && internal.has(r.t) && !/^rm_transaction/.test(r.t) && !SITE_ONLY_033.has(r.t)) fail(`bai_site can read ${r.t}, which is registered internal and is not a transaction read model`)
     }
     if (!(await q(db, "select pg_has_role('bai_web', 'bai_site', 'MEMBER') ok"))[0].ok) fail('bai_web cannot SET ROLE bai_site (the website would fail with BAI_PUBLIC_ROLE=bai_site)')
     notes.push('bai_site: NOLOGIN, member of anon only, no write privilege, reads the transaction read models; anon and authenticated cannot')

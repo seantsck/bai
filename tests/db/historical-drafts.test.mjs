@@ -96,7 +96,7 @@ test('month-precision dates, coverage cells per existing club, and the public vi
   assert.deepEqual(cells, [{ scope_key: '1965-JUNE_AMATEUR', n: 20 }, { scope_key: '1985-JUNE_AMATEUR', n: 26 }])
   const cov = await h.asRole(db, 'anon', () => h.one(db, `select clubs, imported_selections, expected_selections, start_date_precision::text from rm_draft_year_coverage where draft_key = '1985-JANUARY_REGULAR'`))
   assert.deepEqual(cov, { clubs: 26, imported_selections: 1, expected_selections: null, start_date_precision: 'MONTH' })
-  await h.asRole(db, 'anon', async () => assert.ok((await h.rows(db, 'select * from v_draft_explorer limit 5')).length > 0))
+  await h.asRole(db, 'bai_site', async () => assert.ok((await h.rows(db, 'select * from v_draft_explorer limit 5')).length > 0))
   // Each refusal in its own transaction (a refused statement aborts the transaction it runs in).
   await h.asRole(db, 'anon', () => assert.rejects(db.query('select * from v_draft_year_coverage limit 1'), /permission denied/))
   await h.asRole(db, 'anon', () => assert.rejects(db.query('select organization_exists_in_season(1, 1965)'), /permission denied/))
