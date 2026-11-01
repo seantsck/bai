@@ -11,7 +11,7 @@ import os from 'node:os'
 import path from 'node:path'
 import { spawn } from 'node:child_process'
 import * as h from './harness.mjs'
-import { BIN, SKIP } from '../support/postgrest.mjs'
+import { BIN, SKIP, freePort } from '../support/postgrest.mjs'
 import { applyMigrations } from '../../scripts/db/lib/migrations.mjs'
 import { SESSION_SQL, buildPackage, emergencyWithdraw, finishWithdrawal, promote, sha256 } from '../../scripts/db/lib/promotion.mjs'
 import { buildBaseline, importSample } from './promotion-fixture.mjs'
@@ -27,7 +27,7 @@ const RM12 = ['rm_transactions', 'rm_transaction_overview', 'rm_transaction_asse
 const PUBLIC5 = ['players', 'player_external_ids', 'source_observations', 'coverage_assessments', 'sources']
 
 const startRest = async () => {
-  rest?.kill(); await new Promise((r) => setTimeout(r, 500)); port = 30000 + Math.floor(Math.random() * 20000)
+  rest?.kill(); await new Promise((r) => setTimeout(r, 500)); port = await freePort()
   rest = spawn(BIN, [], { stdio: 'ignore', env: { PATH: '/usr/bin:/bin', PGRST_DB_URI: `postgresql://authenticator:local@127.0.0.1:${main.port}/${MAIN}`, PGRST_DB_SCHEMAS: 'public', PGRST_DB_ANON_ROLE: 'anon', PGRST_SERVER_PORT: String(port), PGRST_SERVER_HOST: '127.0.0.1', PGRST_JWT_SECRET: SECRET } })
   for (let i = 0; i < 80; i++) { try { if ((await fetch(`http://127.0.0.1:${port}/`)).status < 500) return } catch { /* starting */ } await new Promise((r) => setTimeout(r, 250)) }
   throw new Error('PostgREST did not start')

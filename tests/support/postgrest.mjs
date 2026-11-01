@@ -7,3 +7,7 @@ export const BIN = process.env.BAI_POSTGREST_BIN ?? `${os.homedir()}/tmp-bai/g5-
 export const REQUIRED = process.env.BAI_REQUIRE_POSTGREST === '1'
 if (REQUIRED && !fs.existsSync(BIN)) throw new Error(`BAI_REQUIRE_POSTGREST=1 but there is no PostgREST binary at ${BIN}: the Data API boundary tests cannot be skipped`)
 export const SKIP = fs.existsSync(BIN) ? false : `SKIPPED: no PostgREST binary at ${BIN} (set BAI_POSTGREST_BIN): the Data API boundary is UNVERIFIED`
+
+import net from 'node:net'
+/** A free TCP port chosen by the operating system (not a random number that can collide with the embedded PostgreSQL servers other test files start at the same time). */
+export const freePort = () => new Promise((resolve, reject) => { const s = net.createServer(); s.once('error', reject); s.listen(0, '127.0.0.1', () => { const { port } = s.address(); s.close(() => resolve(port)) }) })

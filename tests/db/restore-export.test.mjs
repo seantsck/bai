@@ -123,13 +123,25 @@ test('after migration 032 on the restore: ten more internal_objects, no other ba
 })
 
 test('after migration 033 on the restore: seven more internal_objects, no other baseline table changes, the audits pass, the Data API roles read none of the seven', { skip: SKIP }, async () => {
-  const before = await collectBaseline(R.db); await applyMigrations(R.db)   // 033
+  const before = await collectBaseline(R.db); await applyMigrations(R.db, { through: '033' })
   const after = await collectBaseline(R.db)
   const changed = Object.keys(after.fingerprints).filter((t) => JSON.stringify(before.fingerprints[t]) !== JSON.stringify(after.fingerprints[t]))
   assert.deepEqual(changed, ['public.internal_objects']); assert.equal(after.fingerprints['public.internal_objects'].n - before.fingerprints['public.internal_objects'].n, 7)
   for (const o of [{ readOnly: false, localDb: true }, { readOnly: true, localDb: true }]) assert.deepEqual((await runSecurityAudit(R.db, o)).failures, [])
   assert.equal((await rows(R.db, "select version from bai_meta.schema_migrations order by version desc limit 1"))[0].version, '033')
   assert.equal((await rows(R.db, "select count(*)::int n from pg_class where relnamespace = 'public'::regnamespace and relname = any(array['players','player_external_ids','source_observations','coverage_assessments','v_draft_explorer','v_player_outcome_status','v_source_attribution']) and (has_table_privilege('anon', oid, 'SELECT') or has_table_privilege('authenticated', oid, 'SELECT'))"))[0].n, 0)
+})
+
+test('after migration 034 on the restore: one more internal_objects row (player_aliases), no other baseline table changes, the aliases are byte-identical, the audits pass, the Data API roles read none of the eight', { skip: SKIP }, async () => {
+  const hash = async () => (await rows(R.db, "select md5(coalesce(string_agg(t::text, '|' order by id), '')) h, count(*)::int n from public.player_aliases t"))[0]
+  const before = await collectBaseline(R.db); const aliases = await hash(); await applyMigrations(R.db)   // 034
+  const after = await collectBaseline(R.db)
+  const changed = Object.keys(after.fingerprints).filter((t) => JSON.stringify(before.fingerprints[t]) !== JSON.stringify(after.fingerprints[t]))
+  assert.deepEqual(changed, ['public.internal_objects']); assert.equal(after.fingerprints['public.internal_objects'].n - before.fingerprints['public.internal_objects'].n, 1)
+  assert.deepEqual(await hash(), aliases, 'the aliases and their provenance are byte-identical')
+  for (const o of [{ readOnly: false, localDb: true }, { readOnly: true, localDb: true }]) assert.deepEqual((await runSecurityAudit(R.db, o)).failures, [])
+  assert.equal((await rows(R.db, "select version from bai_meta.schema_migrations order by version desc limit 1"))[0].version, '034')
+  assert.equal((await rows(R.db, "select count(*)::int n from pg_class where relnamespace = 'public'::regnamespace and relname = 'player_aliases' and (has_table_privilege('anon', oid, 'SELECT') or has_table_privilege('authenticated', oid, 'SELECT'))"))[0].n, 0)
 })
 
 test('the command line is local-only and refuses a non-empty database', { skip: SKIP }, async () => {
