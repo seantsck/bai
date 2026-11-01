@@ -1,7 +1,8 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { PageHeader, DataTable, load, Unavailable } from '../../../components/ui.tsx'
-import { PageAttribution } from '../../../components/PageAttribution.tsx'
+import { Attribution } from '../../../components/Attribution.tsx'
+import { RETROSHEET_ENTRY } from '../../../lib/attribution.ts'
 import { getPlayer, getPlayerAcquisitions, getPlayerDevelopment, getPlayerExternalIds } from '../../../lib/queries.ts'
 import { formatDate, formatWar, label, AUDIT_STATE_LABELS, PATHWAY_LABELS, SIGNING_STATUS_LABELS } from '../../../lib/format.ts'
 
@@ -17,7 +18,7 @@ export default async function PlayerPage ({ params }: { params: Promise<{ slug: 
   return (
     <>
       <PageHeader title={p.display_name} lede={[p.primary_position, p.birth_country].filter(Boolean).join(' · ') || undefined} />
-      <PageAttribution />
+      <Attribution statements={[RETROSHEET_ENTRY]} />
       <dl className='facts'>
         <dt>Born</dt><dd>{formatDate(p.birth_date, p.birth_date_precision)}</dd>
         <dt>Outcome audit</dt><dd>{label(AUDIT_STATE_LABELS, p.audit_state)}{p.observation_through_season ? ` (observed through ${p.observation_through_season})` : ''}</dd>

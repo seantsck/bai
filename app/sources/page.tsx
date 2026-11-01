@@ -1,7 +1,7 @@
 import { PageHeader, DataTable, Notice, load, Unavailable } from '../../components/ui.tsx'
 import { getSourceAttribution } from '../../lib/queries.ts'
 import { SOURCE_GROUP_LABELS, label } from '../../lib/format.ts'
-import { RETROSHEET_STATEMENT } from '../../lib/attribution.ts'
+import { RETROSHEET_STATEMENT, RETROSHEET_ENTRY } from '../../lib/attribution.ts'
 import { Attribution } from '../../components/TransactionBits.tsx'
 
 export const dynamic = 'force-dynamic'
@@ -92,7 +92,7 @@ export default async function SourcesPage () {
       ]} />
 
       <h2>Retrosheet</h2>
-      <Attribution statements={[{ attribution_category: 'RETROSHEET', statement: RETROSHEET_STATEMENT, notice_url: 'https://www.retrosheet.org/notice.txt' }]} />
+      <Attribution statements={[RETROSHEET_ENTRY]} />
       <p>
         Records derived from Retrosheet’s transactions archive appear on the Transactions pages and, as player identities (names and birth dates), on the Players pages,
         for as long as they are published. Retrosheet’s notice requires its statement to appear prominently wherever its data is used, so it is shown above on this page and on

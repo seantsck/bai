@@ -136,7 +136,12 @@ test('the catalog records Retrosheet (site publication authorized only by a docu
   assert.match(catalog.sources.find((s) => s.id === 'wikidata').license.name, /CC0/)
 })
 
-test('the /sources page shows the exact Retrosheet statement', () => {
+test('the /sources page shows the exact Retrosheet statement, from the one shared constant (rendering is exercised in tests/app/attribution-pages.test.mjs)', () => {
   const page = fs.readFileSync(path.join(root, 'app/sources/page.tsx'), 'utf8')
-  assert.ok(page.includes(RETROSHEET_ATTRIBUTION))
+  const shared = fs.readFileSync(path.join(root, 'lib/attribution.ts'), 'utf8')
+  assert.equal(shared.split(RETROSHEET_ATTRIBUTION).length - 1, 1, 'the statement is written once in lib/attribution.ts')
+  assert.ok(!page.includes(RETROSHEET_ATTRIBUTION), 'the page does not keep its own copy')
+  assert.match(page, /import \{ RETROSHEET_STATEMENT, RETROSHEET_ENTRY \} from '..\/..\/lib\/attribution\.ts'/)
+  assert.match(page, /<Attribution statements=\{\[RETROSHEET_ENTRY\]\} \/>/)
+  assert.match(page, /const RETROSHEET_CREDIT = RETROSHEET_STATEMENT/)
 })

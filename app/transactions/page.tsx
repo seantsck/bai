@@ -4,6 +4,7 @@ import { StatusBadge, Attribution } from '../../components/TransactionBits.tsx'
 import { getTransactionPage, getTransactionOverview, getAttributionStatements, getOrganizationKeys } from '../../lib/queries.ts'
 import { parseTransactionParams, transactionHref, formatTransactionDate, CATEGORY_LABELS, TX_CATEGORIES, TX_STATUSES, STATUS_LABELS, TX_PAGE_SIZE } from '../../lib/transactions.ts'
 import { TRANSACTION_NAV } from '../../lib/nav.ts'
+import { pageStatements } from '../../lib/attribution.ts'
 
 export const dynamic = 'force-dynamic'
 export const metadata = { title: 'Transactions' }
@@ -18,9 +19,7 @@ export default async function TransactionsPage ({ searchParams }: { searchParams
   const rows = res.ok ? res.data.slice(0, TX_PAGE_SIZE) : []
   const hasNext = res.ok && res.data.length > TX_PAGE_SIZE
   const o = overview.ok ? overview.data : null
-  const shown = new Set(rows.flatMap((r) => (r.attribution_required ? ['x'] : [])))
-  const authorized: string[] = o?.display_authorized_categories ?? []
-  const required = statements.ok ? statements.data.filter((s) => authorized.includes(s.attribution_category) || shown.size > 0) : []   // every statement while totals are unavailable and rows are shown
+  const required = pageStatements({ statements: statements.ok ? statements.data : null, authorized: o ? (o.display_authorized_categories ?? []) : null, rowsRequire: rows.some((r) => r.attribution_required) })   // fails closed: Retrosheet's statement is owed unless the page proves none of its content is shown
   return (
     <>
       <PageHeader title='Transactions' lede='A searchable ledger of reconstructed historical transactions: trades, signings, waiver claims, purchases and Rule 5 selections. Each is shown with what is known, what is not, and where it came from.' />

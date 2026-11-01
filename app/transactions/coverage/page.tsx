@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { PageHeader, SubNav, DataTable, Notice, Stat, load, Unavailable } from '../../../components/ui.tsx'
 import { Attribution } from '../../../components/TransactionBits.tsx'
+import { pageStatements } from '../../../lib/attribution.ts'
 import { getTransactionOverview, getTransactionSeasonTotals, getTransactionClubSeasons, getAttributionStatements } from '../../../lib/queries.ts'
 import { CATEGORY_LABELS } from '../../../lib/transactions.ts'
 import { TRANSACTION_NAV } from '../../../lib/nav.ts'
@@ -13,8 +14,8 @@ const STATE_MARK: Record<string, string> = { COMPLETE_CENSUS: 'C', SUBSTANTIALLY
 export default async function TransactionCoveragePage () {
   const [ov, seasons, clubSeasons, statements] = await Promise.all([load(getTransactionOverview), load(getTransactionSeasonTotals), load(getTransactionClubSeasons), load(getAttributionStatements)])
   const o = ov.ok ? ov.data : null
-  const authorized: string[] = o?.display_authorized_categories ?? []
-  const required = statements.ok ? statements.data.filter((s) => !o || authorized.includes(s.attribution_category)) : []   // totals unavailable: credit every source rather than none
+  const aggregatesPresent = !seasons.ok || !clubSeasons.ok || seasons.data.some((r) => Number(r.records) > 0) || clubSeasons.data.some((r) => Number(r.records) > 0)   // a failed read counts as present: fail closed
+  const required = pageStatements({ statements: statements.ok ? statements.data : null, authorized: o ? (o.display_authorized_categories ?? []) : null, aggregatesPresent })
   const years = clubSeasons.ok ? [...new Set(clubSeasons.data.map((r) => Number(r.season)))].sort((a, b) => b - a) : []
   const clubs = clubSeasons.ok ? [...new Set(clubSeasons.data.map((r) => r.club_key as string))].sort() : []
   const cell = new Map((clubSeasons.ok ? clubSeasons.data : []).map((r) => [`${r.season}|${r.club_key}`, r]))
