@@ -11,9 +11,9 @@
 // The mode is chosen by the caller; neither mode ever falls back to the other.
 import { PLATFORM_FUNCTION_FILTER } from './catalog.mjs'
 
-// Migration 033: the relations only the website role (bai_site) may read among the registered-internal ones, besides the transaction read models. anon and authenticated are held to the
+// Migrations 033 and 034: the relations only the website role (bai_site) may read among the registered-internal ones, besides the transaction read models. anon and authenticated are held to the
 // ordinary rule for internal relations (no SELECT, no public policy) by the checks above, so this only declares which internal relations the website role is allowed to hold.
-const SITE_ONLY_033 = new Set(['players', 'player_external_ids', 'source_observations', 'coverage_assessments', 'v_draft_explorer', 'v_player_outcome_status', 'v_source_attribution'])
+const SITE_ONLY_033 = new Set(['player_aliases', 'players', 'player_external_ids', 'source_observations', 'coverage_assessments', 'v_draft_explorer', 'v_player_outcome_status', 'v_source_attribution'])
 
 const PUBLIC_ROLES = ['anon', 'authenticated']
 const PRIVATE_SCHEMAS = ['ingest', 'analytics', 'research', 'bai_meta']

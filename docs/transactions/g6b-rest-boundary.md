@@ -31,7 +31,8 @@ Why privilege denial and not row-level security: a role without `SELECT` is refu
 ## Tests (local, real PostgREST 12.2.3)
 `tests/db/rest-boundary.test.mjs` (9 tests) and `tests/db/promotion-indirect-033.test.mjs` (the emergency suite at 033): catalog state; `apply_public_boundary()` re-run; SQL refusal and website parity (every relation `anon` could read at the 032 stage is read identically by `bai_site` after 033); the full matrix on the baseline and again after a representative Retrosheet promotion (anon and authenticated x GET/HEAD x exact/planned/estimated x duplicated `Prefer` x writes); bypass attempts (embedding, inner joins, filters, RPC, JWT role claims, schema switch); a crawl of every endpoint the API advertises for a promoted player name or Retrosheet id; what stays open; the recovery script. `promotion-rest` and `promotion-counts` now run on the 032 stage (the contract between 032 and 033). In CI the pinned PostgREST release is downloaded and verified by SHA-256, and a missing binary fails the run (`BAI_REQUIRE_POSTGREST=1`): a skipped Data API test is UNVERIFIED, never a pass. The same matrix (141 checks) was also run against the restored baseline and the preserved full-size promoted copy (`~/bai-gates/g6b-evidence`).
 
-## Future release sequence (each hosted step separately authorized; none is performed here)
+## Future release sequence
+**Superseded by `g6d-aliases-and-release-plan.md`** (which adds migration 034, the pooler `SET ROLE` check, the 032-to-role-switch window and the rollback conditions). The original sequence follows for reference (each hosted step separately authorized; none is performed here).
 1. New verified production backup; read-only hosted parity check against its restore (G5-5D collector + `restore-export.mjs`).
 2. Migration 032 (locks on 94 relations: `lock_timeout` about 5 s, `statement_timeout` at least 2 minutes, one transaction).
 3. Set `BAI_PUBLIC_ROLE=bai_site` and redeploy the website.

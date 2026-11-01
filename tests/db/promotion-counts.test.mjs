@@ -12,7 +12,7 @@ import os from 'node:os'
 import path from 'node:path'
 import { spawn } from 'node:child_process'
 import * as h from './harness.mjs'
-import { BIN, SKIP } from '../support/postgrest.mjs'
+import { BIN, SKIP, freePort } from '../support/postgrest.mjs'
 import { applyMigrations } from '../../scripts/db/lib/migrations.mjs'
 import { SESSION_SQL, analyzeStatistics, buildPackage, promote, sha256, withdraw } from '../../scripts/db/lib/promotion.mjs'
 import { buildBaseline, importSample } from './promotion-fixture.mjs'
@@ -40,7 +40,7 @@ const get = (p, auth, prefers) => new Promise((resolve) => {
 const count = async (t, mode, auth = false) => { const r = await get(`${t}?select=id&limit=1`, auth, `count=${mode}`); assert.ok([200, 206].includes(r.status), `${t} ${mode} -> ${r.status} ${r.body.slice(0, 100)}`); return Number(r.total) }
 const snapshot = async (auth = false) => { const o = {}; for (const t of TABLES) for (const m of MODES) o[`${t}/${m}`] = await count(t, m, auth); return o }
 const startRest = async () => {
-  rest?.kill(); await sleep(400); port = 30000 + Math.floor(Math.random() * 20000)
+  rest?.kill(); await sleep(400); port = await freePort()
   rest = spawn(BIN, [], { stdio: 'ignore', env: { PATH: '/usr/bin:/bin', PGRST_DB_URI: `postgresql://authenticator:local@127.0.0.1:${main.port}/${MAIN}`, PGRST_DB_SCHEMAS: 'public', PGRST_DB_ANON_ROLE: 'anon', PGRST_SERVER_PORT: String(port), PGRST_SERVER_HOST: '127.0.0.1', PGRST_JWT_SECRET: SECRET } })
   for (let i = 0; i < 80; i++) { try { if ((await fetch(`http://127.0.0.1:${port}/`)).status < 500) return } catch { /* starting */ } await sleep(250) }
   throw new Error('PostgREST did not start')

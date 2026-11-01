@@ -18,11 +18,14 @@ import { buildBaseline, importSample } from './promotion-fixture.mjs'
 const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'bai-g55c-'))
 const MAIN = 'g55c_ind'
 const ROLES = ['anon', 'authenticated', 'bai_site']
-// The suite runs at two stages of the schema: 032 (the Data API roles read the identity tables; the website role reads them through anon) and 033 (only the website role holds a grant on them).
+// The suite runs at three stages of the schema: 032, 033 and 034 (the last also closes player_aliases to the Data API roles). 032 (the Data API roles read the identity tables; the website role reads them through anon) and 033 (only the website role holds a grant on them).
 // At 033 the Data API roles are refused on the four identity tables, so an assertion that a control row is "still readable" holds only for the website role there.
 const STAGE = process.env.BAI_STAGE ?? '032'
 const FOUR = /\b(from|join)\s+(players|player_external_ids|source_observations|coverage_assessments)\b/
-const ctl = (role, sql) => (STAGE === '033' && role !== 'bai_site' && FOUR.test(sql)) ? 0 : 1
+const ALIASES = /\b(from|join)\s+player_aliases\b/
+const ctl = (role, sql) => (role !== 'bai_site' && ((['033', '034'].includes(STAGE) && FOUR.test(sql)) || (STAGE === '034' && ALIASES.test(sql)))) ? 0 : 1
+// a count the role is allowed to see (where the table is closed to the Data API roles it must be refused, which is what 'hidden' means there)
+const seen = async (role, sql, want) => { if (ctl(role, sql) === 0) await denied(role, sql); else assert.equal(await n(role, sql), want, `${role}: ${sql}`) }
 let admin, main, batches, GRANT_ROW
 const open = async (name) => { const c = await h.connect(name); c.on('error', () => {}); await c.query(SESSION_SQL); return c }
 const rows = (c, sql, p) => h.rows(c, sql, p)
@@ -118,8 +121,8 @@ test('the dependents report names the referencing columns (and the subject), so 
 
 test('BEFORE the emergency the indirect references are publicly readable, the scan finds them, so the later tests are not vacuous', async () => {
   for (const role of ROLES) {
-    const found = await leakScan(role, pkg.sha); assert.ok(found.length >= 5, `${role}: ${found.join(' | ')}`)
-    assert.equal(await n(role, "select count(*)::int n from player_aliases where alias = 'Indirect Alias'"), 1)
+    const found = await leakScan(role, pkg.sha); assert.ok(found.length >= (ctl(role, 'from player_aliases') === 0 ? 4 : 5), `${role}: ${found.join(' | ')}`)   // at 034 the Data API roles no longer see the alias, so one finding fewer
+    await seen(role, "select count(*)::int n from player_aliases where alias = 'Indirect Alias'", 1)
   }
 })
 
@@ -131,8 +134,8 @@ test('EMERGENCY (hide): promoted rows are unreadable; indirect references are hi
   assert.ok(e.closed[0].indirect && e.closed[0].roles.includes('anon') && e.closed[0].roles.includes('authenticated'))
   for (const role of ROLES) {
     assert.deepEqual(await leakScan(role, pkg.sha), [], `${role}: no readable row reveals a promoted or indirect identity`)
-    assert.equal(await n(role, "select count(*)::int n from player_aliases where alias = 'Indirect Alias'"), 0)
-    assert.equal(await n(role, "select count(*)::int n from player_aliases where alias = 'Control Alias'"), 1, 'the unrelated alias is still public')
+    await seen(role, "select count(*)::int n from player_aliases where alias = 'Indirect Alias'", 0)
+    await seen(role, "select count(*)::int n from player_aliases where alias = 'Control Alias'", 1)   // the unrelated alias is still readable by the roles that can read the table
     assert.equal(await n(role, "select count(*)::int n from academies where slug = 'indirect-academy'"), 0); assert.equal(await n(role, "select count(*)::int n from academies where slug = 'control-academy'"), 1)
     { const sql = "select count(*)::int n from source_observations where field_name in ('nickname', 'note') and observed_value = to_jsonb('Indirect'::text)"; if (ctl(role, sql) === 0) await denied(role, sql); else assert.equal(await n(role, sql), 0) }
     { const sql = "select count(*)::int n from source_observations where field_name = 'nickname' and observed_value = to_jsonb('Control'::text)"; if (ctl(role, sql) === 0) await denied(role, sql); else assert.equal(await n(role, sql), 1) }
@@ -156,7 +159,7 @@ test('EMERGENCY (hide): promoted rows are unreadable; indirect references are hi
   // class 1 preserved, policies gone, privileges as before
   assert.equal((await rows(main, "select count(*)::int n from pg_policy where polname like 'emergency_hide_%'"))[0].n, 0)
   for (const role of ROLES) {
-    assert.equal(await n(role, "select count(*)::int n from player_aliases where alias = 'Control Alias'"), 1); assert.equal(await n(role, "select count(*)::int n from zz_ref_norls where note = 'control'"), 1)
+    await seen(role, "select count(*)::int n from player_aliases where alias = 'Control Alias'", 1); assert.equal(await n(role, "select count(*)::int n from zz_ref_norls where note = 'control'"), 1)
   }
   assert.equal(await privileges(), PRIV0, 'every public relation has exactly the privileges it had before the emergency')
 })
@@ -193,8 +196,8 @@ test('EMERGENCY (revert): hidden indirect references are readable again; a close
   const pkg3 = await buildPackage({ connect: open, admin, baseName: MAIN, stageName: 'g55c_ind_stage', config: config() })
   assert.equal((await promote({ connect: open, name: MAIN, pkg: pkg3 })).result, 'PROMOTED'); await refreshAll()
   ids = await plant('revert'); const PRIV2 = await privileges()
-  await emergencyWithdraw(main, pkg3.sha, 'drill: possible licence change'); assert.equal(await n('anon', "select count(*)::int n from player_aliases where alias = 'Indirect Alias'"), 0)
+  await emergencyWithdraw(main, pkg3.sha, 'drill: possible licence change'); const reader = STAGE === '034' ? 'bai_site' : 'anon'; assert.equal(await n(reader, "select count(*)::int n from player_aliases where alias = 'Indirect Alias'"), 0)
   assert.equal((await revertEmergency(main, pkg3.sha, 'false alarm')).state, 'PROMOTED')
-  assert.equal(await n('anon', "select count(*)::int n from player_aliases where alias = 'Indirect Alias'"), 1, 'visible again, as before the false alarm')
+  assert.equal(await n(reader, "select count(*)::int n from player_aliases where alias = 'Indirect Alias'"), 1, 'visible again, as before the false alarm')
   assert.equal(await privileges(), PRIV2); assert.equal((await rows(main, "select count(*)::int n from pg_policy where polname like 'emergency_hide_%'"))[0].n, 0)
 })
