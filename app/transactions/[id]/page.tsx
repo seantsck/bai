@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { PageHeader, SubNav, DataTable, Notice, load, Unavailable } from '../../../components/ui.tsx'
 import { StatusBadge, Attribution, PlayerLink } from '../../../components/TransactionBits.tsx'
+import { pageStatements } from '../../../lib/attribution.ts'
 import { getTransaction, getTransactionAssets, getTransactionSources, getTransactionFollowups, getTransactionReturns, getTransactionPackages, getAttributionStatements } from '../../../lib/queries.ts'
 import { statusView, gapLabel, formatTransactionDate, CATEGORY_LABELS, EVIDENCE_LABELS, AMOUNT_LABELS } from '../../../lib/transactions.ts'
 import { formatUsd, formatDate } from '../../../lib/format.ts'
@@ -22,7 +23,7 @@ export default async function TransactionPage ({ params }: { params: Promise<{ i
   const n = Number(t.transaction_id)
   const [assets, sources, followups, returns, packages, statements] = await Promise.all([load(() => getTransactionAssets(n)), load(() => getTransactionSources(n)), load(() => getTransactionFollowups(n)), load(() => getTransactionReturns(n)), load(() => getTransactionPackages(n)), load(getAttributionStatements)])
   const sv = statusView(t.status, t.verified_on, t.gaps)
-  const required = statements.ok ? statements.data.filter((s) => (t.source_categories as string[]).includes(s.attribution_category)) : []
+  const required = pageStatements({ statements: statements.ok ? statements.data : null, authorized: null, recordCategories: Array.isArray(t.source_categories) ? (t.source_categories as string[]) : null })   // the record's own source groups decide; a failed lookup cannot remove Retrosheet's statement
   const parties = t.parties as Array<{ key: string, name: string, slug: string }>
   const nameOf = (k: string | null) => parties.find((p) => p.key === k)?.name ?? k ?? '—'
   const unknowns: string[] = [...(t.gaps as string[]).map(gapLabel)]

@@ -1,14 +1,15 @@
 import { PageHeader, DataTable, Notice, load, Unavailable } from '../../components/ui.tsx'
 import { getSourceAttribution } from '../../lib/queries.ts'
 import { SOURCE_GROUP_LABELS, label } from '../../lib/format.ts'
+import { RETROSHEET_STATEMENT, RETROSHEET_ENTRY } from '../../lib/attribution.ts'
+import { Attribution } from '../../components/TransactionBits.tsx'
 
 export const dynamic = 'force-dynamic'
 export const metadata = { title: 'Sources & methodology' }
 
 // What each source group is, what BAI takes from it, and how it is credited. Crediting a source is not a claim of a right
 // to redistribute its data (docs/history/hosted-provenance.md).
-// Retrosheet's required statement (https://www.retrosheet.org/notice.txt), verbatim.
-const RETROSHEET_CREDIT = 'The information used here was obtained free of charge from and is copyrighted by Retrosheet. Interested parties may contact Retrosheet at "www.retrosheet.org".'
+const RETROSHEET_CREDIT = RETROSHEET_STATEMENT
 
 const GROUPS: { key: string, uses: string, credit: string }[] = [
   {
@@ -90,14 +91,14 @@ export default async function SourcesPage () {
         { key: 'observations', header: 'Field observations', numeric: true, render: (g) => res.ok ? (totals.get(g.key)?.observations ?? 0).toLocaleString('en-US') : '—' }
       ]} />
 
-      <h2>Reference data used in research</h2>
+      <h2>Retrosheet</h2>
+      <Attribution statements={[RETROSHEET_ENTRY]} />
       <p>
-        BAI’s research tooling also reads Retrosheet’s transactions file, an openly licensed reference dataset. It is not shown on this site yet; it is credited
-        here because Retrosheet’s notice requires its statement to appear prominently wherever its data is used.
+        Records derived from Retrosheet’s transactions archive appear on the Transactions pages and, as player identities (names and birth dates), on the Players pages,
+        for as long as they are published. Retrosheet’s notice requires its statement to appear prominently wherever its data is used, so it is shown above on this page and on
+        every Transactions and Players page; it is also stored with the Retrosheet source record. Retrosheet’s ids are matched to players only
+        through the Chadwick Register. Records that cite only Retrosheet are shown as partial, never as verified complete.
       </p>
-      <ul>
-        <li>{RETROSHEET_CREDIT}</li>
-      </ul>
 
       <h2>Rights</h2>
       <p>

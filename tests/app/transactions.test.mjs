@@ -72,7 +72,7 @@ test('the pages exist, render dynamically, read only the public read model, and 
 })
 
 test('the attribution component shows the statement verbatim from the database rows it is given', () => {
-  const src = fs.readFileSync(path.join(root, 'components/TransactionBits.tsx'), 'utf8')
+  const src = fs.readFileSync(path.join(root, 'components/Attribution.tsx'), 'utf8')
   assert.match(src, /<strong>\{s\.statement\}<\/strong>/)
   assert.match(fs.readFileSync(path.join(root, 'app/globals.css'), 'utf8'), /\.attribution \{[^}]*border: 2px solid/)
 })
