@@ -18,6 +18,11 @@ import { buildBaseline, importSample } from './promotion-fixture.mjs'
 const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'bai-g55c-'))
 const MAIN = 'g55c_ind'
 const ROLES = ['anon', 'authenticated', 'bai_site']
+// The suite runs at two stages of the schema: 032 (the Data API roles read the identity tables; the website role reads them through anon) and 033 (only the website role holds a grant on them).
+// At 033 the Data API roles are refused on the four identity tables, so an assertion that a control row is "still readable" holds only for the website role there.
+const STAGE = process.env.BAI_STAGE ?? '032'
+const FOUR = /\b(from|join)\s+(players|player_external_ids|source_observations|coverage_assessments)\b/
+const ctl = (role, sql) => (STAGE === '033' && role !== 'bai_site' && FOUR.test(sql)) ? 0 : 1
 let admin, main, batches, GRANT_ROW
 const open = async (name) => { const c = await h.connect(name); c.on('error', () => {}); await c.query(SESSION_SQL); return c }
 const rows = (c, sql, p) => h.rows(c, sql, p)
@@ -84,7 +89,7 @@ const leakScan = async (role, sha) => {
 before(async () => {
   await h.startServer(); admin = await h.connect('postgres'); await admin.query(`create database ${MAIN}`)
   main = await open(MAIN)
-  await applyMigrations(main, { through: '030' }); await buildBaseline(main, dir); await applyMigrations(main)
+  await applyMigrations(main, { through: '030' }); await buildBaseline(main, dir); await applyMigrations(main, { through: process.env.BAI_STAGE ?? '032' })   // the 032 stage (033: tests/db/rest-boundary.test.mjs, emergency-033.test.mjs)
   GRANT_ROW = (await rows(main, "select to_jsonb(g) j from ingest.source_publication_grants g where attribution_category = 'RETROSHEET'"))[0].j
   // a table with a foreign key to transactions, which the Data API can read (with row-level security) and one that it can read without (the fall-back: closed); the real public tables that
   // reference transactions need a draft or international signing first, which has nothing to do with this test
@@ -129,8 +134,8 @@ test('EMERGENCY (hide): promoted rows are unreadable; indirect references are hi
     assert.equal(await n(role, "select count(*)::int n from player_aliases where alias = 'Indirect Alias'"), 0)
     assert.equal(await n(role, "select count(*)::int n from player_aliases where alias = 'Control Alias'"), 1, 'the unrelated alias is still public')
     assert.equal(await n(role, "select count(*)::int n from academies where slug = 'indirect-academy'"), 0); assert.equal(await n(role, "select count(*)::int n from academies where slug = 'control-academy'"), 1)
-    assert.equal(await n(role, "select count(*)::int n from source_observations where field_name in ('nickname', 'note') and observed_value = to_jsonb('Indirect'::text)"), 0)
-    assert.equal(await n(role, "select count(*)::int n from source_observations where field_name = 'nickname' and observed_value = to_jsonb('Control'::text)"), 1)
+    { const sql = "select count(*)::int n from source_observations where field_name in ('nickname', 'note') and observed_value = to_jsonb('Indirect'::text)"; if (ctl(role, sql) === 0) await denied(role, sql); else assert.equal(await n(role, sql), 0) }
+    { const sql = "select count(*)::int n from source_observations where field_name = 'nickname' and observed_value = to_jsonb('Control'::text)"; if (ctl(role, sql) === 0) await denied(role, sql); else assert.equal(await n(role, sql), 1) }
     assert.deepEqual((await asRole(role, 'select note from zz_ref_rls order by id')).map((x) => x.note), ['control'])
     if (role !== 'bai_site' || true) await denied(role, 'select 1 from zz_ref_norls')
   }

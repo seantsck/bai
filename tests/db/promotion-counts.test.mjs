@@ -1,3 +1,4 @@
+// NOTE (G6B): runs on the 032 stage (migrations through 032): the mechanism of the planner-based counts for tables the Data API can read; 033 closes the identity tables (tests/db/rest-boundary.test.mjs).
 // G5-5C Part A: the Data API's planner-based counts (Prefer: count=planned | estimated) around a withdrawal, against a REAL PostgREST (a pinned local binary: BAI_POSTGREST_BIN,
 // default ~/tmp-bai/g5-2-bin/postgrest; skipped, loudly, without it). A DELETE does not change the planner's row estimate until ANALYZE, so a client could read how many rows a withdrawal
 // had removed. migration 032 analyzes inside the withdrawal transaction; these tests observe what independent REST clients actually see before, during and after the commit, with both orders of
@@ -11,12 +12,11 @@ import os from 'node:os'
 import path from 'node:path'
 import { spawn } from 'node:child_process'
 import * as h from './harness.mjs'
+import { BIN, SKIP } from '../support/postgrest.mjs'
 import { applyMigrations } from '../../scripts/db/lib/migrations.mjs'
 import { SESSION_SQL, analyzeStatistics, buildPackage, promote, sha256, withdraw } from '../../scripts/db/lib/promotion.mjs'
 import { buildBaseline, importSample } from './promotion-fixture.mjs'
 
-const BIN = process.env.BAI_POSTGREST_BIN ?? `${os.homedir()}/tmp-bai/g5-2-bin/postgrest`
-const SKIP = fs.existsSync(BIN) ? false : `SKIPPED: no PostgREST binary at ${BIN} (set BAI_POSTGREST_BIN)`
 const BULK = Number(process.env.BAI_COUNTS_BULK ?? 2500)
 const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'bai-g55c-'))
 const MAIN = 'g55c_counts'
@@ -60,7 +60,8 @@ before(async () => {
   await h.startServer(); admin = await h.connect('postgres'); await admin.query(`create database ${MAIN}`)
   main = await open(MAIN)
   await applyMigrations(main, { through: '030' }); await main.query("create role authenticator login noinherit password 'local'")
-  await buildBaseline(main, dir); await applyMigrations(main); await main.query('grant anon, authenticated to authenticator')
+  await buildBaseline(main, dir); await applyMigrations(main, { through: '032' }); // the 032 stage: the identity tables are still readable by the Data API roles (033 closes them: tests/db/rest-boundary.test.mjs)
+  await main.query('grant anon, authenticated to authenticator')
   // a plain table for the mechanism test (no promotion involved)
   await main.query(`create table public.zz_big (id bigint generated always as identity primary key, v text); insert into public.zz_big (v) select md5(g::text) from generate_series(1, 5000) g;
     alter table public.zz_big enable row level security; create policy public_read on public.zz_big for select to anon, authenticated using (true); grant select on public.zz_big to anon, authenticated`)

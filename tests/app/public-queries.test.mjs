@@ -7,6 +7,7 @@ import * as h from '../db/harness.mjs'
 let q, db, closePool, publicQuery, DatabaseUnavailableError
 
 before(async () => {
+  process.env.BAI_PUBLIC_ROLE = 'bai_site'   // 033: the raw identities and evidence are the website role's; the Data API roles (anon, authenticated) cannot read them
   ;({ publicQuery, closePool, DatabaseUnavailableError } = await import('../../lib/db.ts'))
   delete process.env.BAI_DATABASE_URL
   delete process.env.BAI_PUBLIC_DATABASE_URL
@@ -20,8 +21,9 @@ before(async () => {
 
 after(async () => { await closePool?.(); await h.stopServer() })
 
-test('public queries run as anon in a read-only transaction', async () => {
-  assert.deepEqual(await publicQuery('select current_user as u'), [{ u: 'anon' }])
+test('public queries run as the website role in a read-only transaction; the Data API role anon cannot read the identities', async () => {
+  assert.deepEqual(await publicQuery('select current_user as u'), [{ u: 'bai_site' }])
+  await assert.rejects(h.asRole(db, 'anon', () => db.query('select count(*) from players')), /permission denied/)
   await assert.rejects(publicQuery("insert into players (slug, full_name, display_name) values ('x','x','x')"), /read-only transaction|permission denied/)
   await assert.rejects(publicQuery('select * from research_tasks'), /permission denied/)
 })

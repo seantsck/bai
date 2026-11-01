@@ -43,7 +43,7 @@ test('attribution: each source is grouped by origin; the public summary and expl
     select d.id, r.id, 1, 1, (select id from organizations where franchise_key = 'KC'), (select id from players where slug = 'fixture-attribution'), (select id from sources where source_key = 'fx:mlb-api')
     from drafts d join draft_rounds r on r.draft_id = d.id and r.round_code = '1' where d.draft_key = '2019-JUNE_AMATEUR' returning id`)
   await db.query(`insert into draft_signings (draft_selection_id, signing_status, signing_bonus_usd, source_id) values ($1, 'SIGNED', 100000, (select id from sources where source_key = 'fx:bref'))`, [sel.id])
-  await h.asRole(db, 'anon', async () => {
+  await h.asRole(db, 'bai_site', async () => {
     const rows = await h.rows(db, `select attribution_category, domain, records, sources from v_source_attribution order by 1, 2`)
     const draft = Object.fromEntries(rows.filter((r) => r.domain === 'DRAFT').map((r) => [r.attribution_category, r.records]))
     assert.equal(draft.BASEBALL_REFERENCE, 1)   // the signing
@@ -96,7 +96,7 @@ test('publication guard (hosted only): existing records stay readable; new MLB a
   await db.query('create role supabase_admin nologin')   // what makes a database a Supabase (hosted) one
   try {
     // Existing MLB- and Baseball-Reference-sourced records: readable by the public site, and editable without changing their source.
-    await h.asRole(db, 'anon', async () => {
+    await h.asRole(db, 'bai_site', async () => {
       const r = await h.rows(db, `select a.selection_source_category, a.signing_source_category from v_selection_attribution a where a.selection_id in (select id from draft_selections where player_id in (select id from players where slug like 'fixture-%'))`)
       assert.ok(r.some((x) => x.selection_source_category === 'MLB' && x.signing_source_category === 'BASEBALL_REFERENCE'))
     })

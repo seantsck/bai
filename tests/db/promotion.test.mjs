@@ -53,7 +53,7 @@ before(async () => {
   await buildBaseline(main, dir)
   anonBefore = await anonRels(); attrBefore = await rows(main, 'select attribution_category, domain, records, sources from v_source_attribution order by 1, 2')
   W0 = pageQueries(null)
-  await applyMigrations(main)                                          // 032 is the only migration left to apply
+  await applyMigrations(main, { through: '032' })                                        // 032 is the only migration left to apply
   exId = Number((await rows(main, "select id from players where slug = 'g54-existing'"))[0].id)
   exRowHash = (await rows(main, 'select md5(p::text) h from players p where id = $1', [exId]))[0].h; exIdsBefore = (await rows(main, 'select count(*)::int n from player_external_ids where player_id = $1', [exId]))[0].n
   BASE_FP = await scopeFp(); BASE_RM = await rmSummary()

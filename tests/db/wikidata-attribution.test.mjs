@@ -157,7 +157,7 @@ test('a source cannot be reclassified or forged: updates, direct writes of the c
 })
 
 test('the public summaries show WIKIDATA; the rule is one immutable function', async () => {
-  await h.asRole(db, 'anon', async () => {
+  await h.asRole(db, 'bai_site', async () => {
     const rows = await h.rows(db, `select attribution_category, domain, records from v_source_attribution order by 1, 2`)
     assert.ok(rows.some((r) => r.attribution_category === 'WIKIDATA' && r.domain === 'FIELD_OBSERVATION'))
     assert.ok(rows.some((r) => r.attribution_category === 'WIKIDATA' && r.domain === 'DRAFT'))
