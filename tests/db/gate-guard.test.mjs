@@ -16,6 +16,8 @@ import crypto from 'node:crypto'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 const REF = 'dbnmktidheefoxaztivm'
+const FAKE_PW = 'fake-hosted-password-0123456789'   // distinctive: a leak into the fake CLI's arguments or output would be visible
+const PGOPTS = '-c lock_timeout=5s -c statement_timeout=120000'
 const COMMIT = 'a'.repeat(40)
 const all = listMigrations().map((m) => ({ version: m.version, file: m.file, checksum: m.checksum }))
 const gate = buildGate({ gate: 'G1', commit: COMMIT, through: '028', projectRef: REF, migrations: all })
@@ -89,8 +91,11 @@ test('the dry-run output of the Supabase CLI is read strictly', () => {
 
 // ---- integration: a real git repository, a real working directory, a fake supabase binary
 let tmp, repo, work, db
-const run = (cwd, script, args, env = {}) => spawnSync(process.execPath, [path.join(cwd, script), ...args], { cwd, encoding: 'utf8', env: { PATH: process.env.PATH, HOME: process.env.HOME, TMPDIR: os.tmpdir(), ...env } })
+// the guard now hands the CLI a scrubbed environment, so the fake CLI cannot read FAKE_DRY_RUN from it: the answer is written to a file the fake reads
+const run = (cwd, script, args, env = {}) => { if (env.FAKE_DRY_RUN !== undefined) fs.writeFileSync(path.join(tmp, 'dry-run.json'), env.FAKE_DRY_RUN); return runRaw(cwd, script, args, env) }
+const runRaw = (cwd, script, args, env = {}) => spawnSync(process.execPath, [path.join(cwd, script), ...args], { cwd, encoding: 'utf8', env: { PATH: process.env.PATH, HOME: process.env.HOME, TMPDIR: os.tmpdir(), ...env } })
 const git = (cwd, ...a) => { const r = spawnSync('git', a, { cwd, encoding: 'utf8' }); assert.equal(r.status, 0, `${a.join(' ')}: ${r.stderr}`); return r.stdout.trim() }
+const envLog = () => (fs.existsSync(path.join(tmp, 'cli-env.log')) ? fs.readFileSync(path.join(tmp, 'cli-env.log'), 'utf8').trim().split('\n') : [])
 const marker = () => (fs.existsSync(path.join(tmp, 'cli-calls.log')) ? fs.readFileSync(path.join(tmp, 'cli-calls.log'), 'utf8').trim().split('\n') : [])
 let gateFile, commit, preActivation
 
@@ -103,7 +108,7 @@ before(async () => {
   for (const f of ['package.json', '.gitignore']) fs.copyFileSync(path.join(root, f), path.join(repo, f))
   // node_modules: only `pg` (a symlink to the real package) and a FAKE supabase binary that records its arguments and answers a dry run with the three pending files
   fs.mkdirSync(path.join(repo, 'node_modules/.bin'), { recursive: true }); fs.symlinkSync(path.join(root, 'node_modules/pg'), path.join(repo, 'node_modules/pg'))
-  fs.writeFileSync(path.join(repo, 'node_modules/.bin/supabase'), `#!/usr/bin/env bash\necho "$*" >> "${path.join(tmp, 'cli-calls.log')}"\nif [[ "$*" == *"--dry-run"* ]]; then echo '{"upToDate":false,"dryRun":true,"migrations":'"$FAKE_DRY_RUN"',"seeds":[],"roles":[]}'; fi\n`, { mode: 0o755 })
+  fs.writeFileSync(path.join(repo, 'node_modules/.bin/supabase'), `#!/usr/bin/env bash\necho "$*" >> "${path.join(tmp, 'cli-calls.log')}"\necho "PGSSLMODE=$PGSSLMODE PGSSLROOTCERT=$PGSSLROOTCERT PGOPTIONS=[$PGOPTIONS] PGPASSWORD_set=\${PGPASSWORD:+yes} PGPASSWORD_is_the_hosted_one=$([ "$PGPASSWORD" = "${FAKE_PW}" ] && echo yes || echo no) BAI_vars=$(env | grep -c '^BAI_') SUPABASE_vars=$(env | grep -c '^SUPABASE_') ARGS_CONTAIN_PASSWORD=$(echo "$*" | grep -c "${FAKE_PW}")" >> "${path.join(tmp, 'cli-env.log')}"\nif [[ "$*" == *"--dry-run"* ]]; then echo '{"upToDate":false,"dryRun":true,"migrations":'"$(cat "${path.join(tmp, 'dry-run.json')}")"',"seeds":[],"roles":[]}'; fi\n`, { mode: 0o755 })
   git(repo, 'init', '-q', '-b', 'main'); git(repo, 'config', 'user.email', 't@example.test'); git(repo, 'config', 'user.name', 't')
   // commit 1 is the pre-activation state (the constant false), commit 2 the activation (true), whatever the constant is in the code under test
   const fpFile = path.join(repo, 'scripts/db/lib/final-parity.mjs')
@@ -163,16 +168,16 @@ test('workdir + offline check: the restricted checkout has migrations 001–028 
 
 test('online check against a stand-in for hosted (a local database at 027): passes when the history is right, refuses each unexpected change, and demands a dry run of exactly 028', () => {
   const { port, database } = db.connectionParameters
-  const env = (extra = {}) => ({ BAI_SUPABASE_PROJECT_REF: REF, BAI_DATABASE_URL: `postgresql://postgres:postgres@127.0.0.1:${port}/${database}`, BAI_SUPABASE_DB_PASSWORD: 'x', FAKE_DRY_RUN: '["028_transaction_forensics_foundation.sql"]', ...extra })
+  const env = (extra = {}) => ({ BAI_SUPABASE_PROJECT_REF: REF, BAI_DATABASE_URL: `postgresql://postgres:postgres@127.0.0.1:${port}/${database}`, BAI_SUPABASE_DB_PASSWORD: FAKE_PW, PGOPTIONS: PGOPTS, FAKE_DRY_RUN: '["028_transaction_forensics_foundation.sql"]', ...extra })
   const check = (e) => run(work, 'scripts/db/gate.mjs', ['check', '--gate', gateFile, '--dry-run'], e)
   let c = check(env()); assert.equal(c.status, 0, c.stdout + c.stderr); assert.match(c.stdout, /hosted migration history \(read-only\); dry run lists exactly the gate migration/); assert.match(c.stdout, /GATE CHECK OK/)
   c = check(env({ FAKE_DRY_RUN: '["028_transaction_forensics_foundation.sql","029_value_view_scale.sql","030_transaction_public_read_model.sql"]' })); assert.equal(c.status, 1); assert.match(c.stdout, /dry run lists/)
   c = check(env({ FAKE_DRY_RUN: '[]' })); assert.equal(c.status, 1)
 })
 
-test('db push is refused without a passing gate and never reaches the CLI; with one it runs exactly `db push --linked`', async () => {
+test('db push is refused without a passing gate and never reaches the CLI (and, once the gate passes, the verified connection is the only one it can use)', async () => {
   const { port, database } = db.connectionParameters
-  const base = { BAI_SUPABASE_PROJECT_REF: REF, BAI_SUPABASE_DB_PASSWORD: 'x', BAI_DATABASE_URL: `postgresql://postgres:postgres@127.0.0.1:${port}/${database}`, FAKE_DRY_RUN: '["028_transaction_forensics_foundation.sql"]' }
+  const base = { BAI_SUPABASE_PROJECT_REF: REF, BAI_SUPABASE_DB_PASSWORD: FAKE_PW, PGOPTIONS: PGOPTS, BAI_DATABASE_URL: `postgresql://postgres:postgres@127.0.0.1:${port}/${database}`, FAKE_DRY_RUN: '["028_transaction_forensics_foundation.sql"]' }
   const push = (cwd, args, e) => run(cwd, 'scripts/db/supabase-hosted.mjs', args, e)
   fs.rmSync(path.join(tmp, 'cli-calls.log'), { force: true })
   // no gate file
@@ -193,9 +198,33 @@ test('db push is refused without a passing gate and never reaches the CLI; with 
   assert.deepEqual(marker().filter((l) => !/--dry-run/.test(l)), [], 'no real push without the final parity record')
 })
 
+test('the verified-connection rules are enforced by the guard before any network contact: loose or missing timeouts, any SSL/host override, a swapped CA, --linked and widening flags are all refused', () => {
+  const { port, database } = db.connectionParameters
+  const base = { BAI_SUPABASE_PROJECT_REF: REF, BAI_SUPABASE_DB_PASSWORD: FAKE_PW, PGOPTIONS: PGOPTS, BAI_DATABASE_URL: `postgresql://postgres:postgres@127.0.0.1:${port}/${database}`, FAKE_DRY_RUN: '["028_transaction_forensics_foundation.sql"]', BAI_GATE_FILE: gateFile }
+  const push = (e, args = ['db', 'push']) => run(work, 'scripts/db/supabase-hosted.mjs', args, { ...base, ...e })
+  fs.rmSync(path.join(tmp, 'cli-calls.log'), { force: true })
+  const refusals = {
+    'PGOPTIONS missing': [{ PGOPTIONS: undefined }, /PGOPTIONS is not set/], 'lock_timeout 0': [{ PGOPTIONS: '-c lock_timeout=0 -c statement_timeout=120000' }, /lock_timeout is 0 ms/], 'lock_timeout 6s': [{ PGOPTIONS: '-c lock_timeout=6s -c statement_timeout=120000' }, /lock_timeout is 6000 ms/],
+    'statement_timeout 60s': [{ PGOPTIONS: '-c lock_timeout=5s -c statement_timeout=60000' }, /exactly 120000/], 'an extra option': [{ PGOPTIONS: `${PGOPTS} -c work_mem=1GB` }, /may set only lock_timeout and statement_timeout/],
+    'PGSSLMODE=require': [{ PGSSLMODE: 'require' }, /PGSSLMODE is set/], 'PGSSLROOTCERT': [{ PGSSLROOTCERT: '/etc/ssl/other.pem' }, /PGSSLROOTCERT is set/], 'SUPABASE_CA_SKIP_VERIFY': [{ SUPABASE_CA_SKIP_VERIFY: 'true' }, /SUPABASE_CA_SKIP_VERIFY is set/],
+    'PGHOST': [{ PGHOST: 'aws-1-ca-central-1.pooler.supabase.com' }, /PGHOST is set/], 'a pooler URL in SUPABASE_DB_URL': [{ SUPABASE_DB_URL: 'postgresql://postgres.x' + String.fromCharCode(64) + 'aws-1-ca-central-1.pooler.supabase.com:6543/postgres' }, /SUPABASE_DB_URL is set/],
+    'a CA override': [{ BAI_SUPABASE_CA_FILE: '/tmp/other.crt' }, /BAI_SUPABASE_CA_FILE is set/], 'PGPASSWORD already set': [{ PGPASSWORD: 'other' }, /PGPASSWORD is set/], 'a short password': [{ BAI_SUPABASE_DB_PASSWORD: 'short' }, /implausibly short/],
+    'no password': [{ BAI_SUPABASE_DB_PASSWORD: undefined }, /BAI_SUPABASE_DB_PASSWORD is not set/], 'the linked flag': [{}, /no extra flags/, ['db', 'push', '--linked']], 'a --db-url flag': [{}, /credentials through/, ['db', 'push', '--db-url']]
+  }
+  for (const [what, [e, re, args]] of Object.entries(refusals)) { const r = push(e, args); assert.equal(r.status, 1, `${what}: ${r.stdout}${r.stderr}`); assert.match(r.stderr, re, what); assert.ok(!(r.stdout + r.stderr).includes(FAKE_PW), `${what}: no password in the output`) }
+  // a CA file other than the pinned Supabase root (the checkout's committed file replaced) is refused before the gate or the CLI
+  const ca = path.join(work, 'supabase/prod-ca-2021.crt'); const orig = fs.readFileSync(ca)
+  try { fs.writeFileSync(ca, fs.readFileSync(path.join(root, 'tests/db/gate-guard.test.mjs')).slice(0, 10)); let r = push({}); assert.equal(r.status, 1); assert.match(r.stderr, /CA file|certificate/)
+    const other = spawnSync('openssl', ['req', '-x509', '-newkey', 'rsa:2048', '-nodes', '-keyout', '/dev/null', '-out', ca, '-subj', '/CN=Supabase Root 2021 CA', '-days', '400', '-addext', 'basicConstraints=critical,CA:TRUE'], { stdio: 'pipe' }); assert.equal(other.status, 0)
+    r = push({}); assert.equal(r.status, 1); assert.match(r.stderr, /not the pinned Supabase root/, 'a look-alike CA with the right name but another key is refused') } finally { fs.writeFileSync(ca, orig) }
+  // an unlinked or differently linked checkout
+  const ref = path.join(work, 'supabase/.temp/project-ref'); fs.writeFileSync(ref, 'a'.repeat(20)); try { const r = push({}); assert.equal(r.status, 1); assert.match(r.stderr, /linked to a{20}/) } finally { fs.writeFileSync(ref, REF) }
+  assert.deepEqual(marker().filter((l) => !/--dry-run/.test(l)), [], 'the CLI was never asked to push in any refused case')
+})
+
 test('protocol v2, the EXACT release command (the restricted checkout\'s own scripts/db/supabase-hosted.mjs, no extra switches): refuses missing, expired, altered and mismatched evidence, and pushes exactly once with a valid record', async () => {
   const { port, database } = db.connectionParameters
-  const env = { BAI_SUPABASE_PROJECT_REF: REF, BAI_SUPABASE_DB_PASSWORD: 'x', BAI_DATABASE_URL: `postgresql://postgres:postgres@127.0.0.1:${port}/${database}`, FAKE_DRY_RUN: '["028_transaction_forensics_foundation.sql"]', BAI_GATE_FILE: gateFile }
+  const env = { BAI_SUPABASE_PROJECT_REF: REF, BAI_SUPABASE_DB_PASSWORD: FAKE_PW, PGOPTIONS: PGOPTS, BAI_DATABASE_URL: `postgresql://postgres:postgres@127.0.0.1:${port}/${database}`, FAKE_DRY_RUN: '["028_transaction_forensics_foundation.sql"]', BAI_GATE_FILE: gateFile }
   const gateObj = JSON.parse(fs.readFileSync(gateFile, 'utf8'))
   assert.match(fs.readFileSync(path.join(work, 'scripts/db/lib/final-parity.mjs'), 'utf8'), /^export const PROTOCOL_V2_ENFORCED = true$/m, 'the restricted checkout carries its own, enforced guard')
   // a sound backup directory for the current (level 027) stand-in database, its encrypted archive and the copy returned from the off-site round trip
@@ -238,5 +267,9 @@ test('protocol v2, the EXACT release command (the restricted checkout\'s own scr
   assert.equal(realPushes(), 0, 'the CLI was never asked to push in any refused case')
   // a valid record: gate check, record verified, exactly one real push without widening flags
   r = push({ BAI_PARITY_RECORD: good }); assert.equal(r.status, 0, r.stdout + r.stderr); assert.match(r.stdout, /GATE CHECK OK/); assert.match(r.stdout, /final parity record verified/)
-  assert.deepEqual(marker().filter((l) => !/--dry-run/.test(l)), ['db push --linked'])
+  const real = marker().filter((l) => !/--dry-run/.test(l)); assert.equal(real.length, 1)
+  assert.match(real[0], new RegExp(`^db push --output-format json --db-url postgresql://postgres@db\\.${REF}\\.supabase\\.co:5432/postgres\\?sslmode=verify-full&sslrootcert=`)); assert.ok(!/--linked/.test(real[0]), 'never the linked connection'); assert.ok(!real[0].includes(FAKE_PW), 'the password is not in the arguments')
+  const last = envLog().at(-1); assert.match(last, /PGSSLMODE=verify-full /); assert.match(last, /PGSSLROOTCERT=\S*prod-ca-2021\.crt /); assert.match(last, /PGOPTIONS=\[-c lock_timeout=5000ms -c statement_timeout=120000ms\]/); assert.match(last, /PGPASSWORD_is_the_hosted_one=yes/)
+  assert.match(last, /BAI_vars=0 /, 'no BAI_* variable reaches the CLI'); assert.match(last, /SUPABASE_vars=0 /); assert.match(last, /ARGS_CONTAIN_PASSWORD=0$/); assert.ok(!r.stdout.includes(FAKE_PW) && !r.stderr.includes(FAKE_PW), 'the password is not in the guard\'s output')
+  assert.match(r.stdout, /verified connection: db\.dbnmktidheefoxaztivm\.supabase\.co:5432, sslmode verify-full, CA Supabase Root 2021 CA sha256 80:70:25:AD/)
 })
