@@ -26,6 +26,8 @@ The guard has no protocol-v1 fallback once enforced: the constant makes the reco
 * **Checked by code** (wrapper and push guard): the encrypted archive beside the backup (`<dir>.tar.zst.gpg`) exists, is an AES-256 OpenPGP file by its outer packets, and its SHA-256 and both companions equal the reported hashes; the reported content hash equals the backup directory's recomputed hash; the copy that came back from the owner's round trip (`returned-<name>/<name>.tar.zst.gpg`) exists and is byte-identical. A typed hash alone is not accepted as proof of anything.
 * **Attested by the owner, not provable by code:** that the round trip went through the private Restricted Google Drive folder, and that the returned copy **decrypted** with the content hash and internal `SHA256SUMS` passing (`backup-offsite.sh check` / Windows `Check`; decryption needs the passphrase, which the tools never see). Likewise the separate backup-specific authorization: the record only carries its reference text; whether it exists, names this backup and is in force is checked by the operator against the owner's message before running the push.
 
+> **Update (G6 R3 hardening):** the push no longer uses the CLI's linked connection; it uses a TLS-verified direct connection pinned to the Supabase root CA, requires `PGOPTIONS` timeouts, and passes the password in `PGPASSWORD` only. See [verified-tls-push.md](verified-tls-push.md). The commands below add `PGOPTIONS='-c lock_timeout=5s -c statement_timeout=120000'` in front of the push.
+
 ## Operating it (after activation is approved)
 ```
 E=/home/prismadmin/projects/bai/.env.hosted.local           # the one mode-600 original; no copy inside any worktree
