@@ -138,11 +138,12 @@ test('the REST-visible delta is computed from the catalog: after 034 only the ne
   assert.deepEqual(none, [], 'closed tables report nothing')
 })
 
-test('the production build pins no owner key yet, so every hosted write is refused (fail closed) even with a valid signature', () => {
-  assert.deepEqual([...OWNER_SIGNING_FINGERPRINTS], [], 'OWNER_SIGNING_FINGERPRINTS is empty until the owner pins a signing key in a reviewed commit')
+test('an empty pin list refuses every write (fail closed) even with a valid signature, and the shipped pin does not trust the test key', () => {
   const f = authorize('withdraw')
-  const v = verifyAuthorization(f, { operation: 'withdraw', projectRef: REF, manifest: pkg.sha, keyring: pubHome, pinned: OWNER_SIGNING_FINGERPRINTS })
+  const v = verifyAuthorization(f, { operation: 'withdraw', projectRef: REF, manifest: pkg.sha, keyring: pubHome, pinned: [] })
   assert.match(v.problems.join(), /no owner signing key is pinned/)
+  const w = verifyAuthorization(f, { operation: 'withdraw', projectRef: REF, manifest: pkg.sha, keyring: pubHome, pinned: OWNER_SIGNING_FINGERPRINTS })
+  assert.match(w.problems.join(), /not one of the keys pinned|not a good signature/, 'a good signature by another key is refused under the shipped pin')
 })
 
 test('control: the inputs of a promotion check out with a good signature, a fresh evidence file and a fresh parity record', () => {
@@ -283,12 +284,12 @@ test('the argument parser refuses unsupported and dangerous flags, duplicates an
   assert.deepEqual(parseArgs(['promote', '--package', 'p', '--authorization', 'a', '--attribution-evidence', 'e', '--parity-record', 'r', '--owner-keyring', 'k']).o, { package: 'p', authorization: 'a', 'attribution-evidence': 'e', 'parity-record': 'r', 'owner-keyring': 'k' })
 })
 
-test('the CLI itself: unsupported flags exit 2; the build without a pinned owner key refuses a complete, correctly signed promotion before connecting; the local tool still refuses hosted', () => {
+test('the CLI itself: unsupported flags exit 2; the build refuses a complete promotion signed by a key that is not the pinned owner key, before connecting; the local tool still refuses hosted', () => {
   const cli = (args, e = {}) => spawnSync(process.execPath, ['scripts/db/promotion-hosted.mjs', ...args], { cwd: root, encoding: 'utf8', env: { PATH: process.env.PATH, HOME: tmp, ...e } })
   assert.equal(cli(['promote', '--hosted', 'x']).status, 2)
   assert.equal(cli(['status']).status, 2)
   const r = cli(['promote', '--package', pkgDir, '--authorization', authorize('promote'), '--attribution-evidence', evidenceFile, '--parity-record', parityFile, '--owner-keyring', pubHome], { BAI_SUPABASE_PROJECT_REF: REF, BAI_SUPABASE_DB_PASSWORD: 'x'.repeat(12) })
-  assert.equal(r.status, 1); assert.match(r.stdout, /no owner signing key is pinned/); assert.match(r.stdout, /before any connection/)
+  assert.equal(r.status, 1); assert.match(r.stdout, /not one of the keys pinned|not a good signature/); assert.match(r.stdout, /before any connection/)
   const local = spawnSync(process.execPath, ['scripts/db/promotion.mjs', 'promote', '--package', pkgDir, '--hosted'], { cwd: root, encoding: 'utf8', env: { PATH: process.env.PATH, HOME: tmp } })
   assert.equal(local.status, 2); assert.match(local.stderr, /NOT AUTHORIZED/)
   const local2 = spawnSync(process.execPath, ['scripts/db/promotion.mjs', 'status', '--manifest', pkg.sha], { cwd: root, encoding: 'utf8', env: { PATH: process.env.PATH, HOME: tmp, BAI_DATABASE_URL: 'postgresql://postgres:x@db.dbnmktidheefoxaztivm.supabase.co:5432/postgres', BAI_ALLOW_REMOTE_DB: '1', BAI_SUPABASE_PROJECT_REF: REF } }) // credential-scan:allow (a placeholder password for a refusal test)
