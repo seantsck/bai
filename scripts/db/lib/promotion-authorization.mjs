@@ -2,7 +2,7 @@
 //
 // A hosted write needs a file that only the OWNER can make: a small JSON document naming the exact operation, project and manifest, plus a detached OpenPGP signature over its bytes by the
 // owner's release-signing key. The runner verifies the signature with `gpg` against a keyring that holds only PUBLIC keys and against the key fingerprints PINNED in this repository
-// (OWNER_SIGNING_FINGERPRINTS, empty until the owner pins a signing key in a reviewed commit: while it is empty every hosted write is refused). A developer, a script or this tool cannot
+// (OWNER_SIGNING_FINGERPRINTS, the owner's dedicated Ed25519 signing SUBKEY, pinned in a reviewed commit: were the list ever empty every hosted write would be refused). A developer, a script or this tool cannot
 // produce a valid artifact; nothing here signs anything. One artifact authorizes one operation once: the runner records its hash in the operator-host attempt ledger and refuses a second use.
 //
 // What an artifact binds (all of it is checked against what the runner computes itself, never taken on trust):
@@ -22,8 +22,8 @@ import { spawnSync } from 'node:child_process'
 export const AUTHORIZATION_FORMAT = 'bai-promotion-authorization/1'
 export const OPERATIONS = Object.freeze(['promote', 'withdraw', 'emergency', 'finish', 'revert', 'analyze'])
 export const MAX_WINDOW_MS = 24 * 3600e3
-/** The owner's release-signing key fingerprints (40 hex, upper case). EMPTY until the owner has made a signing key and pinned it by a reviewed commit: the runner then refuses every write. */
-export const OWNER_SIGNING_FINGERPRINTS = Object.freeze([])
+/** The owner's release-signing key fingerprints (40 hex, upper case): the dedicated Ed25519 signing SUBKEY (capability [S], expires 2027-11-04), not its primary. An empty list makes the runner refuse every write. */
+export const OWNER_SIGNING_FINGERPRINTS = Object.freeze(['86F2D7601CBF30BE47536EDD9819DB56B663821E'])
 const HEX64 = /^[0-9a-f]{64}$/
 const REF_RE = /^[a-z0-9]{20}$/
 
