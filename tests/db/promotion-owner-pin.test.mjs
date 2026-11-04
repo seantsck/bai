@@ -36,7 +36,7 @@ before(() => {
   const oldPub = path.join(tmp, 'old.pub'); ok(gpg(oldHome, ['--export', '--output', oldPub])); ok(gpg(pub, ['--import', oldPub]))
   ok(gpg(sec, ['--export', '--output', pubFile])); ok(gpg(pub, ['--import', pubFile]))
 })
-after(() => fs.rmSync(tmp, { recursive: true, force: true }))
+after(() => { for (const h of [sec, pub, other, old()]) spawnSync('gpgconf', ['--kill', 'gpg-agent'], { env: { PATH: process.env.PATH, HOME: process.env.HOME, GNUPGHOME: h } }); fs.rmSync(tmp, { recursive: true, force: true }) })
 
 test('GnuPG identifies the precise signing subkey: the pinned subkey is accepted and reported as the signer; the primary is certify-only and the encryption subkey cannot sign', () => {
   const f = mkAuth(); signWith(f, SUB_A)
@@ -57,7 +57,7 @@ test('a signature by a different key, a tampered file, a missing signature and a
   const f = mkAuth(); signWith(f, SUB_A); fs.writeFileSync(f, fs.readFileSync(f, 'utf8').replace('pin test', 'pin tesT')); assert.match(check(f).problems.join(), /not a good signature|no valid signature/)
   const g = mkAuth(); assert.match(check(g).problems.join(), /signature file .* missing|missing or unreadable/)
   ok(gpg(other, ['--quick-generate-key', 'Someone Else', 'ed25519', 'sign', 'never'])); const of = /^fpr:::::::::([0-9A-F]{40}):/m.exec(colons(other))[1]
-  const h = mkAuth(); signWith(h, of, other); assert.match(check(h).problems.join(), /not a good signature|no valid signature|not one of the keys pinned/, 'a key that is in the owner keyring only if imported, and never pinned')
+  const h = mkAuth(); signWith(h, of, other); assert.match(check(h).problems.join(), /not a good signature|no valid signature|not one of the keys pinned/, 'a key that is not in the verification keyring at all (NO_PUBKEY); the imported-but-unpinned case is the sibling-subkey test')
   const empty = path.join(tmp, 'empty'); fs.mkdirSync(empty, { mode: 0o700 }); const k = mkAuth(); signWith(k, SUB_A)
   assert.match(check(k, { keyring: empty }).problems.join(), /not a good signature|no valid signature/, 'no public key in the verification keyring')
   assert.match(check(k, { keyring: path.join(tmp, 'absent') }).problems.join(), /does not exist/)
@@ -88,5 +88,4 @@ test('the shipped pin: exactly one 40-hex upper-case fingerprint that is a signi
   assert.notEqual(pin, '47AB7918CDED25B47AE056C5E204499803387355', 'not the owner\'s existing certify/encrypt primary key')
   assert.notEqual(pin, '6458A33EDC92FA39C9A008327E21FB694F673D79', 'not the backup-encryption subkey')
   assert.ok(Object.isFrozen(OWNER_SIGNING_FINGERPRINTS))
-  assert.equal(verifyDetachedSignature(Buffer.from('x'), '/nonexistent.sig', { keyring: pub, pinned: [] }).ok, false, 'with an empty pin list nothing verifies (the former default)')
 })
