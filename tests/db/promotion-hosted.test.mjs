@@ -15,7 +15,7 @@ import { takeSnapshot } from '../../scripts/db/lib/snapshot.mjs'
 import { buildPromotionRecord, contentTreeHash, compareExports } from '../../scripts/db/lib/final-parity.mjs'
 import { SESSION_SQL, buildPackage, loadPackage, sha256, verifyPackage, writePackage } from '../../scripts/db/lib/promotion.mjs'
 import { AUTHORIZATION_FORMAT, OWNER_SIGNING_FINGERPRINTS, attemptLedger, verifyAuthorization } from '../../scripts/db/lib/promotion-authorization.mjs'
-import { checkEvidence, hostedPreflight, operateHosted, promoteHosted, promoteInputs, readModelState, restPublicDelta, resolveState, statusHosted, verifyPromotedHosted } from '../../scripts/db/lib/promotion-hosted.mjs'
+import { checkEvidence, draftAuthorization, hostedPreflight, operateHosted, promoteHosted, promoteInputs, readModelState, restPublicDelta, resolveState, statusHosted, verifyPromotedHosted } from '../../scripts/db/lib/promotion-hosted.mjs'
 import { parseArgs } from '../../scripts/db/lib/promotion-hosted-args.mjs'
 import { buildBaseline, importSample } from './promotion-fixture.mjs'
 
@@ -137,6 +137,22 @@ test('the production build pins no owner key yet, so every hosted write is refus
 test('control: the inputs of a promotion check out with a good signature, a fresh evidence file and a fresh parity record', () => {
   const r = promoteInputs({ pkgDir, authFile: authorize('promote'), evidenceFile, parityFile, env: {}, projectRef: REF, keyring: pubHome, pinned: [FPR], ledger })
   assert.deepEqual(r.problems, [])
+})
+
+test('draft-authorization writes an UNSIGNED draft for the owner: it is filled in from the files and a read-only look at the database, verifies only after the owner signs it, and a close-api draft starts with the outage NOT acknowledged', async () => {
+  const draft = await draftAuthorization(ctx(), { operation: 'promote', pkgDir, parityFile, evidenceFile })
+  const f = path.join(tmp, 'draft-promote.json'); fs.writeFileSync(f, JSON.stringify(draft, null, 1))
+  const o = { operation: 'promote', projectRef: REF, manifest: pkg.sha, keyring: pubHome, pinned: [FPR] }
+  assert.match(verifyAuthorization(f, o).problems.join(), /signature/, 'an unsigned draft authorizes nothing')
+  assert.ok(!fs.existsSync(`${f}.sig`)); assert.deepEqual(draft.rest_public_delta, restDelta); assert.equal(draft.parity_record_sha256, sha256(fs.readFileSync(parityFile))); assert.equal(draft.attribution_evidence_sha256, evidence.evidence_sha256)
+  sign(f); assert.deepEqual(verifyAuthorization(f, o).problems, [], 'signed by the owner, the draft is a valid authorization')
+  assert.equal(draft.after_attempt, null); assert.ok(Date.parse(draft.expires_at) - Date.parse(draft.not_before) <= 3600e3 + 1000)
+  const em = await draftAuthorization(ctx(), { operation: 'emergency', manifest: pkg.sha, reason: 'test', closeApi: true }); assert.deepEqual(em.options, { close_api: true, acknowledge_site_outage: false })
+  const ef = path.join(tmp, 'draft-emergency.json'); fs.writeFileSync(ef, JSON.stringify(em)); sign(ef); assert.match(verifyAuthorization(ef, { ...o, operation: 'emergency' }).problems.join(), /acknowledge the outage/, 'the owner must change the acknowledgement deliberately')
+  await assert.rejects(draftAuthorization(ctx(), { operation: 'withdraw', manifest: pkg.sha }), /needs a --reason/)
+  await assert.rejects(draftAuthorization(ctx(), { operation: 'promote', pkgDir, parityFile, evidenceFile, now: Date.now() + 80 * 3600e3 }), /cannot draft/)
+  assert.deepEqual(parseArgs(['draft-authorization', '--operation', 'emergency', '--out', 'x', '--manifest', 'a', '--reason', 'r', '--close-api']).o, { operation: 'emergency', out: 'x', manifest: 'a', reason: 'r', 'close-api': true })
+  assert.ok(parseArgs(['withdraw', '--manifest', 'a', '--authorization', 'b', '--close-api']).error, 'the switches exist only on the draft command')
 })
 
 test('authorization: missing, unsigned, tampered, signed by another key, wrong operation, project or manifest, expired, not yet valid, over-long window, replayed', () => {

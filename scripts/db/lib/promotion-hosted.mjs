@@ -8,10 +8,11 @@
 //   * a verified TLS connection to the pinned project (lib/hosted-connection.mjs)
 // Failure policy: every check fails closed; nothing is retried; a result that cannot be told from the connection is resolved by asking the ledger on a NEW read-only connection, and when
 // even that fails the attempt stays UNKNOWN and a human decides.
+import crypto from 'node:crypto'
 import fs from 'node:fs'
 import path from 'node:path'
 import { canon, dependents, emergencyWithdraw, finishWithdrawal, loadPackage, openSession, promoteOnce, revertEmergency, statusOf, analyzeStatistics, vacuumAfterWithdrawal, verifyPackage, withdraw } from './promotion.mjs'
-import { verifyAuthorization, sha256Hex } from './promotion-authorization.mjs'
+import { AUTHORIZATION_FORMAT, OPERATIONS, verifyAuthorization, sha256Hex } from './promotion-authorization.mjs'
 import { MAX_BACKUP_AGE_MS, backupStartedAt, contentTreeHash, verifyBackupDir, verifyOffsiteEvidence, verifyPromotionRecordFile } from './final-parity.mjs'
 
 export const EXPECTED_LEVEL = '034'
@@ -299,4 +300,33 @@ export async function verifyPromotedHosted (ctx, pkgDir) {
   const pv = verifyPackage(pkgDir); if (pv.length) refuse(`package: ${pv.join('; ')}`)
   const pkg = loadPackage(pkgDir); const session = await ctx.connect(); const c = await openSession(session.client)
   try { return await verifyPromoted(c, pkg, { expectedMlb: ctx.expectedMlb ?? EXPECTED_MLB_TRANSACTIONS }) } finally { await session.client.end().catch(() => {}) }
+}
+
+/**
+ * An UNSIGNED draft of the owner authorization for an operation, filled in from the files and (read-only) from the database, for the owner to review field by field and sign with their own
+ * key. It carries no signature and is worthless until the owner signs it: this tool never signs anything, and a draft for an emergency close-api has the outage acknowledgement set to false
+ * on purpose (the owner must change it to true deliberately).
+ */
+export async function draftAuthorization (ctx, { operation, manifest, pkgDir, parityFile, evidenceFile, reason, closeApi = false, withGrant = false, afterAttempt = null, hours = 1, now = Date.now() }) {
+  if (!OPERATIONS.includes(operation)) refuse(`unknown operation ${operation}`)
+  const draft = { format: AUTHORIZATION_FORMAT, operation, project_ref: ctx.projectRef, manifest_sha256: manifest, not_before: new Date(now).toISOString(), expires_at: new Date(now + Math.min(Math.max(hours, 0.1), 24) * 3600e3).toISOString(), nonce: crypto.randomBytes(16).toString('hex'), after_attempt: afterAttempt }
+  if (operation !== 'promote') {
+    if (!/^[0-9a-f]{64}$/.test(manifest ?? '')) refuse('--manifest must be a 64-hex manifest SHA-256')
+    if (['withdraw', 'emergency', 'finish', 'revert'].includes(operation)) { if (!String(reason ?? '').trim()) refuse(`${operation} needs a --reason`); draft.reason = reason }
+    if (operation === 'withdraw' && withGrant) draft.options = { with_grant: true }
+    if (operation === 'emergency' && closeApi) draft.options = { close_api: true, acknowledge_site_outage: false }
+    return draft
+  }
+  const pv = verifyPackage(pkgDir); if (pv.length) refuse(`package: ${pv.join('; ')}`)
+  const pkg = loadPackage(pkgDir); draft.manifest_sha256 = pkg.sha
+  const bad = [...checkEvidence(evidenceFile, pkg.manifest, { now }).map((x) => `attribution evidence: ${x}`), ...verifyPromotionRecordFile(parityFile, { manifest: pkg.manifest, manifestSha: pkg.sha, projectRef: ctx.projectRef, expectLevel: EXPECTED_LEVEL, now }).map((x) => `parity record: ${x}`)]
+  if (bad.length) refuse(`cannot draft:\n  ${bad.join('\n  ')}`)
+  const rec = JSON.parse(fs.readFileSync(parityFile, 'utf8')); const ev = JSON.parse(fs.readFileSync(evidenceFile, 'utf8'))
+  const session = await ctx.connect(); const c = await openSession(session.client)
+  try {
+    await c.query('begin read only'); let delta; try { delta = await restPublicDelta(c, pkg.manifest) } finally { await c.query('rollback').catch(() => {}) }
+    Object.assign(draft, { backup: { name: path.basename(rec.backup.dir), t0: rec.backup.started_at, manifest_sha256: rec.backup.manifest_sha256, archive_sha256: rec.offsite.encrypted_sha256, content_tree_sha256: rec.backup.tree_sha256, offsite_record_sha256: rec.offsite.verification_record_sha256 },
+      parity_record_sha256: sha256Hex(fs.readFileSync(parityFile)), attribution_evidence_sha256: ev.evidence_sha256, rest_public_delta: delta.map(({ relation, rows, readable_by: by }) => ({ relation, rows, by })) })
+  } finally { await session.client.end().catch(() => {}) }
+  return draft
 }
