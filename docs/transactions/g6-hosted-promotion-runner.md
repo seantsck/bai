@@ -1,0 +1,110 @@
+# G6 — the gated hosted promotion runner (development and full-scale rehearsal)
+
+**Status: DEVELOPMENT ONLY. NOT AUTHORIZED FOR ANY HOSTED WRITE.** Merging this change publishes code, nothing else: the shipped build pins **no owner signing key** (`OWNER_SIGNING_FINGERPRINTS` is empty), so every hosted write is refused until the owner has made a signing key and pinned it in a reviewed commit. No hosted database was contacted, no production backup was taken, no grant, import, promotion, withdrawal, refresh, Vercel change or migration (001–034 are untouched) is part of this change.
+
+The local tool (`scripts/db/promotion.mjs`, `scripts/db/lib/promotion.mjs`) is **unchanged in behaviour**: it still refuses every non-local database and `--hosted`. The hosted runner is a separate, narrow entrypoint.
+
+## 1. What was built
+
+| File | Role |
+| --- | --- |
+| `scripts/db/promotion-hosted.mjs` | the CLI: `status`, `verify-promoted`, `promote`, `withdraw`, `emergency`, `finish`, `revert`, `analyze`, `draft-authorization`, `check-authorization` |
+| `scripts/db/lib/promotion-hosted-args.mjs` | strict argument parser (each command accepts only its own options; no `--hosted`, `--confirm-hosted`, `--database`, `--url`, `--force`, `--retry`, `--reason`, `--close-api`, `--with-grant` on a write command: what an operation does is fixed by the owner's signed file) |
+| `scripts/db/lib/hosted-connection.mjs` | the only database connection the runner may open (section 4) |
+| `scripts/db/lib/promotion-authorization.mjs` | the owner authorization contract, the detached-signature check, the operator-host attempt ledger (section 3) |
+| `scripts/db/lib/promotion-hosted.mjs` | the checks and operations: hosted preflight, REST-exposure audit, attribution-evidence check, the promote/withdraw/emergency/finish/revert/analyze flows, ambiguity resolution, post-verification |
+| `scripts/db/lib/final-parity.mjs`, `scripts/db/final-parity.mjs` | a **promotion mode** (`--promotion-package <dir>` instead of `--gate`): the same backup/off-site/strict-preflight/fresh-export comparison, bound to the project, migration level 034 and the exact package; valid ten minutes |
+| `tests/db/promotion-hosted.test.mjs`, `tests/db/promotion-hosted-tls.test.mjs` | the tests (section 9) |
+
+Nothing in `lib/promotion.mjs` or `scripts/db/promotion.mjs` was edited; the hosted runner imports its pure functions (`promoteOnce`, the withdrawal calls, `verifyPackage`, …) and deliberately **not** `promote()`, whose automatic retry the hosted runner must not inherit.
+
+## 2. Security architecture and threat model
+
+Assets: the production database (a promotion makes ~95,000 rows of third-party historical data public through the website at commit), the owner's authority over what is published, the integrity of the baseline (65 MLB trades withheld, existing players), the Retrosheet attribution obligation, and the production credential.
+
+| Threat | Control | Residual risk |
+| --- | --- | --- |
+| A developer, script or AI session performs a hosted write without the owner | every write needs a JSON authorization with a **detached OpenPGP signature** by a key whose fingerprint is **pinned in the repository**; the runner host holds only the owner's public key (a keyring with a secret key is refused); nothing in this repository can sign; the pin list is empty in this build | the owner's signing key is the root of trust; its loss or compromise is outside this tool |
+| A signed authorization is replayed or used for something else | it binds operation, project, manifest, a ≤24 h window, a 128-bit nonce and (promote) the backup, parity record, attribution evidence and the exact REST-visible delta; it is consumed on this host before the first write (`O_EXCL`), so a second use is refused even in a parallel process | the consumed-artifact ledger is per host; the database's own manifest state (PROMOTED cannot be promoted again, WITHDRAWN never) is the final word |
+| Man-in-the-middle or a look-alike host | `sslmode=verify-full` semantics through node-postgres (`rejectUnauthorized: true`, `servername` = the project host), the **pinned Supabase Root 2021 CA** (identity, CA flag, validity, SHA-256 fingerprint), host derived from the 20-character project reference only (`db.<ref>.supabase.co:5432`), no URL, no pooler, TLS ≥ 1.2, password only in the client configuration (never argv, URL or log; redacted from errors); `NODE_TLS_REJECT_UNAUTHORIZED`, `NODE_EXTRA_CA_CERTS`, `SSL_CERT_*`, `NODE_OPTIONS`, every `PG*` variable and every connection-URL variable make the runner **refuse to start** | the pinned CA expires 2031-04-26 (the check demands ≥ 30 days left) |
+| A pooler or proxy silently drops the startup options | after connecting, the server is asked for its own `lock_timeout` and `statement_timeout`, encryption (`pg_stat_ssl`), database, user and port; anything but 5 s / 120 s / TLS / `postgres` / `postgres` / 5432 closes the connection | none known |
+| A long-running or contended write holds production | `lock_timeout` 5 s, `statement_timeout` 120 s, `idle_in_transaction_session_timeout` 5 min on the session | a statement near the limit fails the operation (atomic); measured times are in section 7 |
+| A lost connection hides the outcome and an operator or script repeats a committed promotion | no retry anywhere; an unclear result is resolved on a **new read-only connection** by asking the ledger (polling while a writer session is still active); the attempt record says COMMITTED, NOT_PROMOTED_CONFIRMED or UNKNOWN; another attempt needs a new owner authorization that names the earlier attempt (`after_attempt`) | an UNKNOWN result needs a human with `status` |
+| Wrong, stale or tampered inputs | package re-verified file by file; manifest ledger = hosted ledger exactly (and the Supabase history agrees; 031 absent); every one of the 94 scope tables fingerprinted against the manifest baseline inside a repeatable-read read-only transaction; backup ≤ 6 h with verified encrypted off-site evidence and a parity record ≤ 10 min made from the backup tool's verified record; live attribution evidence recomputed and ≤ 72 h old; grant row bound by hash; 65 MLB transactions; empty transaction read models; no other manifest; the database repeats the drift check inside the promotion transaction (`promote_begin`) | — |
+| Publication is wider than the owner understood | the runner computes, from the catalog, every relation a Data API role could read after the promotion (tables by privilege, owner-rights views over them) and the owner's signed file must list exactly that set with row counts (section 6) | a new public relation added later is caught by the next preflight, not retroactively |
+| Emergency close-api switches off public endpoints and website pages | the authorization must carry `acknowledge_site_outage: true` (a draft starts with `false`); the impact is documented (section 7) and needs its own owner authorization at execution time | the outage is real by design |
+
+Not a control, stated plainly: the rehearsal could not exercise the real Supabase platform (pooler, gateway rate limits, hosted timings), and the shipped build cannot be used until the owner pins a key. The local `assertLocalTarget` remains the only protection of the old tool; it was not weakened.
+
+## 3. Owner authorization contract
+
+One file per operation, `bai-promotion-authorization/1`, plus `<file>.sig` (detached OpenPGP signature of the exact bytes). Fields: `format`, `operation` (`promote | withdraw | emergency | finish | revert | analyze`), `project_ref`, `manifest_sha256`, `not_before`, `expires_at` (window ≤ 24 h), `nonce` (≥ 32 hex), `after_attempt` (null or the id of the earlier attempt the owner has seen), and:
+
+* **promote**: `backup {name, t0, manifest_sha256, archive_sha256, content_tree_sha256, offsite_record_sha256}` (all equal to the parity record's, which must itself come from the backup tool's verified off-site record), `parity_record_sha256`, `attribution_evidence_sha256`, `rest_public_delta [{relation, rows, by}]`.
+* **withdraw / emergency / finish / revert**: `reason`; withdraw may set `options.with_grant`; emergency may set `options.close_api` and then must set `options.acknowledge_site_outage: true`.
+* **analyze**: planner statistics only.
+
+`promotion-hosted.mjs draft-authorization` writes an **unsigned** draft filled from the files and a read-only look at the database, for the owner to read field by field and sign with their own key (`gpg --detach-sign`); `check-authorization` verifies a signed file offline. A developer-made approval is therefore impossible by construction: the tool has no signing code and no private key.
+
+**Prerequisite found:** the owner's current key (`47AB7918…7355`) is certify/encrypt only (no signing capability). The owner must create a signing (sub)key, place its public part in a keyring on the runner host (default `~/.config/bai-release/gnupg`, public keys only), and pin its fingerprint in `OWNER_SIGNING_FINGERPRINTS` through a reviewed commit.
+
+## 4. The hosted connection
+
+`hostedClientConfig` / `connectHosted` build the connection from the project reference alone and prove it from the server's side (section 2). `tests/db/promotion-hosted-tls.test.mjs` drives the **real node-postgres client** against local PostgreSQL servers presenting: a trusted CA with the right name (accepted; TLS 1.3; session timeouts 5 s / 2 min arrive), a self-signed certificate, a certificate from an untrusted CA, a certificate for another host name, a server with TLS switched off, the wrong CA file for a good server, a wrong password, a closed port, a path that drops the startup options (a pooler) and a longer `lock_timeout` than allowed (all refused), and proves that `NODE_TLS_REJECT_UNAUTHORIZED=0` in the real process environment does not loosen it. The rehearsal cluster itself ran with TLS 1.3 and SCRAM and all rehearsal traffic used this code path.
+
+## 5. Operations, failure semantics and the CLI contract
+
+`promote` (all of it before the first write): package → authorization (signature, fields, window, nonce unused) → attribution evidence file (recomputed hash, statement on every page, deployment and commit named, ≤ 72 h) → parity record (≤ 10 min, backup ≤ 6 h, off-site evidence, level 034, this package) → the authorization's hashes equal those files → **connect** → hosted preflight (section 2) → REST delta equals the acknowledged one → attempt recorded and artifact consumed → **one** transaction (`promote_begin`, `promote_load` per table, `promote_withhold`, `promote_commit`, `commit`) → read-only post-verification (state, ledger rows per table, 94 fingerprints against the release state, 65 MLB trades, empty read models and unchanged read-model bookkeeping, one grant, REST delta).
+
+Failure classes: a failure carrying a SQLSTATE was reported by the server, which aborted the transaction → `ROLLED_BACK`. A failure without one (socket, client timeout) is `AMBIGUOUS`: the connection is destroyed, a new read-only connection polls the ledger (`PROMOTED` → `COMMITTED`; `NOT_PROMOTED` → `NOT_PROMOTED_CONFIRMED`; a still-active writer session or an unreachable database → `UNKNOWN`). In every case the report says that **nothing was retried**. Exit code 0 only for a verified success; 1 for a refusal or failure (the JSON report on stdout says which); 2 for a usage error.
+
+Operations other than promote check the manifest's state first (withdraw/emergency need PROMOTED; finish/revert need EMERGENCY) and then make one database call (atomic); `withdraw` and `finish` are followed by the best-effort `VACUUM (ANALYZE)` of the promoted tables and the read-model tables (its failure is reported, never hidden). `status`, `verify-promoted`, `check-authorization` and `draft-authorization` write nothing to the database.
+
+## 6. Exposure audit: what a promotion publishes immediately
+
+Audited from the catalog and confirmed empirically on the full-scale rehearsal (real PostgREST for the Data API, the real page queries for the website role):
+
+* **Data API (anon, authenticated):** the eight relations closed by migrations 033/034 (`players`, `player_external_ids`, `source_observations`, `coverage_assessments`, `v_draft_explorer`, `v_player_outcome_status`, `v_source_attribution`, `player_aliases`) stay refused (401/403) for GET and for the `exact`, `planned` and `estimated` count modes, before and after the promotion. The only change a Data API client can see is **`public.sources` +1 row** (the Retrosheet source, with the verbatim statement in its notes) and the owner-rights aggregate `v_transaction_record_sources` (its content is unchanged because it counts the empty transaction read model). `transactions`, `trade_packages`, `trade_package_assets` and the staging tables are closed to the roles. The runner computes this set and requires the owner to acknowledge it exactly.
+* **Website role (`bai_site`):** reads the new identities at commit. In the rehearsal exactly two of the 23 page queries changed (`getPlayers`, `getSourceAttribution`); the transaction pages stay empty until a read-model refresh (R7), which a promotion never triggers (verified: read-model rows and bookkeeping unchanged).
+* **Not exposed:** pg_graphql is not installed on the project; the realtime publication has no members; the `ingest` schema is not part of the Data API.
+* **Unchanged by design:** the free-text player names in `international_signings.notes` (266 rows) and `sources.title` (8 rows): neither table is in the promotion delta (`international_signings` is unchanged, `sources` gains one row).
+
+## 7. Full-scale rehearsal (local PostgreSQL 17.9, not Supabase)
+
+Setup: backup B3 (`g1-20261104T000626Z`, hosted level 033) restored with `restore-export.mjs` (rows, sequences, ledger and catalog equal; security audit full and read-only clean), migration 034 applied locally, the six pinned Retrosheet batches (hashes verified before and after) imported with the existing importer into a copy, the package built with the **real live attribution evidence** captured from production on 2026-11-03 (`ok:true`, deployment `dpl_CBmCp1PqrccBcJUFymC4JKVZjyaS`). The rehearsal cluster used TLS 1.3 + SCRAM and all runner traffic used the production connection path. **Rehearsal-only stand-ins (no B4 exists):** the backup directory is a snapshot of the rehearsal baseline with a synthetic encrypted-archive companion and a synthetic off-site-record hash; the logical export is the repository's test stand-in exporter; the owner key is a throw-away. Manifest of the rehearsal package: `123e144005c1c72c21a5719128bb3adc23b7f5a8c4d5597f30f0d31b92f41a82` (**not valid for production**: built from B3 plus a local 034, not from B4). Checks: part 1 38/38, part 2 28/28, part 3 32/32.
+
+Results (single run each; local disk and CPU, no network latency):
+
+| Item | Result |
+| --- | --- |
+| Staging of the six batches | 11,257 new transactions (65 originals preserved), 10,655 non-trade moves, all PARTIAL, exactly 2 T2 records held (`84305@20190725`, `86281@20180731`), both Jake Fox identities separate, 0 integrity violations, delta insert-only; import+validate+apply 2–5 min per large batch (A1 apply 145 s) |
+| Package | 95,079 promoted rows in 16 tables; 602 Retrosheet `transaction_date` observations withheld privately (hash recorded); 6 batch pins + archive pin; 1 source row with the verbatim statement; no grant row; built in 7 s |
+| Grant-binding prerequisite | **present**: the level-034 baseline holds the single RETROSHEET grant recorded by G4-C (`2026-10-30T00:00:40.046080Z`), bound into the manifest by hash; `buildPackage` needed no change and no grant was fabricated |
+| **Promotion through the runner** | one transaction **9.6 s** (runner total incl. preflight and 94 fingerprints 11.4 s); WAL 48 MB; DB growth 35 MB; slowest statement 2.1 s (`promote_load`); trigger self time 2.0 s; no lock wait; peak PostgreSQL PSS 862 MB; post-verification PASS; all 94 tables = release state; exactly one PROMOTED event; 65 MLB trades, grant (to the microsecond) and ACLs/roles unchanged; no sequence moved backwards |
+| Refusals (nothing changed, no attempt recorded) | no authorization; bare-hash parity record; wrong project; REST delta not acknowledged; empty production pin list; authorization window/clock; tampered payload |
+| Normal withdrawal | **16.9 s**, 95,079 rows deleted, in-transaction ANALYZE then `VACUUM (ANALYZE)` of 35 tables; all 94 tables byte-identical to the baseline; integrity 0 violations; audit trail kept; Data API exact/planned/estimated counts equal the (analyzed) baseline; website: 22 of 23 queries equal the never-promoted baseline — `getTransactionOverview` differs because a withdrawal recomputes the summaries and leaves an overview row (0 transactions, 65 withheld) that a never-refreshed hosted database does not have |
+| Emergency (hide) | 0.65 s; promoted rows hidden from anon/authenticated (and from the website role); grant **deleted**; finish 16.9 s → WITHDRAWN, baseline restored **except the grant row**, which must be recorded again deliberately; privileges restored |
+| Emergency close-api | 0.66 s; the Data API endpoints of every table that held promoted rows (and their views) answer 401; `sources` is closed to anon/authenticated too; **4 of 23 website queries fail** (`getDraftPicks`, `getInternationalSignings`, `getPlayers`, `getSourceAttribution`) until `finish`; after `finish` privileges and all 23 queries are back; refused by the runner unless the authorization acknowledges the outage |
+| Revert (false alarm) | state PROMOTED, hiding lifted, privileges equal; the only difference from the promoted state is the deleted grant (record it again; nothing republished) |
+| Dependency blocker | an unrelated alias referencing a promoted player and source blocks the normal withdrawal (server refusal `P0001`, rolled back, recorded `ROLLED_BACK`, blockers reported by `status`); emergency works; after the blocker is removed `finish` completes |
+| Connection lost before commit (during the 11,257-row load) | server rolled back; baseline unchanged; `promote_begin` sent once; resolved NOT_PROMOTED; a second attempt is refused until the owner's new authorization names the first, then promotes (10.0 s) |
+| Connection lost after commit | resolved read-only to PROMOTED, attempt COMMITTED, nothing repeated, `verify-promoted` passes |
+| Lock contention | a session holding `ACCESS EXCLUSIVE` on `players`: the promotion fails after 5.9 s with `canceling statement due to lock timeout`, rolled back, nothing changed |
+| Statement timeout | a 150 s statement is cancelled at 120.0 s |
+| Conflicting / repeated operations | finish and revert without an emergency, a second withdrawal, an emergency or a new promotion of a withdrawn manifest, a reused authorization: all refused before any write; `analyze` runs under its own authorization (20 tables) |
+
+Hosted differences that remain **unmeasured**: network round trips and the Supabase gateway, shared hardware, concurrent production traffic during the transaction (write locks on the 94 scope tables are taken in `promote_begin`; readers of those tables wait up to the transaction time), and `VACUUM` duration on hosted storage.
+
+## 8. Release prerequisites that remain (all owner-gated)
+
+1. **Owner signing key** made and pinned (section 3); public keyring placed on the runner host.
+2. **B4** at migration 034 (full backup cycle, new owner authorization), and a promotion parity record from `final-parity.mjs --promotion-package <dir> --offsite-record <backup-run record> --offsite-recipient <owner key>` (the runner refuses a record made from bare hashes).
+3. **Live attribution evidence** captured shortly before (≤ 72 h at promotion) from the production deployment.
+4. **Package rebuilt from the B4 restore** (the rehearsal manifest is invalid for production), reconciliation report reviewed by the owner, `draft-authorization` output reviewed and signed.
+5. **Freeze:** no imports, research writes, refreshes or grant changes between B4 and the promotion.
+6. **Operational decisions:** (a) a revert or finish after an emergency leaves the RETROSHEET grant deleted, to be recorded again by the owner; (b) emergency close-api takes four website pages and the Sources Data API endpoint offline until `finish`; (c) the promotion makes the new identities public on the website at commit while the transaction pages stay empty until R7; (d) the 65 MLB trades stay withheld; (e) the free-text names in `international_signings.notes` and `sources.title` are unchanged and need a separate owner decision before the identities are described as complete.
+7. The authorization window for the Retrosheet grant lapses after 2027-01-22 (Chadwick review due 2027-01-21); the runner refuses a package whose window has ended.
+
+## 9. Tests
+
+`tests/db/promotion-hosted.test.mjs` (19 tests): the REST-visible delta; the empty-pin production default; authorization (missing, unsigned, tampered, another key, wrong operation/project/manifest, expired, not yet valid, over-long window, replay, missing reason, close-api without acknowledgement); keyring with a secret key; refusals before connecting (missing/unsigned authorization, wrong project, wrong manifest, another parity record/evidence/backup, bare-hash parity record, changed payload, stale evidence, expired record, backup older than 6 h, missing or altered off-site evidence); refusals by the hosted preflight (changed baseline, wrong migration level, unacknowledged REST delta, missing platform history); unapproved withdrawal; the argument parser; the CLI (flags, empty-pin refusal with a complete signed promotion, the local tool still refusing hosted); a connection lost before and after the commit; unresolved attempts; the single promotion with post-checks; withdraw; draft-authorization. `tests/db/promotion-hosted-tls.test.mjs` (8 tests): section 4. The existing promotion, recovery, count-exposure, REST and TLS suites are unchanged and run with the real PostgREST locally.

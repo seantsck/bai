@@ -35,7 +35,7 @@ const stamp = (ms) => new Date(ms).toISOString().replace(/[-:]/g, '').replace(/\
 // ---- owner key, signed authorizations -------------------------------------------------------------------------------------------------------------------------------------------
 function makeKeys () {
   signHome = path.join(tmp, 'gpg-sign'); pubHome = path.join(tmp, 'gpg-pub'); fs.mkdirSync(signHome, { mode: 0o700 }); fs.mkdirSync(pubHome, { mode: 0o700 })
-  sh('gpg', ['--batch', '--pinentry-mode', 'loopback', '--passphrase', '', '--quick-generate-key', 'Test Owner <owner@example.invalid>', 'ed25519', 'sign', 'never'], { GNUPGHOME: signHome })
+  sh('gpg', ['--batch', '--pinentry-mode', 'loopback', '--passphrase', '', '--quick-generate-key', 'Test Owner', 'ed25519', 'sign', 'never'], { GNUPGHOME: signHome })
   FPR = /^fpr:::::::::([0-9A-F]{40}):/m.exec(sh('gpg', ['--batch', '--with-colons', '--list-keys'], { GNUPGHOME: signHome }))[1]
   const pub = path.join(tmp, 'owner.pub'); sh('gpg', ['--batch', '--export', '--output', pub, FPR], { GNUPGHOME: signHome }); sh('gpg', ['--batch', '--import', pub], { GNUPGHOME: pubHome })
 }
@@ -163,7 +163,7 @@ test('authorization: missing, unsigned, tampered, signed by another key, wrong o
   const t = authorize('promote'); fs.writeFileSync(t, fs.readFileSync(t, 'utf8').replace('"nonce"', '"nonce" '))   // one byte of difference
   assert.match(check(t), /not a good signature|no valid signature/)
   const otherHome = path.join(tmp, 'gpg-other'); fs.mkdirSync(otherHome, { mode: 0o700 })
-  sh('gpg', ['--batch', '--pinentry-mode', 'loopback', '--passphrase', '', '--quick-generate-key', 'Other <other@example.invalid>', 'ed25519', 'sign', 'never'], { GNUPGHOME: otherHome })
+  sh('gpg', ['--batch', '--pinentry-mode', 'loopback', '--passphrase', '', '--quick-generate-key', 'Other Test Key', 'ed25519', 'sign', 'never'], { GNUPGHOME: otherHome })
   const otherFpr = /^fpr:::::::::([0-9A-F]{40}):/m.exec(sh('gpg', ['--batch', '--with-colons', '--list-keys'], { GNUPGHOME: otherHome }))[1]
   const forged = authorize('promote', {}, { signed: false }); sign(forged, otherHome, otherFpr)
   assert.match(check(forged), /not a good signature|no valid signature|not one of the keys pinned/, 'a signature by a key that is not the owner\'s is refused')
@@ -265,7 +265,7 @@ test('the CLI itself: unsupported flags exit 2; the build without a pinned owner
   assert.equal(r.status, 1); assert.match(r.stdout, /no owner signing key is pinned/); assert.match(r.stdout, /before any connection/)
   const local = spawnSync(process.execPath, ['scripts/db/promotion.mjs', 'promote', '--package', pkgDir, '--hosted'], { cwd: root, encoding: 'utf8', env: { PATH: process.env.PATH, HOME: tmp } })
   assert.equal(local.status, 2); assert.match(local.stderr, /NOT AUTHORIZED/)
-  const local2 = spawnSync(process.execPath, ['scripts/db/promotion.mjs', 'status', '--manifest', pkg.sha], { cwd: root, encoding: 'utf8', env: { PATH: process.env.PATH, HOME: tmp, BAI_DATABASE_URL: 'postgresql://postgres:x@db.dbnmktidheefoxaztivm.supabase.co:5432/postgres', BAI_ALLOW_REMOTE_DB: '1', BAI_SUPABASE_PROJECT_REF: REF } })
+  const local2 = spawnSync(process.execPath, ['scripts/db/promotion.mjs', 'status', '--manifest', pkg.sha], { cwd: root, encoding: 'utf8', env: { PATH: process.env.PATH, HOME: tmp, BAI_DATABASE_URL: 'postgresql://postgres:x@db.dbnmktidheefoxaztivm.supabase.co:5432/postgres', BAI_ALLOW_REMOTE_DB: '1', BAI_SUPABASE_PROJECT_REF: REF } }) // credential-scan:allow (a placeholder password for a refusal test)
   assert.notEqual(local2.status, 0); assert.match(local2.stderr, /NOT AUTHORIZED|refusing/, 'the local tool still refuses a hosted URL')
   const cliSrc = fs.readFileSync(path.join(root, 'scripts/db/promotion-hosted.mjs'), 'utf8')
   assert.ok(!/testOnly|requireSupabaseHistory|expectedMlb/.test(cliSrc), 'the CLI never passes the test-only connection override or relaxes the history check')
