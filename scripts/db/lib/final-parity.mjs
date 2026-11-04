@@ -174,10 +174,10 @@ export function buildPromotionRecord ({ backupDir, projectRef, expectLevel, mani
 }
 
 /** Problems (empty = the record is a PASS for exactly this package, project and level, and is still valid). Everything is re-derived from the files. */
-export function verifyPromotionRecordFile (file, { manifest, manifestSha, projectRef, expectLevel, now = Date.now() }) {
+export function verifyPromotionRecordFile (file, { manifest, manifestSha, projectRef, expectLevel, now = Date.now(), bytes = null }) {   // bytes: the file's content read once by the caller, so that what is checked is what is hashed and used
   const p = []
   let rec
-  try { rec = JSON.parse(fs.readFileSync(file, 'utf8')) } catch (e) { return [`parity record unreadable: ${e.message}`] }
+  try { rec = JSON.parse(bytes ? bytes.toString('utf8') : fs.readFileSync(file, 'utf8')) } catch (e) { return [`parity record unreadable: ${e.message}`] }
   if (rec?.kind !== 'g1-final-parity-promotion' || rec.version !== 1) return ['not a g1-final-parity-promotion record (version 1)']
   if (rec.record_sha256 !== recordHash(rec)) return ['parity record was altered (its own hash does not match)']
   if (rec.result !== 'PASS' || rec.preflight?.ok !== true || rec.export_compare?.identical !== true) p.push('parity record is not a PASS')

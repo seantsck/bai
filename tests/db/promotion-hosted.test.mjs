@@ -14,8 +14,8 @@ import { applyMigrations } from '../../scripts/db/lib/migrations.mjs'
 import { takeSnapshot } from '../../scripts/db/lib/snapshot.mjs'
 import { buildPromotionRecord, contentTreeHash, compareExports } from '../../scripts/db/lib/final-parity.mjs'
 import { SESSION_SQL, buildPackage, loadPackage, sha256, verifyPackage, writePackage } from '../../scripts/db/lib/promotion.mjs'
-import { AUTHORIZATION_FORMAT, OWNER_SIGNING_FINGERPRINTS, attemptLedger, verifyAuthorization } from '../../scripts/db/lib/promotion-authorization.mjs'
-import { checkEvidence, draftAuthorization, hostedPreflight, operateHosted, promoteHosted, promoteInputs, readModelState, restPublicDelta, resolveState, statusHosted, verifyPromotedHosted } from '../../scripts/db/lib/promotion-hosted.mjs'
+import { AUTHORIZATION_FORMAT, OWNER_SIGNING_FINGERPRINTS, attemptLedger, verifyAuthorization, verifyDetachedSignature } from '../../scripts/db/lib/promotion-authorization.mjs'
+import { beginAttempt, checkEvidence, draftAuthorization, hostedPreflight, observeState, operateHosted, promoteHosted, promoteInputs, readModelState, restPublicDelta, resolveState, serverReported, statusHosted, verifyPromotedHosted, websiteVisibleDelta } from '../../scripts/db/lib/promotion-hosted.mjs'
 import { parseArgs } from '../../scripts/db/lib/promotion-hosted-args.mjs'
 import { buildBaseline, importSample } from './promotion-fixture.mjs'
 
@@ -48,13 +48,13 @@ function authorize (op, over = {}, { signed = true, manifest = pkg.sha } = {}) {
   if (op === 'promote') {
     const rec = JSON.parse(fs.readFileSync(parityFile, 'utf8'))
     Object.assign(base, { backup: { name: path.basename(backupDir), t0: rec.backup.started_at, manifest_sha256: rec.backup.manifest_sha256, archive_sha256: rec.offsite.encrypted_sha256, content_tree_sha256: rec.backup.tree_sha256, offsite_record_sha256: rec.offsite.verification_record_sha256 },
-      parity_record_sha256: sha256(fs.readFileSync(parityFile)), attribution_evidence_sha256: evidence.evidence_sha256, rest_public_delta: restDelta })
+      parity_record_sha256: sha256(fs.readFileSync(parityFile)), attribution_evidence_sha256: evidence.evidence_sha256, rest_public_delta: restDelta, website_visible_delta: webDelta })
   } else base.reason = `test ${op}`
   const a = { ...base, ...over }; for (const k of Object.keys(a)) if (a[k] === undefined) delete a[k]
   const f = path.join(tmp, `auth-${op}-${++nAuth}.json`); fs.writeFileSync(f, JSON.stringify(a, null, 1)); if (signed) sign(f)
   return f
 }
-let restDelta
+let restDelta, webDelta
 // the local databases have no supabase_migrations schema (a restore keeps that history in a side file), so the library option that allows its absence is set here; the CLI never sets it
 const ctxFor = (connect, over = {}) => ({ connect, projectRef: REF, keyring: pubHome, pinned: [FPR], ledger, env: {}, log: () => {}, requireSupabaseHistory: false, expectedMlb: 2, ...over })
 const connectMain = async () => ({ client: await open(MAIN) })
@@ -115,14 +115,25 @@ before(async () => {
   const r = runParity(backupDir, pkgDir); assert.equal(r.status, 0, r.out); bareParityFile = r.rec
   parityFile = freshRecord()
   BASE_FP = await scopeFp()
-  restDelta = (await restPublicDelta(main, pkg.manifest)).map(({ relation, rows: n, readable_by: by }) => ({ relation, rows: n, by }))
+  restDelta = await restPublicDelta(main, pkg.manifest); webDelta = await websiteVisibleDelta(main, pkg.manifest)
 }, { timeout: 240000 })
 after(async () => { await h.stopServer(); fs.rmSync(tmp, { recursive: true, force: true }) })
 
 // ---- the contract ---------------------------------------------------------------------------------------------------------------------------------------------------------------
 test('the REST-visible delta is computed from the catalog: after 034 only the new source row is readable through the Data API; the identity relations are closed', async () => {
-  assert.deepEqual(restDelta.map((x) => x.relation), ['public.sources', 'v_transaction_record_sources'], 'players, ids, observations, coverage rows and aliases are closed to anon/authenticated since 033/034; the only others are the new source row and the owner-rights attribution aggregate over it')
+  assert.deepEqual(restDelta.map((x) => x.relation), ['public.sources', 'public.v_transaction_record_sources'], 'players, ids, observations, coverage rows and aliases are closed to anon/authenticated since 033/034; the only others are the new source row and the owner-rights attribution aggregate over it')
   assert.equal(restDelta[0].rows, 1); assert.deepEqual(restDelta[0].by, ['anon', 'authenticated'])
+  assert.ok(webDelta.some((x) => x.relation === 'public.players' && x.rows > 0) && webDelta.some((x) => x.relation === 'public.sources'), 'the website role reads the new identities: that is the real publication and the owner must acknowledge it too')
+  assert.ok(webDelta.length > restDelta.length)
+  // a COLUMN-level grant to anon, a view over a view, and security_invoker views are all classified correctly (inside a rolled-back transaction)
+  await main.query('begin')
+  try {
+    await main.query('grant select (slug) on public.players to anon')
+    await main.query('create view public.g6h_inner as select slug from public.players'); await main.query('create view public.g6h_outer as select slug from public.g6h_inner'); await main.query('grant select on public.g6h_outer to anon')
+    await main.query('create view public.g6h_invoker with (security_invoker = on) as select slug from public.players'); await main.query('grant select on public.g6h_invoker to anon')
+    const d = await restPublicDelta(main, pkg.manifest); const names = d.map((x) => x.relation)
+    assert.ok(names.includes('public.players'), 'a column-level grant is found'); assert.ok(names.includes('public.g6h_outer'), 'a view over a view is found'); assert.ok(!names.includes('public.g6h_invoker'), 'a security_invoker view exposes nothing by itself')
+  } finally { await main.query('rollback') }
   const none = (await restPublicDelta(main, { load_order: ['public.players', 'public.player_external_ids'], delta: { 'public.players': { n: 1 }, 'public.player_external_ids': { n: 1 } } }))
   assert.deepEqual(none, [], 'closed tables report nothing')
 })
@@ -184,6 +195,20 @@ test('authorization: missing, unsigned, tampered, signed by another key, wrong o
   assert.deepEqual(verifyAuthorization(authorize('emergency', { options: { close_api: true, acknowledge_site_outage: true } }), { ...o, operation: 'emergency' }).problems, [])
 })
 
+test('what gpg verifies is exactly the bytes that are used: a signature over file A does not verify other bytes (no read-after-check swap), and malformed inputs fail closed', async () => {
+  const a = authorize('withdraw'); const b = authorize('withdraw')
+  const bytesA = fs.readFileSync(a); const bytesB = fs.readFileSync(b)
+  assert.equal(verifyDetachedSignature(bytesA, `${a}.sig`, { keyring: pubHome, pinned: [FPR] }).ok, true)
+  assert.equal(verifyDetachedSignature(bytesB, `${a}.sig`, { keyring: pubHome, pinned: [FPR] }).ok, false, 'A\'s signature does not cover B\'s bytes')
+  assert.equal(verifyDetachedSignature(bytesA, `${tmp}/missing.sig`, { keyring: pubHome, pinned: [FPR] }).ok, false)
+  const nul = path.join(tmp, 'null.json'); fs.writeFileSync(nul, 'null'); sign(nul)
+  assert.match(verifyAuthorization(nul, { operation: 'withdraw', projectRef: REF, manifest: pkg.sha, keyring: pubHome, pinned: [FPR] }).problems.join(), /not a JSON object/)
+  assert.ok(parseArgs(['constructor']).error && parseArgs(['__proto__']).error && parseArgs(['toString']).error, 'prototype keys are not commands')
+  await assert.rejects(draftAuthorization(ctx(), { operation: 'withdraw', manifest: pkg.sha, reason: 'x', hours: Number('abc') }), /positive number/)
+  const loose = path.join(tmp, 'ledger-loose'); fs.mkdirSync(loose, { mode: 0o777 }); fs.chmodSync(loose, 0o777)
+  assert.throws(() => attemptLedger(loose).consume('c'.repeat(64), {}), /mode 0700/)
+})
+
 test('a keyring that holds a secret key is refused (the runner host must hold only the owner\'s public key)', () => {
   const v = verifyAuthorization(authorize('withdraw'), { operation: 'withdraw', projectRef: REF, manifest: pkg.sha, keyring: signHome, pinned: [FPR] })
   assert.match(v.problems.join(), /holds a SECRET key/)
@@ -231,10 +256,11 @@ test('refused by the hosted preflight (connected, read-only, nothing written): c
   m = await refused(run('g6h_lvl')); assert.match(m ?? 'NOT REFUSED', /migration level is 033, not 034|ledger the package was built on/)
   m = await refused(run(MAIN, { rest_public_delta: [] })); assert.match(m ?? 'NOT REFUSED', /REST-visible delta differs/, 'an owner who did not acknowledge the exposure has not authorized it')
   m = await refused(run(MAIN, { rest_public_delta: [{ relation: 'public.sources', rows: 2, by: ['anon', 'authenticated'] }] })); assert.match(m, /REST-visible delta differs/)
+  m = await refused(run(MAIN, { website_visible_delta: [] })); assert.match(m ?? 'NOT REFUSED', /website-visible delta differs/, 'an owner who did not acknowledge what the website would publish has not authorized it')
   assert.deepEqual(await scopeFp(), before); assert.deepEqual(ledger.attempts(pkg.sha), [], 'no attempt, and no authorization consumed, when the preflight refuses')
   const pre = await hostedPreflight(main, pkg, { requireSupabaseHistory: false, expectedMlb: 2 }); assert.deepEqual(pre.problems, [], 'control: against the real baseline the preflight passes')
   assert.match((await hostedPreflight(main, pkg, { expectedMlb: 2 })).problems.join(), /Supabase migration history table .* does not exist/, 'by default the platform history is required')
-  assert.equal(pre.facts.state, 'NOT_PROMOTED'); assert.equal(pre.facts.mlb_transactions, 2); assert.equal(pre.facts.rm.content_rows, 0)
+  assert.equal(pre.facts.state, 'NOT_PROMOTED'); assert.deepEqual(pre.facts.website_visible_delta, webDelta); assert.equal(pre.facts.mlb_transactions, 2); assert.equal(pre.facts.rm.content_rows, 0)
 })
 
 test('an unapproved or mismatched withdrawal is refused: no authorization, an authorization for another operation, an unsigned one, another manifest', async () => {
@@ -285,8 +311,8 @@ test('a connection lost BEFORE the commit: the server rolled everything back; th
   const [a] = ledger.attempts(pkg.sha); assert.equal(a.state, 'NOT_PROMOTED_CONFIRMED'); assert.equal(a.operation, 'promote')
   // a second attempt: with the same artifact (spent), with a fresh one that does not name the attempt, and with one that does
   const first = authorize('promote'); const again = (f) => promoteHosted(ctx(), { pkgDir, authFile: f, evidenceFile, parityFile })
-  assert.match(await refused(again(authorize('promote'))), /an earlier promote attempt .* exists: the owner's authorization must name it in after_attempt/)
-  assert.match(await refused(again(authorize('promote', { after_attempt: 'f'.repeat(24) }))), /must name it in after_attempt/)
+  assert.match(await refused(again(authorize('promote'))), /did not complete: the owner's authorization must name it in after_attempt/)
+  assert.match(await refused(again(authorize('promote', { after_attempt: 'f'.repeat(24) }))), /must name it in after_attempt|not this host's latest attempt/)
   const f2 = authorize('promote', { after_attempt: a.id })
   assert.equal(promoteInputs({ pkgDir, authFile: f2, evidenceFile, parityFile, env: {}, projectRef: REF, keyring: pubHome, pinned: [FPR], ledger }).problems.length, 0, 'an authorization that names the attempt passes the input checks')
   assert.ok(first)
@@ -301,7 +327,7 @@ test('statements issued by the runner never include a write before the attempt i
 
 test('an unresolved or unknown earlier attempt blocks another one until "status" resolves it from the database', async () => {
   const l = attemptLedger(path.join(tmp, 'ledger3')); const m = pkg.sha
-  const a = l.start({ manifest: m, operation: 'promote', started_at: new Date().toISOString() }); a.update({ state: 'UNKNOWN' })
+  const a = l.start({ manifest: m, operation: 'promote', started_at: new Date(Date.now() - 120e3).toISOString() }); a.update({ state: 'UNKNOWN' })
   const f = authorize('promote'); const inputs = () => promoteHosted(ctxFor(connectMain, { ledger: l }), { pkgDir, authFile: authorize('promote', { after_attempt: a.id }), evidenceFile, parityFile })
   assert.match(await refused(inputs()), /is UNKNOWN: resolve it first with "status"/)
   const s = await statusHosted(ctxFor(connectMain, { ledger: l }), m); assert.equal(s.state, 'NOT_PROMOTED'); assert.equal(s.attempts[0].state, 'NOT_PROMOTED_CONFIRMED')
@@ -355,4 +381,39 @@ test('a server-side refusal rolls back and is recorded as such (no ambiguity); a
 
 test('verifyPackage still names tampering after writePackage restores the file', () => {
   const p = loadPackage(pkgDir); assert.equal(p.sha, pkg.sha); writePackage(path.join(tmp, 'pkg-rewrite'), p); assert.deepEqual(verifyPackage(path.join(tmp, 'pkg-rewrite')), [])
+})
+
+test('failure classification: only a server-raised ERROR counts as a rollback; socket codes that look like SQLSTATEs, FATALs and connection/operator classes are ambiguous', () => {
+  const pgErr = (code, severity = 'ERROR') => Object.assign(new Error('x'), { code, severity })
+  assert.equal(serverReported(pgErr('P0001')), true); assert.equal(serverReported(pgErr('55P03')), true); assert.equal(serverReported(pgErr('57014')), true)
+  for (const e of [Object.assign(new Error('x'), { code: 'EPIPE' }), Object.assign(new Error('x'), { code: 'EBUSY' }), Object.assign(new Error('x'), { code: 'EPERM' }), pgErr('57P01', 'FATAL'), pgErr('57P01'), pgErr('08006'), pgErr('58030'), pgErr('XX000'), pgErr('P0001', 'FATAL'), new Error('Connection terminated unexpectedly'), null]) assert.equal(serverReported(e), false)
+})
+
+test('attempt rules: unresolved attempts block; a failed attempt needs the owner to name it; a SUCCESSFUL earlier operation (a second emergency after a revert, a second analyze) does not block a new authorized one; a committed promotion is never repeated', () => {
+  const l = attemptLedger(path.join(tmp, 'ledger-rules')); const m = 'd'.repeat(64)
+  const add = (operation, state) => { const a = l.start({ manifest: m, operation, started_at: new Date().toISOString() }); a.update({ state }); return a.id }
+  const e1 = add('emergency', 'COMMITTED'); add('revert', 'COMMITTED')
+  let b; assert.doesNotThrow(() => { b = beginAttempt(l, { manifest: m, operation: 'emergency', authSha: 'x', afterAttempt: null }) }, 'a real incident after a false alarm must not be blocked by the ledger'); b.update({ state: 'COMMITTED' })
+  assert.throws(() => beginAttempt(l, { manifest: m, operation: 'emergency', authSha: 'x', afterAttempt: 'f'.repeat(24) }), /not this host's latest attempt/)
+  const a1 = add('analyze', 'COMMITTED'); assert.doesNotThrow(() => beginAttempt(l, { manifest: m, operation: 'analyze', authSha: 'x', afterAttempt: null })); assert.ok(a1 && e1)
+  const w = add('withdraw', 'STARTED'); assert.throws(() => beginAttempt(l, { manifest: m, operation: 'withdraw', authSha: 'x', afterAttempt: w }), /resolve it first with "status"/)
+  const f = add('finish', 'ROLLED_BACK'); assert.throws(() => beginAttempt(l, { manifest: m, operation: 'finish', authSha: 'x', afterAttempt: null }), /must name it in after_attempt|not this host's latest attempt/); assert.doesNotThrow(() => beginAttempt(l, { manifest: m, operation: 'finish', authSha: 'x', afterAttempt: f }))
+  const p = add('promote', 'COMMITTED'); assert.throws(() => beginAttempt(l, { manifest: m, operation: 'promote', authSha: 'x', afterAttempt: p }), /already committed this promotion/)
+})
+
+test('observeState trusts an answer only when no runner writer session existed at either end and the state did not change; a writer in a transaction makes it unresolved', async () => {
+  const sha = 'a'.repeat(64)
+  const calm = await observeState(main, sha); assert.equal(calm.resolved, true); assert.equal(calm.state, 'NOT_PROMOTED')
+  const w = new pg.Client({ host: '127.0.0.1', port: PORT, user: 'postgres', password: 'postgres', database: MAIN, application_name: 'bai-promotion-hosted' }); await w.connect()
+  try {
+    await w.query('begin'); await w.query('select 1')
+    const busy = await observeState(main, sha); assert.equal(busy.resolved, false); assert.ok(busy.writers_before >= 1)
+    const slow = await resolveState(async () => ({ client: await open(MAIN) }), sha, { tries: 2, waitMs: 1 }); assert.equal(slow.resolved, false, 'an active writer keeps the result UNKNOWN')
+  } finally { await w.query('rollback'); await w.end() }
+})
+
+test('the CLI exits 1 for a report that is not a verified success and the evidence check refuses a package that allows evidence older than 72 hours', async () => {
+  const src = fs.readFileSync(path.join(root, 'scripts/db/promotion-hosted.mjs'), 'utf8'); assert.match(src, /out\.ok === false \|\| out\.post\?\.ok === false/)
+  const m2 = structuredClone(pkg.manifest); m2.attribution.max_age_hours = 500
+  assert.match(checkEvidence(evidenceFile, m2).join(), /older than 72 hours/)
 })

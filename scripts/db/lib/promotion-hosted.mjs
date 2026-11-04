@@ -24,27 +24,45 @@ const q = async (c, sql, p) => (await c.query(sql, p)).rows
 /** The 12 transaction read-model tables: the content tables must be empty (nothing transactional is public); the bookkeeping rows (refresh log, overview, withdrawal log) are only compared before and after. */
 const RM_BOOKKEEPING = ['rm_transaction_overview', 'rm_transaction_refreshes', 'rm_transaction_withdrawals']
 export async function readModelState (c) {
-  const tabs = (await q(c, `select c.relname t from pg_class c where c.relnamespace = 'public'::regnamespace and c.relkind = 'r' and c.relname like 'rm\\_transaction%' order by 1`)).map((r) => r.t)
+  const tabs = (await q(c, `select quote_ident(c.relname) t from pg_class c where c.relnamespace = 'public'::regnamespace and c.relkind = 'r' and c.relname like 'rm\\_transaction%' order by 1`)).map((r) => r.t)
   const out = { tables: tabs.length, content_rows: 0, bookkeeping: {} }
-  for (const t of tabs) { const n = Number((await q(c, `select count(*) n from public."${t}"`))[0].n); if (RM_BOOKKEEPING.includes(t)) out.bookkeeping[t] = n; else out.content_rows += n }
+  for (const t of tabs) { const n = Number((await q(c, `select count(*) n from public.${t}`))[0].n); if (RM_BOOKKEEPING.includes(t.replace(/"/g, ''))) out.bookkeeping[t] = n; else out.content_rows += n }
   return out
 }
 
 // ---- read-only checks ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-/** Every relation a promotion would make readable through the Data API (anon or authenticated), by table privilege and through any non-invoker view over it. rows = what the package adds. */
-export async function restPublicDelta (c, manifest) {
-  const out = []
+/**
+ * Every relation through which the rows of a promotion could be read, found from the catalog: the delta tables, their inheritance parents and children, and every view or materialized view
+ * that depends on any of them, transitively (a view over a view). A role can read a relation by a table-level or a COLUMN-level SELECT grant (has_any_column_privilege). A view that is
+ * security_invoker needs the reader to hold the underlying privilege, so it exposes nothing by itself but is still traversed (an owner-rights view over it would expose the data).
+ */
+async function reachableRelations (c, manifest) {
+  const out = new Map()   // oid -> { relation, kind, over, rows, invoker }
   for (const t of manifest.load_order) {
-    const r = (await q(c, `select c.oid, c.relkind, has_table_privilege('anon', c.oid, 'SELECT') a, has_table_privilege('authenticated', c.oid, 'SELECT') u from pg_class c where c.oid = $1::regclass`, [t]))[0]
-    if (r.a || r.u) out.push({ relation: t, kind: r.relkind === 'v' ? 'view' : 'table', rows: manifest.delta[t].n, readable_by: [r.a && 'anon', r.u && 'authenticated'].filter(Boolean) })
-    const views = await q(c, `select distinct v.oid::regclass::text rel, coalesce((select option_value from pg_options_to_table(v.reloptions) where option_name = 'security_invoker'), 'false') inv,
-        has_table_privilege('anon', v.oid, 'SELECT') a, has_table_privilege('authenticated', v.oid, 'SELECT') u
-      from pg_depend d join pg_rewrite rw on rw.oid = d.objid join pg_class v on v.oid = rw.ev_class where d.refobjid = $1::regclass and v.relkind in ('v', 'm') and v.oid <> $1::regclass`, [t])
-    for (const v of views) if ((v.a || v.u) && v.inv !== 'true') out.push({ relation: v.rel, kind: 'owner-rights view', over: t, rows: manifest.delta[t].n, readable_by: [v.a && 'anon', v.u && 'authenticated'].filter(Boolean) })
+    const root = (await q(c, 'select $1::regclass::oid::int o, $1::regclass::text r', [t]))[0]; const rows = manifest.delta[t].n
+    const queue = [{ oid: root.o, over: t }]; const seen = new Set()
+    while (queue.length) {
+      const { oid, over } = queue.shift(); if (seen.has(oid)) continue; seen.add(oid)
+      const info = (await q(c, `select c.oid::int o, format('%I.%I', n.nspname, c.relname) r, c.relkind k, coalesce((select option_value from pg_options_to_table(c.reloptions) where option_name = 'security_invoker'), 'false') inv from pg_class c join pg_namespace n on n.oid = c.relnamespace where c.oid = $1`, [oid]))[0]
+      if (!out.has(oid)) out.set(oid, { oid, relation: info.r, kind: ({ r: 'table', p: 'table', v: 'view', m: 'materialized view', f: 'foreign table' })[info.k] ?? info.k, over, rows, invoker: ['true', 'on'].includes(String(info.inv).toLowerCase()) })
+      const next = await q(c, `select v.oid::int o from pg_depend d join pg_rewrite rw on rw.oid = d.objid join pg_class v on v.oid = rw.ev_class where d.classid = 'pg_rewrite'::regclass and d.refobjid = $1 and v.relkind in ('v', 'm') and v.oid <> $1
+        union select inhrelid::int from pg_inherits where inhparent = $1 union select inhparent::int from pg_inherits where inhrelid = $1`, [oid])
+      for (const n of next) queue.push({ oid: n.o, over })
+    }
   }
-  return out.sort((x, y) => x.relation.localeCompare(y.relation))
+  return [...out.values()]
 }
+const readers = async (c, rels, roles) => {
+  const out = []
+  for (const r of rels) { const by = []; for (const role of roles) if ((await q(c, `select has_any_column_privilege($1, $2::oid, 'SELECT') ok`, [role, r.oid]))[0].ok) by.push(role); if (by.length) out.push({ ...r, by }) }
+  return out
+}
+const shape = (list) => list.filter((x) => !(x.kind.endsWith('view') && x.invoker)).map(({ relation, rows, by, kind }) => ({ relation, rows, by, kind })).sort((x, y) => x.relation.localeCompare(y.relation))
+/** What Data API clients (anon, authenticated) could read after the promotion, as the owner must acknowledge it. */
+export async function restPublicDelta (c, manifest) { return shape(await readers(c, await reachableRelations(c, manifest), ['anon', 'authenticated'])).map(({ relation, rows, by }) => ({ relation, rows, by })) }
+/** What the WEBSITE role (bai_site) could read: the real publication of the identities at commit. */
+export async function websiteVisibleDelta (c, manifest) { return shape(await readers(c, await reachableRelations(c, manifest), ['bai_site'])).map(({ relation, rows, by }) => ({ relation, rows, by })) }
 
 /** Everything about the hosted database that must hold before a promotion, in one repeatable-read read-only transaction. Returns { problems, facts }. */
 export async function hostedPreflight (c, pkg, { expectedLevel = EXPECTED_LEVEL, requireSupabaseHistory = true, expectedMlb = EXPECTED_MLB_TRANSACTIONS } = {}) {
@@ -86,15 +104,15 @@ export async function hostedPreflight (c, pkg, { expectedLevel = EXPECTED_LEVEL,
     if (!(new Date(exp + 'T23:59:59Z').getTime() > Date.now())) problems.push(`the package's authorization window ended ${exp}`)
     const mlb = (await q(c, `select count(*)::int n from public.transactions t join public.sources s on s.id = t.source_id where s.attribution_category = 'MLB'`))[0].n; facts.mlb_transactions = mlb
     if (mlb !== expectedMlb) problems.push(`the hosted database holds ${mlb} MLB transactions, expected ${expectedMlb}`)
-    facts.rest_public_delta = await restPublicDelta(c, pkg.manifest)
+    facts.rest_public_delta = await restPublicDelta(c, pkg.manifest); facts.website_visible_delta = await websiteVisibleDelta(c, pkg.manifest)
   } finally { await c.query('rollback').catch(() => {}) }
   return { problems, facts }
 }
 
 /** The attribution evidence file: recomputed hash, the pages it covers, its age. */
-export function checkEvidence (file, manifest, { now = Date.now() } = {}) {
+export function checkEvidence (file, manifest, { now = Date.now(), bytes = null } = {}) {   // bytes: read once by the caller
   const p = []; let ev
-  try { ev = JSON.parse(fs.readFileSync(file, 'utf8')) } catch { return ['the attribution evidence file is missing or unreadable'] }
+  try { ev = JSON.parse(bytes ? bytes.toString('utf8') : fs.readFileSync(file, 'utf8')) } catch { return ['the attribution evidence file is missing or unreadable'] }
   const { evidence_sha256: claimed, ...doc } = ev
   const actual = sha256Hex(JSON.stringify(doc, null, 1))
   if (ev.format !== 'bai-live-attribution-evidence/1') p.push('unknown attribution evidence format')
@@ -102,7 +120,8 @@ export function checkEvidence (file, manifest, { now = Date.now() } = {}) {
   if (claimed !== manifest.attribution.evidence_sha256) p.push('the attribution evidence is not the evidence the package pins')
   if (ev.all_pages_carry_the_statement !== true) p.push('the attribution evidence does not show the statement on every page')
   if (ev.captured_utc !== manifest.attribution.verified_at) p.push('the evidence capture time is not the package\'s verified_at')
-  const age = now - Date.parse(ev.captured_utc); const max = (manifest.attribution.max_age_hours ?? 72) * 3600e3
+  if (!(manifest.attribution.max_age_hours <= 72)) p.push('the package allows attribution evidence older than 72 hours')
+  const age = now - Date.parse(ev.captured_utc); const max = Math.min(manifest.attribution.max_age_hours ?? 72, 72) * 3600e3
   if (!(age >= -60000 && age <= max)) p.push(`the attribution evidence is ${(age / 3600e3).toFixed(1)} hours old; the limit is ${max / 3600e3}`)
   if (!/^dpl_/.test(ev.deployment ?? '') || !/^[0-9a-f]{40}$/.test(ev.commit ?? '')) p.push('the attribution evidence names no real deployment and commit')
   return p
@@ -110,39 +129,51 @@ export function checkEvidence (file, manifest, { now = Date.now() } = {}) {
 
 // ---- attempt records ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-const RESOLVED_OK_TO_RETRY = (s) => ['REFUSED_BEFORE_WRITE', 'ROLLED_BACK', 'NOT_PROMOTED_CONFIRMED'].includes(s) || /^RESOLVED_/.test(s)
-/** Starts an attempt after checking the earlier ones. Returns the attempt (with update()). */
+const AMBIGUOUS_STATES = ['CREATED', 'STARTED', 'AMBIGUOUS', 'UNKNOWN']
+const FAILED_STATES = (s) => ['REFUSED_BEFORE_WRITE', 'ROLLED_BACK', 'NOT_PROMOTED_CONFIRMED'].includes(s) || /^RESOLVED_/.test(s)
+/**
+ * Starts an attempt after checking the earlier ones of the same operation. An earlier attempt whose outcome is unresolved blocks everything until `status` resolves it. A repeat of an attempt
+ * that FAILED (rolled back, or confirmed not to have happened) needs an owner authorization that names it (after_attempt). An earlier attempt that SUCCEEDED does not block a new, separately
+ * authorized operation of the same kind (a second emergency after a revert, a second analyze): the database state decides whether that is allowed. A committed promotion is never repeated.
+ */
 export function beginAttempt (ledger, { manifest, operation, authSha, afterAttempt, now = new Date() }) {
   const prev = ledger.attempts(manifest).filter((a) => a.operation === operation)
   const last = prev.at(-1)
   if (operation === 'promote' && prev.some((a) => a.state === 'COMMITTED')) refuse('an earlier attempt already committed this promotion')
-  if (last && !RESOLVED_OK_TO_RETRY(last.state)) refuse(`the previous ${operation} attempt ${last.id} is ${last.state}: resolve it first with "status" (read-only); it is never repeated automatically`)
-  if (last && afterAttempt !== last.id) refuse(`an earlier ${operation} attempt (${last.id}, ${last.state}) exists: the owner's authorization must name it in after_attempt before another attempt is made`)
-  if (!last && afterAttempt) refuse('the authorization names an earlier attempt that this host has no record of')
+  if (last && AMBIGUOUS_STATES.includes(last.state)) refuse(`the previous ${operation} attempt ${last.id} is ${last.state}: resolve it first with "status" (read-only); it is never repeated automatically`)
+  if (last && FAILED_STATES(last.state) && afterAttempt !== last.id) refuse(`an earlier ${operation} attempt (${last.id}, ${last.state}) did not complete: the owner's authorization must name it in after_attempt before another attempt is made`)
+  if (afterAttempt && !(last && afterAttempt === last.id)) refuse('the authorization names an earlier attempt that is not this host\'s latest attempt')
   return ledger.start({ manifest, operation, authorization_sha256: authSha, started_at: now.toISOString() })
 }
 
 // ---- operations -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+const readOnce = (f) => { try { return fs.readFileSync(f) } catch { return null } }
 const SQLSTATE = /^[0-9A-Z]{5}$/
-/** A failure that carries a SQLSTATE was reported by the server, which then aborted the transaction. Anything else (socket, timeout in the client) leaves the outcome unknown. */
-export const serverReported = (e) => typeof e?.code === 'string' && SQLSTATE.test(e.code)
+/**
+ * A failure is "server-reported" only if it is an ERROR the server itself raised (a pg DatabaseError with severity ERROR and a SQLSTATE) outside the connection (08), operator-intervention (57P),
+ * system (58) and internal (XX) classes: the server then aborted the transaction. Node socket codes that look like SQLSTATEs (EPIPE, EBUSY, EPERM), FATAL/PANIC messages and everything
+ * without a severity leave the outcome unknown.
+ */
+export const serverReported = (e) => e?.severity === 'ERROR' && typeof e.code === 'string' && SQLSTATE.test(e.code) && !/^(08|57P|58|XX)/.test(e.code)
 
-/** Asks the database, on a NEW read-only connection, what became of a manifest. Polls briefly so a transaction still finishing on the server is not misread. Never writes. */
-export async function resolveState (connect, sha, { tries = 6, waitMs = 2500, sleep = (ms) => new Promise((r) => setTimeout(r, ms)) } = {}) {
+/** One consistent look at a manifest: writer sessions counted before and after the state is read twice; the answer is trustworthy only if no writer existed at either end and the state did not change. */
+export async function observeState (c, sha) {
+  const live = async () => (await q(c, `select count(*)::int n from pg_stat_activity where application_name = 'bai-promotion-hosted' and pid <> pg_backend_pid() and state <> 'idle'`))[0].n
+  const w1 = await live(); const s1 = (await statusOf(c, sha)).state; const w2 = await live(); const s2 = (await statusOf(c, sha)).state
+  return { state: s2, writers_before: w1, writers_after: w2, stable: s1 === s2, resolved: w1 === 0 && w2 === 0 && s1 === s2 }
+}
+
+/** Asks the database, on a NEW read-only connection, what became of a manifest. Polls while a writer session of the runner is still active. Never writes. */
+export async function resolveState (connect, sha, { tries = 8, waitMs = 2500, sleep = (ms) => new Promise((r) => setTimeout(r, ms)) } = {}) {
   let last
   for (let i = 0; i < tries; i++) {
     let session
     try {
       session = await connect(); const c = session.client
       await c.query('begin read only')
-      try {
-        const st = await statusOf(c, sha)
-        const live = (await q(c, `select count(*)::int n from pg_stat_activity where application_name = 'bai-promotion-hosted' and pid <> pg_backend_pid() and state <> 'idle'`))[0].n
-        last = { state: st.state, writer_sessions_still_active: live }
-        if (live === 0) return { ...last, resolved: true }
-      } finally { await c.query('rollback').catch(() => {}) }
-    } catch (e) { last = { error: String(e.message).split('\n')[0].slice(0, 160) } } finally { await session?.client?.end().catch(() => {}) }
+      try { last = await observeState(c, sha); if (last.resolved) return last } finally { await c.query('rollback').catch(() => {}) }
+    } catch (e) { last = { error: String(e.message).split('\n')[0].slice(0, 160), resolved: false } } finally { await session?.client?.end().catch(() => {}) }
     await sleep(waitMs)
   }
   return { ...(last ?? {}), resolved: false }
@@ -156,24 +187,24 @@ export function promoteInputs ({ pkgDir, authFile, evidenceFile, parityFile, env
   const pv = verifyPackage(pkgDir); problems.push(...pv.map((x) => `package: ${x}`))
   if (pv.length) return { problems }
   const pkg = loadPackage(pkgDir)
+  const evBytes = readOnce(evidenceFile); const parityBytes = readOnce(parityFile)   // each file is read ONCE; what is checked is what is hashed and used
   const va = verifyAuthorization(authFile, { operation: 'promote', projectRef, manifest: pkg.sha, keyring, pinned, now, isConsumed: ledger.isConsumed })
   problems.push(...va.problems.map((x) => `authorization: ${x}`))
-  problems.push(...checkEvidence(evidenceFile, pkg.manifest, { now }).map((x) => `attribution evidence: ${x}`))
-  if (va.auth && !problems.some((x) => x.startsWith('attribution evidence'))) {
-    const evHash = JSON.parse(fs.readFileSync(evidenceFile, 'utf8')).evidence_sha256
-    if (va.auth.attribution_evidence_sha256 !== evHash) problems.push('authorization: it names another attribution evidence')
-  }
-  const rp = verifyPromotionRecordFile(parityFile, { manifest: pkg.manifest, manifestSha: pkg.sha, projectRef, expectLevel: EXPECTED_LEVEL, now }); problems.push(...rp.map((x) => `parity record: ${x}`))
+  const evProblems = evBytes ? checkEvidence(evidenceFile, pkg.manifest, { now, bytes: evBytes }) : ['the attribution evidence file is missing or unreadable']
+  problems.push(...evProblems.map((x) => `attribution evidence: ${x}`))
+  if (va.auth && !evProblems.length && JSON.parse(evBytes.toString('utf8')).evidence_sha256 !== va.auth.attribution_evidence_sha256) problems.push('authorization: it names another attribution evidence')
+  const rp = parityBytes ? verifyPromotionRecordFile(parityFile, { manifest: pkg.manifest, manifestSha: pkg.sha, projectRef, expectLevel: EXPECTED_LEVEL, now, bytes: parityBytes }) : ['parity record unreadable']; problems.push(...rp.map((x) => `parity record: ${x}`))
   if (!rp.length && va.auth) {
-    const rec = JSON.parse(fs.readFileSync(parityFile, 'utf8'))
+    const rec = JSON.parse(parityBytes.toString('utf8'))
     if (rec.offsite?.method !== 'automated-record' || !/^[0-9a-f]{64}$/.test(rec.offsite?.verification_record_sha256 ?? '')) problems.push('parity record: it was not made from the backup tool\'s verified off-site record (give --offsite-record to final-parity.mjs, not bare hashes)')
-    if (sha256Hex(fs.readFileSync(parityFile)) !== va.auth.parity_record_sha256) problems.push('authorization: it names another parity record')
+    if (sha256Hex(parityBytes) !== va.auth.parity_record_sha256) problems.push('authorization: it names another parity record')
     const b = va.auth.backup ?? {}
     if (path.basename(rec.backup.dir) !== b.name) problems.push('authorization: it names another backup')
     if (rec.backup.started_at !== new Date(Date.parse(b.t0)).toISOString()) problems.push('authorization: it names another backup T0')
     if (rec.backup.manifest_sha256 !== b.manifest_sha256 || rec.offsite.encrypted_sha256 !== b.archive_sha256 || rec.backup.tree_sha256 !== b.content_tree_sha256 || rec.offsite.verification_record_sha256 !== b.offsite_record_sha256) problems.push('authorization: its backup hashes are not the parity record\'s')
   }
-  return { problems, pkg, auth: va.auth, authSha: va.sha256 }
+  const parityExpires = parityBytes && !rp.length ? Date.parse(JSON.parse(parityBytes.toString('utf8')).expires_at) : null
+  return { problems, pkg, auth: va.auth, authSha: va.sha256, parityExpires }
 }
 
 /**
@@ -189,10 +220,13 @@ export async function promoteHosted (ctx, { pkgDir, authFile, evidenceFile, pari
   let attempt
   try {
     const pre = await hostedPreflight(c, pkg, { requireSupabaseHistory: ctx.requireSupabaseHistory !== false, expectedMlb: ctx.expectedMlb ?? EXPECTED_MLB_TRANSACTIONS })
-    const delta = canon(pre.facts.rest_public_delta.map(({ relation, rows, readable_by: by }) => ({ relation, rows, by })))
+    const delta = canon(pre.facts.rest_public_delta)
     if (canon(auth.rest_public_delta) !== delta) pre.problems.push(`the REST-visible delta differs from the one the owner acknowledged (hosted would expose ${JSON.stringify(pre.facts.rest_public_delta.map((x) => `${x.relation}:${x.rows}`))})`)
+    if (canon(auth.website_visible_delta) !== canon(pre.facts.website_visible_delta)) pre.problems.push(`the website-visible delta differs from the one the owner acknowledged (the website role would read ${JSON.stringify(pre.facts.website_visible_delta.map((x) => `${x.relation}:${x.rows}`))})`)
     log(`preflight: ${pre.problems.length ? 'FAILED' : 'ok'} (${pre.facts.tables_checked} tables compared, state ${pre.facts.state}, REST-visible: ${pre.facts.rest_public_delta.map((x) => `${x.relation}:${x.rows}`).join(', ') || 'none'})`)
     if (pre.problems.length) refuse(`PROMOTION REFUSED by the hosted preflight (nothing written):\n  ${pre.problems.join('\n  ')}`, { report: { stage: 'preflight', problems: pre.problems, facts: pre.facts } })
+    // the preflight took time: the parity record must still be valid at the moment the write begins (15 s margin for the transaction's own start)
+    if (!(r.parityExpires - now() > 15e3)) refuse('PROMOTION REFUSED: the parity record would expire before the write could begin; run the final parity again (nothing written)', { report: { stage: 'freshness', problems: ['parity record too old'] } })
     // the artifact is spent and the attempt recorded BEFORE the first write
     attempt = beginAttempt(ledger, { manifest: pkg.sha, operation: 'promote', authSha, afterAttempt: auth.after_attempt })
     ledger.consume(authSha, { operation: 'promote', manifest: pkg.sha, attempt: attempt.id })
@@ -200,7 +234,11 @@ export async function promoteHosted (ctx, { pkgDir, authFile, evidenceFile, pari
     const t0 = Date.now(); let outcome
     try { outcome = await promoteOnce(c, pkg) } catch (e) {
       const ms = Date.now() - t0
-      if (serverReported(e)) { attempt.update({ state: 'ROLLED_BACK', error: String(e.message).split('\n')[0].slice(0, 200), sqlstate: e.code }); refuse(`NOT PROMOTED: the server refused and rolled back (${e.code}): ${String(e.message).split('\n')[0]}`, { report: { stage: 'promote', state: 'ROLLED_BACK', attempt: attempt.id, ms } }) }
+      if (serverReported(e)) {
+        const check = await resolveState(connect, pkg.sha, { tries: 2, waitMs: 1000 })   // the server said it rolled back; ask anyway
+        if (check.resolved && check.state === 'PROMOTED') { attempt.update({ state: 'AMBIGUOUS', error: 'server error but the ledger says PROMOTED', resolved_with: check }); refuse(`CONTRADICTION: the server reported an error (${e.code}) but the ledger says PROMOTED. Nothing was retried. Attempt ${attempt.id}.`, { report: { stage: 'promote', state: 'PROMOTED', attempt: attempt.id, resolution: check } }) }
+        attempt.update({ state: 'ROLLED_BACK', error: String(e.message).split('\n')[0].slice(0, 200), sqlstate: e.code, resolved_with: check }); refuse(`NOT PROMOTED: the server refused and rolled back (${e.code}): ${String(e.message).split('\n')[0]}`, { report: { stage: 'promote', state: 'ROLLED_BACK', attempt: attempt.id, ms } })
+      }
       attempt.update({ state: 'AMBIGUOUS', error: String(e.message).split('\n')[0].slice(0, 200) })
       try { c.connection?.stream?.destroy() } catch { /* the connection is abandoned either way */ }
       const st = await resolveState(connect, pkg.sha)
@@ -208,7 +246,7 @@ export async function promoteHosted (ctx, { pkgDir, authFile, evidenceFile, pari
       refuse(`AMBIGUOUS RESULT (${String(e.message).split('\n')[0].slice(0, 120)}). Read-only ledger check: ${JSON.stringify(st)}. Attempt ${attempt.id} is recorded; NOTHING WAS RETRIED. Decide with the owner: run "status", then a new authorization naming after_attempt=${attempt.id}.`, { report: { stage: 'promote', state: st.resolved ? classify(st.state) : 'UNKNOWN', attempt: attempt.id, resolution: st } })
     }
     const ms = Date.now() - t0
-    attempt.update({ state: outcome === 'PROMOTED' ? 'COMMITTED' : outcome === 'ALREADY_PROMOTED' ? 'COMMITTED' : outcome, ms })
+    attempt.update({ state: outcome === 'PROMOTED' || outcome === 'ALREADY_PROMOTED' ? 'COMMITTED' : outcome, note: outcome === 'ALREADY_PROMOTED' ? 'the database reported ALREADY_PROMOTED (nothing was written by this attempt)' : undefined, ms })
     const post = await verifyPromoted(c, pkg, { expectedMlb: ctx.expectedMlb ?? EXPECTED_MLB_TRANSACTIONS, before: pre.facts.rm })
     attempt.update({ post_verification: post.ok ? 'PASS' : 'FAIL' })
     return { outcome, attempt: attempt.id, ms, preflight: pre.facts, post }
@@ -238,7 +276,7 @@ export async function verifyPromoted (c, pkg, { expectedMlb = EXPECTED_MLB_TRANS
     if (rm.content_rows) problems.push(`read-model rows: ${rm.content_rows}`)
     if (before && canon(rm.bookkeeping) !== canon(before.bookkeeping)) problems.push('the read-model bookkeeping changed: a refresh ran')
     const g = (await q(c, 'select count(*)::int n from ingest.source_publication_grants'))[0].n; facts.grants = g; if (g !== 1) problems.push(`publication grants: ${g}`)
-    facts.rest_public_delta = await restPublicDelta(c, pkg.manifest)
+    facts.rest_public_delta = await restPublicDelta(c, pkg.manifest); facts.website_visible_delta = await websiteVisibleDelta(c, pkg.manifest)
   } finally { await c.query('rollback').catch(() => {}) }
   return { ok: problems.length === 0, problems, facts }
 }
@@ -288,10 +326,10 @@ export async function statusHosted (ctx, manifest) {
   const session = await ctx.connect(); const c = await openSession(session.client)
   try {
     await c.query('begin read only')
-    const st = await statusOf(c, manifest); const blockers = await dependents(c, manifest).catch(() => null)
+    const obs = await observeState(c, manifest); const st = { manifest_sha256: manifest, state: obs.state }; const blockers = await dependents(c, manifest).catch(() => null)
     await c.query('rollback')
-    for (const a of ctx.ledger.attempts(manifest)) if (['STARTED', 'AMBIGUOUS', 'UNKNOWN', 'CREATED'].includes(a.state)) ctx.ledger.mark(manifest, a.id, { state: a.operation === 'promote' ? classify(st.state) : `RESOLVED_${st.state}`, resolved_by: 'status', resolved_at: new Date().toISOString() })
-    return { ...st, blockers, attempts: ctx.ledger.attempts(manifest).map((a) => ({ id: a.id, operation: a.operation, state: a.state })) }
+    if (obs.resolved) for (const a of ctx.ledger.attempts(manifest)) if (AMBIGUOUS_STATES.includes(a.state) && Date.now() - Date.parse(a.started_at) > 60e3) ctx.ledger.mark(manifest, a.id, { state: a.operation === 'promote' ? classify(st.state) : `RESOLVED_${st.state}`, resolved_by: 'status', resolved_at: new Date().toISOString() })
+    return { ...st, observation: obs, blockers, attempts: ctx.ledger.attempts(manifest).map((a) => ({ id: a.id, operation: a.operation, state: a.state })) }
   } finally { await session.client.end().catch(() => {}) }
 }
 
@@ -309,6 +347,7 @@ export async function verifyPromotedHosted (ctx, pkgDir) {
  */
 export async function draftAuthorization (ctx, { operation, manifest, pkgDir, parityFile, evidenceFile, reason, closeApi = false, withGrant = false, afterAttempt = null, hours = 1, now = Date.now() }) {
   if (!OPERATIONS.includes(operation)) refuse(`unknown operation ${operation}`)
+  if (!Number.isFinite(hours) || hours <= 0) refuse('--hours must be a positive number')
   const draft = { format: AUTHORIZATION_FORMAT, operation, project_ref: ctx.projectRef, manifest_sha256: manifest, not_before: new Date(now).toISOString(), expires_at: new Date(now + Math.min(Math.max(hours, 0.1), 24) * 3600e3).toISOString(), nonce: crypto.randomBytes(16).toString('hex'), after_attempt: afterAttempt }
   if (operation !== 'promote') {
     if (!/^[0-9a-f]{64}$/.test(manifest ?? '')) refuse('--manifest must be a 64-hex manifest SHA-256')
@@ -324,9 +363,9 @@ export async function draftAuthorization (ctx, { operation, manifest, pkgDir, pa
   const rec = JSON.parse(fs.readFileSync(parityFile, 'utf8')); const ev = JSON.parse(fs.readFileSync(evidenceFile, 'utf8'))
   const session = await ctx.connect(); const c = await openSession(session.client)
   try {
-    await c.query('begin read only'); let delta; try { delta = await restPublicDelta(c, pkg.manifest) } finally { await c.query('rollback').catch(() => {}) }
+    await c.query('begin read only'); let delta; let web; try { delta = await restPublicDelta(c, pkg.manifest); web = await websiteVisibleDelta(c, pkg.manifest) } finally { await c.query('rollback').catch(() => {}) }
     Object.assign(draft, { backup: { name: path.basename(rec.backup.dir), t0: rec.backup.started_at, manifest_sha256: rec.backup.manifest_sha256, archive_sha256: rec.offsite.encrypted_sha256, content_tree_sha256: rec.backup.tree_sha256, offsite_record_sha256: rec.offsite.verification_record_sha256 },
-      parity_record_sha256: sha256Hex(fs.readFileSync(parityFile)), attribution_evidence_sha256: ev.evidence_sha256, rest_public_delta: delta.map(({ relation, rows, readable_by: by }) => ({ relation, rows, by })) })
+      parity_record_sha256: sha256Hex(fs.readFileSync(parityFile)), attribution_evidence_sha256: ev.evidence_sha256, rest_public_delta: delta, website_visible_delta: web })
   } finally { await session.client.end().catch(() => {}) }
   return draft
 }

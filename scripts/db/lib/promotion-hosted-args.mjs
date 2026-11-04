@@ -16,7 +16,7 @@ const COMMON = ['owner-keyring', 'report']
 /** Strict parser: a known command, only its own options (each exactly once, with a value), nothing positional. Returns { cmd, o }. Exported for the tests. */
 export function parseArgs (argv, usage = 'usage: see scripts/db/promotion-hosted.mjs') {
   const [cmd, ...rest] = argv
-  if (!cmd || !(cmd in SPEC)) return { error: usage }
+  if (!cmd || !Object.hasOwn(SPEC, cmd)) return { error: usage }
   const allowed = new Set([...SPEC[cmd].need, ...SPEC[cmd].opt, ...COMMON]); const o = {}
   for (let i = 0; i < rest.length; i += 2) {
     const k = rest[i]

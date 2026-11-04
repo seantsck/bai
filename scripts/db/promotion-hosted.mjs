@@ -55,7 +55,8 @@ try {
   } else if (cmd === 'verify-promoted') report = await verifyPromotedHosted(ctx, o.package)
   else if (cmd === 'promote') report = await promoteHosted(ctx, { pkgDir: o.package, authFile: o.authorization, evidenceFile: o['attribution-evidence'], parityFile: o['parity-record'] })
   else report = await operateHosted(ctx, cmd, { manifest: o.manifest, authFile: o.authorization })
-  emit({ command: cmd, ok: true, ...report })
+  const out = { command: cmd, ok: true, ...report }; emit(out)
+  if (out.ok === false || out.post?.ok === false) process.exit(1)   // exit 0 only for a verified success
 } catch (e) {
   emit({ command: cmd, ok: false, error: String(e.message), ...(e instanceof HostedPromotionError ? e.report ?? {} : {}) })
   process.exit(1)
