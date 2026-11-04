@@ -150,3 +150,60 @@ export function verifyRecordFile (file, { gate, now = Date.now() }) {
   else if (now - started > MAX_BACKUP_AGE_MS) p.push(`the backup is ${((now - started) / 3600000).toFixed(1)} hours old; the maximum is 6`)
   return p
 }
+
+// ---- the promotion variant (G6 hosted promotion runner) -----------------------------------------------------------------------------------------------------------------------------
+// A promotion applies no migration, so there is no gate. The same comparison (a backup at most six hours old with verified off-site evidence, the strict hosted preflight at the
+// expected level, a fresh logical export identical to the backup's) is recorded in a record bound to the PROJECT, the expected LEVEL and the exact PACKAGE (manifest hash and the
+// migration ledger it was built on) instead of a gate, valid for ten minutes. The hosted promotion runner re-verifies it from the files.
+const canonJson = (o) => Array.isArray(o) ? `[${o.map(canonJson).join(',')}]` : o && typeof o === 'object' ? `{${Object.keys(o).sort().map((k) => `${JSON.stringify(k)}:${canonJson(o[k])}`).join(',')}}` : JSON.stringify(o)
+export const ledgerHash = (migrations) => sha256(canonJson(migrations))
+
+export function buildPromotionRecord ({ backupDir, projectRef, expectLevel, manifest, manifestSha, offsite, exportHashes, now = Date.now() }) {
+  const snap = JSON.parse(fs.readFileSync(path.join(backupDir, 'snapshot/manifest.json'), 'utf8'))
+  const rec = {
+    kind: 'g1-final-parity-promotion', version: 1, result: 'PASS', project_ref: projectRef,
+    promotion: { manifest_sha256: manifestSha, category: manifest.category, ledger_hash: ledgerHash(manifest.migrations), expect_level: expectLevel },
+    backup: { dir: path.resolve(backupDir), started_at: new Date(backupStartedAt(backupDir)).toISOString(), manifest_sha256: snap.manifest_sha256, tree_sha256: contentTreeHash(backupDir) },
+    offsite: { encrypted_sha256: offsite.encrypted, tree_sha256: offsite.tree, authorization_ref: offsite.authorizationRef, ...(offsite.recordSha256 ? { method: 'automated-record', verification_record_sha256: offsite.recordSha256 } : {}) },
+    preflight: { ok: true, expect_level: expectLevel },
+    export_compare: { identical: true, files: exportHashes },
+    max_age_ms: MAX_BACKUP_AGE_MS, checked_at: new Date(now).toISOString(), expires_at: new Date(now + RECORD_VALIDITY_MS).toISOString()
+  }
+  rec.record_sha256 = recordHash(rec)
+  return rec
+}
+
+/** Problems (empty = the record is a PASS for exactly this package, project and level, and is still valid). Everything is re-derived from the files. */
+export function verifyPromotionRecordFile (file, { manifest, manifestSha, projectRef, expectLevel, now = Date.now() }) {
+  const p = []
+  let rec
+  try { rec = JSON.parse(fs.readFileSync(file, 'utf8')) } catch (e) { return [`parity record unreadable: ${e.message}`] }
+  if (rec?.kind !== 'g1-final-parity-promotion' || rec.version !== 1) return ['not a g1-final-parity-promotion record (version 1)']
+  if (rec.record_sha256 !== recordHash(rec)) return ['parity record was altered (its own hash does not match)']
+  if (rec.result !== 'PASS' || rec.preflight?.ok !== true || rec.export_compare?.identical !== true) p.push('parity record is not a PASS')
+  if (rec.project_ref !== projectRef) p.push('parity record is for another project')
+  if (rec.promotion?.manifest_sha256 !== manifestSha) p.push('parity record is for another package')
+  if (rec.promotion?.ledger_hash !== ledgerHash(manifest.migrations)) p.push('parity record was made for another migration ledger')
+  if (rec.promotion?.expect_level !== expectLevel || rec.preflight?.expect_level !== expectLevel) p.push(`parity record did not check migration level ${expectLevel}`)
+  const t0 = Date.parse(rec.checked_at); const t1 = Date.parse(rec.expires_at)
+  if (!Number.isFinite(t0) || !Number.isFinite(t1) || t1 - t0 > RECORD_VALIDITY_MS) p.push('parity record has no valid time window')
+  else if (now < t0 - 1000) p.push('parity record is dated in the future')
+  else if (now > t1) p.push(`parity record expired ${Math.round((now - t1) / 1000)} s ago: run the final parity check again immediately before the promotion`)
+  if (!(rec.max_age_ms <= MAX_BACKUP_AGE_MS)) p.push('parity record claims a longer backup age than the six hours allowed')
+  const dir = rec.backup?.dir
+  if (!dir) return [...p, 'parity record names no backup']
+  const bp = verifyBackupDir(dir); if (bp.length) return [...p, ...bp.map((x) => `backup: ${x}`)]
+  const snap = JSON.parse(fs.readFileSync(path.join(dir, 'snapshot/manifest.json'), 'utf8'))
+  if (snap.manifest_sha256 !== rec.backup.manifest_sha256) p.push('the backup\'s manifest differs from the record')
+  if (snap.migrations?.v !== expectLevel) p.push(`the backup is at migration ${snap.migrations?.v}, not ${expectLevel}`)
+  const tree = contentTreeHash(dir)
+  if (tree !== rec.backup.tree_sha256) p.push('the backup directory content changed since the record was written')
+  if (![rec.offsite?.encrypted_sha256, rec.offsite?.tree_sha256].every((h) => HEX64.test(h ?? ''))) p.push('the record has no off-site verification hashes')
+  if (rec.offsite?.tree_sha256 !== tree) p.push('the off-site verified content hash is not this backup\'s content hash')
+  else for (const x of verifyOffsiteEvidence(dir, rec.offsite?.encrypted_sha256, rec.offsite?.tree_sha256)) p.push(`off-site evidence: ${x}`)
+  if (!String(rec.offsite?.authorization_ref ?? '').trim()) p.push('the record has no owner authorization reference')
+  const started = backupStartedAt(dir)
+  if (started == null) p.push('the backup start time cannot be determined')
+  else if (now - started > MAX_BACKUP_AGE_MS) p.push(`the backup is ${((now - started) / 3600000).toFixed(1)} hours old; the maximum is 6`)
+  return p
+}

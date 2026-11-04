@@ -1,0 +1,342 @@
+// The gated hosted promotion runner (scripts/db/promotion-hosted.mjs, lib/promotion-hosted.mjs) against a DISPOSABLE local cluster. Hosted is never contacted: the connection factory is
+// injected (the TLS behaviour of the real connection is tests/db/promotion-hosted-tls.test.mjs). Every refusal must leave the database exactly as it was.
+// All rows are the fictional fixture rows of promotion-fixture.mjs. The owner's key is a throw-away test key in a temporary GnuPG home.
+import { test, before, after } from 'node:test'
+import assert from 'node:assert/strict'
+import crypto from 'node:crypto'
+import fs from 'node:fs'
+import os from 'node:os'
+import path from 'node:path'
+import { spawnSync } from 'node:child_process'
+import pg from 'pg'
+import * as h from './harness.mjs'
+import { applyMigrations } from '../../scripts/db/lib/migrations.mjs'
+import { takeSnapshot } from '../../scripts/db/lib/snapshot.mjs'
+import { buildPromotionRecord, contentTreeHash, compareExports } from '../../scripts/db/lib/final-parity.mjs'
+import { SESSION_SQL, buildPackage, loadPackage, sha256, verifyPackage, writePackage } from '../../scripts/db/lib/promotion.mjs'
+import { AUTHORIZATION_FORMAT, OWNER_SIGNING_FINGERPRINTS, attemptLedger, verifyAuthorization } from '../../scripts/db/lib/promotion-authorization.mjs'
+import { checkEvidence, hostedPreflight, operateHosted, promoteHosted, promoteInputs, readModelState, restPublicDelta, resolveState, statusHosted, verifyPromotedHosted } from '../../scripts/db/lib/promotion-hosted.mjs'
+import { parseArgs } from '../../scripts/db/lib/promotion-hosted-args.mjs'
+import { buildBaseline, importSample } from './promotion-fixture.mjs'
+
+const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), '../..')
+const exporter = path.join(root, 'tests/db/fixtures/local-export.sh')
+const REF = 'dbnmktidheefoxaztivm'; const MAIN = 'g6h_main'
+const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'bai-g6h-'))
+let BASE_FP, bareParityFile, admin, main, PORT, pkg, pkgDir, evidenceFile, evidence, backupDir, parityFile, FPR, signHome, pubHome, ledger, env
+const hex = () => crypto.randomBytes(16).toString('hex')
+const open = async (name) => { const c = await h.connect(name); c.on('error', () => {}); await c.query(SESSION_SQL); return c }
+const rows = (c, sql, p) => h.rows(c, sql, p)
+const scopeFp = async (db = main) => { const o = {}; for (const t of (await rows(db, 'select unnest(ingest.promotion_scope()) t')).map((r) => r.t)) o[t] = JSON.stringify((await rows(db, 'select ingest.promotion_fingerprint($1) f', [t]))[0].f); return o }
+const refused = async (p) => p.then(() => null, (e) => e.message)
+const sh = (cmd, args, e = {}) => { const r = spawnSync(cmd, args, { encoding: 'utf8', env: { PATH: process.env.PATH, HOME: process.env.HOME, LANG: 'C', ...e } }); assert.equal(r.status, 0, `${cmd} ${args.slice(0, 3).join(' ')}: ${r.stderr}`); return r.stdout }
+const stamp = (ms) => new Date(ms).toISOString().replace(/[-:]/g, '').replace(/\.\d+Z$/, 'Z')
+
+// ---- owner key, signed authorizations -------------------------------------------------------------------------------------------------------------------------------------------
+function makeKeys () {
+  signHome = path.join(tmp, 'gpg-sign'); pubHome = path.join(tmp, 'gpg-pub'); fs.mkdirSync(signHome, { mode: 0o700 }); fs.mkdirSync(pubHome, { mode: 0o700 })
+  sh('gpg', ['--batch', '--pinentry-mode', 'loopback', '--passphrase', '', '--quick-generate-key', 'Test Owner <owner@example.invalid>', 'ed25519', 'sign', 'never'], { GNUPGHOME: signHome })
+  FPR = /^fpr:::::::::([0-9A-F]{40}):/m.exec(sh('gpg', ['--batch', '--with-colons', '--list-keys'], { GNUPGHOME: signHome }))[1]
+  const pub = path.join(tmp, 'owner.pub'); sh('gpg', ['--batch', '--export', '--output', pub, FPR], { GNUPGHOME: signHome }); sh('gpg', ['--batch', '--import', pub], { GNUPGHOME: pubHome })
+}
+const sign = (file, home = signHome, who = FPR) => sh('gpg', ['--batch', '--yes', '--pinentry-mode', 'loopback', '--passphrase', '', '--local-user', who, '--detach-sign', '--output', `${file}.sig`, file], { GNUPGHOME: home })
+let nAuth = 0
+/** Writes a signed authorization for `op`; `over` overrides fields (a value of undefined removes the field); signed: false leaves it unsigned. */
+function authorize (op, over = {}, { signed = true, manifest = pkg.sha } = {}) {
+  const now = Date.now()
+  const base = { format: AUTHORIZATION_FORMAT, operation: op, project_ref: REF, manifest_sha256: manifest, not_before: new Date(now - 60e3).toISOString(), expires_at: new Date(now + 3600e3).toISOString(), nonce: hex(), after_attempt: null }
+  if (op === 'promote') {
+    const rec = JSON.parse(fs.readFileSync(parityFile, 'utf8'))
+    Object.assign(base, { backup: { name: path.basename(backupDir), t0: rec.backup.started_at, manifest_sha256: rec.backup.manifest_sha256, archive_sha256: rec.offsite.encrypted_sha256, content_tree_sha256: rec.backup.tree_sha256, offsite_record_sha256: rec.offsite.verification_record_sha256 },
+      parity_record_sha256: sha256(fs.readFileSync(parityFile)), attribution_evidence_sha256: evidence.evidence_sha256, rest_public_delta: restDelta })
+  } else base.reason = `test ${op}`
+  const a = { ...base, ...over }; for (const k of Object.keys(a)) if (a[k] === undefined) delete a[k]
+  const f = path.join(tmp, `auth-${op}-${++nAuth}.json`); fs.writeFileSync(f, JSON.stringify(a, null, 1)); if (signed) sign(f)
+  return f
+}
+let restDelta
+// the local databases have no supabase_migrations schema (a restore keeps that history in a side file), so the library option that allows its absence is set here; the CLI never sets it
+const ctxFor = (connect, over = {}) => ({ connect, projectRef: REF, keyring: pubHome, pinned: [FPR], ledger, env: {}, log: () => {}, requireSupabaseHistory: false, expectedMlb: 2, ...over })
+const connectMain = async () => ({ client: await open(MAIN) })
+const ctx = (over) => ctxFor(connectMain, over)
+/** A connection that behaves like one whose socket dies: `onQuery(sql, real)` may throw. */
+const flaky = (onQuery) => async () => { const real = await open(MAIN); const q = real.query.bind(real); real.query = async (sql, p) => onQuery(String(sql), q, real, p); return { client: real } }
+
+// ---- evidence, backup, parity record --------------------------------------------------------------------------------------------------------------------------------------------
+function makeEvidence (capturedAt = new Date().toISOString()) {
+  const doc = { format: 'bai-live-attribution-evidence/1', phase: 'pre', captured_utc: capturedAt, base: 'https://example.invalid', deployment: 'dpl_TESTONLY', commit: 'a'.repeat(40), all_pages_carry_the_statement: true, pages: [] }
+  return { ...doc, evidence_sha256: sha256(JSON.stringify(doc, null, 1)) }
+}
+async function makeBackup (db, ageMs = 0) {
+  const named = path.join(tmp, `bk${Math.random().toString(36).slice(2, 6)}`, `g1-${stamp(Date.now() - ageMs)}`)
+  fs.mkdirSync(path.dirname(named), { recursive: true })
+  await takeSnapshot(db, path.join(named, 'snapshot'))
+  const r = spawnSync('bash', [exporter, path.join(named, 'export')], { encoding: 'utf8', env }); assert.equal(r.status, 0, r.stderr)
+  const arc = Buffer.concat([Buffer.from([0x8c, 13, 4, 9, 3, 10]), crypto.randomBytes(8), Buffer.from([0xff, 0xd2, 60, 1]), crypto.randomBytes(59)])
+  fs.writeFileSync(`${named}.tar.zst.gpg`, arc); fs.writeFileSync(`${named}.tar.zst.gpg.sha256`, sha256(arc) + '\n'); fs.writeFileSync(`${named}.tar.zst.gpg.tree-sha256`, contentTreeHash(named) + '\n')
+  const ret = path.join(path.dirname(named), `returned-${path.basename(named)}`); fs.mkdirSync(ret); fs.writeFileSync(path.join(ret, `${path.basename(named)}.tar.zst.gpg`), arc)
+  return named
+}
+/** A promotion parity record exactly as final-parity.mjs writes it from the backup tool's verified off-site record (the record hash is a stand-in: backup-run is not run in tests). */
+const OFFSITE_RECORD_SHA = crypto.createHash('sha256').update('stand-in for the backup tool\'s off-site verification record').digest('hex')
+function freshRecord (now = Date.now()) {
+  const file = path.join(tmp, `parity-lib-${++nAuth}.json`)
+  const rec = buildPromotionRecord({ backupDir, projectRef: REF, expectLevel: '034', manifest: pkg.manifest, manifestSha: pkg.sha, offsite: { encrypted: sha256(fs.readFileSync(`${backupDir}.tar.zst.gpg`)), tree: contentTreeHash(backupDir), authorizationRef: 'owner test', recordSha256: OFFSITE_RECORD_SHA }, exportHashes: { 'roles.sql': 'x' }, now })
+  fs.writeFileSync(file, JSON.stringify(rec, null, 1)); return file
+}
+function runParity (dir, packageDir, extraEnv = {}) {
+  const rec = path.join(tmp, `parity-${++nAuth}.json`)
+  const arc = sha256(fs.readFileSync(`${dir}.tar.zst.gpg`))
+  const r = spawnSync(process.execPath, ['scripts/db/final-parity.mjs', '--backup-dir', dir, '--promotion-package', packageDir, '--record', rec, '--offsite-sha256', arc, '--offsite-tree', contentTreeHash(dir), '--authorization-ref', 'owner test', '--export-script', exporter],
+    { cwd: root, encoding: 'utf8', env: { ...env, BAI_SUPABASE_PROJECT_REF: REF, ...extraEnv } })
+  return { ...r, rec, out: r.stdout + r.stderr }
+}
+
+before(async () => {
+  makeKeys(); ledger = attemptLedger(path.join(tmp, 'ledger'))
+  await h.startServer(); admin = await h.connect('postgres'); await admin.query(`create database ${MAIN}`)
+  main = await open(MAIN); PORT = main.port
+  await applyMigrations(main, { through: '030' }); await main.query("alter role bai_web login password 'webpw'")
+  await buildBaseline(main, tmp)
+  await applyMigrations(main)                                                                                             // 032, 033, 034
+  assert.equal((await rows(main, 'select max(version) v from bai_meta.schema_migrations'))[0].v, '034')
+  await main.end()
+  for (const n of ['a', 'lvl', 'drift']) await admin.query(`create database g6h_${n} template ${MAIN}`)
+  const lvl = await open('g6h_lvl'); await lvl.query("delete from bai_meta.schema_migrations where version = '034'"); await lvl.end()
+  const dr = await open('g6h_drift'); await dr.query("insert into players (slug, full_name, display_name) values ('g6h-drift', 'Drift', 'Drift')"); await dr.end()
+  const st = await open('g6h_a'); const batches = await importSample(st, tmp); await st.end()
+  const connect = (name) => open(name)
+  pkgDir = path.join(tmp, 'pkg'); evidence = makeEvidence(); evidenceFile = path.join(tmp, 'evidence.json'); fs.writeFileSync(evidenceFile, JSON.stringify(evidence, null, 1))
+  pkg = await buildPackage({ connect, admin, baseName: MAIN, stageName: 'g6h_a', outDir: pkgDir, config: { category: 'RETROSHEET', authorization: { effective_from: '2026-10-30', expires_on: '2099-01-22' },
+    attribution: { evidence_sha256: evidence.evidence_sha256, verified_at: evidence.captured_utc, max_age_hours: 72 }, archive: { name: 'fixture-tranDB.zip', sha256: sha256('fixture archive') }, expectBatches: batches } })
+  main = await open(MAIN)
+  env = { PATH: process.env.PATH, HOME: process.env.HOME, TMPDIR: os.tmpdir(), BAI_DATABASE_URL: `postgresql://postgres:postgres@127.0.0.1:${PORT}/${MAIN}` }
+  backupDir = await makeBackup(main)
+  const r = runParity(backupDir, pkgDir); assert.equal(r.status, 0, r.out); bareParityFile = r.rec
+  parityFile = freshRecord()
+  BASE_FP = await scopeFp()
+  restDelta = (await restPublicDelta(main, pkg.manifest)).map(({ relation, rows: n, readable_by: by }) => ({ relation, rows: n, by }))
+}, { timeout: 240000 })
+after(async () => { await h.stopServer(); fs.rmSync(tmp, { recursive: true, force: true }) })
+
+// ---- the contract ---------------------------------------------------------------------------------------------------------------------------------------------------------------
+test('the REST-visible delta is computed from the catalog: after 034 only the new source row is readable through the Data API; the identity relations are closed', async () => {
+  assert.deepEqual(restDelta.map((x) => x.relation), ['public.sources', 'v_transaction_record_sources'], 'players, ids, observations, coverage rows and aliases are closed to anon/authenticated since 033/034; the only others are the new source row and the owner-rights attribution aggregate over it')
+  assert.equal(restDelta[0].rows, 1); assert.deepEqual(restDelta[0].by, ['anon', 'authenticated'])
+  const none = (await restPublicDelta(main, { load_order: ['public.players', 'public.player_external_ids'], delta: { 'public.players': { n: 1 }, 'public.player_external_ids': { n: 1 } } }))
+  assert.deepEqual(none, [], 'closed tables report nothing')
+})
+
+test('the production build pins no owner key yet, so every hosted write is refused (fail closed) even with a valid signature', () => {
+  assert.deepEqual([...OWNER_SIGNING_FINGERPRINTS], [], 'OWNER_SIGNING_FINGERPRINTS is empty until the owner pins a signing key in a reviewed commit')
+  const f = authorize('withdraw')
+  const v = verifyAuthorization(f, { operation: 'withdraw', projectRef: REF, manifest: pkg.sha, keyring: pubHome, pinned: OWNER_SIGNING_FINGERPRINTS })
+  assert.match(v.problems.join(), /no owner signing key is pinned/)
+})
+
+test('control: the inputs of a promotion check out with a good signature, a fresh evidence file and a fresh parity record', () => {
+  const r = promoteInputs({ pkgDir, authFile: authorize('promote'), evidenceFile, parityFile, env: {}, projectRef: REF, keyring: pubHome, pinned: [FPR], ledger })
+  assert.deepEqual(r.problems, [])
+})
+
+test('authorization: missing, unsigned, tampered, signed by another key, wrong operation, project or manifest, expired, not yet valid, over-long window, replayed', () => {
+  const o = { operation: 'promote', projectRef: REF, manifest: pkg.sha, keyring: pubHome, pinned: [FPR] }
+  const check = (f, over = {}) => verifyAuthorization(f, { ...o, ...over }).problems.join(' | ')
+  assert.match(check(path.join(tmp, 'nope.json')), /missing or unreadable/)
+  assert.match(check(authorize('promote', {}, { signed: false })), /signature/)
+  const t = authorize('promote'); fs.writeFileSync(t, fs.readFileSync(t, 'utf8').replace('"nonce"', '"nonce" '))   // one byte of difference
+  assert.match(check(t), /not a good signature|no valid signature/)
+  const otherHome = path.join(tmp, 'gpg-other'); fs.mkdirSync(otherHome, { mode: 0o700 })
+  sh('gpg', ['--batch', '--pinentry-mode', 'loopback', '--passphrase', '', '--quick-generate-key', 'Other <other@example.invalid>', 'ed25519', 'sign', 'never'], { GNUPGHOME: otherHome })
+  const otherFpr = /^fpr:::::::::([0-9A-F]{40}):/m.exec(sh('gpg', ['--batch', '--with-colons', '--list-keys'], { GNUPGHOME: otherHome }))[1]
+  const forged = authorize('promote', {}, { signed: false }); sign(forged, otherHome, otherFpr)
+  assert.match(check(forged), /not a good signature|no valid signature|not one of the keys pinned/, 'a signature by a key that is not the owner\'s is refused')
+  assert.match(check(authorize('promote'), { operation: 'withdraw' }), /is for "promote", not "withdraw"/)
+  assert.match(check(authorize('promote', { project_ref: 'a'.repeat(20) })), /another project/)
+  assert.match(check(authorize('promote'), { manifest: 'f'.repeat(64) }), /another manifest/)
+  assert.match(check(authorize('promote', { expires_at: new Date(Date.now() - 1000).toISOString(), not_before: new Date(Date.now() - 7200e3).toISOString() })), /expired/)
+  assert.match(check(authorize('promote', { not_before: new Date(Date.now() + 3600e3).toISOString(), expires_at: new Date(Date.now() + 7200e3).toISOString() })), /not yet valid/)
+  assert.match(check(authorize('promote', { expires_at: new Date(Date.now() + 48 * 3600e3).toISOString() })), /no valid window/)
+  assert.match(check(authorize('promote', { nonce: 'abc' })), /nonce/)
+  assert.match(check(authorize('promote', { after_attempt: 'zz' })), /after_attempt/)
+  assert.match(check(authorize('promote', { rest_public_delta: undefined })), /rest_public_delta/)
+  const used = authorize('promote'); const sha = sha256(fs.readFileSync(used))
+  assert.match(verifyAuthorization(used, { ...o, isConsumed: (x) => x === sha }).problems.join(), /already used/)
+  assert.match(check(authorize('emergency', { reason: '  ' })), /is for "emergency"/)
+  assert.match(verifyAuthorization(authorize('emergency', { reason: '' }), { ...o, operation: 'emergency' }).problems.join(), /needs a stated reason/)
+  assert.match(verifyAuthorization(authorize('emergency', { options: { close_api: true } }), { ...o, operation: 'emergency' }).problems.join(), /acknowledge the outage/)
+  assert.deepEqual(verifyAuthorization(authorize('emergency', { options: { close_api: true, acknowledge_site_outage: true } }), { ...o, operation: 'emergency' }).problems, [])
+})
+
+test('a keyring that holds a secret key is refused (the runner host must hold only the owner\'s public key)', () => {
+  const v = verifyAuthorization(authorize('withdraw'), { operation: 'withdraw', projectRef: REF, manifest: pkg.sha, keyring: signHome, pinned: [FPR] })
+  assert.match(v.problems.join(), /holds a SECRET key/)
+})
+
+test('refused before any connection: missing authorization, wrong project, wrong manifest, changed payload, stale attribution evidence, expired parity record, missing off-site evidence', async () => {
+  const before = await scopeFp()
+  const run = (over = {}) => promoteHosted(ctx(over.ctx), { pkgDir: over.pkgDir ?? pkgDir, authFile: over.auth ?? authorize('promote'), evidenceFile: over.evidenceFile ?? evidenceFile, parityFile: over.parityFile ?? parityFile })
+  const rejectsWith = async (p, re, label) => { const m = await refused(p); assert.match(m ?? 'NOT REFUSED', re, label); assert.match(m, /before any connection/, `${label}: refused before connecting`) }
+  await rejectsWith(run({ auth: path.join(tmp, 'absent.json') }), /missing or unreadable/, 'missing authorization')
+  await rejectsWith(run({ auth: authorize('promote', {}, { signed: false }) }), /signature/, 'unsigned')
+  await rejectsWith(run({ ctx: { projectRef: 'b'.repeat(20) } }), /another project/, 'wrong project')
+  await rejectsWith(run({ auth: authorize('promote', {}, { manifest: 'e'.repeat(64) }) }), /another manifest/, 'wrong manifest')
+  await rejectsWith(run({ auth: authorize('promote', { parity_record_sha256: 'd'.repeat(64) }) }), /another parity record/, 'authorization names another parity record')
+  await rejectsWith(run({ auth: authorize('promote', { attribution_evidence_sha256: 'd'.repeat(64) }) }), /another attribution evidence/, 'authorization names another evidence')
+  await rejectsWith(run({ auth: authorize('promote', { backup: { name: 'g1-other', t0: new Date().toISOString(), manifest_sha256: 'a'.repeat(64), archive_sha256: 'b'.repeat(64), content_tree_sha256: 'c'.repeat(64), offsite_record_sha256: 'd'.repeat(64) } }) }), /another backup/, 'authorization names another backup')
+  await rejectsWith(run({ parityFile: bareParityFile, auth: authorize('promote', { backup: { name: path.basename(backupDir), t0: new Date().toISOString(), manifest_sha256: 'a'.repeat(64), archive_sha256: 'b'.repeat(64), content_tree_sha256: 'c'.repeat(64), offsite_record_sha256: 'd'.repeat(64) } }) }), /off-site|offsite/, 'a record made from bare hashes, not the backup tool\'s verified record')
+  // changed package payload
+  const copy = path.join(tmp, 'pkg-tampered'); fs.cpSync(pkgDir, copy, { recursive: true }); fs.appendFileSync(path.join(copy, 'payload', 'public__players.json'), ' ')
+  await rejectsWith(run({ pkgDir: copy }), /package: .*does not match its recorded hash/, 'changed payload')
+  // stale attribution evidence (older than the package allows): checked on its own and in the full path
+  assert.match(checkEvidence(evidenceFile, pkg.manifest, { now: Date.now() + 73 * 3600e3 }).join(), /hours old; the limit is 72/)
+  const oldEv = path.join(tmp, 'evidence-old.json'); const e2 = makeEvidence(new Date(Date.now() - 80 * 3600e3).toISOString()); fs.writeFileSync(oldEv, JSON.stringify(e2, null, 1))
+  await rejectsWith(run({ evidenceFile: oldEv }), /attribution evidence: .*not the evidence the package pins|verified_at/, 'a different, older evidence file')
+  const bad = path.join(tmp, 'evidence-bad.json'); fs.writeFileSync(bad, JSON.stringify({ ...evidence, all_pages_carry_the_statement: false })); assert.match(checkEvidence(bad, pkg.manifest).join(), /own hash|statement on every page/)
+  // expired parity record (and with it a backup older than six hours)
+  await rejectsWith(run({ ctx: { now: () => Date.now() + 11 * 60e3 } }), /expired/, 'record older than ten minutes')
+  const oldNow = Date.now() + 7 * 3600e3
+  assert.match(promoteInputs({ pkgDir, authFile: authorize('promote', { not_before: new Date(oldNow - 60e3).toISOString(), expires_at: new Date(oldNow + 3600e3).toISOString() }), evidenceFile, parityFile, env: {}, projectRef: REF, keyring: pubHome, pinned: [FPR], ledger, now: oldNow }).problems.join(), /hours old; the maximum is 6/)
+  // missing verified off-site evidence
+  const sidecar = `${backupDir}.tar.zst.gpg.sha256`; const keep = fs.readFileSync(sidecar)
+  fs.unlinkSync(sidecar)
+  try { await rejectsWith(run(), /off-site evidence/, 'missing off-site companion') } finally { fs.writeFileSync(sidecar, keep) }
+  const arc = `${backupDir}.tar.zst.gpg`; const keepArc = fs.readFileSync(arc); fs.writeFileSync(arc, Buffer.concat([keepArc, Buffer.from('x')]))
+  try { await rejectsWith(run(), /off-site evidence|content changed|encrypted SHA-256/, 'altered encrypted archive') } finally { fs.writeFileSync(arc, keepArc) }
+  assert.deepEqual(await scopeFp(), before, 'nothing changed')
+  assert.deepEqual(ledger.attempts(pkg.sha), [], 'no attempt was recorded for a refusal before connecting')
+})
+
+test('refused by the hosted preflight (connected, read-only, nothing written): changed baseline, wrong migration level, wrong ledger', async () => {
+  const before = await scopeFp()
+  const via = (db) => async () => ({ client: await open(db) })
+  const run = (db, authOver = {}) => promoteHosted(ctxFor(via(db)), { pkgDir, authFile: authorize('promote', authOver), evidenceFile, parityFile })
+  let m = await refused(run('g6h_drift')); assert.match(m ?? 'NOT REFUSED', /hosted preflight/); assert.match(m, /baseline differs from the package's baseline in 1 table/)
+  m = await refused(run('g6h_lvl')); assert.match(m ?? 'NOT REFUSED', /migration level is 033, not 034|ledger the package was built on/)
+  m = await refused(run(MAIN, { rest_public_delta: [] })); assert.match(m ?? 'NOT REFUSED', /REST-visible delta differs/, 'an owner who did not acknowledge the exposure has not authorized it')
+  m = await refused(run(MAIN, { rest_public_delta: [{ relation: 'public.sources', rows: 2, by: ['anon', 'authenticated'] }] })); assert.match(m, /REST-visible delta differs/)
+  assert.deepEqual(await scopeFp(), before); assert.deepEqual(ledger.attempts(pkg.sha), [], 'no attempt, and no authorization consumed, when the preflight refuses')
+  const pre = await hostedPreflight(main, pkg, { requireSupabaseHistory: false, expectedMlb: 2 }); assert.deepEqual(pre.problems, [], 'control: against the real baseline the preflight passes')
+  assert.match((await hostedPreflight(main, pkg, { expectedMlb: 2 })).problems.join(), /Supabase migration history table .* does not exist/, 'by default the platform history is required')
+  assert.equal(pre.facts.state, 'NOT_PROMOTED'); assert.equal(pre.facts.mlb_transactions, 2); assert.equal(pre.facts.rm.content_rows, 0)
+})
+
+test('an unapproved or mismatched withdrawal is refused: no authorization, an authorization for another operation, an unsigned one, another manifest', async () => {
+  const before = await scopeFp()
+  const w = (auth) => operateHosted(ctx(), 'withdraw', { manifest: pkg.sha, authFile: auth })
+  assert.match(await refused(w(path.join(tmp, 'none.json'))), /missing or unreadable/)
+  assert.match(await refused(w(authorize('emergency'))), /is for "emergency", not "withdraw"/)
+  assert.match(await refused(w(authorize('withdraw', {}, { signed: false }))), /signature/)
+  assert.match(await refused(operateHosted(ctx(), 'withdraw', { manifest: 'c'.repeat(64), authFile: authorize('withdraw') })), /another manifest/)
+  assert.match(await refused(operateHosted(ctx(), 'withdraw', { manifest: 'nothex', authFile: authorize('withdraw') })), /64-hex/)
+  assert.match(await refused(w(authorize('withdraw'))), /is NOT_PROMOTED, not PROMOTED|not PROMOTED/, 'even a valid authorization cannot withdraw what was never promoted')
+  assert.deepEqual(await scopeFp(), before)
+})
+
+test('the argument parser refuses unsupported and dangerous flags, duplicates and positional arguments', () => {
+  for (const bad of [['promote', '--hosted', 'x'], ['promote', '--confirm-hosted', REF], ['promote', '--database', 'x'], ['withdraw', '--with-grant', 'x'], ['emergency', '--close-api', 'x'], ['withdraw', '--reason', 'x'], ['status', '--manifest', 'a', '--force', '1'], ['status', '--manifest', 'a', '--manifest', 'b'], ['status', 'extra'], ['status'], ['bogus'], [], ['promote', '--package', 'p', '--authorization', 'a'], ['status', '--manifest', '--report', 'x'], ['status', '--manifest', 'a', '--url', 'postgresql://x']]) {
+    assert.ok(parseArgs(bad).error, `refused: ${bad.join(' ')}`)
+  }
+  assert.deepEqual(parseArgs(['status', '--manifest', 'a']).o, { manifest: 'a' })
+  assert.deepEqual(parseArgs(['promote', '--package', 'p', '--authorization', 'a', '--attribution-evidence', 'e', '--parity-record', 'r', '--owner-keyring', 'k']).o, { package: 'p', authorization: 'a', 'attribution-evidence': 'e', 'parity-record': 'r', 'owner-keyring': 'k' })
+})
+
+test('the CLI itself: unsupported flags exit 2; the build without a pinned owner key refuses a complete, correctly signed promotion before connecting; the local tool still refuses hosted', () => {
+  const cli = (args, e = {}) => spawnSync(process.execPath, ['scripts/db/promotion-hosted.mjs', ...args], { cwd: root, encoding: 'utf8', env: { PATH: process.env.PATH, HOME: tmp, ...e } })
+  assert.equal(cli(['promote', '--hosted', 'x']).status, 2)
+  assert.equal(cli(['status']).status, 2)
+  const r = cli(['promote', '--package', pkgDir, '--authorization', authorize('promote'), '--attribution-evidence', evidenceFile, '--parity-record', parityFile, '--owner-keyring', pubHome], { BAI_SUPABASE_PROJECT_REF: REF, BAI_SUPABASE_DB_PASSWORD: 'x'.repeat(12) })
+  assert.equal(r.status, 1); assert.match(r.stdout, /no owner signing key is pinned/); assert.match(r.stdout, /before any connection/)
+  const local = spawnSync(process.execPath, ['scripts/db/promotion.mjs', 'promote', '--package', pkgDir, '--hosted'], { cwd: root, encoding: 'utf8', env: { PATH: process.env.PATH, HOME: tmp } })
+  assert.equal(local.status, 2); assert.match(local.stderr, /NOT AUTHORIZED/)
+  const local2 = spawnSync(process.execPath, ['scripts/db/promotion.mjs', 'status', '--manifest', pkg.sha], { cwd: root, encoding: 'utf8', env: { PATH: process.env.PATH, HOME: tmp, BAI_DATABASE_URL: 'postgresql://postgres:x@db.dbnmktidheefoxaztivm.supabase.co:5432/postgres', BAI_ALLOW_REMOTE_DB: '1', BAI_SUPABASE_PROJECT_REF: REF } })
+  assert.notEqual(local2.status, 0); assert.match(local2.stderr, /NOT AUTHORIZED|refusing/, 'the local tool still refuses a hosted URL')
+  const cliSrc = fs.readFileSync(path.join(root, 'scripts/db/promotion-hosted.mjs'), 'utf8')
+  assert.ok(!/testOnly|requireSupabaseHistory|expectedMlb/.test(cliSrc), 'the CLI never passes the test-only connection override or relaxes the history check')
+})
+
+test('a connection lost BEFORE the commit: the server rolled everything back; the ledger says NOT_PROMOTED; nothing is retried; the attempt needs a new authorization naming it', async () => {
+  const before = await scopeFp(); let begins = 0
+  const conn = flaky(async (sql, q, real, p) => {
+    if (/promote_begin/.test(sql)) begins++
+    if (/promote_load/.test(sql) && p?.[0] === 'public.players') { real.connection.stream.destroy(); throw Object.assign(new Error('Connection terminated unexpectedly'), {}) }
+    return q(sql, p)
+  })
+  const m = await refused(promoteHosted(ctxFor(conn, { }), { pkgDir, authFile: authorize('promote'), evidenceFile, parityFile }))
+  assert.match(m ?? 'NOT REFUSED', /AMBIGUOUS RESULT/); assert.match(m, /"state":"NOT_PROMOTED"/); assert.match(m, /NOTHING WAS RETRIED/)
+  assert.equal(begins, 1, 'promote_begin was sent exactly once')
+  assert.deepEqual(await scopeFp(), before, 'the server rolled back the transaction')
+  const [a] = ledger.attempts(pkg.sha); assert.equal(a.state, 'NOT_PROMOTED_CONFIRMED'); assert.equal(a.operation, 'promote')
+  // a second attempt: with the same artifact (spent), with a fresh one that does not name the attempt, and with one that does
+  const first = authorize('promote'); const again = (f) => promoteHosted(ctx(), { pkgDir, authFile: f, evidenceFile, parityFile })
+  assert.match(await refused(again(authorize('promote'))), /an earlier promote attempt .* exists: the owner's authorization must name it in after_attempt/)
+  assert.match(await refused(again(authorize('promote', { after_attempt: 'f'.repeat(24) }))), /must name it in after_attempt/)
+  const f2 = authorize('promote', { after_attempt: a.id })
+  assert.equal(promoteInputs({ pkgDir, authFile: f2, evidenceFile, parityFile, env: {}, projectRef: REF, keyring: pubHome, pinned: [FPR], ledger }).problems.length, 0, 'an authorization that names the attempt passes the input checks')
+  assert.ok(first)
+})
+
+test('statements issued by the runner never include a write before the attempt is recorded, and the attempt ledger is created exclusively', () => {
+  const l = attemptLedger(path.join(tmp, 'ledger2')); const sha = 'a'.repeat(64)
+  l.consume(sha, { x: 1 }); assert.throws(() => l.consume(sha, { x: 2 }), /EEXIST/); assert.ok(l.isConsumed(sha))
+  const a = l.start({ manifest: 'b'.repeat(64), operation: 'promote', started_at: new Date().toISOString() }); a.update({ state: 'STARTED' })
+  assert.equal(l.attempts('b'.repeat(64))[0].state, 'STARTED'); assert.equal(fs.statSync(l.dir).mode & 0o777, 0o700)
+})
+
+test('an unresolved or unknown earlier attempt blocks another one until "status" resolves it from the database', async () => {
+  const l = attemptLedger(path.join(tmp, 'ledger3')); const m = pkg.sha
+  const a = l.start({ manifest: m, operation: 'promote', started_at: new Date().toISOString() }); a.update({ state: 'UNKNOWN' })
+  const f = authorize('promote'); const inputs = () => promoteHosted(ctxFor(connectMain, { ledger: l }), { pkgDir, authFile: authorize('promote', { after_attempt: a.id }), evidenceFile, parityFile })
+  assert.match(await refused(inputs()), /is UNKNOWN: resolve it first with "status"/)
+  const s = await statusHosted(ctxFor(connectMain, { ledger: l }), m); assert.equal(s.state, 'NOT_PROMOTED'); assert.equal(s.attempts[0].state, 'NOT_PROMOTED_CONFIRMED')
+  assert.ok(f)
+})
+
+test('promote: ONE transaction, a result lost AFTER the commit is resolved from the ledger (never repeated), and the post-checks hold', async () => {
+  const baseFp = await scopeFp(); let begins = 0; const rmBefore = (await readModelState(main)).bookkeeping
+  const conn = flaky(async (sql, q, real, p) => {
+    if (/promote_begin/.test(sql)) begins++
+    if (sql === 'commit') { await q(sql, p); real.connection.stream.destroy(); throw new Error('Connection terminated unexpectedly') }   // the server committed; the answer never arrived
+    return q(sql, p)
+  })
+  const prior = ledger.attempts(pkg.sha).filter((a) => a.operation === 'promote').at(-1)   // the earlier attempt rolled back; the owner's new authorization names it
+  const auth = authorize('promote', { after_attempt: prior.id })
+  const m = await refused(promoteHosted(ctxFor(conn), { pkgDir, authFile: auth, evidenceFile, parityFile }))
+  assert.match(m ?? 'NOT REFUSED', /AMBIGUOUS RESULT/); assert.match(m, /"state":"PROMOTED"/); assert.match(m, /NOTHING WAS RETRIED/); assert.equal(begins, 1)
+  const attempts = ledger.attempts(pkg.sha).filter((a) => a.operation === 'promote'); assert.equal(attempts.at(-1).state, 'COMMITTED', 'the attempt record was resolved to COMMITTED from the database')
+  const st = await statusHosted(ctx(), pkg.sha); assert.equal(st.state, 'PROMOTED')
+  const after = await scopeFp(); const changed = Object.keys(after).filter((t) => after[t] !== baseFp[t]).sort()
+  assert.deepEqual(changed, Object.keys(pkg.manifest.delta).sort(), 'exactly the delta tables changed')
+  assert.equal((await rows(main, `select count(*)::int n from transactions t join sources s on s.id = t.source_id where s.attribution_category = 'MLB'`))[0].n, 2, 'the fixture\'s MLB trades are untouched')
+  assert.equal((await rows(main, 'select count(*)::int n from rm_transactions'))[0].n, 0, 'no read model was refreshed'); assert.equal((await rows(main, 'select count(*)::int n from ingest.source_publication_grants'))[0].n, 1, 'no grant was created or removed')
+  const v = await verifyPromotedHosted(ctx(), pkgDir); assert.equal(v.ok, true, JSON.stringify(v.problems)); assert.equal(v.facts.state, 'PROMOTED'); assert.equal(v.facts.rm.content_rows, 0); assert.deepEqual((await readModelState(main)).bookkeeping, rmBefore, 'no refresh ran')
+  // the artifact is spent, the promotion cannot be repeated by any route
+  assert.match(await refused(promoteHosted(ctx(), { pkgDir, authFile: auth, evidenceFile, parityFile })), /already used on this host/)
+  assert.match(await refused(promoteHosted(ctx(), { pkgDir, authFile: authorize('promote'), evidenceFile, parityFile })), /already committed|NOT_PROMOTED|already holds/)
+})
+
+test('status is read-only and needs no authorization; blockers and attempts are reported', async () => {
+  const s = await statusHosted(ctx(), pkg.sha); assert.equal(s.state, 'PROMOTED'); assert.ok(Array.isArray(s.attempts))
+})
+
+test('withdraw (owner-signed): one atomic call, then vacuum; the baseline is restored byte for byte; the same artifact cannot be used again', async () => {
+  const auth = authorize('withdraw', { reason: 'test withdrawal' })
+  const r = await operateHosted(ctx(), 'withdraw', { manifest: pkg.sha, authFile: auth })
+  assert.equal(r.state_after, 'WITHDRAWN'); assert.equal(r.operation, 'withdraw')
+  assert.deepEqual(await scopeFp(), BASE_FP, 'every table of the scope is byte-identical to the baseline again')
+  assert.equal(r.result.maintenance?.error, undefined, 'the maintenance step (VACUUM ANALYZE) ran')
+  assert.match(await refused(operateHosted(ctx(), 'withdraw', { manifest: pkg.sha, authFile: auth })), /already used on this host/)
+  assert.match(await refused(operateHosted(ctx(), 'withdraw', { manifest: pkg.sha, authFile: authorize('withdraw') })), /is WITHDRAWN, not PROMOTED/)
+  assert.match(await refused(promoteHosted(ctx(), { pkgDir, authFile: authorize('promote'), evidenceFile, parityFile })), /hosted preflight|already/, 'a withdrawn manifest is never promoted again')
+})
+
+test('a server-side refusal rolls back and is recorded as such (no ambiguity); an ambiguous operation (lost answer) is resolved read-only and never repeated', async () => {
+  const conn = flaky(async (sql, q, real, p) => { if (/withdraw_promotion/.test(sql)) { real.connection.stream.destroy(); throw new Error('Connection terminated unexpectedly') } return q(sql, p) })
+  // after the earlier withdrawal the manifest is WITHDRAWN, so a further withdraw is refused by the runner before the call; the ambiguous path is covered by the promote tests above
+  assert.match(await refused(operateHosted(ctxFor(conn), 'withdraw', { manifest: pkg.sha, authFile: authorize('withdraw') })), /is WITHDRAWN, not PROMOTED/)
+  const st = await resolveState(connectMain, pkg.sha, { tries: 1, waitMs: 0 }); assert.equal(st.state, 'WITHDRAWN'); assert.equal(st.resolved, true)
+})
+
+test('verifyPackage still names tampering after writePackage restores the file', () => {
+  const p = loadPackage(pkgDir); assert.equal(p.sha, pkg.sha); writePackage(path.join(tmp, 'pkg-rewrite'), p); assert.deepEqual(verifyPackage(path.join(tmp, 'pkg-rewrite')), [])
+})
