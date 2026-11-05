@@ -30,6 +30,57 @@ export async function readModelState (c) {
   return out
 }
 
+/**
+ * Which lifecycle the transaction read models are in, taken from the database's OWN bookkeeping and never from a flag the caller supplies:
+ *   PROMOTED   no refresh and no withdrawal is recorded: every read-model table must be empty (the state between the promotion and R7)
+ *   REFRESHED  the latest recorded event is a refresh: the read model must be populated AND consistent with the refresh record, the overview and the publication grant
+ *   WITHDRAWN  the latest recorded event is a read-model withdrawal: the content tables must be empty again (fail closed, as before)
+ * A populated table without the matching record (or the reverse) is never accepted: it is reported as a problem whatever the lifecycle.
+ */
+export async function readModelFacts (c) {
+  const rm = await readModelState(c)
+  const ref = (await q(c, 'select count(*)::int n, max(refreshed_at) at from public.rm_transaction_refreshes'))[0]
+  const last = ref.n ? (await q(c, 'select generation_id::text g, transactions t, withheld_unauthorized w from public.rm_transaction_refreshes order by refreshed_at desc, generation_id desc limit 1'))[0] : null
+  const wd = (await q(c, 'select count(*)::int n, max(withdrawn_at) at from public.rm_transaction_withdrawals'))[0]
+  const ov = await q(c, 'select generation_id::text g, transactions t, withheld_unauthorized w, verified_complete vc, display_authorized_categories cats from public.rm_transaction_overview')
+  const pub = (await q(c, `select count(*)::int n, count(*) filter (where status = 'VERIFIED_COMPLETE')::int vc,
+    coalesce(array_agg(distinct generation_id::text) filter (where generation_id is not null), '{}') gens,
+    count(*) filter (where not exists (select 1 from public.transactions t where t.id = r.transaction_id))::int orphans from public.rm_transactions r`))[0]
+  const cats = (ov[0]?.cats ?? [])
+  const outside = cats.length ? (await q(c, 'select count(*)::int n from public.rm_transactions where not (source_categories <@ $1::text[])', [cats]))[0].n : pub.n
+  const granted = (await q(c, 'select attribution_category c from ingest.source_publication_grants')).map((r) => r.c)
+  const lifecycle = wd.n && (!ref.n || new Date(wd.at) >= new Date(ref.at)) ? 'WITHDRAWN' : ref.n ? 'REFRESHED' : 'PROMOTED'
+  return { lifecycle, rm, refreshes: { n: ref.n, last }, withdrawals: { n: wd.n }, overview: ov, published: { ...pub, outside_authorized: outside }, granted }
+}
+
+/** The openly licensed groups that migration 030 displays without a publication grant (rm_grant_changed lists the same four). */
+const OPEN_CATEGORIES = ['CHADWICK_REGISTER', 'WIKIPEDIA', 'BAI_RESEARCH', 'WIKIDATA']
+
+/** The problems a lifecycle's facts show. Pure, so every rule is tested without a database. */
+export function readModelProblems (f) {
+  const p = []; const { rm, refreshes, withdrawals, overview, published } = f
+  if (f.lifecycle === 'PROMOTED') {
+    if (rm.content_rows) p.push(`read-model rows: ${rm.content_rows} (no refresh is recorded)`)
+    if (refreshes.n || withdrawals.n || (rm.bookkeeping.rm_transaction_overview ?? 0)) p.push('read-model bookkeeping exists without a recorded refresh')
+  } else if (f.lifecycle === 'WITHDRAWN') {
+    if (rm.content_rows) p.push(`read-model rows after a withdrawal: ${rm.content_rows} (a withdrawal removes the overview; the read model must be empty or refreshed again)`)
+  } else if (f.lifecycle === 'REFRESHED') {
+    if (overview.length !== 1) p.push(`the overview has ${overview.length} row(s)`)
+    else {
+      const o = overview[0]; const l = refreshes.last
+      if (o.g !== l.g) p.push(`the overview is generation ${o.g}, the latest refresh ${l.g}`)
+      if (o.t !== published.n) p.push(`the overview says ${o.t} published transactions, the read model holds ${published.n}`)
+      if (o.t !== l.t || o.w !== l.w) p.push('the overview differs from the refresh record')
+      if (o.vc !== published.vc) p.push(`verified complete: overview ${o.vc}, read model ${published.vc}`)
+      for (const cat of o.cats ?? []) if (!OPEN_CATEGORIES.includes(cat) && !f.granted.includes(cat)) p.push(`category ${cat} is displayed without a publication grant`)
+    }
+    if (published.n && (published.gens.length !== 1 || published.gens[0] !== refreshes.last?.g)) p.push(`published rows carry generation(s) ${published.gens.join(',') || 'none'}, the latest refresh is ${refreshes.last?.g}`)
+    if (published.outside_authorized) p.push(`${published.outside_authorized} published transaction(s) carry a source category that is not authorized for display`)
+    if (published.orphans) p.push(`${published.orphans} published transaction(s) do not exist`)
+  }
+  return p
+}
+
 // ---- read-only checks ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 /**
@@ -253,8 +304,8 @@ export async function promoteHosted (ctx, { pkgDir, authFile, evidenceFile, pari
   } finally { await session.client.end().catch(() => {}) }
 }
 
-/** After a committed promotion, read-only: the state, the ledger counts, the baseline outside the delta unchanged, MLB trades, empty read models, the grant unchanged, the REST-visible delta. */
-export async function verifyPromoted (c, pkg, { expectedMlb = EXPECTED_MLB_TRANSACTIONS, before = null } = {}) {
+/** After a committed promotion, read-only: the state, the ledger counts, the baseline outside the delta unchanged, MLB trades, the read models in the lifecycle the database itself records (readModelFacts; expectLifecycle can only add a requirement), the grant unchanged, the REST-visible delta. */
+export async function verifyPromoted (c, pkg, { expectedMlb = EXPECTED_MLB_TRANSACTIONS, before = null, expectLifecycle = null } = {}) {
   const problems = []; const facts = {}
   await c.query('begin isolation level repeatable read read only')
   try {
@@ -272,9 +323,14 @@ export async function verifyPromoted (c, pkg, { expectedMlb = EXPECTED_MLB_TRANS
     facts.tables_compared = scope.length; facts.tables_differing = bad; if (bad.length) problems.push(`tables differ from the release state: ${bad.slice(0, 5).join(', ')}`)
     facts.mlb_transactions = (await q(c, `select count(*)::int n from public.transactions t join public.sources s on s.id = t.source_id where s.attribution_category = 'MLB'`))[0].n
     if (facts.mlb_transactions !== expectedMlb) problems.push(`MLB transactions: ${facts.mlb_transactions}`)
-    const rm = await readModelState(c); facts.rm = rm
-    if (rm.content_rows) problems.push(`read-model rows: ${rm.content_rows}`)
-    if (before && canon(rm.bookkeeping) !== canon(before.bookkeeping)) problems.push('the read-model bookkeeping changed: a refresh ran')
+    const rmf = await readModelFacts(c); facts.rm = rmf.rm; facts.read_model_lifecycle = rmf.lifecycle
+    facts.read_model = { refreshes: rmf.refreshes.n, withdrawals: rmf.withdrawals.n, published: rmf.published.n, verified_complete: rmf.published.vc, generation: rmf.refreshes.last?.g ?? null }
+    problems.push(...readModelProblems(rmf))
+    if (before) {   // the promote runner's own post-check: nothing may have refreshed or withdrawn since the pre-check
+      if (rmf.rm.content_rows) problems.push(`the read models hold ${rmf.rm.content_rows} row(s) straight after a promotion`)
+      if (canon(rmf.rm.bookkeeping) !== canon(before.bookkeeping)) problems.push('the read-model bookkeeping changed: a refresh ran')
+    }
+    if (expectLifecycle && rmf.lifecycle !== expectLifecycle) problems.push(`read-model lifecycle is ${rmf.lifecycle}, expected ${expectLifecycle}`)
     const g = (await q(c, 'select count(*)::int n from ingest.source_publication_grants'))[0].n; facts.grants = g; if (g !== 1) problems.push(`publication grants: ${g}`)
     facts.rest_public_delta = await restPublicDelta(c, pkg.manifest); facts.website_visible_delta = await websiteVisibleDelta(c, pkg.manifest)
   } finally { await c.query('rollback').catch(() => {}) }

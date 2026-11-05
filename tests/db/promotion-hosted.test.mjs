@@ -15,7 +15,7 @@ import { takeSnapshot } from '../../scripts/db/lib/snapshot.mjs'
 import { buildPromotionRecord, contentTreeHash, compareExports } from '../../scripts/db/lib/final-parity.mjs'
 import { SESSION_SQL, buildPackage, loadPackage, sha256, verifyPackage, writePackage } from '../../scripts/db/lib/promotion.mjs'
 import { AUTHORIZATION_FORMAT, OWNER_SIGNING_FINGERPRINTS, attemptLedger, verifyAuthorization, verifyDetachedSignature } from '../../scripts/db/lib/promotion-authorization.mjs'
-import { beginAttempt, checkEvidence, draftAuthorization, hostedPreflight, observeState, operateHosted, promoteHosted, promoteInputs, readModelState, restPublicDelta, resolveState, serverReported, statusHosted, verifyPromotedHosted, websiteVisibleDelta } from '../../scripts/db/lib/promotion-hosted.mjs'
+import { beginAttempt, checkEvidence, draftAuthorization, hostedPreflight, observeState, operateHosted, promoteHosted, promoteInputs, readModelFacts, readModelProblems, readModelState, restPublicDelta, resolveState, serverReported, statusHosted, verifyPromoted, verifyPromotedHosted, websiteVisibleDelta } from '../../scripts/db/lib/promotion-hosted.mjs'
 import { parseArgs } from '../../scripts/db/lib/promotion-hosted-args.mjs'
 import { buildBaseline, importSample } from './promotion-fixture.mjs'
 
@@ -356,6 +356,66 @@ test('promote: ONE transaction, a result lost AFTER the commit is resolved from 
   // the artifact is spent, the promotion cannot be repeated by any route
   assert.match(await refused(promoteHosted(ctx(), { pkgDir, authFile: auth, evidenceFile, parityFile })), /already used on this host/)
   assert.match(await refused(promoteHosted(ctx(), { pkgDir, authFile: authorize('promote'), evidenceFile, parityFile })), /already committed|NOT_PROMOTED|already holds/)
+})
+
+test('verify-promoted follows the lifecycle the DATABASE records: PROMOTED expects empty read models, REFRESHED expects a populated and consistent one, and every unexpected change still fails', async () => {
+  await main.end(); await admin.query(`create database g6h_rm template ${MAIN}`); main = await open(MAIN)   // the promoted state, copied: the refresh never touches the shared test database
+  const rm = await open('g6h_rm')
+  try {
+    const verify = (opts = {}) => verifyPromoted(rm, pkg, { expectedMlb: 2, ...opts })
+    await rm.query('delete from public.rm_transaction_overview; delete from public.rm_transaction_refreshes')   // production before R7 has NO refresh record (this fixture was refreshed once, empty, before the promotion)
+    const promoted = await verify(); assert.equal(promoted.ok, true, JSON.stringify(promoted.problems)); assert.equal(promoted.facts.read_model_lifecycle, 'PROMOTED')
+    assert.match((await verify({ expectLifecycle: 'REFRESHED' })).problems.join(), /lifecycle is PROMOTED, expected REFRESHED/, 'a caller can only ADD a requirement')
+    // before R7, rows without a recorded refresh are refused (as before), whatever they look like
+    const gen0 = Number((await rows(rm, 'select public.refresh_transaction_read_models() g'))[0].g)   // the real refresh function, run on the copy
+    const r = await verify(); assert.equal(r.ok, true, JSON.stringify(r.problems)); assert.equal(r.facts.read_model_lifecycle, 'REFRESHED'); assert.equal(r.facts.read_model.generation, String(gen0))
+    assert.ok(r.facts.rm.content_rows > 0 && r.facts.read_model.published > 0, 'populated read models are expected after a refresh')
+    assert.equal(r.facts.read_model.verified_complete, 0)
+    assert.match((await verify({ expectLifecycle: 'PROMOTED' })).problems.join(), /lifecycle is REFRESHED, expected PROMOTED/)
+    assert.match((await verify({ before: promoted.facts.rm })).problems.join(), /lifecycle is REFRESHED straight after a promotion|bookkeeping changed/, 'the promote runner\'s own post-check still refuses any refresh')
+    // each tamper is committed, must fail verification, and is undone
+    const tamper = async (name, sql, undo, re) => { await rm.query(sql); try { const v = await verify(); assert.equal(v.ok, false, `${name}: verification must fail`); assert.match(v.problems.join(), re, name) } finally { await rm.query(undo) } }
+    const id = (await rows(rm, 'select transaction_id i from public.rm_transactions order by 1 limit 1'))[0].i
+    await tamper('a row of another generation', `update public.rm_transactions set generation_id = generation_id + 1 where transaction_id = ${id}`, `update public.rm_transactions set generation_id = generation_id - 1 where transaction_id = ${id}`, /published rows carry generation/)
+    await tamper('a row that overview does not count', `delete from public.rm_transaction_sources where transaction_id = ${id}; update public.rm_transactions set source_categories = '{MLB}' where transaction_id = ${id}`, `update public.rm_transactions set source_categories = '{RETROSHEET}' where transaction_id = ${id}`, /not authorized for display/)
+    await tamper('a changed overview total', 'update public.rm_transaction_overview set transactions = transactions + 1', 'update public.rm_transaction_overview set transactions = transactions - 1', /overview says|overview differs/)
+    await tamper('a hand-written completeness claim', "update public.rm_transaction_overview set verified_complete = 5", 'update public.rm_transaction_overview set verified_complete = 0', /verified complete: overview 5/)
+    await tamper('a displayed category without a grant', "update public.rm_transaction_overview set display_authorized_categories = display_authorized_categories || '{MLB}'", "update public.rm_transaction_overview set display_authorized_categories = array_remove(display_authorized_categories, 'MLB')", /without a publication grant/)
+    await tamper('an overview from another refresh', 'update public.rm_transaction_overview set generation_id = generation_id + 1', 'update public.rm_transaction_overview set generation_id = generation_id - 1', /overview is generation/)
+    // a withdrawal after the refresh puts the state in WITHDRAWN: the content must be empty again, any leftover fails closed
+    await rm.query("select public.rm_withdraw_transactions(array[" + id + "]::bigint[], 'lifecycle test')")
+    const w = await verify(); assert.equal(w.facts.read_model_lifecycle, 'WITHDRAWN'); assert.equal(w.ok, false); assert.match(w.problems.join(), /read-model rows after a withdrawal/)
+    // read models populated while NO refresh is recorded (rows written by hand, or the log removed) are refused as before
+    await rm.query('truncate public.rm_transaction_refreshes, public.rm_transaction_withdrawals').catch(async () => { await rm.query('delete from public.rm_transaction_refreshes'); await rm.query('delete from public.rm_transaction_withdrawals') })
+    const none = await verify(); assert.equal(none.facts.read_model_lifecycle, 'PROMOTED'); assert.equal(none.ok, false); assert.match(none.problems.join(), /read-model rows: \d+ \(no refresh is recorded\)/)
+    assert.equal((await rows(main, 'select count(*)::int n from rm_transactions'))[0].n, 0, 'the shared test database was never refreshed')
+  } finally { await rm.end() }
+})
+
+test('readModelProblems: every rule of a refreshed read model, without a database', () => {
+  const ok = () => ({ lifecycle: 'REFRESHED', rm: { content_rows: 10, bookkeeping: { rm_transaction_overview: 1, rm_transaction_refreshes: 1, rm_transaction_withdrawals: 0 } }, refreshes: { n: 1, last: { g: '7', t: 3, w: 2 } }, withdrawals: { n: 0 },
+    overview: [{ g: '7', t: 3, w: 2, vc: 0, cats: ['RETROSHEET'] }], published: { n: 3, vc: 0, gens: ['7'], orphans: 0, outside_authorized: 0 }, granted: ['RETROSHEET'] })
+  assert.deepEqual(readModelProblems(ok()), [])
+  const bad = (mut, re) => { const f = ok(); mut(f); assert.match(readModelProblems(f).join(), re) }
+    bad((f) => { f.overview = [] }, /overview has 0 row/)
+  bad((f) => { f.overview.push({ ...f.overview[0] }) }, /overview has 2 row/)
+  bad((f) => { f.overview[0].g = '8' }, /overview is generation 8/)
+  bad((f) => { f.published.n = 4 }, /overview says 3 published/)
+  bad((f) => { f.refreshes.last.t = 9 }, /differs from the refresh record/)
+  bad((f) => { f.overview[0].vc = 1 }, /verified complete: overview 1/)
+  bad((f) => { f.overview[0].cats = ['RETROSHEET', 'MLB'] }, /MLB is displayed without a publication grant/)
+  bad((f) => { f.published.gens = ['7', '8'] }, /generation\(s\) 7,8/)
+  bad((f) => { f.published.gens = [] }, /generation\(s\) none/)
+  { const f = ok(); f.overview[0].cats = ['RETROSHEET', 'WIKIPEDIA', 'CHADWICK_REGISTER']; assert.deepEqual(readModelProblems(f), [], 'the openly licensed groups need no grant') }
+  { const f = ok(); f.rm.content_rows = 0; f.refreshes.last = { g: '7', t: 0, w: 0 }; f.overview = [{ g: '7', t: 0, w: 0, vc: 0, cats: ['WIKIPEDIA'] }]; f.published = { n: 0, vc: 0, gens: [], orphans: 0, outside_authorized: 0 }; assert.deepEqual(readModelProblems(f), [], 'a refresh that published nothing is consistent') }
+  bad((f) => { f.published.outside_authorized = 2 }, /2 published transaction\(s\) carry a source category/)
+  bad((f) => { f.published.orphans = 1 }, /do not exist/)
+  const p = () => ({ lifecycle: 'PROMOTED', rm: { content_rows: 0, bookkeeping: { rm_transaction_overview: 0, rm_transaction_refreshes: 0, rm_transaction_withdrawals: 0 } }, refreshes: { n: 0, last: null }, withdrawals: { n: 0 }, overview: [], published: { n: 0, vc: 0, gens: [], orphans: 0, outside_authorized: 0 }, granted: ['RETROSHEET'] })
+  assert.deepEqual(readModelProblems(p()), [])
+  let f = p(); f.rm.content_rows = 1; assert.match(readModelProblems(f).join(), /read-model rows: 1/)
+  f = p(); f.rm.bookkeeping.rm_transaction_overview = 1; assert.match(readModelProblems(f).join(), /bookkeeping exists without a recorded refresh/)
+  f = p(); f.lifecycle = 'WITHDRAWN'; f.withdrawals.n = 1; assert.deepEqual(readModelProblems(f), []); f.rm.content_rows = 2; assert.match(readModelProblems(f).join(), /after a withdrawal/)
+  f = ok(); f.lifecycle = 'UNKNOWN'; assert.deepEqual(readModelProblems(f), [], 'unknown lifecycles carry no rule of their own: verifyPromoted refuses them through the manifest state')
 })
 
 test('status is read-only and needs no authorization; blockers and attempts are reported', async () => {
