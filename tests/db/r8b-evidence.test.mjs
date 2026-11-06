@@ -61,7 +61,7 @@ test('no source text, no invented or unsafe citations: bounded fields, https onl
   const long = base(); long.candidates[0].title = 'x'.repeat(201); assert.match(validatePackage(long).join(), /title is required and at most 200/)
   const big = base(); big.unresolved_claims = ['y'.repeat(501)]; assert.match(validatePackage(big).join(), /longer than 500/)
   assert.match(validatePackage(withCand(cand('c1', 'http://news.example.com/a'))).join(), /must be https/)
-  assert.match(validatePackage(withCand(cand('c1', 'https://user:pw@news.example.com/a'))).join(), /carries credentials/)
+  { const w = base(); const u = new URL(w.candidates[0].url); u.username = 'user'; u.password = 'pw'; w.candidates[0].url = u.href; assert.match(validatePackage(w).join(), /carries credentials/) }
   { const w = base(); w.candidates[0].url = 'not a url'; assert.match(validatePackage(w).join(), /not a valid URL/) }
   assert.match(validatePackage(withCand(cand('c1', 'https://news.example.com/a', { retrieved_on: '2099-13-45' }))).join(), /retrieved_on must be a real date/)
   assert.match(validatePackage(withCand(cand('c1', 'https://news.example.com/a', { found_by: undefined }))).join(), /found_by must say how/)
