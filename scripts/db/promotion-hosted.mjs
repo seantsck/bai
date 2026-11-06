@@ -1,6 +1,7 @@
 // The gated hosted promotion runner (G6). The LOCAL tool scripts/db/promotion.mjs is unchanged and still refuses every hosted target; this is a separate, narrow entrypoint.
 //   node --env-file=<hosted env> scripts/db/promotion-hosted.mjs status    --manifest <sha256>                                                      read-only, no authorization needed
-//   node --env-file=<hosted env> scripts/db/promotion-hosted.mjs verify-promoted --package <dir>                                               read-only post-promotion checks
+//   node --env-file=<hosted env> scripts/db/promotion-hosted.mjs verify-promoted --package <dir> [--release-evidence <dir>]                         read-only post-promotion checks; with a directory of later authorized draft releases, a cumulative check (promotion-cumulative.mjs)
+//   node --env-file=<hosted env> scripts/db/promotion-hosted.mjs record-release-evidence --authorization <signed draft-release authorization> --out <new file> [--proof <file>]   read-only: the evidence record of one release, right after it was verified
 //   node --env-file=<hosted env> scripts/db/promotion-hosted.mjs promote   --package <dir> --authorization <file> --attribution-evidence <file> --parity-record <file>
 //   node --env-file=<hosted env> scripts/db/promotion-hosted.mjs withdraw  --manifest <sha256> --authorization <file>
 //   node --env-file=<hosted env> scripts/db/promotion-hosted.mjs emergency --manifest <sha256> --authorization <file>     (the authorization says whether it closes the Data API)
@@ -19,7 +20,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { connectHosted } from './lib/hosted-connection.mjs'
 import { OWNER_SIGNING_FINGERPRINTS, attemptLedger, verifyAuthorization } from './lib/promotion-authorization.mjs'
-import { HostedPromotionError, draftAuthorization, operateHosted, promoteHosted, statusHosted, verifyPromotedHosted } from './lib/promotion-hosted.mjs'
+import { HostedPromotionError, draftAuthorization, operateHosted, promoteHosted, recordReleaseEvidence, statusHosted, verifyPromotedHosted } from './lib/promotion-hosted.mjs'
 import { parseArgs } from './lib/promotion-hosted-args.mjs'
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
@@ -52,7 +53,11 @@ try {
     const draft = await draftAuthorization(ctx, { operation: o.operation, manifest: o.manifest, pkgDir: o.package, parityFile: o['parity-record'], evidenceFile: o['attribution-evidence'], reason: o.reason, closeApi: o['close-api'] === true, withGrant: o['with-grant'] === true, afterAttempt: o['after-attempt'] ?? null, hours: o.hours ? Number(o.hours) : 1 })
     fs.writeFileSync(o.out, JSON.stringify(draft, null, 1) + '\n', { flag: 'wx', mode: 0o600 })
     report = { draft: o.out, signed: false, next: `Review every field. If you agree, sign it yourself: gpg --local-user <your signing key> --detach-sign --output ${o.out}.sig ${o.out}. An unsigned draft authorizes nothing.`, draft_sha256: (await import('node:crypto')).createHash('sha256').update(fs.readFileSync(o.out)).digest('hex') }
-  } else if (cmd === 'verify-promoted') report = await verifyPromotedHosted(ctx, o.package)
+  } else if (cmd === 'verify-promoted') report = await verifyPromotedHosted(ctx, o.package, { releaseEvidenceDir: o['release-evidence'] ?? null })
+  else if (cmd === 'record-release-evidence') {
+    const ev = await recordReleaseEvidence(ctx, { authorizationFile: o.authorization, proofFiles: o.proof ? [o.proof] : [] })
+    fs.writeFileSync(o.out, JSON.stringify(ev, null, 1) + '\n', { flag: 'wx', mode: 0o600 }); report = { evidence: o.out, release_key: ev.release_key, audit_id: ev.audit_id, tables: Object.keys(ev.tables).length, note: 'Run this only right after the release was verified: the evidence records the CURRENT state as the release state.' }
+  }
   else if (cmd === 'promote') report = await promoteHosted(ctx, { pkgDir: o.package, authFile: o.authorization, evidenceFile: o['attribution-evidence'], parityFile: o['parity-record'] })
   else report = await operateHosted(ctx, cmd, { manifest: o.manifest, authFile: o.authorization })
   const out = { command: cmd, ok: true, ...report }; emit(out)

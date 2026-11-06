@@ -1,7 +1,8 @@
 // Strict argument parser of scripts/db/promotion-hosted.mjs (kept apart so that the tests can import it without running the CLI).
 const SPEC = {
   status: { need: ['manifest'], opt: [] },
-  'verify-promoted': { need: ['package'], opt: [] },
+  'verify-promoted': { need: ['package'], opt: ['release-evidence'] },
+  'record-release-evidence': { need: ['authorization', 'out'], opt: ['proof'] },
   promote: { need: ['package', 'authorization', 'attribution-evidence', 'parity-record'], opt: [] },
   withdraw: { need: ['manifest', 'authorization'], opt: [] },
   emergency: { need: ['manifest', 'authorization'], opt: [] },

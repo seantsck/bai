@@ -15,6 +15,7 @@ import { takeSnapshot } from '../../scripts/db/lib/snapshot.mjs'
 import { buildPromotionRecord, contentTreeHash, compareExports } from '../../scripts/db/lib/final-parity.mjs'
 import { SESSION_SQL, buildPackage, loadPackage, sha256, verifyPackage, writePackage } from '../../scripts/db/lib/promotion.mjs'
 import { AUTHORIZATION_FORMAT, OWNER_SIGNING_FINGERPRINTS, attemptLedger, verifyAuthorization, verifyDetachedSignature } from '../../scripts/db/lib/promotion-authorization.mjs'
+import { RELEASE_EVIDENCE_FORMAT, cumulativeReleases, buildReleaseEvidence, releaseDirs } from '../../scripts/db/lib/promotion-cumulative.mjs'
 import { beginAttempt, checkEvidence, draftAuthorization, hostedPreflight, observeState, operateHosted, promoteHosted, promoteInputs, readModelFacts, readModelProblems, readModelState, restPublicDelta, resolveState, serverReported, statusHosted, verifyPromoted, verifyPromotedHosted, websiteVisibleDelta } from '../../scripts/db/lib/promotion-hosted.mjs'
 import { parseArgs } from '../../scripts/db/lib/promotion-hosted-args.mjs'
 import { buildBaseline, importSample } from './promotion-fixture.mjs'
@@ -282,6 +283,10 @@ test('the argument parser refuses unsupported and dangerous flags, duplicates an
   }
   assert.deepEqual(parseArgs(['status', '--manifest', 'a']).o, { manifest: 'a' })
   assert.deepEqual(parseArgs(['promote', '--package', 'p', '--authorization', 'a', '--attribution-evidence', 'e', '--parity-record', 'r', '--owner-keyring', 'k']).o, { package: 'p', authorization: 'a', 'attribution-evidence': 'e', 'parity-record': 'r', 'owner-keyring': 'k' })
+  assert.deepEqual(parseArgs(['verify-promoted', '--package', 'p', '--release-evidence', 'd']).o, { package: 'p', 'release-evidence': 'd' })
+  assert.deepEqual(parseArgs(['record-release-evidence', '--authorization', 'a.json', '--out', 'e.json', '--proof', 'x']).o, { authorization: 'a.json', out: 'e.json', proof: 'x' })
+  assert.match(parseArgs(['record-release-evidence', '--authorization', 'a.json']).error, /missing --out/); assert.match(parseArgs(['verify-promoted', '--package', 'p', '--release-evidence', 'a', '--release-evidence', 'b']).error, /given twice/)
+  assert.match(parseArgs(['record-release-evidence', '--authorization', 'a', '--out', 'b', '--confirm-hosted', 'x']).error, /refusing|unsupported/)
 })
 
 test('the CLI itself: unsupported flags exit 2; the build refuses a complete promotion signed by a key that is not the pinned owner key, before connecting; the local tool still refuses hosted', () => {
@@ -356,6 +361,69 @@ test('promote: ONE transaction, a result lost AFTER the commit is resolved from 
   // the artifact is spent, the promotion cannot be repeated by any route
   assert.match(await refused(promoteHosted(ctx(), { pkgDir, authFile: auth, evidenceFile, parityFile })), /already used on this host/)
   assert.match(await refused(promoteHosted(ctx(), { pkgDir, authFile: authorize('promote'), evidenceFile, parityFile })), /already committed|NOT_PROMOTED|already holds/)
+})
+
+test('cumulative releases: a later owner-signed, audited draft release is excused only through signature, binding, audit, exact deltas and the recorded fingerprints; every other difference still fails', async () => {
+  await main.end(); await admin.query(`create database g6h_cum template ${MAIN}`); main = await open(MAIN)   // the promoted state, copied
+  const cu = await open('g6h_cum')
+  const tabs = ['ingest.release_audits', 'public.schools']
+  try {
+    const verify = (releases = null, o = {}) => verifyPromoted(cu, pkg, { expectedMlb: 2, releases, keyring: pubHome, pinned: [FPR], projectRef: REF, ...o })
+    const base = await verify(); assert.equal(base.ok, true, JSON.stringify(base.problems))
+    // ---- a FICTIONAL draft release: two school rows and its audit row (the real release tool writes many more tables; the verifier treats every table alike) ----
+    const KEY = 'fixture-draft-2099-n2'; const MAN = hex() + hex()
+    await cu.query("insert into public.schools (slug, name, school_type) values ('fixture-school-a', 'Fixture School A', 'COLLEGE'), ('fixture-school-b', 'Fixture School B', 'COLLEGE')")
+    await cu.query("insert into ingest.release_audits (release_key, manifest_sha256, draft_year, operator, counts, entries) values ($1, $2, 2099, 'Fixture Operator', $3, '[]')", [KEY, MAN, { held: 0, skipped: 0, imported: 2, selections: 2, held_in_manifest: 0 }])
+    const withoutRelease = await verify(); assert.equal(withoutRelease.ok, false); assert.match(withoutRelease.problems.join(), /tables differ from the release state: .*release_audits/, 'with no release evidence the difference is a failure, as before')
+    let n = 0
+    const release = (over = {}, { authOver = {}, evOver = {}, sigWith = signHome, who = FPR, signed = true } = {}) => {
+      const dir = path.join(tmp, `cum-${++n}`); fs.mkdirSync(dir)
+      const auth = { format: 'bai-draft-release-authorization/1', operation: 'apply-draft-release', project_ref: REF, release_key: KEY, manifest_sha256: MAN, selections: 2, expected_after_apply: { 'ingest.release_audits': 1, 'public.schools': 2 }, ...authOver }
+      const af = path.join(dir, 'authorization.json'); fs.writeFileSync(af, JSON.stringify(auth, null, 1)); if (signed) sign(af, sigWith, who)
+      return { dir, af, auth, evPath: path.join(dir, 'evidence.json'), over, evOver }
+    }
+    const evidenceFor = async (r) => { const ev = await buildReleaseEvidence(cu, { authorizationFile: r.af }); const e = { ...ev, ...r.evOver }; fs.writeFileSync(r.evPath, JSON.stringify(e, null, 1)); return e }
+    const good = release(); const ev = await evidenceFor(good)
+    assert.equal(ev.format, RELEASE_EVIDENCE_FORMAT); assert.deepEqual(Object.keys(ev.tables).sort(), tabs)
+    const ok = await verify([good.dir]); assert.equal(ok.ok, true, JSON.stringify(ok.problems)); assert.deepEqual(ok.facts.tables_differing, []); assert.deepEqual(ok.facts.tables_excused_by_releases.sort(), tabs); assert.equal(ok.facts.cumulative_releases[0].release_key, KEY)
+    // ---- everything below must FAIL, each on its own ----
+    const fails = async (name, dirs, re, o = {}) => { const r = await verify(dirs, o); assert.equal(r.ok, false, `${name}: must fail`); assert.match(r.problems.join(' | '), re, name) }
+    { const r = release({}, { signed: false }); await evidenceFor(r); await fails('an unsigned authorization excuses nothing', [r.dir], /not signed by the pinned owner key/) }
+    { const stranger = path.join(tmp, 'gpg-stranger'); fs.mkdirSync(stranger, { mode: 0o700 }); sh('gpg', ['--batch', '--pinentry-mode', 'loopback', '--passphrase', '', '--quick-generate-key', 'Stranger', 'ed25519', 'sign', 'never'], { GNUPGHOME: stranger })
+      const sf = /^fpr:::::::::([0-9A-F]{40}):/m.exec(sh('gpg', ['--batch', '--with-colons', '--list-keys'], { GNUPGHOME: stranger }))[1]; const r = release({}, { sigWith: stranger, who: sf }); await evidenceFor(r); await fails('a signature by another key excuses nothing', [r.dir], /not signed by the pinned owner key/) }
+    { const r = release(); await evidenceFor(r); fs.writeFileSync(r.af, fs.readFileSync(r.af, 'utf8').replace('"selections": 2', '"selections": 3')); await fails('an authorization edited after signing excuses nothing', [r.dir], /not signed by the pinned owner key/) }
+    { const r = release({}, { authOver: { project_ref: 'a'.repeat(20) } }); await evidenceFor(r); await fails('another project', [r.dir], /another project/) }
+    { const r = release({}, { authOver: { operation: 'promote' } }); await evidenceFor(r); await fails('another operation', [r.dir], /not a draft-release authorization/) }
+    const hand = (r, patch = {}) => { const e = { ...ev, authorization_sha256: sha256(fs.readFileSync(r.af)), ...patch }; fs.writeFileSync(r.evPath, JSON.stringify(e)); return e }
+    { const r = release({}, { authOver: { expected_after_apply: { 'ingest.release_audits': 1, 'public.schools': 0 } } }); hand(r); await fails('a zero delta is not an authorization', [r.dir], /exact, positive expected row deltas/) }
+    { const r = release({}, { evOver: { authorization_sha256: hex() + hex() } }); await evidenceFor(r); await fails('evidence bound to another authorization', [r.dir], /not bound to this authorization/) }
+    { const r = release({}, { evOver: { audit_id: '999999' } }); await evidenceFor(r); await fails('evidence naming another audit', [r.dir], /names audit 999999/) }
+    { const other = hex() + hex(); const r = release({}, { authOver: { manifest_sha256: other } }); hand(r, { manifest_sha256: other }); await fails('no database audit for the release: an audit elsewhere accepts nothing', [r.dir], /database holds 0 release audit\(s\) for this release key and manifest/) }
+    { const r = release({}, { authOver: { selections: 3 } }); await evidenceFor(r); await fails('audit counts that differ from the authorized selection count', [r.dir], /audit counts .* do not match the authorized 3/) }
+    { const r = release(); const e = await evidenceFor(r); e.tables['public.schools'].delta = 5; e.tables['public.schools'].n_after += 3; fs.writeFileSync(r.evPath, JSON.stringify(e)); await fails('evidence delta different from the authorized one', [r.dir], /differs from the authorized 2/) }
+    { const r = release(); const e = await evidenceFor(r); e.tables['public.schools'].n_before -= 1; fs.writeFileSync(r.evPath, JSON.stringify(e)); await fails('counts that do not chain from the R6 state', [r.dir], /do not chain from the previous state/) }
+    { const r = release(); const e = await evidenceFor(r); e.tables['public.sources'] = { n_before: 1, delta: 1, n_after: 2, md5_after: 'x' }; fs.writeFileSync(r.evPath, JSON.stringify(e)); await fails('evidence for a table the authorization does not list', [r.dir], /not exactly the authorized tables/) }
+    { const r = release(); const e = await evidenceFor(r); delete e.tables['public.schools']; fs.writeFileSync(r.evPath, JSON.stringify(e)); await fails('evidence missing an authorized table', [r.dir], /not exactly the authorized tables/) }
+    // a modification AFTER the release, in a table the release legitimately changed, is a difference from the recorded state
+    await cu.query("update public.schools set name = 'Edited later' where slug = 'fixture-school-a'")
+    await fails('an old/new row edited after the release', [good.dir], /public\.schools differs from the state recorded/)
+    await cu.query("update public.schools set name = 'Fixture School A' where slug = 'fixture-school-a'"); assert.equal((await verify([good.dir])).ok, true, 'restoring the row restores the recorded state')
+    await cu.query("insert into public.schools (slug, name, school_type) values ('fixture-extra', 'Extra', 'COLLEGE')"); await fails('an extra row beyond the authorized delta', [good.dir], /public\.schools differs from the state recorded/)
+    await cu.query("delete from public.schools where slug = 'fixture-extra'")
+    // an unauthorized modification elsewhere is still found, with a release present
+    await cu.query("insert into public.players (slug, full_name, display_name) values ('cum-drift', 'Drift', 'Drift')")
+    await fails('an unrelated unauthorized change still fails with a release present', [good.dir], /tables differ from the release state: .*players/)
+    await cu.query("delete from public.players where slug = 'cum-drift'"); assert.equal((await verify([good.dir])).ok, true)
+    // the audit row cannot be replaced to match: audits are append-only
+    await assert.rejects(cu.query("update ingest.release_audits set counts = counts where release_key = $1", [KEY]), /append-only|cannot be/)
+    // two evidence directories for one audit are refused
+    { const dup = release(); await evidenceFor(dup); await fails('the same audit twice', [good.dir, dup.dir], /second evidence directory for the same audit|differs from the state/) }
+    // a release whose audit pre-dates the promotion cannot explain a later change
+    await cu.query("alter table ingest.release_audits disable trigger user"); await cu.query("update ingest.release_audits set applied_at = '2000-01-01' where release_key = $1", [KEY]); await cu.query("alter table ingest.release_audits enable trigger user")
+    await fails('an audit older than the promotion', [good.dir], /pre-dates the R6 promotion/)
+    // releaseDirs refuses a missing or empty directory
+    assert.throws(() => releaseDirs(path.join(tmp, 'nope')), /does not exist/); const empty = path.join(tmp, 'empty-rel'); fs.mkdirSync(empty); assert.throws(() => releaseDirs(empty), /holds no release/)
+  } finally { await cu.end() }
 })
 
 test('verify-promoted follows the lifecycle the DATABASE records: PROMOTED expects empty read models, REFRESHED expects a populated and consistent one, and every unexpected change still fails', async () => {
