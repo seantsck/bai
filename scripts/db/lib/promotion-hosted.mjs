@@ -34,27 +34,53 @@ export async function readModelState (c) {
  * Which lifecycle the transaction read models are in, taken from the database's OWN bookkeeping and never from a flag the caller supplies:
  *   PROMOTED   no refresh and no withdrawal is recorded: every read-model table must be empty (the state between the promotion and R7)
  *   REFRESHED  the latest recorded event is a refresh: the read model must be populated AND consistent with the refresh record, the overview and the publication grant
- *   WITHDRAWN  the latest recorded event is a read-model withdrawal: the content tables must be empty again (fail closed, as before)
- * A populated table without the matching record (or the reverse) is never accepted: it is reported as a problem whatever the lifecycle.
+ *   WITHDRAWN  the latest recorded event is a withdrawal (rm_withdraw_transactions / rm_withdraw_category, migration 030). A withdrawal removes the named transactions and their child rows and
+ *              invalidates the aggregates (overview, coverage, club-seasons are deleted) but KEEPS every other published transaction. So the remaining published count must equal the latest refresh's
+ *              count minus the withdrawn counts logged since, the aggregates must be gone, and what remains must still be consistent (one generation, authorized categories, a source row each, no orphan
+ *              child rows). A complete withdrawal is the case where nothing remains: every content table is then empty. A later refresh rebuilds everything and the state is REFRESHED again.
+ * Anything else (rows without the matching record, a count that does not reconcile, stale aggregates, leaked categories, orphans) is a problem in every lifecycle.
  */
 export async function readModelFacts (c) {
   const rm = await readModelState(c)
   const ref = (await q(c, 'select count(*)::int n, max(refreshed_at) at from public.rm_transaction_refreshes'))[0]
-  const last = ref.n ? (await q(c, 'select generation_id::text g, transactions t, withheld_unauthorized w from public.rm_transaction_refreshes order by refreshed_at desc, generation_id desc limit 1'))[0] : null
+  const last = ref.n ? (await q(c, 'select generation_id::text g, transactions t, withheld_unauthorized w, refreshed_at at from public.rm_transaction_refreshes order by refreshed_at desc, generation_id desc limit 1'))[0] : null
   const wd = (await q(c, 'select count(*)::int n, max(withdrawn_at) at from public.rm_transaction_withdrawals'))[0]
+  const since = (await q(c, 'select count(*)::int n, coalesce(sum(withdrawn_transactions), 0)::int withdrawn from public.rm_transaction_withdrawals where $1::timestamptz is null or withdrawn_at >= $1::timestamptz', [last?.at ?? null]))[0]
   const ov = await q(c, 'select generation_id::text g, transactions t, withheld_unauthorized w, verified_complete vc, display_authorized_categories cats from public.rm_transaction_overview')
   const pub = (await q(c, `select count(*)::int n, count(*) filter (where status = 'VERIFIED_COMPLETE')::int vc,
     coalesce(array_agg(distinct generation_id::text) filter (where generation_id is not null), '{}') gens,
-    count(*) filter (where not exists (select 1 from public.transactions t where t.id = r.transaction_id))::int orphans from public.rm_transactions r`))[0]
-  const cats = (ov[0]?.cats ?? [])
-  const outside = cats.length ? (await q(c, 'select count(*)::int n from public.rm_transactions where not (source_categories <@ $1::text[])', [cats]))[0].n : pub.n
+    count(*) filter (where not exists (select 1 from public.transactions t where t.id = r.transaction_id))::int orphans,
+    count(*) filter (where not exists (select 1 from public.rm_transaction_sources s where s.transaction_id = r.transaction_id))::int no_source from public.rm_transactions r`))[0]
+  const childOrphans = (await q(c, `select ((select count(*) from public.rm_transaction_sources x where not exists (select 1 from public.rm_transactions r where r.transaction_id = x.transaction_id))
+    + (select count(*) from public.rm_transaction_players x where not exists (select 1 from public.rm_transactions r where r.transaction_id = x.transaction_id))
+    + (select count(*) from public.rm_transaction_assets x where not exists (select 1 from public.rm_transactions r where r.transaction_id = x.transaction_id))
+    + (select count(*) from public.rm_transaction_packages x where not exists (select 1 from public.rm_transactions r where r.transaction_id = x.transaction_id))
+    + (select count(*) from public.rm_transaction_returns x where not exists (select 1 from public.rm_transactions r where r.transaction_id = x.transaction_id))
+    + (select count(*) from public.rm_transaction_followups x where not exists (select 1 from public.rm_transactions r where r.transaction_id = x.transaction_id)
+                                                                  or not exists (select 1 from public.rm_transactions r where r.transaction_id = x.later_transaction_id)))::int as n`))[0].n
+  const aggregates = (await q(c, 'select (select count(*) from public.rm_transaction_coverage)::int coverage, (select count(*) from public.rm_transaction_club_seasons)::int club_seasons'))[0]
   const granted = (await q(c, 'select attribution_category c from ingest.source_publication_grants')).map((r) => r.c)
+  const cats = ov[0]?.cats ?? []
+  const outside = cats.length ? (await q(c, 'select count(*)::int n from public.rm_transactions where not (source_categories <@ $1::text[])', [cats]))[0].n : pub.n
+  const unauthorizedNow = (await q(c, 'select count(*)::int n from public.rm_transactions where not (source_categories <@ $1::text[])', [[...OPEN_CATEGORIES, ...granted]]))[0].n
   const lifecycle = wd.n && (!ref.n || new Date(wd.at) >= new Date(ref.at)) ? 'WITHDRAWN' : ref.n ? 'REFRESHED' : 'PROMOTED'
-  return { lifecycle, rm, refreshes: { n: ref.n, last }, withdrawals: { n: wd.n }, overview: ov, published: { ...pub, outside_authorized: outside }, granted }
+  return { lifecycle, rm, refreshes: { n: ref.n, last }, withdrawals: { n: wd.n, since_refresh: since.n, withdrawn_since_refresh: since.withdrawn }, overview: ov, aggregates, child_orphans: childOrphans,
+    published: { ...pub, outside_authorized: outside, unauthorized_now: unauthorizedNow }, granted }
 }
 
 /** The openly licensed groups that migration 030 displays without a publication grant (rm_grant_changed lists the same four). */
 const OPEN_CATEGORIES = ['CHADWICK_REGISTER', 'WIKIPEDIA', 'BAI_RESEARCH', 'WIKIDATA']
+
+/** What every remaining published transaction must satisfy, whatever the lifecycle. */
+const publishedProblems = (f, generation) => {
+  const p = []; const { published } = f
+  if (published.n && (published.gens.length !== 1 || published.gens[0] !== generation)) p.push(`published rows carry generation(s) ${published.gens.join(',') || 'none'}, the latest refresh is ${generation}`)
+  if (published.unauthorized_now) p.push(`${published.unauthorized_now} published transaction(s) carry a source category that has no publication grant and is not openly licensed`)
+  if (published.orphans) p.push(`${published.orphans} published transaction(s) do not exist`)
+  if (published.no_source) p.push(`${published.no_source} published transaction(s) have no source row (no attribution)`)
+  if (f.child_orphans) p.push(`${f.child_orphans} read-model child row(s) belong to a transaction that is not published`)
+  return p
+}
 
 /** The problems a lifecycle's facts show. Pure, so every rule is tested without a database. */
 export function readModelProblems (f) {
@@ -63,7 +89,14 @@ export function readModelProblems (f) {
     if (rm.content_rows) p.push(`read-model rows: ${rm.content_rows} (no refresh is recorded)`)
     if (refreshes.n || withdrawals.n || (rm.bookkeeping.rm_transaction_overview ?? 0)) p.push('read-model bookkeeping exists without a recorded refresh')
   } else if (f.lifecycle === 'WITHDRAWN') {
-    if (rm.content_rows) p.push(`read-model rows after a withdrawal: ${rm.content_rows} (a withdrawal removes the overview; the read model must be empty or refreshed again)`)
+    const base = refreshes.last?.t ?? 0; const expected = base - withdrawals.withdrawn_since_refresh
+    if (expected < 0) p.push(`the withdrawal log removes ${withdrawals.withdrawn_since_refresh} transactions, the latest refresh published ${base}`)
+    else if (published.n !== expected) p.push(`read-model rows after a withdrawal: ${published.n} published, ${expected} expected (refresh ${base} minus ${withdrawals.withdrawn_since_refresh} withdrawn)`)
+    if (overview.length) p.push('the overview survived a withdrawal (a withdrawal deletes it)')
+    if (f.aggregates.coverage || f.aggregates.club_seasons) p.push(`coverage (${f.aggregates.coverage}) or club-season (${f.aggregates.club_seasons}) aggregates survived a withdrawal`)
+    if (published.n === 0 && rm.content_rows) p.push(`a complete withdrawal left ${rm.content_rows} content row(s)`)
+    if (published.n && !refreshes.last) p.push('published rows without a recorded refresh')
+    p.push(...publishedProblems(f, refreshes.last?.g))
   } else if (f.lifecycle === 'REFRESHED') {
     if (overview.length !== 1) p.push(`the overview has ${overview.length} row(s)`)
     else {
@@ -74,9 +107,8 @@ export function readModelProblems (f) {
       if (o.vc !== published.vc) p.push(`verified complete: overview ${o.vc}, read model ${published.vc}`)
       for (const cat of o.cats ?? []) if (!OPEN_CATEGORIES.includes(cat) && !f.granted.includes(cat)) p.push(`category ${cat} is displayed without a publication grant`)
     }
-    if (published.n && (published.gens.length !== 1 || published.gens[0] !== refreshes.last?.g)) p.push(`published rows carry generation(s) ${published.gens.join(',') || 'none'}, the latest refresh is ${refreshes.last?.g}`)
     if (published.outside_authorized) p.push(`${published.outside_authorized} published transaction(s) carry a source category that is not authorized for display`)
-    if (published.orphans) p.push(`${published.orphans} published transaction(s) do not exist`)
+    p.push(...publishedProblems(f, refreshes.last?.g))
   }
   return p
 }
@@ -324,7 +356,7 @@ export async function verifyPromoted (c, pkg, { expectedMlb = EXPECTED_MLB_TRANS
     facts.mlb_transactions = (await q(c, `select count(*)::int n from public.transactions t join public.sources s on s.id = t.source_id where s.attribution_category = 'MLB'`))[0].n
     if (facts.mlb_transactions !== expectedMlb) problems.push(`MLB transactions: ${facts.mlb_transactions}`)
     const rmf = await readModelFacts(c); facts.rm = rmf.rm; facts.read_model_lifecycle = rmf.lifecycle
-    facts.read_model = { refreshes: rmf.refreshes.n, withdrawals: rmf.withdrawals.n, published: rmf.published.n, verified_complete: rmf.published.vc, generation: rmf.refreshes.last?.g ?? null }
+    facts.read_model = { refreshes: rmf.refreshes.n, withdrawals: rmf.withdrawals.n, withdrawn_since_refresh: rmf.withdrawals.withdrawn_since_refresh, published: rmf.published.n, verified_complete: rmf.published.vc, generation: rmf.refreshes.last?.g ?? null }
     problems.push(...readModelProblems(rmf))
     if (before) {   // the promote runner's own post-check: nothing may have refreshed or withdrawn since the pre-check
       if (rmf.rm.content_rows) problems.push(`the read models hold ${rmf.rm.content_rows} row(s) straight after a promotion`)

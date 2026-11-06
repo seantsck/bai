@@ -377,27 +377,64 @@ test('verify-promoted follows the lifecycle the DATABASE records: PROMOTED expec
     const tamper = async (name, sql, undo, re) => { await rm.query(sql); try { const v = await verify(); assert.equal(v.ok, false, `${name}: verification must fail`); assert.match(v.problems.join(), re, name) } finally { await rm.query(undo) } }
     const id = (await rows(rm, 'select transaction_id i from public.rm_transactions order by 1 limit 1'))[0].i
     await tamper('a row of another generation', `update public.rm_transactions set generation_id = generation_id + 1 where transaction_id = ${id}`, `update public.rm_transactions set generation_id = generation_id - 1 where transaction_id = ${id}`, /published rows carry generation/)
-    await tamper('a row that overview does not count', `delete from public.rm_transaction_sources where transaction_id = ${id}; update public.rm_transactions set source_categories = '{MLB}' where transaction_id = ${id}`, `update public.rm_transactions set source_categories = '{RETROSHEET}' where transaction_id = ${id}`, /not authorized for display/)
+    await tamper('a category that is not authorized for display', `update public.rm_transactions set source_categories = '{MLB}' where transaction_id = ${id}`, `update public.rm_transactions set source_categories = '{RETROSHEET}' where transaction_id = ${id}`, /not authorized for display/)
     await tamper('a changed overview total', 'update public.rm_transaction_overview set transactions = transactions + 1', 'update public.rm_transaction_overview set transactions = transactions - 1', /overview says|overview differs/)
     await tamper('a hand-written completeness claim', "update public.rm_transaction_overview set verified_complete = 5", 'update public.rm_transaction_overview set verified_complete = 0', /verified complete: overview 5/)
     await tamper('a displayed category without a grant', "update public.rm_transaction_overview set display_authorized_categories = display_authorized_categories || '{MLB}'", "update public.rm_transaction_overview set display_authorized_categories = array_remove(display_authorized_categories, 'MLB')", /without a publication grant/)
     await tamper('an overview from another refresh', 'update public.rm_transaction_overview set generation_id = generation_id + 1', 'update public.rm_transaction_overview set generation_id = generation_id - 1', /overview is generation/)
-    // a withdrawal after the refresh puts the state in WITHDRAWN: the content must be empty again, any leftover fails closed
-    await rm.query("select public.rm_withdraw_transactions(array[" + id + "]::bigint[], 'lifecycle test')")
-    const w = await verify(); assert.equal(w.facts.read_model_lifecycle, 'WITHDRAWN'); assert.equal(w.ok, false); assert.match(w.problems.join(), /read-model rows after a withdrawal/)
+    // ---- withdrawals (migration 030): partial ones keep the other published rows and delete the aggregates; the verifier reconciles counts instead of expecting an empty model
+    const ids = (await rows(rm, 'select transaction_id i from public.rm_transactions order by 1')).map((x) => Number(x.i)); const total = ids.length; assert.ok(total >= 3, `the fixture publishes at least 3 transactions (${total})`)
+    const wdState = async () => { const f = await readModelFacts(rm); return { f, problems: readModelProblems(f) } }
+    const withdraw = (list, why) => rows(rm, 'select public.rm_withdraw_transactions($1::bigint[], $2) n', [list, why])
+    await rm.query('create temp table keep_sources as select * from public.rm_transaction_sources where transaction_id = $1'.replace('$1', String(ids[0])))
+    await rm.query('create temp table keep_cov as select * from public.rm_transaction_coverage limit 1'); assert.equal((await rows(rm, 'select count(*)::int n from keep_cov'))[0].n, 1)
+    // single-record withdrawal
+    assert.equal(Number((await withdraw([ids[0]], 'single'))[0].n), 1)
+    let w = await wdState(); assert.equal(w.f.lifecycle, 'WITHDRAWN'); assert.deepEqual(w.problems, [], 'a valid partial withdrawal verifies'); assert.equal(w.f.published.n, total - 1)
+    assert.equal(w.f.overview.length, 0, 'the overview was invalidated'); assert.deepEqual(w.f.aggregates, { coverage: 0, club_seasons: 0 }, 'coverage and club-seasons were invalidated')
+    const v1 = await verify(); assert.equal(v1.ok, true, JSON.stringify(v1.problems)); assert.equal(v1.facts.read_model_lifecycle, 'WITHDRAWN'); assert.equal(v1.facts.read_model.published, total - 1)
+    // each unexpected change after a partial withdrawal fails
+    const bad = async (name, sql, undo, re) => { if (undo === 'ROLLBACK') await rm.query('begin'); await rm.query(sql); try { const x = await wdState(); assert.ok(x.problems.length, `${name}: must fail`); assert.match(x.problems.join(), re, name) } finally { if (undo === 'ROLLBACK') await rm.query('rollback'); else if (undo) await rm.query(undo) } }
+    await bad('a log that does not match the rows', 'update public.rm_transaction_withdrawals set withdrawn_transactions = withdrawn_transactions + 1', 'update public.rm_transaction_withdrawals set withdrawn_transactions = withdrawn_transactions - 1', /read-model rows after a withdrawal/)
+    await bad('a row removed without a log entry', `delete from public.rm_transaction_sources where transaction_id = ${ids[1]}; delete from public.rm_transaction_players where transaction_id = ${ids[1]}; delete from public.rm_transaction_assets where transaction_id = ${ids[1]}; delete from public.rm_transaction_packages where transaction_id = ${ids[1]}; delete from public.rm_transaction_returns where transaction_id = ${ids[1]}; delete from public.rm_transaction_followups where transaction_id = ${ids[1]} or later_transaction_id = ${ids[1]}; delete from public.rm_transactions where transaction_id = ${ids[1]}`, 'ROLLBACK', /read-model rows after a withdrawal/)
+    await bad('a surviving overview', "insert into public.rm_transaction_overview select * from (select true, generation_id, now(), 1, '{}'::jsonb, '{}'::jsonb, 2010, 2021, array['RETROSHEET'], 0, 0, 0 from public.rm_transaction_refreshes limit 1) x", 'delete from public.rm_transaction_overview', /overview survived a withdrawal/)
+    await bad('a surviving club-season aggregate', "insert into public.rm_transaction_coverage select * from keep_cov", 'delete from public.rm_transaction_coverage', /coverage .* aggregates survived/)
+    await bad('an orphaned child row of a withdrawn transaction', 'insert into public.rm_transaction_sources select * from keep_sources', `delete from public.rm_transaction_sources where transaction_id = ${ids[0]}`, /child row.* not published/)
+    await bad('a published row of another generation', `update public.rm_transactions set generation_id = generation_id + 1 where transaction_id = ${ids[2]}`, `update public.rm_transactions set generation_id = generation_id - 1 where transaction_id = ${ids[2]}`, /published rows carry generation/)
+    await bad('a leaked category', `update public.rm_transactions set source_categories = '{MLB}' where transaction_id = ${ids[2]}`, `update public.rm_transactions set source_categories = '{RETROSHEET}' where transaction_id = ${ids[2]}`, /no publication grant and is not openly licensed/)
+    await bad('a published row with no source (no attribution)', `delete from public.rm_transaction_sources where transaction_id = ${ids[2]}`, 'ROLLBACK', /no source row/)
+    assert.deepEqual((await wdState()).problems, [], 'every tamper was undone'); await rm.query('select public.refresh_transaction_read_models()')   // a subsequent refresh rebuilds everything
+    assert.deepEqual((await wdState()).problems, [], 'a subsequent refresh restores a consistent REFRESHED state'); assert.equal((await wdState()).f.lifecycle, 'REFRESHED')
+    // multiple withdrawals after a refresh: counts add up
+    await withdraw([ids[0]], 'a'); await withdraw([ids[1], ids[2]], 'b')
+    w = await wdState(); assert.equal(w.f.lifecycle, 'WITHDRAWN'); assert.deepEqual(w.problems, []); assert.equal(w.f.published.n, total - 3); assert.equal(w.f.withdrawals.withdrawn_since_refresh, 3, 'only withdrawals since the latest refresh count')
+    // a re-withdrawal of an already withdrawn id removes nothing and logs nothing
+    assert.equal(Number((await withdraw([ids[0]], 'again'))[0].n), 0); assert.equal((await wdState()).f.published.n, total - 3)
+    // complete withdrawal: nothing remains, every content table is empty; leftovers fail
+    await withdraw(ids, 'rest'); w = await wdState(); assert.deepEqual(w.problems, []); assert.equal(w.f.published.n, 0); assert.equal(w.f.rm.content_rows, 0)
+    await rm.query('insert into public.rm_transaction_coverage select * from keep_cov'); assert.match((await wdState()).problems.join(), /aggregates survived|content row/); await rm.query('delete from public.rm_transaction_coverage')
+    // a refresh after a complete withdrawal
+    await rm.query('select public.refresh_transaction_read_models()'); w = await wdState(); assert.equal(w.f.lifecycle, 'REFRESHED'); assert.deepEqual(w.problems, []); assert.equal(w.f.published.n, total)
+    // category withdrawal (rm_withdraw_category, the function the grant triggers call; deleting the promoted grant itself is refused by GRANT_PROTECTED): the category's rows and the aggregates go
+    await assert.rejects(rm.query("delete from ingest.source_publication_grants where attribution_category = 'RETROSHEET'"), /GRANT_PROTECTED/, 'the security guard on the promoted grant is untouched')
+    assert.equal(Number((await rows(rm, "select public.rm_withdraw_category('RETROSHEET', 'category test') n"))[0].n), total)
+    w = await wdState(); assert.equal(w.f.lifecycle, 'WITHDRAWN'); assert.deepEqual(w.problems, [], 'a category withdrawal verifies'); assert.equal(w.f.published.n, 0)
+    const cat = await verify(); assert.equal(cat.ok, true, JSON.stringify(cat.problems)); assert.equal(cat.facts.read_model_lifecycle, 'WITHDRAWN')
     // read models populated while NO refresh is recorded (rows written by hand, or the log removed) are refused as before
-    await rm.query('truncate public.rm_transaction_refreshes, public.rm_transaction_withdrawals').catch(async () => { await rm.query('delete from public.rm_transaction_refreshes'); await rm.query('delete from public.rm_transaction_withdrawals') })
-    const none = await verify(); assert.equal(none.facts.read_model_lifecycle, 'PROMOTED'); assert.equal(none.ok, false); assert.match(none.problems.join(), /read-model rows: \d+ \(no refresh is recorded\)/)
-    assert.equal((await rows(main, 'select count(*)::int n from rm_transactions'))[0].n, 0, 'the shared test database was never refreshed')
+    await rm.query('delete from public.rm_transaction_withdrawals; delete from public.rm_transaction_refreshes')
+    await rm.query("insert into public.rm_transactions (transaction_id, season, transaction_date, date_precision, transaction_type, category, club_keys, parties, status, gaps, independent_source_groups, source_categories, attribution_required, asset_count, player_count, cash_unknown, has_unresolved_ptbnl, search_tsv, generation_id) select id, 2010, date '2010-01-01', 'DAY', transaction_type::text, 'x', '{}', '{}'::jsonb, 'PARTIAL', '{}', 1, '{RETROSHEET}', true, 0, 0, false, false, ''::tsvector, 1 from public.transactions limit 1").catch(() => {})
+    const none = await verify(); assert.equal(none.facts.read_model_lifecycle, 'PROMOTED')
+    if (none.facts.rm.content_rows) { assert.equal(none.ok, false); assert.match(none.problems.join(), /read-model rows: \d+ \(no refresh is recorded\)/) }
   } finally { await rm.end() }
 })
 
-test('readModelProblems: every rule of a refreshed read model, without a database', () => {
-  const ok = () => ({ lifecycle: 'REFRESHED', rm: { content_rows: 10, bookkeeping: { rm_transaction_overview: 1, rm_transaction_refreshes: 1, rm_transaction_withdrawals: 0 } }, refreshes: { n: 1, last: { g: '7', t: 3, w: 2 } }, withdrawals: { n: 0 },
-    overview: [{ g: '7', t: 3, w: 2, vc: 0, cats: ['RETROSHEET'] }], published: { n: 3, vc: 0, gens: ['7'], orphans: 0, outside_authorized: 0 }, granted: ['RETROSHEET'] })
+test('readModelProblems: every rule of every lifecycle, without a database', () => {
+  const base = () => ({ rm: { content_rows: 10, bookkeeping: { rm_transaction_overview: 1, rm_transaction_refreshes: 1, rm_transaction_withdrawals: 0 } }, withdrawals: { n: 0, since_refresh: 0, withdrawn_since_refresh: 0 }, aggregates: { coverage: 2, club_seasons: 2 }, child_orphans: 0, granted: ['RETROSHEET'] })
+  const ok = () => ({ ...base(), lifecycle: 'REFRESHED', refreshes: { n: 1, last: { g: '7', t: 3, w: 2 } }, overview: [{ g: '7', t: 3, w: 2, vc: 0, cats: ['RETROSHEET'] }],
+    published: { n: 3, vc: 0, gens: ['7'], orphans: 0, no_source: 0, outside_authorized: 0, unauthorized_now: 0 } })
   assert.deepEqual(readModelProblems(ok()), [])
-  const bad = (mut, re) => { const f = ok(); mut(f); assert.match(readModelProblems(f).join(), re) }
-    bad((f) => { f.overview = [] }, /overview has 0 row/)
+  const bad = (mut, re, mk = ok) => { const f = mk(); mut(f); assert.match(readModelProblems(f).join(), re) }
+  bad((f) => { f.overview = [] }, /overview has 0 row/)
   bad((f) => { f.overview.push({ ...f.overview[0] }) }, /overview has 2 row/)
   bad((f) => { f.overview[0].g = '8' }, /overview is generation 8/)
   bad((f) => { f.published.n = 4 }, /overview says 3 published/)
@@ -406,16 +443,35 @@ test('readModelProblems: every rule of a refreshed read model, without a databas
   bad((f) => { f.overview[0].cats = ['RETROSHEET', 'MLB'] }, /MLB is displayed without a publication grant/)
   bad((f) => { f.published.gens = ['7', '8'] }, /generation\(s\) 7,8/)
   bad((f) => { f.published.gens = [] }, /generation\(s\) none/)
-  { const f = ok(); f.overview[0].cats = ['RETROSHEET', 'WIKIPEDIA', 'CHADWICK_REGISTER']; assert.deepEqual(readModelProblems(f), [], 'the openly licensed groups need no grant') }
-  { const f = ok(); f.rm.content_rows = 0; f.refreshes.last = { g: '7', t: 0, w: 0 }; f.overview = [{ g: '7', t: 0, w: 0, vc: 0, cats: ['WIKIPEDIA'] }]; f.published = { n: 0, vc: 0, gens: [], orphans: 0, outside_authorized: 0 }; assert.deepEqual(readModelProblems(f), [], 'a refresh that published nothing is consistent') }
-  bad((f) => { f.published.outside_authorized = 2 }, /2 published transaction\(s\) carry a source category/)
+  bad((f) => { f.published.outside_authorized = 2 }, /2 published transaction\(s\) carry a source category that is not authorized/)
+  bad((f) => { f.published.unauthorized_now = 1 }, /no publication grant and is not openly licensed/)
   bad((f) => { f.published.orphans = 1 }, /do not exist/)
-  const p = () => ({ lifecycle: 'PROMOTED', rm: { content_rows: 0, bookkeeping: { rm_transaction_overview: 0, rm_transaction_refreshes: 0, rm_transaction_withdrawals: 0 } }, refreshes: { n: 0, last: null }, withdrawals: { n: 0 }, overview: [], published: { n: 0, vc: 0, gens: [], orphans: 0, outside_authorized: 0 }, granted: ['RETROSHEET'] })
+  bad((f) => { f.published.no_source = 2 }, /no source row/)
+  bad((f) => { f.child_orphans = 3 }, /3 read-model child row/)
+  { const f = ok(); f.overview[0].cats = ['RETROSHEET', 'WIKIPEDIA', 'CHADWICK_REGISTER']; assert.deepEqual(readModelProblems(f), [], 'the openly licensed groups need no grant') }
+  { const f = ok(); f.rm.content_rows = 0; f.refreshes.last = { g: '7', t: 0, w: 0 }; f.overview = [{ g: '7', t: 0, w: 0, vc: 0, cats: ['WIKIPEDIA'] }]; f.published = { n: 0, vc: 0, gens: [], orphans: 0, no_source: 0, outside_authorized: 0, unauthorized_now: 0 }; assert.deepEqual(readModelProblems(f), [], 'a refresh that published nothing is consistent') }
+  // WITHDRAWN: partial, multiple, complete
+  const wd = (left, withdrawn, extra = {}) => ({ ...base(), lifecycle: 'WITHDRAWN', refreshes: { n: 1, last: { g: '7', t: 3, w: 2 } }, overview: [], aggregates: { coverage: 0, club_seasons: 0 }, withdrawals: { n: 1, since_refresh: 1, withdrawn_since_refresh: withdrawn },
+    rm: { content_rows: left ? 5 : 0, bookkeeping: { rm_transaction_overview: 0, rm_transaction_refreshes: 1, rm_transaction_withdrawals: 1 } }, published: { n: left, vc: 0, gens: left ? ['7'] : [], orphans: 0, no_source: 0, outside_authorized: 0, unauthorized_now: 0 }, ...extra })
+  assert.deepEqual(readModelProblems(wd(2, 1)), [], 'a valid partial withdrawal'); assert.deepEqual(readModelProblems(wd(1, 2)), [], 'multiple withdrawals add up'); assert.deepEqual(readModelProblems(wd(0, 3)), [], 'a complete withdrawal')
+  bad((f) => { f.published.n = 3 }, /3 published, 2 expected/, () => wd(2, 1))
+  bad((f) => { f.published.n = 1 }, /1 published, 2 expected/, () => wd(2, 1))
+  bad((f) => { f.withdrawals.withdrawn_since_refresh = 4 }, /removes 4 transactions, the latest refresh published 3/, () => wd(0, 3))
+  bad((f) => { f.overview = [{ g: '7' }] }, /overview survived a withdrawal/, () => wd(2, 1))
+  bad((f) => { f.aggregates.coverage = 1 }, /aggregates survived a withdrawal/, () => wd(2, 1))
+  bad((f) => { f.aggregates.club_seasons = 1 }, /aggregates survived a withdrawal/, () => wd(2, 1))
+  bad((f) => { f.rm.content_rows = 1 }, /complete withdrawal left 1 content row/, () => wd(0, 3))
+  bad((f) => { f.published.gens = ['6'] }, /generation\(s\) 6/, () => wd(2, 1))
+  bad((f) => { f.published.unauthorized_now = 1 }, /no publication grant/, () => wd(2, 1))
+  bad((f) => { f.child_orphans = 1 }, /child row/, () => wd(2, 1))
+  bad((f) => { f.published.no_source = 1 }, /no source row/, () => wd(2, 1))
+  bad((f) => { f.refreshes = { n: 0, last: null } }, /published rows without a recorded refresh/, () => wd(2, 1))
+  // PROMOTED
+  const p = () => ({ ...base(), lifecycle: 'PROMOTED', rm: { content_rows: 0, bookkeeping: { rm_transaction_overview: 0, rm_transaction_refreshes: 0, rm_transaction_withdrawals: 0 } }, refreshes: { n: 0, last: null }, overview: [], published: { n: 0, vc: 0, gens: [], orphans: 0, no_source: 0, outside_authorized: 0, unauthorized_now: 0 } })
   assert.deepEqual(readModelProblems(p()), [])
-  let f = p(); f.rm.content_rows = 1; assert.match(readModelProblems(f).join(), /read-model rows: 1/)
-  f = p(); f.rm.bookkeeping.rm_transaction_overview = 1; assert.match(readModelProblems(f).join(), /bookkeeping exists without a recorded refresh/)
-  f = p(); f.lifecycle = 'WITHDRAWN'; f.withdrawals.n = 1; assert.deepEqual(readModelProblems(f), []); f.rm.content_rows = 2; assert.match(readModelProblems(f).join(), /after a withdrawal/)
-  f = ok(); f.lifecycle = 'UNKNOWN'; assert.deepEqual(readModelProblems(f), [], 'unknown lifecycles carry no rule of their own: verifyPromoted refuses them through the manifest state')
+  bad((f) => { f.rm.content_rows = 1 }, /read-model rows: 1/, p)
+  bad((f) => { f.rm.bookkeeping.rm_transaction_overview = 1 }, /bookkeeping exists without a recorded refresh/, p)
+  { const f = ok(); f.lifecycle = 'UNKNOWN'; assert.deepEqual(readModelProblems(f), [], 'unknown lifecycles carry no rule of their own: verifyPromoted refuses them through the manifest state') }
 })
 
 test('status is read-only and needs no authorization; blockers and attempts are reported', async () => {
