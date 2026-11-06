@@ -19,7 +19,13 @@ export function rank (rows, keep) {
     .map((r, i) => ({ ...r, rank: i + 1 }))
 }
 
-const cell = (v) => { const s = v == null ? '' : Array.isArray(v) ? v.join('|') : String(v); return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s }
+/** A cell that a spreadsheet would read as a formula (it starts with = + - @, a tab or a carriage return) is neutralised with a leading apostrophe (OWASP CSV-injection guidance), then quoted if needed. */
+export const FORMULA_START = /^[=+\-@\t\r]/
+export const cell = (v) => {
+  let s = v == null ? '' : Array.isArray(v) ? v.join('|') : String(v)
+  if (FORMULA_START.test(s)) s = `'${s}`
+  return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s
+}
 export const toCsv = (rows) => [COLUMNS.join(','), ...rows.map((r) => COLUMNS.map((k) => cell(r[k])).join(','))].join('\n') + '\n'
 
 /** The output directory must be new and outside every git work tree. */

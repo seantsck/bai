@@ -6,7 +6,7 @@ import os from 'node:os'
 import path from 'node:path'
 import { spawnSync } from 'node:child_process'
 import * as h from './harness.mjs'
-import { COLUMNS, QUEUES, TRADES_SQL, assertOutputAllowed, difficulty, fetchTrades, rank, tierOf, toCsv, writeQueues } from '../../scripts/research/lib/r8b-queue.mjs'
+import { COLUMNS, QUEUES, cell, TRADES_SQL, assertOutputAllowed, difficulty, fetchTrades, rank, tierOf, toCsv, writeQueues } from '../../scripts/research/lib/r8b-queue.mjs'
 
 const row = (id, o = {}) => ({ transaction_id: id, season: 2015, date: '2015-06-01', club_keys: ['AAA', 'BBB'], gaps: ['PACKAGE_NOT_CORROBORATED'], cash_unknown: false, ptbnl: false, asset_count: 2, player_count: 2, conditional_assets: 0, unresolved_ptbnl_assets: 0, external_ids: `x${id}`, ...o })
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'bai-r8b-'))
@@ -48,4 +48,29 @@ test('output guard: a new directory outside any git work tree; never overwritten
 test('the SQL runs against the real schema read-only and returns the published trades (none before a refresh)', async () => {
   await db.query('begin read only'); try { assert.deepEqual(await fetchTrades(db), []); assert.match(TRADES_SQL, /from public\.rm_transactions/); assert.doesNotMatch(TRADES_SQL, /\b(insert|update|delete)\b/i) } finally { await db.query('rollback') }
   const r = spawnSync(process.execPath, ['scripts/research/r8b-queues.mjs', '--out', path.join(tmp, 'x'), '--extra'], { encoding: 'utf8', cwd: path.resolve(path.dirname(new URL(import.meta.url).pathname), '../..') }); assert.equal(r.status, 2, 'unsupported arguments exit 2')
+})
+
+test('CSV formula injection: cells that start with = + - @ tab or CR are neutralised, in every column, and ordinary values are unchanged', () => {
+  for (const evil of ['=1+1', '+SUM(A1)', '-2+3', '@cmd', '\tx', '\rx', '=HYPERLINK("http://x","y")']) {
+    const c = cell(evil); assert.ok(c.replace(/^"/, '').startsWith("'"), `${JSON.stringify(evil)} -> ${c}`)
+  }
+  assert.equal(cell('2015-06-01'), '2015-06-01'); assert.equal(cell('85987@20210204'), '85987@20210204'); assert.equal(cell(42), '42'); assert.equal(cell(null), ''); assert.equal(cell(['A', 'B']), 'A|B')
+  assert.equal(cell(['=A', 'B']), "'=A|B", 'the joined cell is judged as a whole')
+  const csv = toCsv(rank([row(1, { club_keys: ['=cmd|calc'], gaps: ['@x'], external_ids: '+1' })], QUEUES['queue-2-clean-trades']))
+  const line = csv.trim().split('\n')[1]; for (const f of ["'=cmd|calc", "'@x", "'+1"]) assert.ok(line.includes(f), `${f} in ${line}`)
+  assert.ok(!/(^|,)[=+@\-]/.test(line.replace(/^\d+,[A-Z0-9]+,\d+,/, '')), 'no cell starts with a formula character')
+})
+
+test('the generator is strictly read-only: the SQL is one SELECT, the session is forced read-only, and no write verb appears in either file', () => {
+  const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), '../..')
+  const lib = fs.readFileSync(path.join(root, 'scripts/research/lib/r8b-queue.mjs'), 'utf8'); const cli = fs.readFileSync(path.join(root, 'scripts/research/r8b-queues.mjs'), 'utf8')
+  assert.match(TRADES_SQL.trim(), /^select /i); assert.equal(TRADES_SQL.split(';').filter((x) => x.trim()).length, 1)
+  assert.match(cli, /default_transaction_read_only=on/); assert.match(cli, /begin isolation level repeatable read read only/)
+  const sqlLiterals = [...(lib + cli).matchAll(/`([^`]*)`|'((?:[^'\\]|\\.)*)'/g)].map((m) => m[1] ?? m[2]).filter((x) => /\b(select|begin|rollback|commit)\b/i.test(x))
+  for (const s of sqlLiterals) assert.doesNotMatch(s, /\b(insert|update|delete|truncate|drop|alter|create|grant|revoke|vacuum|copy|call|do)\b/i, s.slice(0, 60))
+  assert.doesNotMatch(cli, /\.query\(\s*['"`](?!begin isolation level repeatable read read only|rollback)/, 'only the read-only begin and rollback are issued directly')
+})
+
+test('behaviourally read-only: against a database that refuses writes, fetching succeeds and a write attempt is refused', async () => {
+  await db.query('begin read only'); try { await fetchTrades(db); await assert.rejects(db.query('create temp table r8b_probe (x int)'), /read-only transaction/) } finally { await db.query('rollback') }
 })
