@@ -2,7 +2,7 @@
 const SPEC = {
   status: { need: ['manifest'], opt: [] },
   'verify-promoted': { need: ['package'], opt: ['release-evidence'] },
-  'record-release-evidence': { need: ['authorization', 'out'], opt: ['proof'] },
+  'record-release-evidence': { need: ['package', 'authorization', 'anchor', 'out'], opt: ['previous-evidence'] },
   promote: { need: ['package', 'authorization', 'attribution-evidence', 'parity-record'], opt: [] },
   withdraw: { need: ['manifest', 'authorization'], opt: [] },
   emergency: { need: ['manifest', 'authorization'], opt: [] },

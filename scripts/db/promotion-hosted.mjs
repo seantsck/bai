@@ -1,7 +1,7 @@
 // The gated hosted promotion runner (G6). The LOCAL tool scripts/db/promotion.mjs is unchanged and still refuses every hosted target; this is a separate, narrow entrypoint.
 //   node --env-file=<hosted env> scripts/db/promotion-hosted.mjs status    --manifest <sha256>                                                      read-only, no authorization needed
 //   node --env-file=<hosted env> scripts/db/promotion-hosted.mjs verify-promoted --package <dir> [--release-evidence <dir>]                         read-only post-promotion checks; with a directory of later authorized draft releases, a cumulative check (promotion-cumulative.mjs)
-//   node --env-file=<hosted env> scripts/db/promotion-hosted.mjs record-release-evidence --authorization <signed draft-release authorization> --out <new file> [--proof <file>]   read-only: the evidence record of one release, right after it was verified
+//   node --env-file=<hosted env> scripts/db/promotion-hosted.mjs record-release-evidence --package <R6 package> --authorization <signed draft-release authorization> --anchor <anchor.json> --out <new file> [--previous-evidence <file>]   read-only: the UNSIGNED evidence record of one release, built from the independent anchor (anchor-release-evidence.mjs); the owner must sign it
 //   node --env-file=<hosted env> scripts/db/promotion-hosted.mjs promote   --package <dir> --authorization <file> --attribution-evidence <file> --parity-record <file>
 //   node --env-file=<hosted env> scripts/db/promotion-hosted.mjs withdraw  --manifest <sha256> --authorization <file>
 //   node --env-file=<hosted env> scripts/db/promotion-hosted.mjs emergency --manifest <sha256> --authorization <file>     (the authorization says whether it closes the Data API)
@@ -14,6 +14,7 @@
 // Common options: --owner-keyring <dir> (a GnuPG home holding the owner's PUBLIC signing key; default ~/.config/bai-release/gnupg), --report <new file> (the JSON report, never overwritten).
 // There are no other options. A signed owner authorization is required for every write: see docs/transactions/g6-hosted-promotion-runner.md. The connection is the pinned project's direct host,
 // verified TLS only (lib/hosted-connection.mjs). Nothing is ever retried; an unclear result is resolved read-only and left for the owner.
+import crypto from 'node:crypto'
 import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
@@ -55,8 +56,8 @@ try {
     report = { draft: o.out, signed: false, next: `Review every field. If you agree, sign it yourself: gpg --local-user <your signing key> --detach-sign --output ${o.out}.sig ${o.out}. An unsigned draft authorizes nothing.`, draft_sha256: (await import('node:crypto')).createHash('sha256').update(fs.readFileSync(o.out)).digest('hex') }
   } else if (cmd === 'verify-promoted') report = await verifyPromotedHosted(ctx, o.package, { releaseEvidenceDir: o['release-evidence'] ?? null })
   else if (cmd === 'record-release-evidence') {
-    const ev = await recordReleaseEvidence(ctx, { authorizationFile: o.authorization, proofFiles: o.proof ? [o.proof] : [] })
-    fs.writeFileSync(o.out, JSON.stringify(ev, null, 1) + '\n', { flag: 'wx', mode: 0o600 }); report = { evidence: o.out, release_key: ev.release_key, audit_id: ev.audit_id, tables: Object.keys(ev.tables).length, note: 'Run this only right after the release was verified: the evidence records the CURRENT state as the release state.' }
+    const ev = await recordReleaseEvidence(ctx, { authorizationFile: o.authorization, anchorFile: o.anchor, packageDir: o.package, previousEvidenceFile: o['previous-evidence'] ?? null })
+    fs.writeFileSync(o.out, JSON.stringify(ev, null, 1) + '\n', { flag: 'wx', mode: 0o600 }); report = { evidence: o.out, release_key: ev.release_key, audit_id: ev.audit_id, tables: Object.keys(ev.tables).length, evidence_sha256: crypto.createHash('sha256').update(fs.readFileSync(o.out)).digest('hex'), next: `This file is UNSIGNED and verifies nothing. Review it, then sign the exact bytes with your own key: gpg --local-user <your signing key> --detach-sign --output ${o.out}.sig ${o.out}` }
   }
   else if (cmd === 'promote') report = await promoteHosted(ctx, { pkgDir: o.package, authFile: o.authorization, evidenceFile: o['attribution-evidence'], parityFile: o['parity-record'] })
   else report = await operateHosted(ctx, cmd, { manifest: o.manifest, authFile: o.authorization })

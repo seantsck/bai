@@ -442,10 +442,11 @@ export async function verifyPromotedHosted (ctx, pkgDir, { releaseEvidenceDir = 
   try { return await verifyPromoted(c, pkg, { expectedMlb: ctx.expectedMlb ?? EXPECTED_MLB_TRANSACTIONS, releases, keyring: ctx.keyring, pinned: ctx.pinned, projectRef: ctx.projectRef }) } finally { await session.client.end().catch(() => {}) }
 }
 
-/** Read-only: the evidence record for one authorized, audited draft release, captured from the database right after the release was verified (docs/transactions/g6-hosted-promotion-runner.md). */
-export async function recordReleaseEvidence (ctx, { authorizationFile, proofFiles = [] }) {
-  const session = await ctx.connect(); const c = await openSession(session.client)
-  try { await c.query('begin isolation level repeatable read read only'); try { return await buildReleaseEvidence(c, { authorizationFile, proofFiles }) } finally { await c.query('rollback') } } finally { await session.client.end().catch(() => {}) }
+/** Read-only: the UNSIGNED evidence record for one authorized, audited draft release, built from an independent anchor and CHECKED against the current database (never regenerated from it). The owner signs the exact bytes. */
+export async function recordReleaseEvidence (ctx, { authorizationFile, anchorFile, packageDir, previousEvidenceFile = null }) {
+  const pv = verifyPackage(packageDir); if (pv.length) refuse(`package: ${pv.join('; ')}`)
+  const pkg = loadPackage(packageDir); const session = await ctx.connect(); const c = await openSession(session.client)
+  try { await c.query('begin isolation level repeatable read read only'); try { return await buildReleaseEvidence(c, { authorizationFile, anchorFile, previousEvidenceFile, r6ManifestSha256: pkg.sha }) } finally { await c.query('rollback') } } finally { await session.client.end().catch(() => {}) }
 }
 
 /**
