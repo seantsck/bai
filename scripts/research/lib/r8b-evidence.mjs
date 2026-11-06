@@ -48,8 +48,11 @@ export function classifySource (url) {
 /** Sources whose records are partly derived from, or republish, the origin: never better than LIKELY_DERIVED without a human lineage review. Keyed on the CLASSIFIED source, not the raw host. */
 export const isDerivedSource = (url) => {
   if (['RETROSHEET', 'BASEBALL_REFERENCE', 'CHADWICK_REGISTER'].includes(classifySource(url).category)) return true
-  let u; try { u = new URL(url) } catch { return false }; const h = u.hostname.toLowerCase().replace(/\.$/, '')
-  return /(^|\.)(retrosheet\.org|baseball-reference\.com|sports-reference\.com|chadwick-bureau\.com|chadwickbureau\.github\.io)$/.test(h) || (['github.com', 'raw.githubusercontent.com', 'gist.github.com'].includes(h) && /^\/chadwickbureau(\/|$)/i.test(u.pathname))
+  let u; try { u = new URL(url) } catch { return false }
+  let flat = u.href.toLowerCase(); for (let i = 0; i < 3; i++) { try { const d = decodeURIComponent(flat); if (d === flat) break; flat = d } catch { break } }
+  if (/retrosheet|baseball-?reference|sports-?reference|chadwick/.test(flat)) return true   // the origin or a derivative named anywhere in the URL (aliases, mirrors, wrappers, proxies, query strings)
+  const h = u.hostname.toLowerCase().replace(/\.$/, '')
+  return /(^|\.)(github\.com|githubusercontent\.com|github\.io|jsdelivr\.net|archive\.org|archive\.ph|archive\.today|googleusercontent\.com)$/.test(h)   // code hosts, CDNs and archive wrappers can hold copies of anything: never independent
 }
 export const categoryOfUrl = (url) => classifySource(url).category
 
@@ -119,13 +122,15 @@ const strOrNull = (v, max = 500) => v === null || v === undefined || str(v, max)
 function typeProblems (pkg) {
   const p = []; const t = pkg.transaction
   if (!Number.isSafeInteger(t.id) || t.id < 1) p.push('transaction.id must be a positive integer')
+  if (!Number.isInteger(t.season)) p.push('transaction.season must be an integer')
   if (!Array.isArray(t.clubs) || !t.clubs.every((x) => str(x, 20))) p.push('transaction.clubs must be a list of short strings')
   if (!Array.isArray(t.external_ids) || !t.external_ids.every((x) => str(x, 200))) p.push('transaction.external_ids must be a list of strings')
   t.assets.forEach((a, i) => { for (const k of ['from_key', 'to_key', 'kind', 'player_name', 'detail', 'condition_text', 'amount_status', 'resolution_kind']) if (!strOrNull(a[k])) p.push(`transaction.assets[${i}].${k} must be text or null`); if (!Number.isInteger(a.position)) p.push(`transaction.assets[${i}].position must be an integer`); if (typeof a.conditional !== 'boolean' && a.conditional != null) p.push(`transaction.assets[${i}].conditional must be true or false`) })
-  t.origin_sources.forEach((a, i) => { for (const k of ['role', 'independence_group', 'category']) if (!strOrNull(a[k])) p.push(`transaction.origin_sources[${i}].${k} must be text or null`) })
+  t.origin_sources.forEach((a, i) => { if (!Number.isInteger(a.position)) p.push(`transaction.origin_sources[${i}].position must be an integer`); for (const k of ['role', 'independence_group', 'category']) if (!strOrNull(a[k])) p.push(`transaction.origin_sources[${i}].${k} must be text or null`) })
   for (const k of ['note', 'category', 'independence_group']) if (!strOrNull(pkg.origin[k])) p.push(`origin.${k} must be text`)
+  if (pkg.origin.category !== 'RETROSHEET' || pkg.origin.independence_group !== ORIGIN_GROUP) p.push(`origin must be the BAI record's own origin (RETROSHEET, ${ORIGIN_GROUP})`)
   pkg.candidates.forEach((c, i) => { for (const k of ['id', 'url', 'title', 'publisher', 'role', 'locator', 'retrieved_on', 'found_by']) if (!str(c[k])) p.push(`candidates[${i}].${k} must be text`); for (const k of ['evidence_basis', 'page_read']) if (!strOrNull(c[k], 200) && typeof c[k] !== 'boolean') p.push(`candidates[${i}].${k} must be short text, true/false or null`); for (const k of ['assessment', 'group', 'lineage_note']) if (!strOrNull(c.independence?.[k])) p.push(`candidates[${i}].independence.${k} must be text`) })
-  for (const [k, rows] of [['packages', pkg.corroboration.packages], ['assets', pkg.corroboration.assets]]) rows.forEach((r, i) => { if (!Array.isArray(r.candidate_ids) || !r.candidate_ids.every((x) => str(x))) p.push(`corroboration.${k}[${i}].candidate_ids must be a list of candidate ids`); if (!str(r.status)) p.push(`corroboration.${k}[${i}].status must be text`) })
+  for (const [k, rows] of [['packages', pkg.corroboration.packages], ['assets', pkg.corroboration.assets]]) rows.forEach((r, i) => { if (k === 'assets' && !Number.isInteger(r.position)) p.push(`corroboration.assets[${i}].position must be an integer`); if (k === 'packages' && !str(r.side)) p.push(`corroboration.packages[${i}].side must be text`); if (!Array.isArray(r.candidate_ids) || !r.candidate_ids.every((x) => str(x))) p.push(`corroboration.${k}[${i}].candidate_ids must be a list of candidate ids`); if (!str(r.status)) p.push(`corroboration.${k}[${i}].status must be text`) })
   for (const k of ['gaps', 'recommended_human_action', 'unresolved_claims']) pkg[k].forEach((g, i) => { if (typeof g !== 'string' && !(strOrNull(g?.code) && strOrNull(g?.detail))) p.push(`${k}[${i}] must be text or a { code, detail } note`) })
   for (const k of ['created_on']) if (!isDate(pkg[k])) p.push(`${k} must be a real date`)
   return p

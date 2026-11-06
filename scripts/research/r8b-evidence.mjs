@@ -20,13 +20,14 @@ const cell = (v) => { let s = v == null ? '' : String(v); if (/^[=+\-@\t\r]/.tes
 if (cmd === 'init') {
   const q = opt('queue'); const n = opt('count') == null ? 10 : Number(opt('count')); const out = opt('out'); if (!q || !out || !Number.isInteger(n) || n < 1 || n > 50) die('usage: init --queue <csv> --count <1-50> --out <new dir>')
   try { assertOutputAllowed(out) } catch (e) { die(e.message) }
-  const ids = queueIds(q, n); const c = await connect(); try { const txs = await fetchTransactions(c, ids); await c.query('rollback'); assertComplete(ids, txs); writePackages(txs.map(newPackage), out); console.log(JSON.stringify({ requested: ids.length, written: txs.length, status: 'every claim UNRESOLVED; nothing verified' })) } catch (e) { fail(e) } finally { await c.end() }
+  const ids = queueIds(q, n); let c; try { c = await connect(); const txs = await fetchTransactions(c, ids); await c.query('rollback'); assertComplete(ids, txs); writePackages(txs.map(newPackage), out); console.log(JSON.stringify({ requested: ids.length, written: txs.length, status: 'every claim UNRESOLVED; nothing verified' })) } catch (e) { fail(e) } finally { await c?.end() }
 } else if (cmd === 'validate') {
   const dir = opt('dir'); if (!dir) die('usage: validate --dir <dir> [--offline] [--grant-expiry CATEGORY=YYYY-MM-DD|NONE ...]')
   const expiries = {}; argv.forEach((x, i) => { if (x === '--grant-expiry') { const m = /^([A-Z_]+)=(\d{4}-\d{2}-\d{2}|NONE)$/.exec(argv[i + 1] ?? ''); if (!m) die('--grant-expiry needs CATEGORY=YYYY-MM-DD (or CATEGORY=NONE for a grant that does not lapse)'); if (expiries[m[1]]) die(`--grant-expiry ${m[1]} given twice`); if (m[2] !== 'NONE' && !isDate(m[2])) die(`${m[2]} is not a real date`); expiries[m[1]] = m[2] } })
+  try { fs.readdirSync(dir) } catch (e) { die(`cannot read ${dir}: ${e.code}`, 2) }   // before any database connection
   if (argv.includes('--offline') && Object.keys(expiries).length) die('--grant-expiry has no effect with --offline (no grant is assumed); drop one of them')
   // the CURRENT grants come from the database (read-only); --offline assumes NONE, so every restricted candidate is checked as needing permission
-  let authorization = null; if (!argv.includes('--offline')) { const c = await connect(); try { authorization = await fetchAuthorization(c, expiries); await c.query('rollback') } catch (e) { fail(e) } finally { await c.end() } }
+  let authorization = null; if (!argv.includes('--offline')) { let c; try { c = await connect(); authorization = await fetchAuthorization(c, expiries); await c.query('rollback') } catch (e) { fail(e) } finally { await c?.end() } }
   let files; try { files = fs.readdirSync(dir).sort() } catch (e) { die(`cannot read ${dir}: ${e.code}`, 2) } const problems = []; const rows = []; const seen = new Set()
   for (const f of files) {
     const m = /^p-(\d+)\.json$/.exec(f); if (!m) { problems.push(`${f}: not an evidence package file (expected p-<id>.json); nothing in the directory is ignored`); continue }
@@ -40,7 +41,7 @@ if (cmd === 'init') {
 } else if (cmd === 'triage') {
   const q = opt('queue'); const out = opt('out'); if (!q || !out) die('usage: triage --queue <ptbnl queue csv> --out <new dir>')
   try { assertOutputAllowed(out) } catch (e) { die(e.message) }
-  const ids = queueIds(q); const c = await connect(); try {
+  const ids = queueIds(q); let c; try { c = await connect();
     const txs = await fetchTransactions(c, ids); await c.query('rollback'); assertComplete(ids, txs); const rows = triageRows(txs)
     const without = txs.filter((t) => !rows.some((r) => r.transaction_id === t.id)).map((t) => t.id); if (without.length) throw new Error(`the queue is stale: ${without.length} listed trades no longer have an unresolved player-to-be-named asset [${without.slice(0, 20).join(', ')}]; regenerate the queue`)
     fs.mkdirSync(out, { recursive: true, mode: 0o700 }); const cols = Object.keys(rows[0] ?? {})
@@ -48,5 +49,5 @@ if (cmd === 'init') {
     fs.writeFileSync(path.join(out, 'ptbnl-triage.csv'), [cols.join(','), ...rows.map((r) => cols.map((k) => cell(r[k])).join(','))].join('\n') + '\n', { mode: 0o600 })
     const by = (k) => rows.reduce((m, r) => ((m[r[k]] = (m[r[k]] ?? 0) + 1), m), {})
     console.log(JSON.stringify({ requested: ids.length, transactions: txs.length, ptbnl_assets: rows.length, by_action: by('action'), by_priority: by('priority') }))
-  } catch (e) { fail(e) } finally { await c.end() }
+  } catch (e) { fail(e) } finally { await c?.end() }
 } else die('usage: r8b-evidence.mjs init|validate|triage (see the header)')

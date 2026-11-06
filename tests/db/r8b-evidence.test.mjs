@@ -198,5 +198,15 @@ test('second review: encoded Wikipedia namespaces, Chadwick-org derivatives, val
   const run = (...a) => spawnSync(process.execPath, ['scripts/research/r8b-evidence.mjs', ...a], { cwd: root, encoding: 'utf8' })
   let r = run('validate', '--dir', 'a', '--offline', '--grant-expiry', 'MLB=2027-13-45'); assert.equal(r.status, 2); assert.doesNotMatch(r.stderr, /RangeError/)
   r = run('validate', '--dir', '/nonexistent-dir-for-test', '--offline'); assert.equal(r.status, 2); assert.match(r.stderr, /cannot read/)
-  r = run('validate', '--dir', 'a', '--offline', '--grant-expiry', 'MLB=NONE'); assert.equal(r.status, 2); assert.match(r.stderr, /no effect with --offline/)
+  r = run('validate', '--dir', os.tmpdir(), '--offline', '--grant-expiry', 'MLB=NONE'); assert.equal(r.status, 2); assert.match(r.stderr, /no effect with --offline/)
+})
+
+test('third review: aliases, mirrors, proxies and archive wrappers of derived sources are never independent; season, positions and origin are pinned', () => {
+  const ind = { assessment: 'LIKELY_INDEPENDENT', group: 'g', lineage_note: 'n' }
+  for (const u of ['https://www.github.com/chadwickbureau/register', 'https://codeload.github.com/chadwickbureau/register/zip/master', 'https://api.github.com/repos/chadwickbureau/register', 'https://raw.github.com/chadwickbureau/register/x', 'https://cdn.jsdelivr.net/gh/chadwickbureau/register@master/x',
+    'https://github.com/%63hadwickbureau/register', 'https://github.com//chadwickbureau/register', 'https://web.archive.org/web/2020/https://www.baseball-reference.com/x', 'https://news.example.com/mirror?u=https%3A%2F%2Fretrosheet.org%2Fx', 'https://someone.github.io/copy']) assert.match(V(withCand(cand('c1', u, { independence: ind }))).join(), /partly derived from the origin/, u)
+  assert.deepEqual(V(withCand(cand('c1', 'https://news.example.com/a', { independence: ind }))), [], 'an ordinary publisher is not caught')
+  const ok = withCand(cand('c1', 'https://news.example.com/a'))
+  for (const [mut, re] of [[(p) => { p.transaction.season = { verified: true } }, /season must be an integer/], [(p) => { p.transaction.origin_sources[0].position = { a: 1 } }, /position must be an integer/], [(p) => { p.origin.independence_group = 'other-group' }, /origin must be the BAI record's own origin/],
+    [(p) => { p.corroboration.assets[0].position = [1] }, /position must be an integer/], [(p) => { p.corroboration.assets[0].position = '1' }, /position must be an integer/]]) { const p = structuredClone(ok); mut(p); assert.match(V(p).join(), re) }
 })
