@@ -34,3 +34,5 @@ An external id; at least two trade packages, none empty; at least two distinct i
 3. The reviewer connects with their own credential from their own device and calls `research.enroll_reviewer(name, note)`; confirm one active row in `research.reviewers`.
 4. `research.certification_gate` stays **disabled** (a separate decision; it must stay off while automation holds the owner credential). Per-transaction verification does not need it.
 5. Agents prepare queues, drafts and proposals only; they never hold the reviewer credential or call `verify_transaction`.
+
+See also: [evidence workflow and pilot](r8b-evidence-workflow.md), [source-policy assessment](r8b-source-policy.md), [reviewer design](r8b-reviewer-workflow.md).
