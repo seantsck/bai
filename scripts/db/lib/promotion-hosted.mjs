@@ -24,7 +24,7 @@ const q = async (c, sql, p) => (await c.query(sql, p)).rows
 /** The 12 transaction read-model tables: the content tables must be empty (nothing transactional is public); the bookkeeping rows (refresh log, overview, withdrawal log) are only compared before and after. */
 const RM_BOOKKEEPING = ['rm_transaction_overview', 'rm_transaction_refreshes', 'rm_transaction_withdrawals']
 export async function readModelState (c) {
-  const tabs = (await q(c, `select quote_ident(c.relname) t from pg_class c where c.relnamespace = 'public'::regnamespace and c.relkind = 'r' and c.relname like 'rm\\_transaction%' order by 1`)).map((r) => r.t)
+  const tabs = (await q(c, `select quote_ident(c.relname) t from pg_class c where c.relnamespace = 'public'::regnamespace and c.relkind in ('r', 'p') and c.relname like 'rm\\_transaction%' order by 1`)).map((r) => r.t)
   const out = { tables: tabs.length, content_rows: 0, bookkeeping: {} }
   for (const t of tabs) { const n = Number((await q(c, `select count(*) n from public.${t}`))[0].n); if (RM_BOOKKEEPING.includes(t.replace(/"/g, ''))) out.bookkeeping[t] = n; else out.content_rows += n }
   return out
@@ -42,10 +42,13 @@ export async function readModelState (c) {
  */
 export async function readModelFacts (c) {
   const rm = await readModelState(c)
-  const ref = (await q(c, 'select count(*)::int n, max(refreshed_at) at from public.rm_transaction_refreshes'))[0]
-  const last = ref.n ? (await q(c, 'select generation_id::text g, transactions t, withheld_unauthorized w, refreshed_at at from public.rm_transaction_refreshes order by refreshed_at desc, generation_id desc limit 1'))[0] : null
-  const wd = (await q(c, 'select count(*)::int n, max(withdrawn_at) at from public.rm_transaction_withdrawals'))[0]
-  const since = (await q(c, 'select count(*)::int n, coalesce(sum(withdrawn_transactions), 0)::int withdrawn from public.rm_transaction_withdrawals where $1::timestamptz is null or withdrawn_at >= $1::timestamptz', [last?.at ?? null]))[0]
+  const ref = (await q(c, 'select count(*)::int n from public.rm_transaction_refreshes'))[0]
+  // the LATEST refresh is the highest generation (refreshed_at is a transaction start time, so overlapping transactions could order differently); only refresh-versus-withdrawal uses time, compared inside the database at full precision
+  const last = ref.n ? (await q(c, 'select generation_id::text g, transactions t, withheld_unauthorized w from public.rm_transaction_refreshes order by generation_id desc limit 1'))[0] : null
+  const wd = (await q(c, `select count(*)::int n,
+      coalesce(bool_or(withdrawn_at >= (select refreshed_at from public.rm_transaction_refreshes order by generation_id desc limit 1)), count(*) > 0) as after_refresh,
+      coalesce(sum(withdrawn_transactions) filter (where withdrawn_at >= (select refreshed_at from public.rm_transaction_refreshes order by generation_id desc limit 1)), sum(withdrawn_transactions), 0)::int as withdrawn_since
+    from public.rm_transaction_withdrawals`))[0]
   const ov = await q(c, 'select generation_id::text g, transactions t, withheld_unauthorized w, verified_complete vc, display_authorized_categories cats from public.rm_transaction_overview')
   const pub = (await q(c, `select count(*)::int n, count(*) filter (where status = 'VERIFIED_COMPLETE')::int vc,
     coalesce(array_agg(distinct generation_id::text) filter (where generation_id is not null), '{}') gens,
@@ -61,10 +64,15 @@ export async function readModelFacts (c) {
   const aggregates = (await q(c, 'select (select count(*) from public.rm_transaction_coverage)::int coverage, (select count(*) from public.rm_transaction_club_seasons)::int club_seasons'))[0]
   const granted = (await q(c, 'select attribution_category c from ingest.source_publication_grants')).map((r) => r.c)
   const cats = ov[0]?.cats ?? []
+  const allowed = [...OPEN_CATEGORIES, ...granted]
   const outside = cats.length ? (await q(c, 'select count(*)::int n from public.rm_transactions where not (source_categories <@ $1::text[])', [cats]))[0].n : pub.n
-  const unauthorizedNow = (await q(c, 'select count(*)::int n from public.rm_transactions where not (source_categories <@ $1::text[])', [[...OPEN_CATEGORIES, ...granted]]))[0].n
-  const lifecycle = wd.n && (!ref.n || new Date(wd.at) >= new Date(ref.at)) ? 'WITHDRAWN' : ref.n ? 'REFRESHED' : 'PROMOTED'
-  return { lifecycle, rm, refreshes: { n: ref.n, last }, withdrawals: { n: wd.n, since_refresh: since.n, withdrawn_since_refresh: since.withdrawn }, overview: ov, aggregates, child_orphans: childOrphans,
+  // the self-declared column AND the rows it summarises AND the real source of the transaction must each be authorized now (a swapped or hand-edited row cannot hide behind one of them)
+  const unauthorizedNow = (await q(c, `select count(*)::int n from public.rm_transactions r where cardinality(r.source_categories) = 0 or not (r.source_categories <@ $1::text[])
+      or exists (select 1 from public.rm_transaction_sources s where s.transaction_id = r.transaction_id and not (s.attribution_category = any ($1::text[])))
+      or r.source_categories is distinct from (select array_agg(distinct s.attribution_category order by s.attribution_category) from public.rm_transaction_sources s where s.transaction_id = r.transaction_id)
+      or not exists (select 1 from public.transactions t join public.sources so on so.id = t.source_id where t.id = r.transaction_id and so.attribution_category = any ($1::text[]))`, [allowed]))[0].n
+  const lifecycle = wd.n && wd.after_refresh ? 'WITHDRAWN' : ref.n ? 'REFRESHED' : 'PROMOTED'
+  return { lifecycle, rm, refreshes: { n: ref.n, last }, withdrawals: { n: wd.n, withdrawn_since_refresh: wd.withdrawn_since }, overview: ov, aggregates, child_orphans: childOrphans,
     published: { ...pub, outside_authorized: outside, unauthorized_now: unauthorizedNow }, granted }
 }
 
@@ -75,7 +83,7 @@ const OPEN_CATEGORIES = ['CHADWICK_REGISTER', 'WIKIPEDIA', 'BAI_RESEARCH', 'WIKI
 const publishedProblems = (f, generation) => {
   const p = []; const { published } = f
   if (published.n && (published.gens.length !== 1 || published.gens[0] !== generation)) p.push(`published rows carry generation(s) ${published.gens.join(',') || 'none'}, the latest refresh is ${generation}`)
-  if (published.unauthorized_now) p.push(`${published.unauthorized_now} published transaction(s) carry a source category that has no publication grant and is not openly licensed`)
+  if (published.unauthorized_now) p.push(`${published.unauthorized_now} published transaction(s) fail the category check (an empty, undeclared or unauthorized source category in the row, its source rows, or the transaction's own source; no publication grant and not openly licensed)`)
   if (published.orphans) p.push(`${published.orphans} published transaction(s) do not exist`)
   if (published.no_source) p.push(`${published.no_source} published transaction(s) have no source row (no attribution)`)
   if (f.child_orphans) p.push(`${f.child_orphans} read-model child row(s) belong to a transaction that is not published`)
@@ -109,7 +117,7 @@ export function readModelProblems (f) {
     }
     if (published.outside_authorized) p.push(`${published.outside_authorized} published transaction(s) carry a source category that is not authorized for display`)
     p.push(...publishedProblems(f, refreshes.last?.g))
-  }
+  } else p.push(`unknown read-model lifecycle ${JSON.stringify(f.lifecycle)}`)
   return p
 }
 
