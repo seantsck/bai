@@ -1,6 +1,6 @@
 // LOCAL-ONLY (no hosted connection exists in this process): the INDEPENDENT anchor for the release evidence of one owner-authorized draft release.
 //   node scripts/db/anchor-release-evidence.mjs --authorization <signed authorization.json> --snapshot-dir <post-release backup snapshot> --before-snapshot-dir <pre-release backup snapshot>
-//                                               --post-apply-report <the executor's post-apply report> --package <the R6 package> [--previous-evidence <file>] [--owner-keyring <dir>] --out <new anchor.json>
+//                                               --post-apply-report <the executor's post-apply report> --package <the R6 package> [--previous-evidence <file[,file...]>] [--owner-keyring <dir>] --out <new anchor.json>
 // It uses only artifacts that were captured independently of the evidence: the pre-release and post-release backup SNAPSHOTS (each verified with verify-snapshot) and the release executor's
 // row-level post-apply report. It checks, for the tables the authorization lists: the snapshot row counts differ by exactly the authorized delta; the report's row-count deltas are exactly the
 // authorized ones and it found no pre-existing row missing or modified; and that NO other table changed between the two snapshots except the authorized read-model refresh tables. The post-release
@@ -24,15 +24,16 @@ const opt = (k) => { const i = argv.indexOf(`--${k}`); return i >= 0 ? argv[i + 
 const die = (m, c = 1) => { console.error(`anchor: ${m}`); process.exit(c) }
 const sha = (b) => crypto.createHash('sha256').update(b).digest('hex')
 const [authFile, after, before, reportFile, out, pkgDir] = ['authorization', 'snapshot-dir', 'before-snapshot-dir', 'post-apply-report', 'out', 'package'].map(opt)
-if (![authFile, after, before, reportFile, out, pkgDir].every(Boolean)) die('usage: --authorization <file> --snapshot-dir <dir> --before-snapshot-dir <dir> --post-apply-report <file> --package <R6 package> [--previous-evidence <file>] [--owner-keyring <dir>] --out <new file>', 2)
+if (![authFile, after, before, reportFile, out, pkgDir].every(Boolean)) die('usage: --authorization <file> --snapshot-dir <dir> --before-snapshot-dir <dir> --post-apply-report <file> --package <R6 package> [--previous-evidence <file[,file...]>] [--owner-keyring <dir>] --out <new file>', 2)
 if (fs.existsSync(out)) die(`${out} already exists`, 2)
 
 {
   const authBytes = fs.readFileSync(authFile); const auth = JSON.parse(authBytes.toString('utf8'))
   const sig = verifyDetachedSignature(authBytes, `${authFile}.sig`, { keyring: path.resolve(opt('owner-keyring') ?? path.join(os.homedir(), '.config/bai-release/gnupg')), pinned: OWNER_SIGNING_FINGERPRINTS }); if (!sig.ok) die(`the authorization is not signed by the pinned owner key: ${sig.problems.join('; ')}`)
   const pv = verifyPackage(pkgDir); if (pv.length) die(`R6 package: ${pv.join('; ')}`); const pkg = loadPackage(pkgDir)
-  const prevEv = opt('previous-evidence') ? JSON.parse(fs.readFileSync(opt('previous-evidence'), 'utf8')) : null
-  const expectedBefore = (t) => prevEv?.tables?.[t]?.md5_after ?? (pkg.manifest.after?.[t] ?? pkg.manifest.baseline.fingerprints?.[t])?.md5
+  const prevState = {}   // table -> md5 as recorded by the LAST earlier release that touched it (the files are listed in release order)
+  for (const f of (opt('previous-evidence') ?? '').split(',').filter(Boolean)) for (const [t, rec] of Object.entries(JSON.parse(fs.readFileSync(f, 'utf8')).tables ?? {})) prevState[t] = rec.md5_after
+  const expectedBefore = (t) => prevState[t] ?? (pkg.manifest.after?.[t] ?? pkg.manifest.baseline.fingerprints?.[t])?.md5
   for (const d of [after, before]) { const r = spawnSync(process.execPath, ['scripts/db/verify-snapshot.mjs', d], { cwd: root, encoding: 'utf8' }); if (r.status !== 0) die(`verify-snapshot failed for ${d}: ${(r.stdout + r.stderr).trim().split('\n').pop()}`) }
   const mAfter = JSON.parse(fs.readFileSync(path.join(after, 'manifest.json'), 'utf8')); const mBefore = JSON.parse(fs.readFileSync(path.join(before, 'manifest.json'), 'utf8'))
   const reportBytes = fs.readFileSync(reportFile); const report = JSON.parse(reportBytes.toString('utf8'))
@@ -57,8 +58,17 @@ if (fs.existsSync(out)) die(`${out} already exists`, 2)
       if (f.md5 !== expectedBefore(t)) die(`${t}: the pre-release content is not the recorded R6/previous state (${f.md5} vs ${expectedBefore(t)}): the table was changed before this release`)
       tables[t].md5_before = f.md5
     }
-    await cb.end()
     const c = new pg.Client({ connectionString: url }); await c.connect()
+    // ROW LEVEL, both restored databases: every pre-release row must be present, byte-identical, in the post-release table, and the table must have gained exactly the authorized number of rows;
+    // refresh tables are excluded by the authorization. This closes a same-count edit made between the two snapshots, which counts alone cannot see.
+    for (const t of Object.keys(tables)) {
+      const rowsOf = async (cl) => (await cl.query(`select md5(to_jsonb(z)::text) h from ${t} z`)).rows.map((r) => r.h)
+      const pre = await rowsOf(cb); const post = await rowsOf(c); const have = new Map(); for (const h of post) have.set(h, (have.get(h) ?? 0) + 1)
+      let missing = 0; for (const h of pre) { const n = have.get(h) ?? 0; if (n > 0) have.set(h, n - 1); else missing++ }
+      if (missing) die(`${t}: ${missing} pre-release row(s) are missing or modified in the post-release snapshot (a change between the two snapshots): no anchor written`)
+      if (post.length - pre.length !== tables[t].delta) die(`${t}: the post-release table gained ${post.length - pre.length} rows, the authorization allows ${tables[t].delta}`)
+    }
+    await cb.end()
     for (const t of Object.keys(tables)) {
       const f = (await c.query('select ingest.promotion_fingerprint($1) f', [t])).rows[0].f
       if (Number(f.n) !== tables[t].n_after) die(`${t}: the restored snapshot holds ${f.n} rows, the manifest says ${tables[t].n_after}`)

@@ -38,7 +38,7 @@ export async function cumulativeReleases (c, pkg, dirs, { keyring, pinned, proje
   const problems = []; const accepted = {}; const facts = []
   const r6fp = (t) => pkg.manifest.after?.[t] ?? pkg.manifest.baseline.fingerprints?.[t]
   const r6n = (t) => r6fp(t)?.n
-  if (typeof projectRef !== 'string' || !/^[a-z]{20}$/.test(projectRef)) problems.push('cumulative verification needs the project reference')
+  if (typeof projectRef !== 'string' || !/^[a-z0-9]{20}$/.test(projectRef)) problems.push('cumulative verification needs the project reference')
   const promoted = (await q(c, "select max(at) at from ingest.promotion_events where manifest_sha256 = $1 and event = 'PROMOTED'", [pkg.sha]))[0]?.at
   const loaded = []
   for (const dir of dirs) {

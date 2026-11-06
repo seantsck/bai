@@ -283,9 +283,10 @@ test('the argument parser refuses unsupported and dangerous flags, duplicates an
   }
   assert.deepEqual(parseArgs(['status', '--manifest', 'a']).o, { manifest: 'a' })
   assert.deepEqual(parseArgs(['promote', '--package', 'p', '--authorization', 'a', '--attribution-evidence', 'e', '--parity-record', 'r', '--owner-keyring', 'k']).o, { package: 'p', authorization: 'a', 'attribution-evidence': 'e', 'parity-record': 'r', 'owner-keyring': 'k' })
-  assert.deepEqual(parseArgs(['verify-promoted', '--package', 'p', '--release-evidence', 'd']).o, { package: 'p', 'release-evidence': 'd' })
+  assert.deepEqual(parseArgs(['verify-promoted', '--package', 'p', '--release-evidence', 'd', '--expect-head', 'h']).o, { package: 'p', 'release-evidence': 'd', 'expect-head': 'h' })
+  assert.match(parseArgs(['verify-promoted', '--package', 'p', '--release-evidence', 'd']).error, /needs --expect-head/); assert.match(parseArgs(['verify-promoted', '--package', 'p', '--expect-head', 'h']).error, /needs --release-evidence/); assert.deepEqual(parseArgs(['verify-promoted', '--package', 'p']).o, { package: 'p' })
   assert.deepEqual(parseArgs(['record-release-evidence', '--package', 'p', '--authorization', 'a.json', '--anchor', 'n.json', '--out', 'e.json', '--previous-evidence', 'x']).o, { package: 'p', authorization: 'a.json', anchor: 'n.json', out: 'e.json', 'previous-evidence': 'x' })
-  assert.match(parseArgs(['record-release-evidence', '--package', 'p', '--authorization', 'a.json', '--out', 'e.json']).error, /missing --anchor/); assert.match(parseArgs(['verify-promoted', '--package', 'p', '--release-evidence', 'a', '--release-evidence', 'b']).error, /given twice/)
+  assert.match(parseArgs(['record-release-evidence', '--package', 'p', '--authorization', 'a.json', '--out', 'e.json']).error, /missing --anchor/); assert.match(parseArgs(['verify-promoted', '--package', 'p', '--release-evidence', 'a', '--release-evidence', 'b', '--expect-head', 'h']).error, /given twice/)
   assert.match(parseArgs(['record-release-evidence', '--authorization', 'a', '--out', 'b', '--confirm-hosted', 'x']).error, /refusing|unsupported/)
 })
 
@@ -472,6 +473,7 @@ test('cumulative releases: a later owner-signed, audited draft release is excuse
       assert.equal((await verifyPromoted(c2, pkg, { expectedMlb: 2, releases: [r1.dir, r2.dir], keyring: pubHome, pinned: [FPR], projectRef: REF, expectHead: headOf(r2) })).ok, true)
       assert.match((await verifyPromoted(c2, pkg, { expectedMlb: 2, releases: [r1.dir, r2.dir], keyring: pubHome, pinned: [FPR], projectRef: REF, expectHead: headOf(r1) })).problems.join(' | '), /expected head .* a release is missing or the history was rolled back/)
       assert.match((await verifyPromoted(c2, pkg, { expectedMlb: 2, releases: [r1.dir, r2.dir], keyring: pubHome, pinned: [FPR], projectRef: null })).problems.join(' | '), /needs the project reference/)
+      assert.doesNotMatch((await verifyPromoted(c2, pkg, { expectedMlb: 2, releases: [r1.dir, r2.dir], keyring: pubHome, pinned: [FPR], projectRef: 'abc123def456ghi789jk' })).problems.join(' | '), /needs the project reference/, 'a project reference with digits is a valid reference')
       // a release whose evidence names the wrong predecessor, or none
       const alien = path.join(tmp, 'alien-prev'); fs.writeFileSync(alien, 'not a release evidence'); const r2b = await (async () => { const e = JSON.parse(fs.readFileSync(r2.ep, 'utf8')); e.previous_evidence_sha256 = sha256(fs.readFileSync(alien)); fs.writeFileSync(r2.ep, JSON.stringify(e, null, 1)); sign(r2.ep); return r2 })()
       assert.match((await v2([r1.dir, r2b.dir])).problems.join(' | '), /release chain is broken/, 'a signed release naming the wrong predecessor')
