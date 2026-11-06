@@ -1,11 +1,11 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { partialYear, partialYearText, editorialNote, EDITORIAL_NOTE_2021, PARTIAL_YEAR_DETAIL } from '../../lib/partial-years.ts'
+import { partialBanner, PARTIAL_RECONSTRUCTION_STATEMENT, partialYear, partialYearText, editorialNote, EDITORIAL_NOTE_2021, PARTIAL_YEAR_DETAIL } from '../../lib/partial-years.ts'
 
 test('2021 with 205 represented shows 205 of 612, 407 absent, and no inference or rates', () => {
   const p = partialYear(2021, 205)
   assert.deepEqual(p, { year: 2021, documented: 612, represented: 205, absent: 407 })
-  assert.equal(partialYearText(p), '2021: 205 of 612 documented selections are represented; 407 are absent.')
+  assert.equal(partialYearText(p), '2021: Partial reconstruction — not a complete draft census. 205 of the 612 selections stated by BAI’s source are represented; 407 are absent. The 612 is the source’s stated total, not an independently verified census.')
   assert.match(PARTIAL_YEAR_DETAIL, /not an unsigned player or a failed outcome/)
   assert.match(PARTIAL_YEAR_DETAIL, /no signing outcome may be inferred from a missing row/)
   assert.match(PARTIAL_YEAR_DETAIL, /No league-wide or club-efficiency rates/)
@@ -32,7 +32,7 @@ test('the editorially-selected later-round note belongs to 2021 only', () => {
 test('2022 is declared: 616 documented, opening picks 1 to 80, and nothing is shown until rows are published', async () => {
   const { partialYear: py, partialYearText: pt, editorialNote: en } = await import('../../lib/partial-years.ts')
   assert.equal(py(2022, 0), null, 'no notice before any 2022 selection is on the database')
-  assert.equal(pt(py(2022, 178)), '2022: 178 of 616 documented selections are represented; 438 are absent.')
+  assert.equal(pt(py(2022, 178)), '2022: Partial reconstruction — not a complete draft census. 178 of the 616 selections stated by BAI’s source are represented; 438 are absent. The 616 is the source’s stated total, not an independently verified census.')
   assert.equal(en([2022]), 'For the incomplete 2022 draft, picks 1 to 80 are listed in full, but later-round entries are editorially selected notable players, not a representative sample.')
   assert.equal(en([2021, 2022]).split('. ').length, 2, 'one sentence per declared year')
   assert.equal(en([2020, 2019]), null)
@@ -106,4 +106,14 @@ test('2024 and 2025 are declared: 615 documented each, the absent selections tol
   assert.equal(at(py(2024, 131)), "Of the 484 absent: 470 are not listed by BAI's source (a source gap); 14 listed selections are held for identity or collision review.")
   assert.match(en([2024]), /^For the incomplete 2024 draft, picks 1 to 74 are listed in full/)
   assert.match(en([2025]), /^For the incomplete 2025 draft, picks 1 to 75 are listed in full/)
+})
+
+test('every page that lists picks of a declared partial year leads with the partial-reconstruction statement, and the years page states that the total is the source’s claim', () => {
+  assert.equal(PARTIAL_RECONSTRUCTION_STATEMENT, 'Partial reconstruction — not a complete draft census.')
+  assert.equal(partialBanner([2020, 2019]), null)
+  assert.equal(partialBanner([2021]), `${PARTIAL_RECONSTRUCTION_STATEMENT} ${EDITORIAL_NOTE_2021}`)
+  assert.match(partialBanner([2024, 2025]), /^Partial reconstruction — not a complete draft census\. For the incomplete 2024 draft.*2025 draft/)
+  const p = partialYear(2025, 126); assert.deepEqual(p, { year: 2025, documented: 615, represented: 126, absent: 489 })
+  const t = partialYearText(p); assert.match(t, /^2025: Partial reconstruction — not a complete draft census\. /); assert.match(t, /126 of the 615 selections stated by BAI’s source are represented/); assert.match(t, /not an independently verified census/)
+  assert.doesNotMatch(t, /\b(verified complete|complete census of|all 615)\b/i)
 })
