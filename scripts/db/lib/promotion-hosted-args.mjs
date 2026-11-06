@@ -1,7 +1,8 @@
 // Strict argument parser of scripts/db/promotion-hosted.mjs (kept apart so that the tests can import it without running the CLI).
 const SPEC = {
   status: { need: ['manifest'], opt: [] },
-  'verify-promoted': { need: ['package'], opt: [] },
+  'verify-promoted': { need: ['package'], opt: ['release-evidence', 'expect-head'] },
+  'record-release-evidence': { need: ['package', 'authorization', 'anchor', 'out'], opt: ['previous-evidence'] },
   promote: { need: ['package', 'authorization', 'attribution-evidence', 'parity-record'], opt: [] },
   withdraw: { need: ['manifest', 'authorization'], opt: [] },
   emergency: { need: ['manifest', 'authorization'], opt: [] },
@@ -30,6 +31,10 @@ export function parseArgs (argv, usage = 'usage: see scripts/db/promotion-hosted
     o[name] = rest[i + 1]
   }
   for (const n of SPEC[cmd].need) if (!(n in o)) return { error: `missing --${n}` }
+  if (cmd === 'verify-promoted') {   // the head of the release history is pinned whenever release evidence is used, and is meaningless without it
+    if ('release-evidence' in o && !('expect-head' in o)) return { error: '--release-evidence needs --expect-head <sha256 of the latest signed release evidence> (a release removed from the end of the history cannot otherwise be seen)' }
+    if ('expect-head' in o && !('release-evidence' in o)) return { error: '--expect-head needs --release-evidence' }
+  }
   return { cmd, o }
 }
 

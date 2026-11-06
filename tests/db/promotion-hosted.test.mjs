@@ -15,6 +15,7 @@ import { takeSnapshot } from '../../scripts/db/lib/snapshot.mjs'
 import { buildPromotionRecord, contentTreeHash, compareExports } from '../../scripts/db/lib/final-parity.mjs'
 import { SESSION_SQL, buildPackage, loadPackage, sha256, verifyPackage, writePackage } from '../../scripts/db/lib/promotion.mjs'
 import { AUTHORIZATION_FORMAT, OWNER_SIGNING_FINGERPRINTS, attemptLedger, verifyAuthorization, verifyDetachedSignature } from '../../scripts/db/lib/promotion-authorization.mjs'
+import { ANCHOR_FORMAT, RELEASE_EVIDENCE_FORMAT, anchorChecks, cumulativeReleases, buildReleaseEvidence, releaseDirs } from '../../scripts/db/lib/promotion-cumulative.mjs'
 import { beginAttempt, checkEvidence, draftAuthorization, hostedPreflight, observeState, operateHosted, promoteHosted, promoteInputs, readModelFacts, readModelProblems, readModelState, restPublicDelta, resolveState, serverReported, statusHosted, verifyPromoted, verifyPromotedHosted, websiteVisibleDelta } from '../../scripts/db/lib/promotion-hosted.mjs'
 import { parseArgs } from '../../scripts/db/lib/promotion-hosted-args.mjs'
 import { buildBaseline, importSample } from './promotion-fixture.mjs'
@@ -282,6 +283,11 @@ test('the argument parser refuses unsupported and dangerous flags, duplicates an
   }
   assert.deepEqual(parseArgs(['status', '--manifest', 'a']).o, { manifest: 'a' })
   assert.deepEqual(parseArgs(['promote', '--package', 'p', '--authorization', 'a', '--attribution-evidence', 'e', '--parity-record', 'r', '--owner-keyring', 'k']).o, { package: 'p', authorization: 'a', 'attribution-evidence': 'e', 'parity-record': 'r', 'owner-keyring': 'k' })
+  assert.deepEqual(parseArgs(['verify-promoted', '--package', 'p', '--release-evidence', 'd', '--expect-head', 'h']).o, { package: 'p', 'release-evidence': 'd', 'expect-head': 'h' })
+  assert.match(parseArgs(['verify-promoted', '--package', 'p', '--release-evidence', 'd']).error, /needs --expect-head/); assert.match(parseArgs(['verify-promoted', '--package', 'p', '--expect-head', 'h']).error, /needs --release-evidence/); assert.deepEqual(parseArgs(['verify-promoted', '--package', 'p']).o, { package: 'p' })
+  assert.deepEqual(parseArgs(['record-release-evidence', '--package', 'p', '--authorization', 'a.json', '--anchor', 'n.json', '--out', 'e.json', '--previous-evidence', 'x']).o, { package: 'p', authorization: 'a.json', anchor: 'n.json', out: 'e.json', 'previous-evidence': 'x' })
+  assert.match(parseArgs(['record-release-evidence', '--package', 'p', '--authorization', 'a.json', '--out', 'e.json']).error, /missing --anchor/); assert.match(parseArgs(['verify-promoted', '--package', 'p', '--release-evidence', 'a', '--release-evidence', 'b', '--expect-head', 'h']).error, /given twice/)
+  assert.match(parseArgs(['record-release-evidence', '--authorization', 'a', '--out', 'b', '--confirm-hosted', 'x']).error, /refusing|unsupported/)
 })
 
 test('the CLI itself: unsupported flags exit 2; the build refuses a complete promotion signed by a key that is not the pinned owner key, before connecting; the local tool still refuses hosted', () => {
@@ -356,6 +362,146 @@ test('promote: ONE transaction, a result lost AFTER the commit is resolved from 
   // the artifact is spent, the promotion cannot be repeated by any route
   assert.match(await refused(promoteHosted(ctx(), { pkgDir, authFile: auth, evidenceFile, parityFile })), /already used on this host/)
   assert.match(await refused(promoteHosted(ctx(), { pkgDir, authFile: authorize('promote'), evidenceFile, parityFile })), /already committed|NOT_PROMOTED|already holds/)
+})
+
+test('cumulative releases: a later owner-signed, audited draft release is excused only through a signed authorization AND signed evidence anchored independently, exact deltas, a chained release history and the recorded fingerprints; every other difference still fails', async () => {
+  await main.end(); await admin.query(`create database g6h_cum template ${MAIN}`); main = await open(MAIN)   // the promoted state, copied
+  const cu = await open('g6h_cum')
+  const tabs = ['ingest.release_audits', 'public.schools']
+  const fpOf = async (t) => (await rows(cu, 'select ingest.promotion_fingerprint($1) f', [t]))[0].f
+  try {
+    const verify = (releases = null, o = {}) => verifyPromoted(cu, pkg, { expectedMlb: 2, releases, keyring: pubHome, pinned: [FPR], projectRef: REF, ...o })
+    const base = await verify(); assert.equal(base.ok, true, JSON.stringify(base.problems))
+    const stranger = path.join(tmp, 'gpg-stranger'); fs.mkdirSync(stranger, { mode: 0o700 }); sh('gpg', ['--batch', '--pinentry-mode', 'loopback', '--passphrase', '', '--quick-generate-key', 'Stranger', 'ed25519', 'sign', 'never'], { GNUPGHOME: stranger })
+    const strangerFpr = /^fpr:::::::::([0-9A-F]{40}):/m.exec(sh('gpg', ['--batch', '--with-colons', '--list-keys'], { GNUPGHOME: stranger }))[1]
+    // ---- a FICTIONAL draft release: two school rows and its audit row (the real release tool writes many more tables; the verifier treats every table alike) ----
+    const KEY = 'fixture-draft-2099-n2'; const MAN = hex() + hex()
+    const preFp = Object.fromEntries(await Promise.all(tabs.map(async (t) => [t, await fpOf(t)])))
+    await cu.query("insert into public.schools (slug, name, school_type) values ('fixture-school-a', 'Fixture School A', 'COLLEGE'), ('fixture-school-b', 'Fixture School B', 'COLLEGE')")
+    await cu.query("insert into ingest.release_audits (release_key, manifest_sha256, draft_year, operator, counts, entries) values ($1, $2, 2099, 'Fixture Operator', $3, '[]')", [KEY, MAN, { held: 0, skipped: 0, imported: 2, selections: 2, held_in_manifest: 0 }])
+    const withoutRelease = await verify(); assert.equal(withoutRelease.ok, false); assert.match(withoutRelease.problems.join(), /tables differ from the release state: .*release_audits/, 'with no release evidence the difference is a failure, as before')
+    let n = 0
+    const mkAuth = (authOver = {}, { sigWith = signHome, who = FPR, signed = true, exp = { 'ingest.release_audits': 1, 'public.schools': 2 }, key = KEY, man = MAN } = {}) => {
+      const dir = path.join(tmp, `cum-${++n}`); fs.mkdirSync(dir)
+      const auth = { format: 'bai-draft-release-authorization/1', operation: 'apply-draft-release', project_ref: REF, release_key: key, manifest_sha256: man, selections: 2, expected_after_apply: exp, ...authOver }
+      const af = path.join(dir, 'authorization.json'); fs.writeFileSync(af, JSON.stringify(auth, null, 1)); if (signed) sign(af, sigWith, who)
+      return { dir, af, evPath: path.join(dir, 'evidence.json') }
+    }
+    /** The anchor the independent snapshot would give (in the real flow: anchor-release-evidence.mjs on a disposable restore of the post-release snapshot). Here: the fixture state right after the release. */
+    const anchorFor = async (r, { before = preFp, patch = {} } = {}) => {
+      const authSha = sha256(fs.readFileSync(r.af)); const af = path.join(r.dir, 'anchor.json'); const t = {}
+      for (const [tb, d] of Object.entries(JSON.parse(fs.readFileSync(r.af, 'utf8')).expected_after_apply)) { const f = await fpOf(tb); t[tb] = { n_before: Number(f.n) - d, md5_before: before[tb]?.md5, delta: d, n_after: Number(f.n), md5_after: f.md5 } }
+      fs.writeFileSync(af, JSON.stringify({ format: ANCHOR_FORMAT, authorization_sha256: authSha, release_key: KEY, snapshot_manifest_sha256: hex() + hex(), before_manifest_sha256: hex() + hex(), post_apply_report_sha256: hex() + hex(), post_apply_rows_sha256: hex() + hex(), tables: t, ...patch }, null, 1)); return af
+    }
+    const signedEvidence = async (r, { prev = null, patch = {}, sigWith = signHome, who = FPR, sign: doSign = true } = {}) => {
+      const ev = await buildReleaseEvidence(cu, { authorizationFile: r.af, anchorFile: await anchorFor(r), previousEvidenceFile: prev, r6ManifestSha256: pkg.sha })
+      const e = { ...ev, ...patch }; fs.writeFileSync(r.evPath, JSON.stringify(e, null, 1)); if (doSign) sign(r.evPath, sigWith, who); return e
+    }
+    const good = mkAuth(); const ev = await signedEvidence(good)
+    assert.equal(ev.format, RELEASE_EVIDENCE_FORMAT); assert.equal(ev.previous_evidence_sha256, null); assert.equal(ev.r6_manifest_sha256, pkg.sha); assert.deepEqual(Object.keys(ev.tables).sort(), tabs)
+    const ok = await verify([good.dir]); assert.equal(ok.ok, true, JSON.stringify(ok.problems)); assert.deepEqual(ok.facts.tables_differing, []); assert.deepEqual(ok.facts.tables_excused_by_releases.sort(), tabs); assert.equal(ok.facts.cumulative_releases[0].release_key, KEY)
+    const fails = async (name, dirs, re, o = {}) => { const r = await verify(dirs, o); assert.equal(r.ok, false, `${name}: must fail`); assert.match(r.problems.join(' | '), re, name) }
+    // ---- THE ATTACK (security review of PR #75): same-count tampering of a table the release changed, evidence recomputed from the tampered state ----
+    await cu.query("update public.schools set name = 'Tampered by an attacker' where slug = 'fixture-school-a'")
+    { const f = await fpOf('public.schools'); const forged = { ...ev, tables: { ...ev.tables, 'public.schools': { ...ev.tables['public.schools'], md5_after: f.md5 } } }
+      // 1. the forged evidence left unsigned
+      fs.writeFileSync(good.evPath, JSON.stringify(forged, null, 1)); fs.rmSync(`${good.evPath}.sig`, { force: true }); await fails('forged, UNSIGNED evidence (the attack)', [good.dir], /evidence is not signed by the pinned owner key/)
+      // 2. the old signature kept over the edited bytes
+      fs.writeFileSync(good.evPath, JSON.stringify(ev, null, 1)); sign(good.evPath); const oldSig = fs.readFileSync(`${good.evPath}.sig`); fs.writeFileSync(good.evPath, JSON.stringify(forged, null, 1)); fs.writeFileSync(`${good.evPath}.sig`, oldSig); await fails('forged evidence carrying the OLD valid signature', [good.dir], /evidence is not signed by the pinned owner key/)
+      // 3. the attacker signs with his own key
+      sign(good.evPath, stranger, strangerFpr); await fails('forged evidence signed by a FOREIGN key', [good.dir], /evidence is not signed by the pinned owner key/)
+      // 4. the authentic evidence, with the tampered table: the recorded fingerprint no longer matches
+      fs.writeFileSync(good.evPath, JSON.stringify(ev, null, 1)); sign(good.evPath); await fails('authentic signed evidence, table tampered afterwards', [good.dir], /public\.schools differs from the state recorded/)
+      // 5. an evidence file built from the tampered state is refused by the builder (it checks the anchor), so it cannot even be produced for signing
+      await assert.rejects(buildReleaseEvidence(cu, { authorizationFile: good.af, anchorFile: path.join(good.dir, 'anchor.json'), r6ManifestSha256: pkg.sha }), /no longer matches the independently anchored release state/)
+    }
+    await cu.query("update public.schools set name = 'Fixture School A' where slug = 'fixture-school-a'"); assert.equal((await verify([good.dir])).ok, true, 'restoring the row restores the recorded state')
+    // ---- every other difference ----
+    { const r = mkAuth({}, { signed: false }); await signedEvidence(r); await fails('an unsigned authorization excuses nothing', [r.dir], /authorization is not signed by the pinned owner key/) }
+    { const r = mkAuth({}, { sigWith: stranger, who: strangerFpr }); await signedEvidence(r); await fails('an authorization signed by another key', [r.dir], /authorization is not signed by the pinned owner key/) }
+    { const r = mkAuth(); await signedEvidence(r); fs.writeFileSync(r.af, fs.readFileSync(r.af, 'utf8').replace('"selections": 2', '"selections": 3')); await fails('an authorization edited after signing', [r.dir], /authorization is not signed by the pinned owner key/) }
+    { const r = mkAuth({ project_ref: 'a'.repeat(20) }); await signedEvidence(r); await fails('another project', [r.dir], /another project/) }
+    { const r = mkAuth({ operation: 'promote' }); await signedEvidence(r); await fails('another operation', [r.dir], /not a draft-release authorization/) }
+    { const r = mkAuth(); const e = await signedEvidence(r, { patch: { authorization_sha256: hex() + hex() } }); await fails('evidence bound to another authorization', [r.dir], /not bound to this authorization/) }
+    { const r = mkAuth(); await signedEvidence(r, { patch: { audit_id: '999999' } }); await fails('evidence naming another audit', [r.dir], /names audit 999999/) }
+    { const r = mkAuth(); await signedEvidence(r, { patch: { r6_manifest_sha256: hex() + hex() } }); await fails('evidence for another R6 promotion', [r.dir], /another R6 promotion/) }
+    { const r = mkAuth(); await signedEvidence(r, { patch: { anchor: undefined } }); await fails('evidence without an independent anchor', [r.dir], /no independent anchor/) }
+    { const r = mkAuth(); await signedEvidence(r, { patch: { format: 'bai-draft-release-evidence/1' } }); await fails('a v1 evidence file is never accepted, even signed', [r.dir], /unknown format/) }
+    { const other = hex() + hex(); const r = mkAuth({}, { man: other }); const e = { ...ev, manifest_sha256: other, authorization_sha256: sha256(fs.readFileSync(r.af)) }; fs.writeFileSync(r.evPath, JSON.stringify(e)); sign(r.evPath); await fails('no database audit for the release', [r.dir], /database holds 0 release audit\(s\) for this release key and manifest/) }
+    { const r = mkAuth({ selections: 3 }); await signedEvidence(r); await fails('audit counts that differ from the authorized selection count', [r.dir], /audit counts .* do not match the authorized 3/) }
+    { const r = mkAuth(); const e = { ...ev, authorization_sha256: sha256(fs.readFileSync(r.af)), tables: { ...ev.tables, 'public.schools': { ...ev.tables['public.schools'], delta: 5, n_after: ev.tables['public.schools'].n_after + 3 } } }; fs.writeFileSync(r.evPath, JSON.stringify(e)); sign(r.evPath); await fails('a signed evidence delta different from the authorized one', [r.dir], /differs from the authorized 2/) }
+    { const r = mkAuth(); const e = { ...ev, authorization_sha256: sha256(fs.readFileSync(r.af)), tables: { ...ev.tables, 'public.schools': { ...ev.tables['public.schools'], n_before: ev.tables['public.schools'].n_before - 1 } } }; fs.writeFileSync(r.evPath, JSON.stringify(e)); sign(r.evPath); await fails('counts that do not chain from the R6 state', [r.dir], /do not chain from the previous state/) }
+    { const r = mkAuth(); const e = { ...ev, authorization_sha256: sha256(fs.readFileSync(r.af)), tables: { ...ev.tables, 'public.schools': { ...ev.tables['public.schools'], md5_before: hex() } } }; fs.writeFileSync(r.evPath, JSON.stringify(e)); sign(r.evPath); await fails('content before the release is not the recorded previous state (a change absorbed into the anchor)', [r.dir], /table was changed between the previous state and this release/) }
+    { const r = mkAuth(); const e = { ...ev, authorization_sha256: sha256(fs.readFileSync(r.af)), tables: { ...ev.tables, 'public.sources': { n_before: 1, delta: 1, n_after: 2, md5_after: 'x' } } }; fs.writeFileSync(r.evPath, JSON.stringify(e)); sign(r.evPath); await fails('evidence for a table the authorization does not list', [r.dir], /not exactly the authorized tables/) }
+    // ---- stale evidence: a row edited / added / deleted after the release ----
+    await cu.query("update public.schools set name = 'Edited later' where slug = 'fixture-school-a'"); await fails('a row edited after the release', [good.dir], /public\.schools differs from the state recorded/)
+    await cu.query("update public.schools set name = 'Fixture School A' where slug = 'fixture-school-a'")
+    await cu.query("insert into public.schools (slug, name, school_type) values ('fixture-extra', 'Extra', 'COLLEGE')"); await fails('an extra row beyond the authorized delta', [good.dir], /public\.schools differs from the state recorded/)
+    await cu.query("delete from public.schools where slug = 'fixture-extra'")
+    await cu.query("insert into public.players (slug, full_name, display_name) values ('cum-drift', 'Drift', 'Drift')"); await fails('an unrelated unauthorized change still fails with a release present', [good.dir], /tables differ from the release state: .*players/)
+    await cu.query("delete from public.players where slug = 'cum-drift'"); assert.equal((await verify([good.dir])).ok, true)
+    await assert.rejects(cu.query("update ingest.release_audits set counts = counts where release_key = $1", [KEY]), /append-only|cannot be/)
+    // ---- duplicate audits ----
+    { const dup = mkAuth(); await signedEvidence(dup); await fails('the same audit twice', [good.dir, dup.dir], /second evidence directory for the same audit|release chain is broken/) }
+    await assert.rejects(cu.query("insert into ingest.release_audits (release_key, manifest_sha256, draft_year, operator, counts, entries) values ($1, $2, 2099, 'Fixture Operator', $3, '[]')", [KEY, MAN, { held: 0, skipped: 0, imported: 2, selections: 2, held_in_manifest: 0 }]), /unique|duplicate/, 'the database itself refuses a second audit with the same key and manifest')
+    // ---- an audited release without signed evidence is a difference nobody vouched for ----
+    await cu.query("insert into ingest.release_audits (release_key, manifest_sha256, draft_year, operator, counts, entries) values ('fixture-unvouched', $1, 2099, 'Fixture Operator', $2, '[]')", [hex() + hex(), { held: 0, skipped: 0, imported: 1, selections: 1, held_in_manifest: 0 }])
+    await fails('an audit applied after the promotion with no signed evidence', [good.dir], /audit \d+ \(fixture-unvouched\) was applied after the R6 promotion and has no signed release evidence|differs from the state/)
+    // ---- a SECOND release chains from the first ----
+    // (the unvouched audit above is a separate fixture; use a fresh copy of the promoted state for the chain)
+    await cu.end()
+    await main.end(); await admin.query('drop database g6h_cum'); await admin.query(`create database g6h_cum template ${MAIN}`); main = await open(MAIN)
+    const c2 = await open('g6h_cum')
+    try {
+      const v2 = (releases) => verifyPromoted(c2, pkg, { expectedMlb: 2, releases, keyring: pubHome, pinned: [FPR], projectRef: REF })
+      const fp2 = async (t) => (await rows(c2, 'select ingest.promotion_fingerprint($1) f', [t]))[0].f
+      const release = async (key, slug, prev) => {
+        const man = hex() + hex(); const pre = { 'ingest.release_audits': (await fp2('ingest.release_audits')).md5, 'public.schools': (await fp2('public.schools')).md5 }; await c2.query("insert into public.schools (slug, name, school_type) values ($1, $2, 'COLLEGE')", [slug, `School ${slug}`])
+        await c2.query("insert into ingest.release_audits (release_key, manifest_sha256, draft_year, operator, counts, entries) values ($1, $2, 2099, 'Fixture Operator', $3, '[]')", [key, man, { held: 0, skipped: 0, imported: 1, selections: 1, held_in_manifest: 0 }])
+        const dir = path.join(tmp, `chain-${key}`); fs.mkdirSync(dir); const auth = { format: 'bai-draft-release-authorization/1', operation: 'apply-draft-release', project_ref: REF, release_key: key, manifest_sha256: man, selections: 1, expected_after_apply: { 'ingest.release_audits': 1, 'public.schools': 1 } }
+        const af = path.join(dir, 'authorization.json'); fs.writeFileSync(af, JSON.stringify(auth, null, 1)); sign(af)
+        const t = {}; for (const [tb, d] of Object.entries(auth.expected_after_apply)) { const f = await fp2(tb); t[tb] = { n_before: Number(f.n) - d, md5_before: pre[tb], delta: d, n_after: Number(f.n), md5_after: f.md5 } }
+        const anchor = path.join(dir, 'anchor.json'); fs.writeFileSync(anchor, JSON.stringify({ format: ANCHOR_FORMAT, authorization_sha256: sha256(fs.readFileSync(af)), release_key: key, snapshot_manifest_sha256: hex() + hex(), before_manifest_sha256: hex() + hex(), post_apply_report_sha256: hex() + hex(), post_apply_rows_sha256: hex() + hex(), tables: t }))
+        const e = await buildReleaseEvidence(c2, { authorizationFile: af, anchorFile: anchor, previousEvidenceFile: prev, r6ManifestSha256: pkg.sha }); const ep = path.join(dir, 'evidence.json'); fs.writeFileSync(ep, JSON.stringify(e, null, 1)); sign(ep); return { dir, ep, key }
+      }
+      const r1 = await release('chain-one', 'chain-a', null); const r2 = await release('chain-two', 'chain-b', r1.ep)
+      const both = await v2([r1.dir, r2.dir]); assert.equal(both.ok, true, JSON.stringify(both.problems)); assert.equal(both.facts.cumulative_releases.length, 2)
+      assert.match((await v2([r1.dir])).problems.join(' | '), /chain-two\)? was applied after the R6 promotion and has no signed release evidence|differs from the state recorded/, 'the later release cannot be dropped')
+      assert.match((await v2([r2.dir])).problems.join(' | '), /release chain is broken/, 'the second release cannot stand alone: it names a previous evidence that is not there')
+      // the pinned head: dropping the last release (and rolling its data back) is caught when the owner pins the head
+      const headOf = (r) => sha256(fs.readFileSync(r.ep))
+      assert.equal((await verifyPromoted(c2, pkg, { expectedMlb: 2, releases: [r1.dir, r2.dir], keyring: pubHome, pinned: [FPR], projectRef: REF, expectHead: headOf(r2) })).ok, true)
+      assert.match((await verifyPromoted(c2, pkg, { expectedMlb: 2, releases: [r1.dir, r2.dir], keyring: pubHome, pinned: [FPR], projectRef: REF, expectHead: headOf(r1) })).problems.join(' | '), /expected head .* a release is missing or the history was rolled back/)
+      assert.match((await verifyPromoted(c2, pkg, { expectedMlb: 2, releases: [r1.dir, r2.dir], keyring: pubHome, pinned: [FPR], projectRef: null })).problems.join(' | '), /needs the project reference/)
+      assert.doesNotMatch((await verifyPromoted(c2, pkg, { expectedMlb: 2, releases: [r1.dir, r2.dir], keyring: pubHome, pinned: [FPR], projectRef: 'abc123def456ghi789jk' })).problems.join(' | '), /needs the project reference/, 'a project reference with digits is a valid reference')
+      // a release whose evidence names the wrong predecessor, or none
+      const alien = path.join(tmp, 'alien-prev'); fs.writeFileSync(alien, 'not a release evidence'); const r2b = await (async () => { const e = JSON.parse(fs.readFileSync(r2.ep, 'utf8')); e.previous_evidence_sha256 = sha256(fs.readFileSync(alien)); fs.writeFileSync(r2.ep, JSON.stringify(e, null, 1)); sign(r2.ep); return r2 })()
+      assert.match((await v2([r1.dir, r2b.dir])).problems.join(' | '), /release chain is broken/, 'a signed release naming the wrong predecessor')
+      // same-count tampering between the two releases breaks the first release's recorded state
+      await c2.query("update public.schools set name = 'Edited between releases' where slug = 'chain-a'"); assert.match((await v2([r1.dir, r2b.dir])).problems.join(' | '), /differs from the state recorded|release chain is broken/)
+    } finally { await c2.end().catch(() => {}) }
+    // releaseDirs refuses a missing or empty directory
+    assert.throws(() => releaseDirs(path.join(tmp, 'nope')), /does not exist/); const empty = path.join(tmp, 'empty-rel'); fs.mkdirSync(empty); assert.throws(() => releaseDirs(empty), /holds no release/)
+  } finally { await cu.end().catch(() => {}) }
+})
+
+test('anchorChecks: the independent artifacts must support exactly the authorized release, and nothing else may have changed between the two snapshots', () => {
+  const tbl = (rows, h = 'a') => ({ rows, sha256: h.repeat(64).slice(0, 64) })
+  const auth = { expected_after_apply: { 'public.t1': 2, 'ingest.release_audits': 1 }, allowed_refresh_changes: ['public.rm_x'] }
+  const before = { tables: { 'public.t1': tbl(10, '1'), 'ingest.release_audits': tbl(3, '2'), 'public.rm_x': tbl(5, '3'), 'public.other': tbl(7, '4') } }
+  const after = { tables: { 'public.t1': tbl(12, '5'), 'ingest.release_audits': tbl(4, '6'), 'public.rm_x': tbl(9, '7'), 'public.other': tbl(7, '4') } }
+  const report = { diffs: [{ table: 'public.t1', change: 'ROW COUNT', before: 10, after: 12 }, { table: 'ingest.release_audits', change: 'ROW COUNT', before: 3, after: 4 }], row_level_old_rows_missing_or_modified: [] }
+  const ok = anchorChecks(auth, after, before, report); assert.deepEqual(ok.problems, []); assert.deepEqual(ok.tables['public.t1'], { n_before: 10, delta: 2, n_after: 12 })
+  const bad = (mutA, mutR, re) => { const a = structuredClone(after); const r = structuredClone(report); mutA?.(a); mutR?.(r); assert.match(anchorChecks(auth, a, before, r).problems.join(' | '), re) }
+  bad((a) => { a.tables['public.t1'].rows = 13 }, null, /differ by 3 rows, the authorization allows exactly 2/)
+  bad((a) => { a.tables['public.other'] = tbl(7, '9') }, null, /public\.other: changed between the snapshots/)
+  bad((a) => { a.tables['public.other'] = tbl(8, '4') }, null, /public\.other: changed between the snapshots/)
+  bad((a) => { delete a.tables['public.other'] }, null, /public\.other: missing from the post-release snapshot/)
+  bad(null, (r) => { r.diffs[0].after = 13 }, /report shows delta 3, authorized 2/)
+  bad(null, (r) => { r.diffs.push({ table: 'public.other', change: 'ROW COUNT', before: 7, after: 8 }) }, /public\.other: the executor's report shows a row-count change that is not authorized/)
+  bad(null, (r) => { r.row_level_old_rows_missing_or_modified = [{ table: 'public.t1', pre_existing_rows_missing_or_modified: 1 }] }, /pre-existing rows missing or modified/)
+  bad(null, (r) => { delete r.row_level_old_rows_missing_or_modified }, /no row-level section/)
+  assert.match(anchorChecks({}, after, before, report).problems.join(), /no expected row deltas/)
 })
 
 test('verify-promoted follows the lifecycle the DATABASE records: PROMOTED expects empty read models, REFRESHED expects a populated and consistent one, and every unexpected change still fails', async () => {
