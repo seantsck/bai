@@ -54,7 +54,7 @@ export async function cumulativeReleases (c, pkg, dirs, { keyring, pinned, proje
     if (ev?.format !== RELEASE_EVIDENCE_FORMAT) { bad('the evidence has an unknown format (an unsigned v1 evidence file is never accepted)'); continue }
     if (ev.r6_manifest_sha256 !== pkg.sha) { bad('the evidence is for another R6 promotion'); continue }
     if (ev.previous_evidence_sha256 !== null && !HEX64.test(ev.previous_evidence_sha256 ?? '')) { bad('the evidence has no valid previous-evidence reference (null for the first release)'); continue }
-    const an = ev.anchor; if (!an || !HEX64.test(an.snapshot_manifest_sha256 ?? '') || !HEX64.test(an.before_manifest_sha256 ?? '') || !HEX64.test(an.post_apply_report_sha256 ?? '')) { bad('the evidence carries no independent anchor (snapshot, before-snapshot and post-apply report checksums)'); continue }
+    const an = ev.anchor; if (!an || !HEX64.test(an.snapshot_manifest_sha256 ?? '') || !HEX64.test(an.before_manifest_sha256 ?? '') || !HEX64.test(an.post_apply_report_sha256 ?? '') || !HEX64.test(an.post_apply_rows_sha256 ?? '')) { bad('the evidence carries no independent anchor (snapshot, before-snapshot, post-apply report and post-apply row-hash checksums)'); continue }
     if (ev.authorization_sha256 !== sha256Hex(bytes)) { bad('the evidence is not bound to this authorization (SHA-256 differs)'); continue }
     if (ev.release_key !== auth.release_key || ev.manifest_sha256 !== auth.manifest_sha256) { bad('the evidence names another release'); continue }
     const aud = await q(c, 'select id::text id, release_key, manifest_sha256, applied_at, counts from ingest.release_audits where release_key = $1 and manifest_sha256 = $2', [auth.release_key, auth.manifest_sha256])
@@ -126,7 +126,7 @@ export async function buildReleaseEvidence (c, { authorizationFile, anchorFile, 
   }
   return { format: RELEASE_EVIDENCE_FORMAT, release_key: auth.release_key, manifest_sha256: auth.manifest_sha256, audit_id: aud[0].id, authorization_sha256: authSha, r6_manifest_sha256: r6ManifestSha256,
     previous_evidence_sha256: previousEvidenceFile ? sha256Hex(fs.readFileSync(previousEvidenceFile)) : null,
-    anchor: { snapshot_manifest_sha256: anchor.snapshot_manifest_sha256, before_manifest_sha256: anchor.before_manifest_sha256, post_apply_report_sha256: anchor.post_apply_report_sha256 }, captured_at: new Date().toISOString(), tables }
+    anchor: { snapshot_manifest_sha256: anchor.snapshot_manifest_sha256, before_manifest_sha256: anchor.before_manifest_sha256, post_apply_report_sha256: anchor.post_apply_report_sha256, post_apply_rows_sha256: anchor.post_apply_rows_sha256 }, captured_at: new Date().toISOString(), tables }
 }
 export const ANCHOR_FORMAT = 'bai-draft-release-anchor/1'
 

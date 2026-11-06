@@ -391,7 +391,7 @@ test('cumulative releases: a later owner-signed, audited draft release is excuse
     const anchorFor = async (r, { before = preFp, patch = {} } = {}) => {
       const authSha = sha256(fs.readFileSync(r.af)); const af = path.join(r.dir, 'anchor.json'); const t = {}
       for (const [tb, d] of Object.entries(JSON.parse(fs.readFileSync(r.af, 'utf8')).expected_after_apply)) { const f = await fpOf(tb); t[tb] = { n_before: Number(f.n) - d, md5_before: before[tb]?.md5, delta: d, n_after: Number(f.n), md5_after: f.md5 } }
-      fs.writeFileSync(af, JSON.stringify({ format: ANCHOR_FORMAT, authorization_sha256: authSha, release_key: KEY, snapshot_manifest_sha256: hex() + hex(), before_manifest_sha256: hex() + hex(), post_apply_report_sha256: hex() + hex(), tables: t, ...patch }, null, 1)); return af
+      fs.writeFileSync(af, JSON.stringify({ format: ANCHOR_FORMAT, authorization_sha256: authSha, release_key: KEY, snapshot_manifest_sha256: hex() + hex(), before_manifest_sha256: hex() + hex(), post_apply_report_sha256: hex() + hex(), post_apply_rows_sha256: hex() + hex(), tables: t, ...patch }, null, 1)); return af
     }
     const signedEvidence = async (r, { prev = null, patch = {}, sigWith = signHome, who = FPR, sign: doSign = true } = {}) => {
       const ev = await buildReleaseEvidence(cu, { authorizationFile: r.af, anchorFile: await anchorFor(r), previousEvidenceFile: prev, r6ManifestSha256: pkg.sha })
@@ -461,7 +461,7 @@ test('cumulative releases: a later owner-signed, audited draft release is excuse
         const dir = path.join(tmp, `chain-${key}`); fs.mkdirSync(dir); const auth = { format: 'bai-draft-release-authorization/1', operation: 'apply-draft-release', project_ref: REF, release_key: key, manifest_sha256: man, selections: 1, expected_after_apply: { 'ingest.release_audits': 1, 'public.schools': 1 } }
         const af = path.join(dir, 'authorization.json'); fs.writeFileSync(af, JSON.stringify(auth, null, 1)); sign(af)
         const t = {}; for (const [tb, d] of Object.entries(auth.expected_after_apply)) { const f = await fp2(tb); t[tb] = { n_before: Number(f.n) - d, md5_before: pre[tb], delta: d, n_after: Number(f.n), md5_after: f.md5 } }
-        const anchor = path.join(dir, 'anchor.json'); fs.writeFileSync(anchor, JSON.stringify({ format: ANCHOR_FORMAT, authorization_sha256: sha256(fs.readFileSync(af)), release_key: key, snapshot_manifest_sha256: hex() + hex(), before_manifest_sha256: hex() + hex(), post_apply_report_sha256: hex() + hex(), tables: t }))
+        const anchor = path.join(dir, 'anchor.json'); fs.writeFileSync(anchor, JSON.stringify({ format: ANCHOR_FORMAT, authorization_sha256: sha256(fs.readFileSync(af)), release_key: key, snapshot_manifest_sha256: hex() + hex(), before_manifest_sha256: hex() + hex(), post_apply_report_sha256: hex() + hex(), post_apply_rows_sha256: hex() + hex(), tables: t }))
         const e = await buildReleaseEvidence(c2, { authorizationFile: af, anchorFile: anchor, previousEvidenceFile: prev, r6ManifestSha256: pkg.sha }); const ep = path.join(dir, 'evidence.json'); fs.writeFileSync(ep, JSON.stringify(e, null, 1)); sign(ep); return { dir, ep, key }
       }
       const r1 = await release('chain-one', 'chain-a', null); const r2 = await release('chain-two', 'chain-b', r1.ep)

@@ -36,6 +36,7 @@ if (fs.existsSync(out)) die(`${out} already exists`, 2)
   const expectedBefore = (t) => prevState[t] ?? (pkg.manifest.after?.[t] ?? pkg.manifest.baseline.fingerprints?.[t])?.md5
   for (const d of [after, before]) { const r = spawnSync(process.execPath, ['scripts/db/verify-snapshot.mjs', d], { cwd: root, encoding: 'utf8' }); if (r.status !== 0) die(`verify-snapshot failed for ${d}: ${(r.stdout + r.stderr).trim().split('\n').pop()}`) }
   const mAfter = JSON.parse(fs.readFileSync(path.join(after, 'manifest.json'), 'utf8')); const mBefore = JSON.parse(fs.readFileSync(path.join(before, 'manifest.json'), 'utf8'))
+  const rowsFile = reportFile.replace(/\.json$/, '.rows.json'); const rowsBytes = fs.readFileSync(rowsFile); const appliedRows = JSON.parse(rowsBytes.toString('utf8'))   // the executor's per-table row hashes taken right after the apply
   const reportBytes = fs.readFileSync(reportFile); const report = JSON.parse(reportBytes.toString('utf8'))
   const { problems, tables } = anchorChecks(auth, mAfter, mBefore, report)
   if (problems.length) { for (const p of problems) console.error(`  - ${p}`); die('the independent artifacts do not support this release; no anchor written') }
@@ -66,6 +67,9 @@ if (fs.existsSync(out)) die(`${out} already exists`, 2)
       const pre = await rowsOf(cb); const post = await rowsOf(c); const have = new Map(); for (const h of post) have.set(h, (have.get(h) ?? 0) + 1)
       let missing = 0; for (const h of pre) { const n = have.get(h) ?? 0; if (n > 0) have.set(h, n - 1); else missing++ }
       if (missing) die(`${t}: ${missing} pre-release row(s) are missing or modified in the post-release snapshot (a change between the two snapshots): no anchor written`)
+      // the rows the release ADDED: the post-release table must equal, row for row, the table as the executor saw it right after the apply (its row-level hashes), so an added row edited or swapped in between is caught
+      const applied = [...(appliedRows[t] ?? [])].sort(); const sortedPost = [...post].sort()
+      if (!appliedRows[t] || applied.length !== sortedPost.length || applied.some((h, i) => h !== sortedPost[i])) die(`${t}: the post-release snapshot differs from the table as the release executor recorded it right after the apply (an added or existing row changed in between, or the executor's row hashes are missing)`)
       if (post.length - pre.length !== tables[t].delta) die(`${t}: the post-release table gained ${post.length - pre.length} rows, the authorization allows ${tables[t].delta}`)
     }
     await cb.end()
@@ -76,6 +80,6 @@ if (fs.existsSync(out)) die(`${out} already exists`, 2)
     }
     await c.end()
   } finally { await server.stop().catch(() => {}); fs.rmSync(dataDir, { recursive: true, force: true }) }
-  const anchor = { format: ANCHOR_FORMAT, authorization_sha256: sha(authBytes), release_key: auth.release_key, snapshot_manifest_sha256: mAfter.manifest_sha256, before_manifest_sha256: mBefore.manifest_sha256, post_apply_report_sha256: sha(reportBytes), computed_on: 'a disposable database restored from the post-release snapshot', tables }
+  const anchor = { format: ANCHOR_FORMAT, authorization_sha256: sha(authBytes), release_key: auth.release_key, snapshot_manifest_sha256: mAfter.manifest_sha256, before_manifest_sha256: mBefore.manifest_sha256, post_apply_report_sha256: sha(reportBytes), post_apply_rows_sha256: sha(rowsBytes), computed_on: 'a disposable database restored from the post-release snapshot', tables }
   fs.writeFileSync(out, JSON.stringify(anchor, null, 1) + '\n', { flag: 'wx', mode: 0o600 }); console.log(JSON.stringify({ anchor: out, tables: Object.keys(tables).length, snapshot_manifest_sha256: anchor.snapshot_manifest_sha256 }))
 }
