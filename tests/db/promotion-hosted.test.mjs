@@ -389,7 +389,7 @@ test('cumulative releases: a later owner-signed, audited draft release is excuse
     /** The anchor the independent snapshot would give (in the real flow: anchor-release-evidence.mjs on a disposable restore of the post-release snapshot). Here: the fixture state right after the release. */
     const anchorFor = async (r, { before = preFp, patch = {} } = {}) => {
       const authSha = sha256(fs.readFileSync(r.af)); const af = path.join(r.dir, 'anchor.json'); const t = {}
-      for (const [tb, d] of Object.entries(JSON.parse(fs.readFileSync(r.af, 'utf8')).expected_after_apply)) { const f = await fpOf(tb); t[tb] = { n_before: Number(f.n) - d, delta: d, n_after: Number(f.n), md5_after: f.md5 } }
+      for (const [tb, d] of Object.entries(JSON.parse(fs.readFileSync(r.af, 'utf8')).expected_after_apply)) { const f = await fpOf(tb); t[tb] = { n_before: Number(f.n) - d, md5_before: before[tb]?.md5, delta: d, n_after: Number(f.n), md5_after: f.md5 } }
       fs.writeFileSync(af, JSON.stringify({ format: ANCHOR_FORMAT, authorization_sha256: authSha, release_key: KEY, snapshot_manifest_sha256: hex() + hex(), before_manifest_sha256: hex() + hex(), post_apply_report_sha256: hex() + hex(), tables: t, ...patch }, null, 1)); return af
     }
     const signedEvidence = async (r, { prev = null, patch = {}, sigWith = signHome, who = FPR, sign: doSign = true } = {}) => {
@@ -430,6 +430,7 @@ test('cumulative releases: a later owner-signed, audited draft release is excuse
     { const r = mkAuth({ selections: 3 }); await signedEvidence(r); await fails('audit counts that differ from the authorized selection count', [r.dir], /audit counts .* do not match the authorized 3/) }
     { const r = mkAuth(); const e = { ...ev, authorization_sha256: sha256(fs.readFileSync(r.af)), tables: { ...ev.tables, 'public.schools': { ...ev.tables['public.schools'], delta: 5, n_after: ev.tables['public.schools'].n_after + 3 } } }; fs.writeFileSync(r.evPath, JSON.stringify(e)); sign(r.evPath); await fails('a signed evidence delta different from the authorized one', [r.dir], /differs from the authorized 2/) }
     { const r = mkAuth(); const e = { ...ev, authorization_sha256: sha256(fs.readFileSync(r.af)), tables: { ...ev.tables, 'public.schools': { ...ev.tables['public.schools'], n_before: ev.tables['public.schools'].n_before - 1 } } }; fs.writeFileSync(r.evPath, JSON.stringify(e)); sign(r.evPath); await fails('counts that do not chain from the R6 state', [r.dir], /do not chain from the previous state/) }
+    { const r = mkAuth(); const e = { ...ev, authorization_sha256: sha256(fs.readFileSync(r.af)), tables: { ...ev.tables, 'public.schools': { ...ev.tables['public.schools'], md5_before: hex() } } }; fs.writeFileSync(r.evPath, JSON.stringify(e)); sign(r.evPath); await fails('content before the release is not the recorded previous state (a change absorbed into the anchor)', [r.dir], /table was changed between the previous state and this release/) }
     { const r = mkAuth(); const e = { ...ev, authorization_sha256: sha256(fs.readFileSync(r.af)), tables: { ...ev.tables, 'public.sources': { n_before: 1, delta: 1, n_after: 2, md5_after: 'x' } } }; fs.writeFileSync(r.evPath, JSON.stringify(e)); sign(r.evPath); await fails('evidence for a table the authorization does not list', [r.dir], /not exactly the authorized tables/) }
     // ---- stale evidence: a row edited / added / deleted after the release ----
     await cu.query("update public.schools set name = 'Edited later' where slug = 'fixture-school-a'"); await fails('a row edited after the release', [good.dir], /public\.schools differs from the state recorded/)
@@ -454,11 +455,11 @@ test('cumulative releases: a later owner-signed, audited draft release is excuse
       const v2 = (releases) => verifyPromoted(c2, pkg, { expectedMlb: 2, releases, keyring: pubHome, pinned: [FPR], projectRef: REF })
       const fp2 = async (t) => (await rows(c2, 'select ingest.promotion_fingerprint($1) f', [t]))[0].f
       const release = async (key, slug, prev) => {
-        const man = hex() + hex(); await c2.query("insert into public.schools (slug, name, school_type) values ($1, $2, 'COLLEGE')", [slug, `School ${slug}`])
+        const man = hex() + hex(); const pre = { 'ingest.release_audits': (await fp2('ingest.release_audits')).md5, 'public.schools': (await fp2('public.schools')).md5 }; await c2.query("insert into public.schools (slug, name, school_type) values ($1, $2, 'COLLEGE')", [slug, `School ${slug}`])
         await c2.query("insert into ingest.release_audits (release_key, manifest_sha256, draft_year, operator, counts, entries) values ($1, $2, 2099, 'Fixture Operator', $3, '[]')", [key, man, { held: 0, skipped: 0, imported: 1, selections: 1, held_in_manifest: 0 }])
         const dir = path.join(tmp, `chain-${key}`); fs.mkdirSync(dir); const auth = { format: 'bai-draft-release-authorization/1', operation: 'apply-draft-release', project_ref: REF, release_key: key, manifest_sha256: man, selections: 1, expected_after_apply: { 'ingest.release_audits': 1, 'public.schools': 1 } }
         const af = path.join(dir, 'authorization.json'); fs.writeFileSync(af, JSON.stringify(auth, null, 1)); sign(af)
-        const t = {}; for (const [tb, d] of Object.entries(auth.expected_after_apply)) { const f = await fp2(tb); t[tb] = { n_before: Number(f.n) - d, delta: d, n_after: Number(f.n), md5_after: f.md5 } }
+        const t = {}; for (const [tb, d] of Object.entries(auth.expected_after_apply)) { const f = await fp2(tb); t[tb] = { n_before: Number(f.n) - d, md5_before: pre[tb], delta: d, n_after: Number(f.n), md5_after: f.md5 } }
         const anchor = path.join(dir, 'anchor.json'); fs.writeFileSync(anchor, JSON.stringify({ format: ANCHOR_FORMAT, authorization_sha256: sha256(fs.readFileSync(af)), release_key: key, snapshot_manifest_sha256: hex() + hex(), before_manifest_sha256: hex() + hex(), post_apply_report_sha256: hex() + hex(), tables: t }))
         const e = await buildReleaseEvidence(c2, { authorizationFile: af, anchorFile: anchor, previousEvidenceFile: prev, r6ManifestSha256: pkg.sha }); const ep = path.join(dir, 'evidence.json'); fs.writeFileSync(ep, JSON.stringify(e, null, 1)); sign(ep); return { dir, ep, key }
       }
@@ -466,6 +467,11 @@ test('cumulative releases: a later owner-signed, audited draft release is excuse
       const both = await v2([r1.dir, r2.dir]); assert.equal(both.ok, true, JSON.stringify(both.problems)); assert.equal(both.facts.cumulative_releases.length, 2)
       assert.match((await v2([r1.dir])).problems.join(' | '), /chain-two\)? was applied after the R6 promotion and has no signed release evidence|differs from the state recorded/, 'the later release cannot be dropped')
       assert.match((await v2([r2.dir])).problems.join(' | '), /release chain is broken/, 'the second release cannot stand alone: it names a previous evidence that is not there')
+      // the pinned head: dropping the last release (and rolling its data back) is caught when the owner pins the head
+      const headOf = (r) => sha256(fs.readFileSync(r.ep))
+      assert.equal((await verifyPromoted(c2, pkg, { expectedMlb: 2, releases: [r1.dir, r2.dir], keyring: pubHome, pinned: [FPR], projectRef: REF, expectHead: headOf(r2) })).ok, true)
+      assert.match((await verifyPromoted(c2, pkg, { expectedMlb: 2, releases: [r1.dir, r2.dir], keyring: pubHome, pinned: [FPR], projectRef: REF, expectHead: headOf(r1) })).problems.join(' | '), /expected head .* a release is missing or the history was rolled back/)
+      assert.match((await verifyPromoted(c2, pkg, { expectedMlb: 2, releases: [r1.dir, r2.dir], keyring: pubHome, pinned: [FPR], projectRef: null })).problems.join(' | '), /needs the project reference/)
       // a release whose evidence names the wrong predecessor, or none
       const alien = path.join(tmp, 'alien-prev'); fs.writeFileSync(alien, 'not a release evidence'); const r2b = await (async () => { const e = JSON.parse(fs.readFileSync(r2.ep, 'utf8')); e.previous_evidence_sha256 = sha256(fs.readFileSync(alien)); fs.writeFileSync(r2.ep, JSON.stringify(e, null, 1)); sign(r2.ep); return r2 })()
       assert.match((await v2([r1.dir, r2b.dir])).problems.join(' | '), /release chain is broken/, 'a signed release naming the wrong predecessor')

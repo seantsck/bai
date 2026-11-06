@@ -34,9 +34,11 @@ export function releaseDirs (root) {
  * @param pkg  the loaded R6 promotion package (its manifest holds the R6 table counts)
  * @returns { problems, accepted: { table -> true }, facts: [...] }; a table is in `accepted` only when every check passed and its current fingerprint equals the recorded one
  */
-export async function cumulativeReleases (c, pkg, dirs, { keyring, pinned, projectRef }) {
+export async function cumulativeReleases (c, pkg, dirs, { keyring, pinned, projectRef, expectHead = null }) {
   const problems = []; const accepted = {}; const facts = []
-  const r6n = (t) => (pkg.manifest.after?.[t] ?? pkg.manifest.baseline.fingerprints?.[t])?.n
+  const r6fp = (t) => pkg.manifest.after?.[t] ?? pkg.manifest.baseline.fingerprints?.[t]
+  const r6n = (t) => r6fp(t)?.n
+  if (typeof projectRef !== 'string' || !/^[a-z]{20}$/.test(projectRef)) problems.push('cumulative verification needs the project reference')
   const promoted = (await q(c, "select max(at) at from ingest.promotion_events where manifest_sha256 = $1 and event = 'PROMOTED'", [pkg.sha]))[0]?.at
   const loaded = []
   for (const dir of dirs) {
@@ -79,7 +81,9 @@ export async function cumulativeReleases (c, pkg, dirs, { keyring, pinned, proje
     for (const [t, d] of Object.entries(r.exp)) {
       const rec = r.tabs[t]; const before = state[t]?.n ?? r6n(t)
       if (!Number.isInteger(before)) { bad(`${t} has no known R6 state to start from`); ok = false; continue }
-      if (!rec || !Number.isInteger(rec.n_before) || !Number.isInteger(rec.delta) || !Number.isInteger(rec.n_after) || typeof rec.md5_after !== 'string') { bad(`${t}: the evidence record is incomplete`); ok = false; continue }
+      if (!rec || !Number.isInteger(rec.n_before) || !Number.isInteger(rec.delta) || !Number.isInteger(rec.n_after) || typeof rec.md5_after !== 'string' || typeof rec.md5_before !== 'string') { bad(`${t}: the evidence record is incomplete`); ok = false; continue }
+      const beforeMd5 = state[t]?.md5 ?? r6fp(t)?.md5
+      if (rec.md5_before !== beforeMd5) { bad(`${t}: the content before the release (${rec.md5_before}) is not the previously recorded state (${beforeMd5}): the table was changed between the previous state and this release`); ok = false; continue }
       if (rec.delta !== d) { bad(`${t}: the evidence delta ${rec.delta} differs from the authorized ${d}`); ok = false; continue }
       if (rec.n_before !== before || rec.n_before + rec.delta !== rec.n_after) { bad(`${t}: counts do not chain from the previous state (${before}) by the authorized delta ${d}`); ok = false; continue }
       touched.push([t, rec])
@@ -89,6 +93,7 @@ export async function cumulativeReleases (c, pkg, dirs, { keyring, pinned, proje
     prevSha = r.evSha
     facts.push({ release_key: r.auth.release_key, audit_id: r.audit.id, selections: r.auth.selections, tables: touched.map(([t]) => t) })
   }
+  if (expectHead !== undefined && expectHead !== null) { if (!HEX64.test(expectHead)) problems.push('--expect-head must be a SHA-256'); else if (prevSha !== expectHead) problems.push(`the last verified release evidence is ${prevSha ?? 'none'}, the expected head is ${expectHead}: a release is missing or the history was rolled back`) }
   for (const [t, s] of Object.entries(state)) {   // the CURRENT state must be exactly the last recorded one
     const f = (await q(c, 'select ingest.promotion_fingerprint($1) f', [t]))[0].f
     if (Number(f.n) === s.n && f.md5 === s.md5) accepted[t] = true
@@ -114,10 +119,10 @@ export async function buildReleaseEvidence (c, { authorizationFile, anchorFile, 
   const tables = {}
   for (const [t, d] of Object.entries(auth.expected_after_apply)) {
     if (!TABLE.test(t)) throw new Error(`bad table name ${t}`)
-    const a = anchor.tables[t]; if (!a || a.delta !== d || a.n_before + a.delta !== a.n_after) throw new Error(`${t}: the anchor does not carry the authorized delta ${d}`)
+    const a = anchor.tables[t]; if (!a || a.delta !== d || a.n_before + a.delta !== a.n_after || typeof a.md5_before !== 'string') throw new Error(`${t}: the anchor does not carry the authorized delta ${d}`)
     const f = (await q(c, 'select ingest.promotion_fingerprint($1) f', [t]))[0].f
     if (Number(f.n) !== a.n_after || f.md5 !== a.md5_after) throw new Error(`${t}: the database no longer matches the independently anchored release state (now ${f.n} rows); the evidence is not written`)
-    tables[t] = { n_before: a.n_before, delta: d, n_after: a.n_after, md5_after: a.md5_after }
+    tables[t] = { n_before: a.n_before, md5_before: a.md5_before, delta: d, n_after: a.n_after, md5_after: a.md5_after }
   }
   return { format: RELEASE_EVIDENCE_FORMAT, release_key: auth.release_key, manifest_sha256: auth.manifest_sha256, audit_id: aud[0].id, authorization_sha256: authSha, r6_manifest_sha256: r6ManifestSha256,
     previous_evidence_sha256: previousEvidenceFile ? sha256Hex(fs.readFileSync(previousEvidenceFile)) : null,

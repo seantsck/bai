@@ -346,7 +346,7 @@ export async function promoteHosted (ctx, { pkgDir, authFile, evidenceFile, pari
 }
 
 /** After a committed promotion, read-only: the state, the ledger counts, the baseline outside the delta unchanged, MLB trades, the read models in the lifecycle the database itself records (readModelFacts; expectLifecycle can only add a requirement), the grant unchanged, the REST-visible delta. */
-export async function verifyPromoted (c, pkg, { expectedMlb = EXPECTED_MLB_TRANSACTIONS, before = null, expectLifecycle = null, releases = null, keyring = null, pinned = undefined, projectRef = null } = {}) {
+export async function verifyPromoted (c, pkg, { expectedMlb = EXPECTED_MLB_TRANSACTIONS, before = null, expectLifecycle = null, releases = null, keyring = null, pinned = undefined, projectRef = null, expectHead = null } = {}) {
   const problems = []; const facts = {}
   await c.query('begin isolation level repeatable read read only')
   try {
@@ -362,7 +362,7 @@ export async function verifyPromoted (c, pkg, { expectedMlb = EXPECTED_MLB_TRANS
       if (canon(f) !== canon(want)) bad.push(t)
     }
     if (releases?.length) {   // later owner-authorized, audited draft releases: a difference is excused only through all four checks of promotion-cumulative.mjs
-      const cum = await cumulativeReleases(c, pkg, releases, { keyring, pinned, projectRef }); problems.push(...cum.problems); facts.cumulative_releases = cum.facts
+      const cum = await cumulativeReleases(c, pkg, releases, { keyring, pinned, projectRef, expectHead }); problems.push(...cum.problems); facts.cumulative_releases = cum.facts
       facts.tables_excused_by_releases = bad.filter((t) => cum.accepted[t]); for (let i = bad.length - 1; i >= 0; i--) if (cum.accepted[bad[i]]) bad.splice(i, 1)
     }
     facts.tables_compared = scope.length; facts.tables_differing = bad; if (bad.length) problems.push(`tables differ from the release state: ${bad.slice(0, 5).join(', ')}`)
@@ -435,11 +435,11 @@ export async function statusHosted (ctx, manifest) {
 }
 
 /** Read-only: the post-promotion checks, runnable at any time (for example after an ambiguous result). Needs no authorization. */
-export async function verifyPromotedHosted (ctx, pkgDir, { releaseEvidenceDir = null } = {}) {
+export async function verifyPromotedHosted (ctx, pkgDir, { releaseEvidenceDir = null, expectHead = null } = {}) {
   const pv = verifyPackage(pkgDir); if (pv.length) refuse(`package: ${pv.join('; ')}`)
   const releases = releaseEvidenceDir ? releaseDirs(releaseEvidenceDir) : null
   const pkg = loadPackage(pkgDir); const session = await ctx.connect(); const c = await openSession(session.client)
-  try { return await verifyPromoted(c, pkg, { expectedMlb: ctx.expectedMlb ?? EXPECTED_MLB_TRANSACTIONS, releases, keyring: ctx.keyring, pinned: ctx.pinned, projectRef: ctx.projectRef }) } finally { await session.client.end().catch(() => {}) }
+  try { return await verifyPromoted(c, pkg, { expectedMlb: ctx.expectedMlb ?? EXPECTED_MLB_TRANSACTIONS, releases, keyring: ctx.keyring, pinned: ctx.pinned, projectRef: ctx.projectRef, expectHead }) } finally { await session.client.end().catch(() => {}) }
 }
 
 /** Read-only: the UNSIGNED evidence record for one authorized, audited draft release, built from an independent anchor and CHECKED against the current database (never regenerated from it). The owner signs the exact bytes. */
