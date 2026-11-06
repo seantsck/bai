@@ -25,8 +25,11 @@ export function partialYear (year: number, represented: number): PartialYear | n
   return { year, documented, represented, absent: documented - represented }
 }
 
+/** The one sentence every partial draft year carries wherever it is shown: BAI's rows are a reconstruction from sources, never a count of the whole draft. */
+export const PARTIAL_RECONSTRUCTION_STATEMENT = 'Partial reconstruction — not a complete draft census.'
+
 export function partialYearText (p: PartialYear): string {
-  return `${p.year}: ${p.represented} of ${p.documented} documented selections are represented; ${p.absent} are absent.`
+  return `${p.year}: ${PARTIAL_RECONSTRUCTION_STATEMENT} ${p.represented} of the ${p.documented} selections stated by BAI’s source are represented; ${p.absent} are absent. The ${p.documented} is the source’s stated total, not an independently verified census.`
 }
 
 export const PARTIAL_YEAR_DETAIL = 'An absent selection is not an unsigned player or a failed outcome, and no signing outcome may be inferred from a missing row. No league-wide or club-efficiency rates are published from this incomplete sample.'
@@ -77,6 +80,12 @@ export const EDITORIAL_NOTE_2021 = editorialNoteFor(2021)
 export function editorialNote (years: Array<number | string | null | undefined>): string | null {
   const shown = [...new Set(years.map(Number).filter((y) => Object.hasOwn(EDITORIAL_YEARS, y)))].sort()
   return shown.length ? shown.map(editorialNoteFor).join(' ') : null
+}
+
+/** The notice for pages that list picks: the partial-reconstruction statement followed by the later-round note, for every declared year shown. Null when none is shown. */
+export function partialBanner (years: Array<number | string | null | undefined>): string | null {
+  const note = editorialNote(years)
+  return note ? `${PARTIAL_RECONSTRUCTION_STATEMENT} ${note}` : null
 }
 
 /** Declared years inside an explorer year range (open ends allowed), so the note shows when a search can include them. */

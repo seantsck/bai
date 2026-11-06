@@ -2,14 +2,14 @@ import Link from 'next/link'
 import { PageHeader, DataTable, Notice, load, Unavailable } from '../../../components/ui.tsx'
 import { getDraftPicks, LIST_LIMIT } from '../../../lib/queries.ts'
 import { formatUsd, label, SIGNING_STATUS_LABELS } from '../../../lib/format.ts'
-import { editorialNote, ABSENCE_STATEMENT } from '../../../lib/partial-years.ts'
+import { partialBanner, ABSENCE_STATEMENT } from '../../../lib/partial-years.ts'
 
 export const dynamic = 'force-dynamic'
 export const metadata = { title: 'Draft picks' }
 
 export default async function PicksPage () {
   const res = await load(getDraftPicks)
-  const note = res.ok ? editorialNote(res.data.map((r) => r.draft_year)) : null
+  const note = res.ok ? partialBanner(res.data.map((r) => r.draft_year)) : null
   return (
     <>
       <PageHeader title='Draft picks' lede={`Most recent ${LIST_LIMIT} tracked selections.`} />

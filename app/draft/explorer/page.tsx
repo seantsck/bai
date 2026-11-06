@@ -3,7 +3,7 @@ import { PageHeader, SubNav, DataTable, Notice, load, Unavailable } from '../../
 import { getDraftExplorer, getOrganizationKeys, getSelectionAttribution, getDraftYearCoverage } from '../../../lib/queries.ts'
 import { formatUsd, label, KIND_LABELS, SIGNING_STATUS_LABELS, SOURCE_GROUP_SHORT } from '../../../lib/format.ts'
 import { DRAFT_NAV } from '../../../lib/nav.ts'
-import { editorialNote, editorialYearsBetween, editorialYearsToShow, ABSENCE_STATEMENT } from '../../../lib/partial-years.ts'
+import { partialBanner, editorialYearsBetween, editorialYearsToShow, ABSENCE_STATEMENT } from '../../../lib/partial-years.ts'
 import { parseExplorerParams, explorerHref, PAGE_SIZE, DRAFT_KINDS } from '../../../lib/search.ts'
 
 export const dynamic = 'force-dynamic'
@@ -33,7 +33,7 @@ export default async function ExplorerPage ({ searchParams }: { searchParams: Pr
   const coverage = await load(getDraftYearCoverage)
   const importedYears = coverage.ok ? coverage.data.filter((r) => Number(r.imported_selections) > 0).map((r) => Number(r.draft_year)) : []
   const searchedYears = f.year ? [f.year] : (f.from || f.to) ? editorialYearsBetween(f.from, f.to) : []
-  const note = editorialNote(editorialYearsToShow(rows.map((r) => r.draft_year), searchedYears, importedYears))
+  const note = partialBanner(editorialYearsToShow(rows.map((r) => r.draft_year), searchedYears, importedYears))
   return (
     <>
       <PageHeader title='Historical draft explorer'
